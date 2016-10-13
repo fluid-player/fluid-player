@@ -12,6 +12,10 @@ Fluid Player is a new HTML5 video player. Its main purpose is to serve VAST ads.
 * Compatible with modern web browsers.
 * Ability to have more than 1 player per page.
 
+![Fluid Player - VAST Ad](examples/ScreenshotFluidPlayerVastAd.jpg)
+
+![Fluid Player](examples/ScreenshotFluidPlayerMain.jpg)
+
 ## What is VAST
 
 The IAB Digital Video Ad Serving Template (VAST) specification is a universal XML schema for serving ads to digital video players, and describes expected video player behavior when executing VAST-formatted ad responses.
