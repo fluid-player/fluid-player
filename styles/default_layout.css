@@ -1,0 +1,369 @@
+.fluid_controls_container {
+    color: white;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    height: 24px;
+    z-index: 1;
+    visibility: hidden;
+    opacity: 0;
+    -webkit-transition: visibility 0.5s, opacity 0.5s; /* Safari */
+    transition: visibility 0.5s, opacity 0.5s;
+}
+
+.fluid_video_wrapper:hover .fluid_controls_container {
+    visibility: visible;
+    opacity: 1;
+}
+
+.fluid_video_wrapper.pseudo_fullscreen {
+    width: 100% !important;
+    height: 100% !important;
+    top: 0;
+    left: 0;
+    position: fixed;
+    z-index: 99999;
+}
+
+.fluid_video_wrapper:-webkit-full-screen {
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.fluid_video_wrapper:-ms-fullscreen {
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute;
+}
+
+.fluid_video_wrapper .vast_video_loading {
+    position: absolute;
+    display: table;
+    text-align: center;
+    content: '';
+    background: rgba(0,0,0, 0.5); /*partially transparent image*/
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: auto;
+    z-index: 10;
+}
+
+.fluid_video_wrapper .vast_video_loading i {
+    font-size: 48px;
+    color: #b0b0b0;
+    display: table-cell;
+    vertical-align: middle;
+    cursor: default;
+    -webkit-animation: pulsate 1s ease-out;
+    -webkit-animation-iteration-count: infinite;
+    -moz-animation: pulsate 1s ease-out;
+    -moz-animation-iteration-count: infinite;
+    animation: pulsate 1s ease-out;
+    animation-iteration-count: infinite;
+    opacity: 1;
+    background-color: transparent;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+@-webkit-keyframes pulsate {
+    0% {opacity: 0.0;}
+    50% {opacity: 1.0;}
+    100% {opacity: 0.0;}
+}
+
+@-moz-keyframes pulsate {
+    0% {opacity: 0.0;}
+    50% {opacity: 1.0;}
+    100% {opacity: 0.0;}
+}
+
+@keyframes pulsate {
+    0% {opacity: 0.0;}
+    50% {opacity: 1.0;}
+    100% {opacity: 0.0;}
+}
+
+.fluid_video_wrapper .fluid_context_menu {
+    background-color: rgba(0, 0, 0, 0.7);
+    border: 2px solid #000000;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-family: Verdana, Arial;
+    padding: 0 5px;
+    white-space: nowrap;
+    text-align: start;
+    z-index: 11;
+}
+
+/* IE 10+ */
+_:-ms-lang(x),
+.fluid_video_wrapper .fluid_context_menu {
+    text-align: left;
+}
+
+.fluid_video_wrapper .fluid_context_menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.fluid_video_wrapper .fluid_context_menu ul li {
+    padding: 0 4px;
+    cursor: pointer;
+}
+
+.fluid_video_wrapper .fluid_context_menu ul li:hover {
+    border-radius: 2px;
+    background-color: #404040;
+}
+
+.fluid_controls_container .fluid_controls_left {
+    float: left;
+    width: 24px;
+}
+
+.fluid_controls_container i {
+    width: 24px;
+    overflow: hidden; /*IE 9*/
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.fluid_controls_container .fluid_controls_right {
+    float: right;
+    width: 150px;
+}
+
+.fluid_controls_container .fluid_controls_left,
+.fluid_controls_container .fluid_controls_right {
+    height: 24px;
+}
+
+.fluid_controls_container .fluid_controls_progress_container {
+    height: 24px;
+    position: absolute;
+    left: 35px;
+    right: 160px;
+    z-index: 2;
+}
+
+.fluid_controls_container .fluid_controls_progress_container .fluid_controls_progress {
+    position: absolute;
+    top: 10px;
+    width: 100%;
+    height: 4px;
+    background-color: #606060;
+    border-radius: 2px;
+    z-index: 3;
+}
+
+.fluid_controls_container .fluid_controls_progress_container .fluid_controls_progress .fluid_controls_currentprogress {
+    top: 0px;
+    left: 0px;
+    z-index: 4;
+    width: 0px;
+}
+
+.fluid_controls_container .fluid_controls_progress_container .fluid_controls_progress,
+.fluid_controls_container .fluid_controls_progress_container .fluid_controls_progress .fluid_controls_currentprogress {
+    position: absolute;
+    height: 4px;
+    border-radius: 2px;
+}
+
+.fluid_controls_container .fluid_controls_progress_container .fluid_timeline_preview_container {
+    bottom: 24px;
+    border: 2px solid #000000;
+}
+
+.fluid_controls_container .fluid_controls_progress_container.fluid_slider .fluid_controls_progress .fluid_controls_currentprogress,
+.fluid_controls_container .fluid_controls_progress_container.fluid_slider .fluid_controls_progress .fluid_controls_currentprogress .fluid_controls_currentpos {
+    background-color: #FF0000;
+}
+
+.fluid_controls_container .fluid_controls_progress_container.fluid_ad_slider .fluid_controls_progress .fluid_controls_currentprogress {
+    background-color: #FFFF00;
+}
+
+.fluid_controls_container .fluid_controls_progress_container.fluid_slider .fluid_controls_progress .fluid_controls_currentprogress .fluid_controls_currentpos,
+.fluid_controls_container .fluid_controls_progress_container.fluid_ad_slider .fluid_controls_progress .fluid_controls_currentprogress .fluid_controls_currentpos {
+    opacity: 0;
+}
+
+.fluid_controls_container .fluid_controls_progress_container.fluid_slider:hover .fluid_controls_progress .fluid_controls_currentprogress .fluid_controls_currentpos {
+    opacity: 1;
+}
+
+.fluid_controls_container .fluid_controls_progress_container.fluid_slider .fluid_controls_progress .fluid_controls_currentprogress .fluid_controls_currentpos {
+    -webkit-transition: opacity 0.3s; /* Safari */
+    transition: opacity 0.3s;
+}
+
+.fluid_controls_container .fluid_controls_right .fluid_control_volume_container {
+    position: relative;
+    height: 24px;
+    width: 80px;
+    margin: 0 5px;
+    z-index: 2;
+}
+
+.fluid_controls_container .fluid_controls_right .fluid_control_volume_container .fluid_control_volume {
+    position: relative;
+    height: 4px;
+    width: 100%;
+    margin-top: 10px;
+    border-radius: 2px;
+    background-color: #FFFFFF;
+    z-index: 3;
+}
+
+.fluid_controls_container .fluid_controls_right .fluid_control_volume_container .fluid_control_volume .fluid_control_volume_currentpos {
+    background-color: #FFFFFF;
+}
+
+.fluid_controls_container .fluid_controls_progress_container .fluid_controls_progress .fluid_controls_currentpos {
+    right: -4px;
+    z-index: 5;
+}
+
+.fluid_controls_container .fluid_controls_right .fluid_control_volume_container .fluid_control_volume .fluid_control_volume_currentpos,
+.fluid_controls_container .fluid_controls_progress_container .fluid_controls_progress .fluid_controls_currentpos {
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    top: -3px;
+    border-radius: 5px;
+}
+
+.fluid_controls_container.no_volume_controls .fluid_controls_right {
+    width: 24px;
+}
+
+.fluid_controls_container.no_volume_controls .fluid_controls_right .fluid_control_volume_container,
+.fluid_controls_container.no_volume_controls .fluid_controls_right .fluid_control_mute {
+    display: none;
+}
+
+.fluid_controls_container.no_volume_controls .fluid_controls_progress_container {
+    right: 35px;
+}
+
+.fluid_controls_container .fluid_button {
+    border-radius: 2px;
+}
+
+.fluid_controls_container .fluid_button:not(.fluid_button_disabled):hover {
+    background-color: #404040;
+}
+
+.fluid_controls_container .fluid_button_disabled:hover {
+    cursor: default;
+}
+
+.fluid_controls_container .fluid_button,
+.fluid_controls_container .fluid_slider {
+    cursor: pointer;
+}
+
+.fluid_controls_container div i,
+.fluid_controls_container div div {
+    display: block;
+}
+
+.fluid_controls_container .fluid_controls_left i,
+.fluid_controls_container .fluid_controls_left div {
+    float: left;
+}
+
+.fluid_controls_container .fluid_controls_right i,
+.fluid_controls_container .fluid_controls_right div {
+    float: right;
+}
+
+.fluid_controls_container .fluid_button_disabled {
+    color: #808080;
+    cursor: auto;
+}
+
+/*Mobile Layout*/
+.fluid_video_wrapper.mobile .fluid_controls_container {
+    height: 48px;
+}
+
+.fluid_video_wrapper.mobile .fluid_controls_container .fluid_controls_left,
+.fluid_video_wrapper.mobile .fluid_controls_container .fluid_controls_right {
+    height: 48px;
+}
+
+.fluid_video_wrapper.mobile .fluid_controls_container .fluid_controls_left {
+    width: 48px;
+}
+
+.fluid_video_wrapper.mobile .fluid_controls_container i {
+    width: 48px;
+    font-size: 48px;
+}
+
+.fluid_video_wrapper.mobile .fluid_controls_container .fluid_controls_progress_container {
+    height: 48px;
+    left: 70px;
+    right: 208px;
+}
+
+.fluid_video_wrapper.mobile .fluid_controls_container.no_volume_controls .fluid_controls_progress_container {
+    right: 70px;
+}
+
+.fluid_video_wrapper.mobile .fluid_controls_container.no_volume_controls .fluid_controls_right {
+    width: 48px;
+}
+
+.fluid_video_wrapper.mobile .fluid_controls_container .fluid_controls_progress_container .fluid_controls_progress,
+.fluid_video_wrapper.mobile .fluid_controls_container .fluid_controls_progress_container .fluid_controls_progress .fluid_controls_currentprogress {
+    border-radius: 4px;
+    height: 8px;
+}
+
+.fluid_video_wrapper.mobile .fluid_controls_container .fluid_controls_progress_container .fluid_controls_progress {
+    border-radius: 4px;
+    height: 8px;
+    top: 20px;
+}
+
+.fluid_video_wrapper.mobile .fluid_controls_container .fluid_controls_right .fluid_control_volume_container .fluid_control_volume .fluid_control_volume_currentpos,
+.fluid_video_wrapper.mobile .fluid_controls_container .fluid_controls_progress_container .fluid_controls_progress .fluid_controls_currentpos {
+    border-radius: 10px;
+    height: 20px;
+    top: -6px;
+    width: 20px;
+}
+
+.fluid_video_wrapper.mobile .fluid_controls_container .fluid_controls_right {
+    width: 198px;
+}
+
+.fluid_video_wrapper.mobile .fluid_controls_container .fluid_controls_right .fluid_control_volume_container {
+    height: 48px;
+    margin: 0 10px;
+}
+
+.fluid_video_wrapper.mobile .fluid_controls_container .fluid_controls_right .fluid_control_volume_container .fluid_control_volume {
+    border-radius: 4px;
+    height: 8px;
+    margin-top: 20px;
+}
+
+
+

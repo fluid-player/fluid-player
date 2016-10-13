@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+<head>
+    <title>Fluid Player</title>
+	<link rel="stylesheet" href="demo.css" type="text/css"/>
+	<link rel="stylesheet" href="../vast.css" type="text/css"/>
+    <script src="../vast.js"></script>
+	
+</head>
+<body>
+	<header>
+		<div class="header_main">
+			<div class="wrap clearfix">
+				<a href="/" class="top_logo">Fluid Player Homepage</a>
+			</div>
+		</div>
+	</header>
+	
+	<div class="main">
+		<div class="container_wrap clearfix">
+			<h1>Fluid Player - Example 1</h1>
+			
+			<div class="demo_container clearfix">
+				<div class="demo_container_left">
+					<video id='test-video' controls style="width: 640px; height: 360px;">
+						<source src='vid.mp4' type='video/mp4' />		
+					</video>
+				</div>
+				<div class="demo_container_right">
+					<ul>
+						<li>Supports VAST (Video Ad Serving Template).</li>
+						<li>Comes with its own design, which is easily customizable.</li>
+						<li>Timeline Preview.</li>
+						<li>Lightweight.</li>
+						<li>Compatible with modern web browsers.</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+        
+        <div class="container_wrap clearfix">
+            <h1>Fluid Player - Example 2</h1>
+            
+			<div class="demo_container clearfix">
+				<div class="demo_container_left">
+					<video id='test-video-2' controls style="width: 640px; height: 360px;">
+						<source src='vid.mp4' type='video/mp4' />		
+					</video>
+				</div>
+				<div class="demo_container_right">
+					<ul>
+						<li>Ability to have more than 1 player per page.</li>
+						<li>Ability to use the default video layout for the current browser.</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		var testVideo = fluidPlayer(
+            'test-video',
+            'vast.xml',
+            {
+                timelinePreview: {
+                    file: 'thumbnails.vtt',
+                    type: 'VTT'
+                },
+                vastLoadedCallback: function() {console.log('vast loaded')},
+                noVastVideoCallback: function() {console.log('no vast')},
+                vastVideoSkippedCallback: function() {console.log('vast skipped')},
+                vastVideoEndedCallback: function() {console.log('vast ended')}
+            }
+        );
+
+        var testVideo2 = fluidPlayer(
+            'test-video-2',
+            'vast.xml',
+            {layout: 'browser'}
+        );
+	</script>
+</body>
+</html>
