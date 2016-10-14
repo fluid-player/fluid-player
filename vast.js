@@ -1094,7 +1094,12 @@ var fluidPlayerClass = {
     playPauseToggle: function(videoPlayerTag) {
         var player = fluidPlayerClass.getInstanceById(videoPlayerTag.id);
 
-        if (player.initialStart) {
+        if (player.initialStart || (!player.vastOptions.vastTagUrl)) {
+            if (!player.vastOptions.vastTagUrl) {
+                player.initialStart = true;
+                player.displayOptions.noVastVideoCallback();
+            }
+
             if (player.displayOptions.layout !== 'browser') { //The original player play/pause toggling is managed by the browser
                 if (videoPlayerTag.paused) {
                     videoPlayerTag.play();
