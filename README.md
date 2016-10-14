@@ -4,7 +4,9 @@
 
 ## Overview
 
-Fluid Player is a new free HTML5 video player. It is lightweight, easy to integrate and has advanced VAST[\*](#what-is-vast) capabilities. Here is a list of its main features:
+Fluid Player is a new free HTML5 video player. It is lightweight, easy to integrate and has advanced VAST[\*](#what-is-vast) capabilities.
+
+## Features
 * Supports the VAST standard.
 * Comes with its own design, which is easily customizable. Ability to use the browser default layout.
 * Timeline Preview.
