@@ -34,11 +34,11 @@ In order to set Fluid Player, three things are required:
 </video>
 
 <script type="text/javascript">
-	var testVideo = fluidPlayer('my-video', 'http://example.com/vast.xml');
+	var testVideo = fluidPlayer('my-video');
 </script>
 ```
 
-The `fluidVideo()` function gets the video tag id as a first parameter, which is the only required one. The second parameter is the URL of the VAST Tag, which returns an XML describing the VAST ad to be displayed.
+The `fluidVideo()` function gets the video tag id as a first parameter, which is the only required one.
 
 ### Integration Using Optional Parameters
 
