@@ -4,7 +4,7 @@
 
 ## Overview
 
-Fluid Player is a new HTML5 video player. Its main purpose is to serve VAST ads. Here is a list of its main features:
+Fluid Player is a new free HTML5 video player. It is lightweight, easy to integrate and has advanced VAST[\*](#what-is-vast) capabilities. Here is a list of its main features:
 * Supports the VAST standard.
 * Comes with its own design, which is easily customizable. Ability to use the browser default layout.
 * Timeline Preview.
@@ -15,14 +15,6 @@ Fluid Player is a new HTML5 video player. Its main purpose is to serve VAST ads.
 ![Fluid Player - VAST Ad](examples/ScreenshotFluidPlayerVastAd.jpg)
 
 ![Fluid Player](examples/ScreenshotFluidPlayerMain.jpg)
-
-## What is VAST
-
-The IAB Digital Video Ad Serving Template (VAST) specification is a universal XML schema for serving ads to digital video players, and describes expected video player behavior when executing VAST-formatted ad responses.
-
-In short, VAST makes it possible for an ad provider to serve ads to various video players using a universal way of communication which all these players understand.
-
-A thorough description of the overall idea behind VAST, as well as the full VAST specification, can be found here: [VAST 4.0](https://www.iab.com/guidelines/digital-video-ad-serving-template-vast-4-0/).
 
 ## Integration Guide
 
@@ -103,6 +95,14 @@ Here is a description of the parameters which can be used when setting Fluid Pla
 
 When Fluid Player is set to use its `default` layout, it automatically loads the [styles/default_layout.css](styles/default_layout.css) CSS file. It also loads the [Material Icons font](https://design.google.com/icons/), used to display the symbols of the buttons.
 The easiest way to change the layout is to edit the [styles/default_layout.css](styles/default_layout.css) CSS file of the local copy of Fluid Player.
+
+## <a name="what-is-vast"></a>What is VAST
+
+The IAB Digital Video Ad Serving Template (VAST) specification is a universal XML schema for serving ads to digital video players, and describes expected video player behavior when executing VAST-formatted ad responses.
+
+In short, VAST makes it possible for an ad provider to serve ads to various video players using a universal way of communication which all these players understand.
+
+A thorough description of the overall idea behind VAST, as well as the full VAST specification, can be found here: [VAST 4.0](https://www.iab.com/guidelines/digital-video-ad-serving-template-vast-4-0/).
 
 ## License
 
