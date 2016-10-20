@@ -294,7 +294,8 @@ var fluidPlayerClass = {
         if (
             (typeof errorTags !== 'undefined') &&
             (errorTags !== null) &&
-            (errorTags.length === 1) //Only 1 Error tag is expected
+            (errorTags.length === 1) && //Only 1 Error tag is expected
+            (errorTags[0].childNodes.length === 1)
         ) {
             this.vastOptions.errorUrl = errorTags[0].childNodes[0].nodeValue;
         }
