@@ -290,6 +290,38 @@ var fluidPlayerClass = {
         }
     },
 
+    registerErrorEvents: function(errorTags) {
+        if (
+            (typeof errorTags !== 'undefined') &&
+            (errorTags !== null) &&
+            (errorTags.length === 1) && //Only 1 Error tag is expected
+            (errorTags[0].childNodes.length === 1)
+        ) {
+            this.vastOptions.errorUrl = errorTags[0].childNodes[0].nodeValue;
+        }
+    },
+
+    announceError: function(code) {
+        if (
+            (typeof this.vastOptions.errorUrl === 'undefined') ||
+            !this.vastOptions.errorUrl
+        ) {
+            return;
+        }
+
+        if (typeof(code) !== 'undefined') {
+            code = parseInt(code);
+        } else {
+            //Set a default code (900 Unidentified error)
+            code = 900;
+        }
+
+        var errorUrl = this.vastOptions.errorUrl.replace('[ERRORCODE]' , code);
+
+        //Send the error request
+        this.callUris([errorUrl]);
+    },
+
     getClickTrackingEvents: function(linear) {
         var result = [];
 
@@ -361,6 +393,20 @@ var fluidPlayerClass = {
         xmlHttpReq.send();
     },
 
+    playMainVideoWhenVastFails: function(errorCode) {
+        var player = this;
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);
+
+        videoPlayerTag.removeEventListener('loadedmetadata', player.switchPlayerToVastMode);
+        videoPlayerTag.pause();
+        player.toggleLoader(false);
+        player.displayOptions.noVastVideoCallback();
+
+        player.announceError(errorCode);
+
+        player.switchToMainVideo();
+    },
+
     /**
      * Parse the VAST Tag
      *
@@ -368,12 +414,6 @@ var fluidPlayerClass = {
      */
     parseVastTag: function(vastTag) {
         var player = this;
-        var videoPlayerTag = document.getElementById(player.videoPlayerId);
-
-        var playVideo = function() {
-            player.toggleLoader(false);
-            videoPlayerTag.play();
-        };
 
         player.toggleLoader(true);
 
@@ -386,10 +426,7 @@ var fluidPlayerClass = {
 
                 if ((xmlHttpReq.readyState === 4) && (xmlHttpReq.status !== 200)) {
                     //The response returned an error. Proceeding with the main video.
-                    videoPlayerTag.pause();
-                    videoPlayerTag.src = player.originalSrc;
-                    playVideo();
-                    player.displayOptions.noVastVideoCallback();
+                    player.playMainVideoWhenVastFails(900);
                     return;
                 }
 
@@ -403,6 +440,12 @@ var fluidPlayerClass = {
                 var impression = xmlResponse.getElementsByTagName('Impression');
                 if(impression !== null) {
                     player.registerImpressionEvents(impression);
+                }
+
+                //Get the error tag, if any
+                var errorTags = xmlResponse.getElementsByTagName('Error');
+                if (errorTags !== null) {
+                    player.registerErrorEvents(errorTags);
                 }
 
                 //Set initial values
@@ -433,34 +476,27 @@ var fluidPlayerClass = {
                         player.preRoll();
                     } else {
                         //Play the main video
-                        videoPlayerTag.pause();
-                        videoPlayerTag.src = player.originalSrc;
-                        playVideo();
-                        player.displayOptions.noVastVideoCallback();
+                        player.playMainVideoWhenVastFails(101);
+                        return;
                     }
                 } else {
                     //Play the main video
-                    videoPlayerTag.pause();
-                    videoPlayerTag.src = player.originalSrc;
-                    playVideo();
-                    player.displayOptions.noVastVideoCallback();
+                    player.playMainVideoWhenVastFails(101);
+                    return;
                 }
                 player.displayOptions.vastLoadedCallback();
             }
         );
     },
 
+    switchPlayerToVastMode: function() {},
+
     preRoll: function() {
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
         var playVideoPlayer = function() {
-            //Load the PreRoll ad
-            videoPlayerTag.pause();
-            videoPlayerTag.src = player.vastOptions.mediaFile;
-            videoPlayerTag.load();
-
-            var switchPlayerToVastMode = function() {
+            player.switchPlayerToVastMode = function() {
                 //Get the actual duration from the video file if it is not present in the VAST XML
                 if (!player.vastOptions.duration) {
                     player.vastOptions.duration = videoPlayerTag.duration;
@@ -481,21 +517,25 @@ var fluidPlayerClass = {
                     }
                 }
 
-                player.isCurrentlyPlayingAd = true;
-
                 player.toggleLoader(false);
                 videoPlayerTag.play();
 
                 //Announce the impressions
                 trackSingleEvent('impression');
 
-                videoPlayerTag.removeEventListener('loadedmetadata', switchPlayerToVastMode);
+                videoPlayerTag.removeEventListener('loadedmetadata', player.switchPlayerToVastMode);
             };
 
-            /**
-             * Handles the ending of the Pre-Roll ad
-             */
-            videoPlayerTag.addEventListener('loadedmetadata', switchPlayerToVastMode);
+            videoPlayerTag.pause();
+
+            videoPlayerTag.addEventListener('loadedmetadata', player.switchPlayerToVastMode);
+
+            //Load the PreRoll ad
+            videoPlayerTag.src = player.vastOptions.mediaFile;
+            player.isCurrentlyPlayingAd = true;
+            videoPlayerTag.load();
+
+            //Handle the ending of the Pre-Roll ad
             videoPlayerTag.addEventListener('ended', player.onVastAdEnded);
         };
 
@@ -750,7 +790,10 @@ var fluidPlayerClass = {
      */
     removeClickthrough: function() {
         var clickthroughLayer = document.getElementById('vast_clickthrough_layer_' + this.videoPlayerId);
-        clickthroughLayer.parentNode.removeChild(clickthroughLayer);
+
+        if (clickthroughLayer) {
+            clickthroughLayer.parentNode.removeChild(clickthroughLayer);
+        }
     },
 
     /**
@@ -1095,7 +1138,7 @@ var fluidPlayerClass = {
         var player = fluidPlayerClass.getInstanceById(videoPlayerTag.id);
 
         if (player.initialStart || (!player.vastOptions.vastTagUrl)) {
-            if (!player.vastOptions.vastTagUrl) {
+            if (!(player.initialStart || player.vastOptions.vastTagUrl)) {
                 player.initialStart = true;
                 player.displayOptions.noVastVideoCallback();
             }
@@ -1510,6 +1553,20 @@ var fluidPlayerClass = {
         divVideoWrapper.appendChild(videoPlayer);
     },
 
+    onErrorDetection: function() {
+        var videoPlayerTag = this;
+        var player = fluidPlayerClass.getInstanceById(videoPlayerTag.id);
+
+        if (
+            (videoPlayerTag.networkState === videoPlayerTag.NETWORK_NO_SOURCE) &&
+            player.isCurrentlyPlayingAd
+        ) {
+           //Probably the video ad file was not loaded successfully
+           player.playMainVideoWhenVastFails(401);
+        }
+
+    },
+
     init: function(idVideoPlayer, vastTag, options) {
         var player = this;
         var videoPlayer = document.getElementById(idVideoPlayer);
@@ -1556,6 +1613,7 @@ var fluidPlayerClass = {
         videoPlayer.addEventListener('waiting', player.onRecentWaiting, false);
         videoPlayer.addEventListener('pause', player.onFluidPlayerPause, false);
         videoPlayer.addEventListener('durationchange', function() {player.currentVideoDuration = player.getCurrentVideoDuration();}, false);
+        videoPlayer.addEventListener('error', player.onErrorDetection, false);
 
         //Manually load the video duration if the video was loaded before adding the event listener
         player.currentVideoDuration = player.getCurrentVideoDuration();
