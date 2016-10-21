@@ -18,12 +18,12 @@
 	
 	<div class="main">
 		<div class="container_wrap clearfix">
-			<h1>Fluid Player - Example 1</h1>
+			<h1>Fluid Player - Default Skin</h1>
 			
 			<div class="demo_container clearfix">
 				<div class="demo_container_left">
 					<video id='test-video' controls style="width: 640px; height: 360px;">
-						<source src='vid.mp4' type='video/mp4' />		
+						<source src='video.mp4' type='video/mp4' />		
 					</video>
 				</div>
 				<div class="demo_container_right">
@@ -38,13 +38,43 @@
 			</div>
 		</div>
         
-        <div class="container_wrap clearfix">
-            <h1>Fluid Player - Example 2</h1>
-            
+		<div class="container_wrap clearfix">
+			<h1>Fluid Player - Funky Skin</h1>
+			
 			<div class="demo_container clearfix">
 				<div class="demo_container_left">
 					<video id='test-video-2' controls style="width: 640px; height: 360px;">
-						<source src='vid.mp4' type='video/mp4' />		
+						<source src='video.mp4' type='video/mp4' />		
+					</video>
+				</div>
+				<div class="demo_container_right">
+					
+				</div>
+			</div>
+		</div>
+        
+		<div class="container_wrap clearfix">
+			<h1>Fluid Player - Metal Skin</h1>
+			
+			<div class="demo_container clearfix">
+				<div class="demo_container_left">
+					<video id='test-video-3' controls style="width: 640px; height: 360px;">
+						<source src='video.mp4' type='video/mp4' />		
+					</video>
+				</div>
+				<div class="demo_container_right">
+					
+				</div>
+			</div>
+		</div>
+        
+        <div class="container_wrap clearfix">
+            <h1>Fluid Player - Browser-Based Layout</h1>
+            
+			<div class="demo_container clearfix">
+				<div class="demo_container_left">
+					<video id='test-video-4' controls style="width: 640px; height: 360px;">
+						<source src='video.mp4' type='video/mp4' />		
 					</video>
 				</div>
 				<div class="demo_container_right">
@@ -52,6 +82,20 @@
 						<li>Ability to have more than 1 player per page.</li>
 						<li>Ability to use the default video layout for the current browser.</li>
 					</ul>
+				</div>
+			</div>
+		</div>
+        
+        <div class="container_wrap clearfix">
+            <div class="demo_container clearfix">
+				<div class="demo_container_left">
+                    <div style="font-size: 11px; margin-top: 15px;">
+                        Free Stock Footage by <a target="_blank" style="color: #555;" href="http://www.videezy.com">Videezy</a>,
+                        <a target="_blank" style="color: #555;" href="https://www.videezy.com/members/bk-vids">bk-vids</a>
+                    </div>
+				</div>
+				<div class="demo_container_right">
+					
 				</div>
 			</div>
 		</div>
@@ -72,8 +116,34 @@
             }
         );
 
-        var testVideo2 = fluidPlayer(
+		var testVideo2 = fluidPlayer(
             'test-video-2',
+            'vast.xml',
+            {
+                timelinePreview: {
+                    file: 'thumbnails.vtt',
+                    type: 'VTT'
+                },
+                customCssFile: '../styles/funky_layout.css',
+                customClassName: 'funky_layout'
+            }
+        );
+
+		var testVideo3 = fluidPlayer(
+            'test-video-3',
+            'vast.xml',
+            {
+                timelinePreview: {
+                    file: 'thumbnails.vtt',
+                    type: 'VTT'
+                },
+                customCssFile: '../styles/metal_layout.css',
+                customClassName: 'metal_layout'
+            }
+        );
+
+        var testVideo4 = fluidPlayer(
+            'test-video-4',
             'vast.xml',
             {layout: 'browser'}
         );
