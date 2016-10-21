@@ -88,6 +88,8 @@ Here is a description of the parameters which can be used when setting Fluid Pla
 * `options`: Various options for tweaking the appearance and behaviour of the player:
   * `timelinePreview`: Sets the timeline preview, visible when hovering over the progress bar. The provided `file` contains a description of the thumbnail images used for the preview. The `type` sets the format of the file. Currently only the VTT format is supported. The timeline preview only works if the `default` layout is chosen (see below).
   * `layout`: Two options are available. The default layout is `default`. It provides own skin to the player. The other option is `browser`. There, the standard video player layout and behaviour, specific for each browser, is used. _Note: on iPhone devices the `default` layout is not available, so the player switches automatically to `browser` layout._
+  * `customCssFile`: If "default" layout is chosen, a custom CSS file can be used instead the default one.
+  * `customClassName`: When a custom CSS file is used, the video wrapper (id="fluid_video_wrapper_<VIDEO PLAYER ID>") will have this additional class name assigned.
   * `skipButtonCaption` (VAST only): The text, displayed on the Skip button. The text can contain the placeholder `[seconds]`. The default value is `Skip ad in [seconds]`.
   * `skipButtonClickCaption` (VAST only): The text, displayed when the Skip button is available for clicking.
   * `vastTimeout` (VAST only): The number of milliseconds before the VAST Tag call timeouts. Default: `5000`.
