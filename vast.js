@@ -53,15 +53,13 @@ fluidPlayer = function(idVideoPlayer, vastTag, options) {
 };
 
 var fluidPlayerClass = {
-    defaultIconUrl: '//fonts.googleapis.com/icon?family=Material+Icons',
     defaultControlsStylesheet: fluidPlayerScriptLocation + 'styles/default_layout.css',
     vttParserScript: fluidPlayerScriptLocation + 'scripts/webvtt.js',
     instances: [],
-    notCloned: ['notCloned', 'defaultIconUrl', 'defaultControlsStylesheet',
+    notCloned: ['notCloned', 'defaultControlsStylesheet',
         'vttParserScript', 'instances', 'getInstanceById', 'requestStylesheet',
         'reqiestScript', 'isTouchDevice', 'vastOptions', 'displayOptions',
-        'getEventOffsetX', 'controlMaterialIconsMapping',
-        'controlMaterialIconsGetMappedIcon', 'toggleElementText', 'getMobileOs'],
+        'getEventOffsetX', 'toggleElementText', 'getMobileOs', 'findClosestParent'],
 
     getInstanceById: function(playerId) {
         for (var i = 0; i < this.instances.length; i++) {
@@ -849,34 +847,6 @@ var fluidPlayerClass = {
         }, 100);
     },
 
-    /**
-     * Maps the default names of the material icons, used in the default layout,
-     * to their codes, so that compatibility with IE9 is achieved.
-     *
-     * @returns object
-     */
-    controlMaterialIconsMapping: function() {
-        return {
-            volume_up:       '&#xE050;',
-            volume_off:      '&#xE04F;',
-            play_arrow:      '&#xE037;',
-            pause:           '&#xE034;',
-            fullscreen:      '&#xE5D0;',
-            fullscreen_exit: '&#xE5D1;',
-            hourglass_empty: '&#xE88B;'
-        };
-    },
-
-    controlMaterialIconsGetMappedIcon: function(iconName) {
-        var mapObj = fluidPlayerClass.controlMaterialIconsMapping();
-
-        if (typeof mapObj[iconName] !== 'undefined') {
-            return mapObj[iconName];
-        }
-
-        return '';
-    },
-
     checkShouldDisplayVolumeControls: function() {
         var deviceType = fluidPlayerClass.getMobileOs();
 
@@ -888,49 +858,42 @@ var fluidPlayerClass = {
     },
 
     generateCustomControlTags: function() {
-        var htmlResult = '<div class="fluid_controls_left">' +
-        '   <i class="material-icons fluid_button" id="' + this.videoPlayerId + '_vast_control_playpause">play_arrow</i>' +
-        '</div>' +
-            '<div id="' + this.videoPlayerId + '_fluid_controls_progress_container" class="fluid_controls_progress_container fluid_slider">' +
-        '   <div class="fluid_controls_progress">' +
-        '      <div id="' + this.videoPlayerId + '_vast_control_currentprogress" class="fluid_controls_currentprogress">' +
-        '          <div id="' + this.videoPlayerId + '_vast_control_currentpos" class="fluid_controls_currentpos"></div>' +
-        '      </div>' +
-        '   </div>' +
-        '</div>' +
-        '<div class="fluid_controls_right">' +
-        '   <i class="material-icons fluid_button" id="' + this.videoPlayerId + '_vast_control_fullscreen">fullscreen</i>' +
-        '   <div id="' + this.videoPlayerId + '_fluid_control_volume_container" class="fluid_control_volume_container fluid_slider">' +
-        '       <div id="' + this.videoPlayerId + '_fluid_control_volume" class="fluid_control_volume">' +
-        '           <div id="' + this.videoPlayerId + '_fluid_control_volume_currentpos" class="fluid_control_volume_currentpos"></div>' +
-        '       </div>' +
-        '   </div>' +
-        '   <i class="material-icons fluid_button fluid_control_mute" id="' + this.videoPlayerId + '_fluid_control_mute">volume_off</i>' +
-        '</div>';
-
-        var mapObj = fluidPlayerClass.controlMaterialIconsMapping();
-
-        var re = new RegExp('>' + Object.keys(mapObj).join('<\\/i>|>') + '<\\/i>', 'gi');
-        htmlResult = htmlResult.replace(re, function(matched) {
-            return '>' + mapObj[matched.replace(/>/, '').replace(/<\/i>/, '')] + '</i>';
-        });
-
-        return htmlResult;
+        return '<div class="fluid_controls_left">' +
+            '   <div id="' + this.videoPlayerId + '_fluid_control_playpause" class="fluid_button fluid_button_play"></div>' +
+            '</div>' +
+                '<div id="' + this.videoPlayerId + '_fluid_controls_progress_container" class="fluid_controls_progress_container fluid_slider">' +
+            '   <div class="fluid_controls_progress">' +
+            '      <div id="' + this.videoPlayerId + '_vast_control_currentprogress" class="fluid_controls_currentprogress">' +
+            '          <div id="' + this.videoPlayerId + '_vast_control_currentpos" class="fluid_controls_currentpos"></div>' +
+            '      </div>' +
+            '   </div>' +
+            '</div>' +
+            '<div class="fluid_controls_right">' +
+            '   <div id="' + this.videoPlayerId + '_fluid_control_fullscreen" class="fluid_button fluid_button_fullscreen"></div>' +
+            '   <div id="' + this.videoPlayerId + '_fluid_control_volume_container" class="fluid_control_volume_container fluid_slider">' +
+            '       <div id="' + this.videoPlayerId + '_fluid_control_volume" class="fluid_control_volume">' +
+            '           <div id="' + this.videoPlayerId + '_fluid_control_currentvolume" class="fluid_control_currentvolume">' +
+            '               <div id="' + this.videoPlayerId + '_fluid_control_volume_currentpos" class="fluid_control_volume_currentpos"></div>' +
+            '           </div>' +
+            '       </div>' +
+            '   </div>' +
+            '   <div id="' + this.videoPlayerId + '_fluid_control_mute" class="fluid_button fluid_button_volume"></div>' +
+            '</div>';
     },
 
     controlPlayPauseToggle: function(videoPlayerId, isPlaying) {
-        var playPauseButton = document.getElementById(videoPlayerId + '_vast_control_playpause');
+        var playPauseButton = document.getElementById(videoPlayerId + '_fluid_control_playpause');
         var menuOptionPlay = document.getElementById(videoPlayerId + 'context_option_play');
 
         if (isPlaying) {
-            playPauseButton.innerHTML = fluidPlayerClass.controlMaterialIconsGetMappedIcon('pause');
+            playPauseButton.className = playPauseButton.className.replace(/\bfluid_button_play\b/g, 'fluid_button_pause');
 
             if (menuOptionPlay !== null) {
                 menuOptionPlay.innerHTML = 'Pause';
             }
 
         } else {
-            playPauseButton.innerHTML = fluidPlayerClass.controlMaterialIconsGetMappedIcon('play_arrow');
+            playPauseButton.className = playPauseButton.className.replace(/\bfluid_button_pause\b/g, 'fluid_button_play');
          
             if (menuOptionPlay !== null) {
                 menuOptionPlay.innerHTML = 'Play';
@@ -954,6 +917,7 @@ var fluidPlayerClass = {
         }
 
         var videoPlayerTag = document.getElementById(videoPlayerId);
+        var currentVolumeTag = document.getElementById(videoPlayerId + '_fluid_control_currentvolume');
         var volumeposTag = document.getElementById(videoPlayerId + '_fluid_control_volume_currentpos');
         var volumebarTotalWidth = document.getElementById(videoPlayerId + '_fluid_control_volume').clientWidth;
         var volumeposTagWidth = volumeposTag.clientWidth;
@@ -965,20 +929,20 @@ var fluidPlayerClass = {
         }
 
         if (videoPlayerTag.volume) {
-            muteButtonTag.innerHTML = fluidPlayerClass.controlMaterialIconsGetMappedIcon('volume_up');
+            muteButtonTag.className = muteButtonTag.className.replace(/\bfluid_button_mute\b/g, 'fluid_button_volume');
 
             if (menuOptionMute !== null) {
                 menuOptionMute.innerHTML = 'Mute';
             }
 
         } else {
-            muteButtonTag.innerHTML = fluidPlayerClass.controlMaterialIconsGetMappedIcon('volume_off');
+            muteButtonTag.className = muteButtonTag.className.replace(/\bfluid_button_volume\b/g, 'fluid_button_mute');
 
             if (menuOptionMute !== null) {
                 menuOptionMute.innerHTML = 'Unmute';
             }
         }
-
+        currentVolumeTag.style.width = (videoPlayerTag.volume * volumebarTotalWidth) + 'px';
         volumeposTag.style.left = (videoPlayerTag.volume * volumebarTotalWidth - (volumeposTagWidth / 2)) + 'px';
     },
 
@@ -1016,7 +980,7 @@ var fluidPlayerClass = {
     fullscreenToggle: function(videoPlayerId) {
         var fullscreenTag = document.getElementById('fluid_video_wrapper_' + videoPlayerId);
         var requestFullscreenFunctionNames = this.checkFullscreenSupport('fluid_video_wrapper_' + videoPlayerId);
-        var fullscreenButton = document.getElementById(videoPlayerId + '_vast_control_fullscreen');
+        var fullscreenButton = document.getElementById(videoPlayerId + '_fluid_control_fullscreen');
         var menuOptionFullscreen = document.getElementById(videoPlayerId + 'context_option_fullscreen');
 
         if (requestFullscreenFunctionNames) {
@@ -1025,7 +989,7 @@ var fluidPlayerClass = {
             if (document[requestFullscreenFunctionNames.isFullscreen] === null) {
                 //Go fullscreen
                 functionNameToExecute = 'videoPlayerTag.' + requestFullscreenFunctionNames.goFullscreen + '();';
-                fullscreenButton.innerHTML = fluidPlayerClass.controlMaterialIconsGetMappedIcon('fullscreen_exit');
+                fullscreenButton.className = fullscreenButton.className.replace(/\bfluid_button_fullscreen\b/g, 'fluid_button_fullscreen_exit');
 
                 if (menuOptionFullscreen !== null) {
                     menuOptionFullscreen.innerHTML = 'Exit Fullscreen';
@@ -1034,7 +998,7 @@ var fluidPlayerClass = {
             } else {
                 //Exit fullscreen
                 functionNameToExecute = 'document.' + requestFullscreenFunctionNames.exitFullscreen + '();';
-                fullscreenButton.innerHTML = fluidPlayerClass.controlMaterialIconsGetMappedIcon('fullscreen');
+                fullscreenButton.className = fullscreenButton.className.replace(/\bfluid_button_fullscreen_exit\b/g, 'fluid_button_fullscreen');
 
                 if (menuOptionFullscreen !== null) {
                     menuOptionFullscreen.innerHTML = 'Fullscreen';
@@ -1047,7 +1011,7 @@ var fluidPlayerClass = {
             //The browser does not support the Fullscreen API, so a pseudo-fullscreen implementation is used
             if (fullscreenTag.className.search(/\bpseudo_fullscreen\b/g) !== -1) {
                 fullscreenTag.className = fullscreenTag.className.replace(/\bpseudo_fullscreen\b/g, '');
-                fullscreenButton.innerHTML = fluidPlayerClass.controlMaterialIconsGetMappedIcon('fullscreen');
+                fullscreenButton.className = fullscreenButton.className.replace(/\bfluid_button_fullscreen_exit\b/g, 'fluid_button_fullscreen');
 
                 if (menuOptionFullscreen !== null) {
                     menuOptionFullscreen.innerHTML = 'Fullscreen';
@@ -1055,7 +1019,7 @@ var fluidPlayerClass = {
 
             } else {
                 fullscreenTag.className += ' pseudo_fullscreen';
-                fullscreenButton.innerHTML = fluidPlayerClass.controlMaterialIconsGetMappedIcon('fullscreen_exit');
+                fullscreenButton.className = fullscreenButton.className.replace(/\bfluid_button_fullscreen\b/g, 'fluid_button_fullscreen_exit');
 
                 if (menuOptionFullscreen !== null) {
                     menuOptionFullscreen.innerHTML = 'Exit Fullscreen';
@@ -1066,11 +1030,47 @@ var fluidPlayerClass = {
         this.recalculateAdDimensions();
     },
 
+    findClosestParent: function(el, selector) {
+        var matchesFn;
+
+        // find vendor prefix
+        ['matches','webkitMatchesSelector','mozMatchesSelector','msMatchesSelector','oMatchesSelector'].some(function(fn) {
+            if (typeof document.body[fn] == 'function') {
+                matchesFn = fn;
+                return true;
+            }
+            return false;
+        });
+
+        var parent;
+
+        // Check if the current element matches the selector
+        if (el[matchesFn](selector)) {
+            return el;
+        }
+
+        // traverse parents
+        while (el) {
+            parent = el.parentElement;
+            if (parent && parent[matchesFn](selector)) {
+                return parent;
+            }
+            el = parent;
+        }
+
+        return null;
+    },
+
     getEventOffsetX: function(evt, el) {
         var x = 0;
 
         while (el && !isNaN(el.offsetLeft)) {
-            x += el.offsetLeft - el.scrollLeft;
+            if (el.tagName === 'BODY') {
+                x += el.offsetLeft - (el.scrollLeft || document.documentElement.scrollLeft);
+            } else {
+                x += el.offsetLeft - el.scrollLeft;
+            }
+
             el = el.offsetParent;
         }
 
@@ -1078,10 +1078,28 @@ var fluidPlayerClass = {
     },
 
     getEventOffsetY: function(evt, el) {
+        var fullscreenMultiplier = 1;
+        var videoWrapper = fluidPlayerClass.findClosestParent(el, 'div[id^="fluid_video_wrapper_"]');
+
+        if (videoWrapper) {
+            var videoPlayerId = videoWrapper.id.replace('fluid_video_wrapper_', '');
+
+            var requestFullscreenFunctionNames = fluidPlayerClass.checkFullscreenSupport('fluid_video_wrapper_' + videoPlayerId);
+            if (requestFullscreenFunctionNames && document[requestFullscreenFunctionNames.isFullscreen]) {
+                fullscreenMultiplier = 0;
+            }
+        }
+
         var y = 0;
 
         while (el && !isNaN(el.offsetTop)) {
-            y += el.offsetTop - el.scrollTop;
+            if (el.tagName === 'BODY') {
+                y += el.offsetTop - ((el.scrollTop || document.documentElement.scrollTop) * fullscreenMultiplier);
+
+            } else {
+                y += el.offsetTop - (el.scrollTop * fullscreenMultiplier);
+            }
+
             el = el.offsetParent;
         }
 
@@ -1166,7 +1184,7 @@ var fluidPlayerClass = {
         var videoPlayerTag = document.getElementById(this.videoPlayerId);
 
         //Set the Play/Pause behaviour
-        document.getElementById(this.videoPlayerId + '_vast_control_playpause').addEventListener('click', function() {
+        document.getElementById(this.videoPlayerId + '_fluid_control_playpause').addEventListener('click', function() {
 
             if (!player.initialStart) {
                 videoPlayerTag.removeEventListener('play', player.initialPlay);
@@ -1207,7 +1225,7 @@ var fluidPlayerClass = {
         });
 
         //Set the fullscreen control
-        document.getElementById(player.videoPlayerId + '_vast_control_fullscreen').addEventListener('click', function(){
+        document.getElementById(player.videoPlayerId + '_fluid_control_fullscreen').addEventListener('click', function(){
             player.fullscreenToggle(player.videoPlayerId);
         });
     },
@@ -1267,12 +1285,19 @@ var fluidPlayerClass = {
 
     setDefaultLayout: function() {
         var player = this;
-
-        //Load the icon css
-        fluidPlayerClass.requestStylesheet('defaultLayoutIcons', fluidPlayerClass.defaultIconUrl);
-        fluidPlayerClass.requestStylesheet('defaultControlsStylesheet', fluidPlayerClass.defaultControlsStylesheet);
-
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
+        var layoutStyleSheet = fluidPlayerClass.defaultControlsStylesheet;
+        var playerWrapper = document.getElementById('fluid_video_wrapper_' + player.videoPlayerId);
+
+        if (player.displayOptions.customClassName) {
+            playerWrapper.className += ' ' + player.displayOptions.customClassName;
+        }
+
+        if (player.displayOptions.customCssFile) {
+            layoutStyleSheet = player.displayOptions.customCssFile;
+        }
+
+        fluidPlayerClass.requestStylesheet('controls_stylesheet_' + player.videoPlayerId, layoutStyleSheet);
 
         //Remove the default Controls
         videoPlayerTag.removeAttribute('controls');
@@ -1296,18 +1321,53 @@ var fluidPlayerClass = {
         divLoading.className = 'vast_video_loading';
         divLoading.id = 'vast_video_loading_' + player.videoPlayerId;
         divLoading.style.display = 'none';
-        divLoading.innerHTML = '<i class="material-icons md-48">' + fluidPlayerClass.controlMaterialIconsGetMappedIcon('hourglass_empty') + '</i>';
 
         videoPlayerTag.parentNode.insertBefore(divLoading, videoPlayerTag.nextSibling);
 
-        //Wait for the volume bar to be rendered
-        setTimeout(function() {
-            player.contolVolumebarUpdate(player.videoPlayerId);
-        }, 100);
+        var remainingAttemptsToInitiateVolumeBar = 100;
+
+        /**
+         * Set the volumebar after its elements are properly rendered.
+         */
+        var initiateVolumebar = function() {
+            if (!remainingAttemptsToInitiateVolumeBar) {
+                clearInterval(initiateVolumebarTimerId);
+
+            } else if (player.checkIfVolumebarIsRendered()) {
+                clearInterval(initiateVolumebarTimerId);
+                player.contolVolumebarUpdate(player.videoPlayerId);
+
+            } else {
+                remainingAttemptsToInitiateVolumeBar--;
+            }
+        };
+
+        if (player.checkShouldDisplayVolumeControls()) {
+            var initiateVolumebarTimerId = setInterval(initiateVolumebar, 100);
+        }
 
         player.setCustomControls();
 
         player.setupThumbnailPreview();
+    },
+
+    /**
+     * Checks if the volumebar is rendered and the styling applied by comparing
+     * the width of 2 elements that should look different.
+     *
+     * @returns Boolean
+     */
+    checkIfVolumebarIsRendered: function() {
+        var player = this;
+        var volumeposTag = document.getElementById(player.videoPlayerId + '_fluid_control_volume_currentpos');
+        var volumebarTotalWidth = document.getElementById(player.videoPlayerId + '_fluid_control_volume').clientWidth;
+        var volumeposTagWidth = volumeposTag.clientWidth;
+
+        if (volumeposTagWidth === volumebarTotalWidth) {
+            return false;
+        }
+
+        return true;
     },
 
     forceLayoutIfNeeded: function() {
@@ -1336,10 +1396,6 @@ var fluidPlayerClass = {
         switch (this.displayOptions.layout) {
             case 'default':
                 this.setDefaultLayout();
-                break;
-
-            case 'custom':
-                //TODO
                 break;
 
             case 'browser':
@@ -1591,8 +1647,10 @@ var fluidPlayerClass = {
         player.displayOptions = {
             mediaType:                'video/mp4',//TODO: should be taken from the VAST Tag; consider removing it completely, since the supported format is browser-dependent
             skipButtonCaption:        'Skip ad in [seconds]',
-            skipButtonClickCaption:   'Skip ad &#9193;',
-            layout:                   'default', //options: browser, default, custom
+            skipButtonClickCaption:   'Skip ad <span class="skip_button_icon"></span>',
+            layout:                   'default', //options: browser, default
+            customCssFile:            null, //If "default" layout is chosen, a custom CSS file can be used instead the default one.
+            customClassName:          null, //When a custom CSS file is used, the video wrapper (id="fluid_video_wrapper_<VIDEO PLAYER ID>") will have this additional class name assigned.
             vastTimeout:              5000, //number of milliseconds before the VAST Tag call timeouts
             timelinePreview:          {}, //Structure: {file: 'filename.vtt', type: 'VTT'}. Supported types: VTT only at this time.
             vastLoadedCallback:       (function() {}),
