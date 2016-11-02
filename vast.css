@@ -1,14 +1,39 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400&subset=cyrillic,greek,latin-ext');
 
-.fluid_video_wrapper{
+.fluid_video_wrapper {
 	position:relative;
 	display: inline-block;
 }
+
 .fluid_video_wrapper video {
 	position:relative;
 	background-color: #000000;
     display: block;
 }
+
+.fluid_video_wrapper .vast_video_loading {
+    position: absolute;
+    display: table;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: auto;
+    z-index: 10;
+}
+
+.fluid_video_wrapper .vast_video_loading:before {
+    background: #000000 url("images/loader.gif") no-repeat scroll center center;
+    opacity: 0.6;
+    content: '';
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+}
+
 .skip_button {
 	position:absolute;
 	height:47px;
@@ -42,7 +67,7 @@
 }
 
 .skip_button a span.skip_button_icon {
-    background: rgba(0, 0, 0, 0) url("../images/skip_next.png") no-repeat scroll center center;
+    background: rgba(0, 0, 0, 0) url("images/skip_next.png") no-repeat scroll center center;
     display: inline-block;
     height: 14px;
     width: 12px;
