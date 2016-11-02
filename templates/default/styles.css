@@ -425,6 +425,12 @@ _:-ms-lang(x),
     position: relative;
 }
 
+.fluid_video_wrapper.fluid_player_layout_default.mobile .fluid_controls_container .fluid_controls_right .fluid_control_volume_container,
+.fluid_video_wrapper.fluid_player_layout_default.mobile .fluid_controls_container .fluid_controls_right .fluid_button.fluid_button_volume,
+.fluid_video_wrapper.fluid_player_layout_default.mobile .fluid_controls_container .fluid_controls_right .fluid_button.fluid_button_mute {
+    position: absolute;
+}
+
 .fluid_video_wrapper.fluid_player_layout_default.mobile .fluid_controls_container .fluid_button.fluid_button_play:before,
 .fluid_video_wrapper.fluid_player_layout_default.mobile .fluid_controls_container .fluid_button.fluid_button_pause:before,
 .fluid_video_wrapper.fluid_player_layout_default.mobile .fluid_controls_container .fluid_button.fluid_button_volume:before,
