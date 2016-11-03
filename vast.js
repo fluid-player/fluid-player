@@ -53,12 +53,12 @@ fluidPlayer = function(idVideoPlayer, vastTag, options) {
 };
 
 var fluidPlayerClass = {
-    vttParserScript: fluidPlayerScriptLocation + 'scripts/webvtt.js',
+    vttParserScript: 'webvtt.js',
     instances: [],
     notCloned: ['notCloned', 'vttParserScript', 'instances', 'getInstanceById',
         'requestStylesheet', 'reqiestScript', 'isTouchDevice', 'vastOptions',
-        'displayOptions', 'getEventOffsetX', 'toggleElementText', 'getMobileOs',
-        'findClosestParent'],
+        'displayOptions', 'getEventOffsetX', 'getEventOffsetY', 'getTranslateX',
+        'toggleElementText', 'getMobileOs', 'findClosestParent'],
 
     getInstanceById: function(playerId) {
         for (var i = 0; i < this.instances.length; i++) {
@@ -1060,35 +1060,34 @@ var fluidPlayerClass = {
         return null;
     },
 
-    getEventOffsetX: function(evt, el) {
-        var getTranslateX = function(el) {
-            var coordinates = null;
+    getTranslateX: function(el) {
+        var coordinates = null;
 
-            try {
-                var results = el.style.transform.match(/translate3d\((-?\d+px,\s?){2}-?\d+px\)/);
+        try {
+            var results = el.style.transform.match(/translate3d\((-?\d+px,\s?){2}-?\d+px\)/);
 
-                if (results && results.length) {
-                    coordinates = results[0]
-                        .replace('translate3d(', '', results[0])
-                        .replace(')', '', results[0])
-                        .replace(/\s/g, '', results[0])
-                        .replace(/px/g, '', results[0])
-                        .split(',')
-                    ;
-                }
-            } catch (e) {
-                coordinates = null;
+            if (results && results.length) {
+                coordinates = results[0]
+                    .replace('translate3d(', '')
+                    .replace(')', '')
+                    .replace(/\s/g, '')
+                    .replace(/px/g, '')
+                    .split(',')
+                ;
             }
+        } catch (e) {
+            coordinates = null;
+        }
 
-            return (coordinates && (coordinates.length === 3)) ? parseInt(coordinates[0]) : 0;
-        };
+        return (coordinates && (coordinates.length === 3)) ? parseInt(coordinates[0]) : 0;
+    },
 
+    getEventOffsetX: function(evt, el) {
         var x = 0;
         var translateX = 0;
 
         while (el && !isNaN(el.offsetLeft)) {
-            translateX = getTranslateX(el);
-
+            translateX = fluidPlayerClass.getTranslateX(el);
 
             if (el.tagName === 'BODY') {
                 x += el.offsetLeft + el.clientLeft + translateX - (el.scrollLeft || document.documentElement.scrollLeft);
@@ -1311,14 +1310,13 @@ var fluidPlayerClass = {
     setDefaultLayout: function() {
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
-        var layoutStyleSheet = fluidPlayerClass.defaultControlsStylesheet;
         var playerWrapper = document.getElementById('fluid_video_wrapper_' + player.videoPlayerId);
 
         playerWrapper.className += ' fluid_player_layout_' + player.displayOptions.layout;
 
         fluidPlayerClass.requestStylesheet(
             'controls_stylesheet_' + player.videoPlayerId,
-            fluidPlayerScriptLocation + 'templates/' + player.displayOptions.layout + '/styles.css'
+            player.displayOptions.templateLocation + player.displayOptions.layout + '/styles.css'
         );
 
         //Remove the default Controls
@@ -1589,7 +1587,10 @@ var fluidPlayerClass = {
         ) {
             switch (player.displayOptions.timelinePreview.type) {
                 case 'VTT':
-                    fluidPlayerClass.requestScript(fluidPlayerClass.vttParserScript, player.setupThumbnailPreviewVtt.bind(this));
+                    fluidPlayerClass.requestScript(
+                        player.displayOptions.scriptsLocation + fluidPlayerClass.vttParserScript,
+                        player.setupThumbnailPreviewVtt.bind(this)
+                    );
 
                     document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container')
                         .addEventListener('mousemove', player.drawTimelinePreview.bind(player), false);
@@ -1668,17 +1669,28 @@ var fluidPlayerClass = {
             skipButtonCaption:        'Skip ad in [seconds]',
             skipButtonClickCaption:   'Skip ad <span class="skip_button_icon"></span>',
             layout:                   'default', //options: 'default', 'browser', '<custom>'
+            templateLocation:         fluidPlayerScriptLocation + 'templates/', //Custom folder where the template is located
+            scriptsLocation:          fluidPlayerScriptLocation + 'scripts/', //Custom folder where additional scripts are located
             vastTimeout:              5000, //number of milliseconds before the VAST Tag call timeouts
             timelinePreview:          {}, //Structure: {file: 'filename.vtt', type: 'VTT'}. Supported types: VTT only at this time.
             vastLoadedCallback:       (function() {}),
             noVastVideoCallback:      (function() {}),
             vastVideoSkippedCallback: (function() {}),
-            vastVideoEndedCallback:   (function() {})
+            vastVideoEndedCallback:   (function() {}),
+            playerInitCallback:       (function() {})
         };
 
         //Overriding the default options
         for (var key in options) {
             player.displayOptions[key] = options[key];
+        }
+
+        if (player.displayOptions.templateLocation.slice(-1) !== '/') {
+            player.displayOptions.templateLocation += '/';
+        }
+
+        if (player.displayOptions.scriptsLocation.slice(-1) !== '/') {
+            player.displayOptions.scriptsLocation += '/';
         }
 
         player.setupPlayerWrapper();
@@ -1704,5 +1716,7 @@ var fluidPlayerClass = {
 
         //Set the custom fullscreen behaviour
         player.handleFullscreen();
+
+        player.displayOptions.playerInitCallback();
     }
 };
