@@ -1061,13 +1061,39 @@ var fluidPlayerClass = {
     },
 
     getEventOffsetX: function(evt, el) {
+        var getTranslateX = function(el) {
+            var coordinates = null;
+
+            try {
+                var results = el.style.transform.match(/translate3d\((-?\d+px,\s?){2}-?\d+px\)/);
+
+                if (results && results.length) {
+                    coordinates = results[0]
+                        .replace('translate3d(', '', results[0])
+                        .replace(')', '', results[0])
+                        .replace(/\s/g, '', results[0])
+                        .replace(/px/g, '', results[0])
+                        .split(',')
+                    ;
+                }
+            } catch (e) {
+                coordinates = null;
+            }
+
+            return (coordinates && (coordinates.length === 3)) ? parseInt(coordinates[0]) : 0;
+        };
+
         var x = 0;
+        var translateX = 0;
 
         while (el && !isNaN(el.offsetLeft)) {
+            translateX = getTranslateX(el);
+
+
             if (el.tagName === 'BODY') {
-                x += el.offsetLeft - (el.scrollLeft || document.documentElement.scrollLeft);
+                x += el.offsetLeft + el.clientLeft + translateX - (el.scrollLeft || document.documentElement.scrollLeft);
             } else {
-                x += el.offsetLeft - el.scrollLeft;
+                x += el.offsetLeft + el.clientLeft + translateX - el.scrollLeft;
             }
 
             el = el.offsetParent;
