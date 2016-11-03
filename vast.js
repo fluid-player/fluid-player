@@ -53,13 +53,12 @@ fluidPlayer = function(idVideoPlayer, vastTag, options) {
 };
 
 var fluidPlayerClass = {
-    defaultControlsStylesheet: fluidPlayerScriptLocation + 'styles/default_layout.css',
     vttParserScript: fluidPlayerScriptLocation + 'scripts/webvtt.js',
     instances: [],
-    notCloned: ['notCloned', 'defaultControlsStylesheet',
-        'vttParserScript', 'instances', 'getInstanceById', 'requestStylesheet',
-        'reqiestScript', 'isTouchDevice', 'vastOptions', 'displayOptions',
-        'getEventOffsetX', 'toggleElementText', 'getMobileOs', 'findClosestParent'],
+    notCloned: ['notCloned', 'vttParserScript', 'instances', 'getInstanceById',
+        'requestStylesheet', 'reqiestScript', 'isTouchDevice', 'vastOptions',
+        'displayOptions', 'getEventOffsetX', 'toggleElementText', 'getMobileOs',
+        'findClosestParent'],
 
     getInstanceById: function(playerId) {
         for (var i = 0; i < this.instances.length; i++) {
@@ -507,7 +506,7 @@ var fluidPlayerClass = {
 
                 videoPlayerTag.removeAttribute('controls'); //Remove the default Controls
 
-                if (player.displayOptions.layout === 'default') {
+                if (player.displayOptions.layout !== 'browser') {
                     var progressbarContainer = document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container');
 
                     if (progressbarContainer !== null) {
@@ -650,7 +649,7 @@ var fluidPlayerClass = {
         player.vastOptions.adFinished = true;
         player.displayOptions.vastVideoEndedCallback();
 
-        if (player.displayOptions.layout === 'default') {
+        if (player.displayOptions.layout !== 'browser') {
             var progressbarContainer = document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container');
 
             if (progressbarContainer !== null) {
@@ -1289,15 +1288,12 @@ var fluidPlayerClass = {
         var layoutStyleSheet = fluidPlayerClass.defaultControlsStylesheet;
         var playerWrapper = document.getElementById('fluid_video_wrapper_' + player.videoPlayerId);
 
-        if (player.displayOptions.customClassName) {
-            playerWrapper.className += ' ' + player.displayOptions.customClassName;
-        }
+        playerWrapper.className += ' fluid_player_layout_' + player.displayOptions.layout;
 
-        if (player.displayOptions.customCssFile) {
-            layoutStyleSheet = player.displayOptions.customCssFile;
-        }
-
-        fluidPlayerClass.requestStylesheet('controls_stylesheet_' + player.videoPlayerId, layoutStyleSheet);
+        fluidPlayerClass.requestStylesheet(
+            'controls_stylesheet_' + player.videoPlayerId,
+            fluidPlayerScriptLocation + 'templates/' + player.displayOptions.layout + '/styles.css'
+        );
 
         //Remove the default Controls
         videoPlayerTag.removeAttribute('controls');
@@ -1394,15 +1390,12 @@ var fluidPlayerClass = {
         }, false);
 
         switch (this.displayOptions.layout) {
-            case 'default':
-                this.setDefaultLayout();
-                break;
-
             case 'browser':
                 //Nothing special to do here at this point.
                 break;
 
             default:
+                this.setDefaultLayout();
                 break;
         }
     },
@@ -1648,9 +1641,7 @@ var fluidPlayerClass = {
             mediaType:                'video/mp4',//TODO: should be taken from the VAST Tag; consider removing it completely, since the supported format is browser-dependent
             skipButtonCaption:        'Skip ad in [seconds]',
             skipButtonClickCaption:   'Skip ad <span class="skip_button_icon"></span>',
-            layout:                   'default', //options: browser, default
-            customCssFile:            null, //If "default" layout is chosen, a custom CSS file can be used instead the default one.
-            customClassName:          null, //When a custom CSS file is used, the video wrapper (id="fluid_video_wrapper_<VIDEO PLAYER ID>") will have this additional class name assigned.
+            layout:                   'default', //options: 'default', 'browser', '<custom>'
             vastTimeout:              5000, //number of milliseconds before the VAST Tag call timeouts
             timelinePreview:          {}, //Structure: {file: 'filename.vtt', type: 'VTT'}. Supported types: VTT only at this time.
             vastLoadedCallback:       (function() {}),

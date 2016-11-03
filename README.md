@@ -87,9 +87,7 @@ Here is a description of the parameters which can be used when setting Fluid Pla
 * `vastTag`: The URL of the VAST Tag, which returns an XML describing the VAST ad to be displayed.
 * `options`: Various options for tweaking the appearance and behaviour of the player:
   * `timelinePreview`: Sets the timeline preview, visible when hovering over the progress bar. The provided `file` contains a description of the thumbnail images used for the preview. The `type` sets the format of the file. Currently only the VTT format is supported. The timeline preview only works if the `default` layout is chosen (see below).
-  * `layout`: Two options are available. The default layout is `default`. It provides own skin to the player. The other option is `browser`. There, the standard video player layout and behaviour, specific for each browser, is used. _Note: on iPhone devices the `default` layout is not available, so the player switches automatically to `browser` layout._
-  * `customCssFile`: If "default" layout is chosen, a custom CSS file can be used instead the default one.
-  * `customClassName`: When a custom CSS file is used, the video wrapper (id="fluid_video_wrapper_<VIDEO PLAYER ID>") will have this additional class name assigned.
+  * `layout`: Several options are available. The default layout is `default`. It provides own skin to the player. Another option is `browser`, meaning that the standard video player layout and behaviour, specific for each browser, is used. Also, a custom layout may be used: in this case there should be a folder with the given name inside the `/templates` folder, containing a file `styles.css`. _Note: on iPhone devices the player always switches automatically to the `browser` layout._
   * `skipButtonCaption` (VAST only): The text, displayed on the Skip button. The text can contain the placeholder `[seconds]`. The default value is `Skip ad in [seconds]`.
   * `skipButtonClickCaption` (VAST only): The text, displayed when the Skip button is available for clicking.
   * `vastTimeout` (VAST only): The number of milliseconds before the VAST Tag call timeouts. Default: `5000`.
@@ -97,8 +95,13 @@ Here is a description of the parameters which can be used when setting Fluid Pla
 
 ## Layout Customization
 
-When Fluid Player is set to use its `default` layout, it automatically loads the [styles/default_layout.css](styles/default_layout.css) CSS file. It also loads the [Material Icons font](https://design.google.com/icons/), used to display the symbols of the buttons.
-The easiest way to change the layout is to edit the [styles/default_layout.css](styles/default_layout.css) CSS file of the local copy of Fluid Player.
+Fluid Player supports customization of its look. It is even possible to have several instances of the player, using different skins, on the same page.
+
+The easiest way to create a custom skin is to make a copy of one of the existing templates, located in separate folders inside the `/templates/` folder. Then, it can be modified to implement the new skin.
+
+When loading a template, the video wrapper element of the player (`id="fluid_video_wrapper_<VIDEO PLAYER ID>"`) will have the template name as an additional class name assigned, prefiexed with `fluid_player_layout_`. This makes it possible for several templates to be used on different instances of Fluid Player on the same page.
+
+For example, if a new skin, called `my_custom_skin` is created, all CSS selectors should start with `.fluid_video_wrapper.fluid_player_layout_my_custom_skin`.
 
 ## <a name="what-is-vast"></a>What is VAST
 
