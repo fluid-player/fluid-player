@@ -29,7 +29,7 @@
                 <ClickTracking><![CDATA[http://example.com/view2?tracking_event=click&idzone=9999999]]></ClickTracking>
             </VideoClicks>
             <MediaFiles>
-              <MediaFile delivery="progressive" type="video/mp4"><![CDATA[ad_wine.mp4]]></MediaFile>
+              <MediaFile delivery="progressive" type="video/mp4"><![CDATA[pre-ad.mp4]]></MediaFile>
             </MediaFiles>
           </Linear>
         </Creative>
