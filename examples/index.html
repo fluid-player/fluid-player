@@ -109,10 +109,11 @@
                     file: 'thumbnails.vtt',
                     type: 'VTT'
                 },
-                vastLoadedCallback: function() {console.log('vast loaded')},
-                noVastVideoCallback: function() {console.log('no vast')},
-                vastVideoSkippedCallback: function() {console.log('vast skipped')},
-                vastVideoEndedCallback: function() {console.log('vast ended')}
+                vastLoadedCallback: function() {console.log('vast loaded');},
+                noVastVideoCallback: function() {console.log('no vast');},
+                vastVideoSkippedCallback: function() {console.log('vast skipped');},
+                vastVideoEndedCallback: function() {console.log('vast ended');},
+                playerInitCallback: function() {console.log('Player "test-video" initiation called');}
             }
         );
 
