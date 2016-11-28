@@ -877,6 +877,7 @@ var fluidPlayerClass = {
             '       </div>' +
             '   </div>' +
             '   <div id="' + this.videoPlayerId + '_fluid_control_mute" class="fluid_button fluid_button_volume"></div>' +
+            '   <div id="' + this.videoPlayerId + '_fluid_control_duration" class="fluid_fluid_control_duration">00:00 / 00:00</div>' +
             '</div>';
     },
 
@@ -906,6 +907,29 @@ var fluidPlayerClass = {
         var currentProgressTag = document.getElementById(videoPlayerId + '_vast_control_currentprogress');
 
         currentProgressTag.style.width = (videoPlayerTag.currentTime / player.currentVideoDuration * 100) + '%';
+    },
+
+    contolDurationUpdate: function(videoPlayerId) {
+        var player = fluidPlayerClass.getInstanceById(videoPlayerId);
+
+        if (player.isCurrentlyPlayingAd) {
+            var durationText = '00:00 / 00:00';
+        } else {
+            var videoPlayerTag = document.getElementById(videoPlayerId);
+            var durationText = player.pad(parseInt(videoPlayerTag.currentTime / 60)) + ':' + player.pad(parseInt(videoPlayerTag.currentTime % 60)) +
+            ' / ' +
+            player.pad(parseInt(player.currentVideoDuration / 60)) + ':' + player.pad(parseInt(player.currentVideoDuration % 60));
+        }
+        var timePlaceholder = document.getElementById(videoPlayerId + '_fluid_control_duration');
+        timePlaceholder.innerHTML = durationText;
+    },
+
+    pad: function(value) {
+        if (value < 10) {
+            return '0' + value;
+        } else {
+            return value;
+        }
     },
 
     contolVolumebarUpdate: function(videoPlayerId) {
@@ -1229,6 +1253,7 @@ var fluidPlayerClass = {
         //Set the progressbar
         videoPlayerTag.addEventListener('timeupdate', function(){
             player.contolProgressbarUpdate(player.videoPlayerId);
+            player.contolDurationUpdate(player.videoPlayerId);
         });
         
         document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container').addEventListener('click', function(event) {

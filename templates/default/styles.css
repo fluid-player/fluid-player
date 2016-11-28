@@ -493,3 +493,26 @@ _:-ms-lang(x),
 .fluid_video_wrapper.fluid_player_layout_default.mobile .fluid_controls_container .fluid_button.fluid_button_fullscreen_exit:hover:before {
     background-position: -56px -84px;
 }
+
+/* Duration */
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_fluid_control_duration {
+    display: inline-block;
+    position: absolute;
+    left: 80px;
+    height: 24px;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 16px;
+    font-weight: normal;
+    font-style: normal;
+    text-align: left;
+    text-decoration: none;
+    line-height: 24px;
+}
+
+/* Duration - Double Size */
+.fluid_video_wrapper.fluid_player_layout_default.mobile .fluid_controls_container .fluid_fluid_control_duration {
+    left: 150px;
+    height: 48px;
+    font-size: 22px;
+    line-height: 48px;
+}
