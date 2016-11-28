@@ -1478,7 +1478,7 @@ var fluidPlayerClass = {
                                 result.push({
                                     startTime: vttRawData.cues[i].startTime,
                                     endTime: vttRawData.cues[i].endTime,
-                                    image: tempThumbnailData[0],
+                                    image: (player.displayOptions.timelinePreview.sprite ? player.displayOptions.timelinePreview.sprite : tempThumbnailData[0]),
                                     x: parseInt(tempThumbnailCoordinates[0]),
                                     y: parseInt(tempThumbnailCoordinates[1]),
                                     w: parseInt(tempThumbnailCoordinates[2]),
@@ -1672,7 +1672,7 @@ var fluidPlayerClass = {
             templateLocation:         fluidPlayerScriptLocation + 'templates/', //Custom folder where the template is located
             scriptsLocation:          fluidPlayerScriptLocation + 'scripts/', //Custom folder where additional scripts are located
             vastTimeout:              5000, //number of milliseconds before the VAST Tag call timeouts
-            timelinePreview:          {}, //Structure: {file: 'filename.vtt', type: 'VTT'}. Supported types: VTT only at this time.
+            timelinePreview:          {}, //Structure: {file: 'filename.vtt', sprite: 'timeline.jpg', type: 'VTT'}. Supported types: VTT only at this time. Sprite will override values from vtt file
             vastLoadedCallback:       (function() {}),
             noVastVideoCallback:      (function() {}),
             vastVideoSkippedCallback: (function() {}),
