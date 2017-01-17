@@ -253,6 +253,10 @@ _:-ms-lang(x),
     left: 0;
 }
 
+.fluid_video_wrapper.fluid_player_layout_metal .fluid_controls_container .fluid_controls_right .fluid_fluid_control_duration {
+    display: none;
+}
+
 /* Button Icons */
 .fluid_video_wrapper.fluid_player_layout_metal .fluid_controls_container .fluid_button.fluid_button_play,
 .fluid_video_wrapper.fluid_player_layout_metal .fluid_controls_container .fluid_button.fluid_button_pause,
