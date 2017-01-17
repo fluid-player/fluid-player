@@ -1178,17 +1178,19 @@ var fluidPlayerClass = {
 
     playPauseToggle: function(videoPlayerTag) {
         var player = fluidPlayerClass.getInstanceById(videoPlayerTag.id);
+        var initialStartJustSet = false;
 
         if (player.initialStart || (!player.vastOptions.vastTagUrl)) {
             if (!(player.initialStart || player.vastOptions.vastTagUrl)) {
                 player.initialStart = true;
+                initialStartJustSet = true;
                 player.displayOptions.noVastVideoCallback();
             }
 
             if (player.displayOptions.layout !== 'browser') { //The original player play/pause toggling is managed by the browser
                 if (videoPlayerTag.paused) {
                     videoPlayerTag.play();
-                } else {
+                } else if (!initialStartJustSet) {
                     videoPlayerTag.pause();
                 }
             }
