@@ -32,7 +32,7 @@ In order to set Fluid Player, three things are required:
 <script src="vast.js"></script>
 
 <video id='my-video' controls style="width: 640px; height: 360px;">
-	<source src='vid.mp4' type='video/mp4' />		
+	<source src='vid.mp4' type='video/mp4' />
 </video>
 
 <script type="text/javascript">
@@ -51,7 +51,7 @@ Fluid Player can be customized by setting some optional parameters:
 <script src="vast.js"></script>
 
 <video id='my-video' controls style="width: 640px; height: 360px;">
-	<source src='vid.mp4' type='video/mp4' />		
+	<source src='vid.mp4' type='video/mp4' />
 </video>
 
 <script type="text/javascript">
@@ -94,6 +94,30 @@ Here is a description of the parameters which can be used when setting Fluid Pla
   * `skipButtonClickCaption` (VAST only): The text, displayed when the Skip button is available for clicking.
   * `vastTimeout` (VAST only): The number of milliseconds before the VAST Tag call timeouts. Default: `5000`.
   * Callback functions: can be used to execute custom code when some key events occur. Currently the following events are supported: `vastLoadedCallback`, `noVastVideoCallback`, `vastVideoSkippedCallback`, `vastVideoEndedCallback` and `playerInitCallback`.
+
+### Integration with popular frameworks
+
+#### Wordpress
+
+We developed a plugin to embed Fluid Player in Wordpress blogs:
+https://wordpress.org/plugins/fluid-player/
+
+Fluid Player can be easily embedded by using the custom [fluid-player] shortcode.
+The initial version accepts the following list of named parameters:
+
+  * video : path to actual video to be used by the player. If no value is passed it will fall back to the plugin sample video.
+  * vast_file : path to vast file (optional)
+  * vtt_file : path to VTT file (optional)
+  * vtt_sprite : path to VTT sprites file (optional)
+  * layout : any of the following themes are provided with the player: default/funky/metal, if no value is passed it will fall back to 'default'
+
+Provided below is a generic example of how such a call would look like:
+
+```
+[fluid-player video="foo.mp4" vast_file="vast.xml"  vtt_file="thumbs.vtt" vtt_sprite="thumbs.jpg" layout="default"]
+```
+
+For more information visit the Wordpress hosted plugin page.
 
 ## Layout Customization
 
