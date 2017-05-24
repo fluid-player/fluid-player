@@ -29,7 +29,7 @@ In order to set Fluid Player, three things are required:
 
 ```html
 <link rel="stylesheet" href="vast.css" type="text/css"/>
-<script src="vast.js"></script>
+<script src="fluidplayer.js"></script>
 
 <video id='my-video' controls style="width: 640px; height: 360px;">
 	<source src='vid.mp4' type='video/mp4' />
@@ -48,7 +48,7 @@ Fluid Player can be customized by setting some optional parameters:
 
 ```html
 <link rel="stylesheet" href="vast.css" type="text/css"/>
-<script src="vast.js"></script>
+<script src="fluidplayer.js"></script>
 
 <video id='my-video' controls style="width: 640px; height: 360px;">
 	<source src='vid.mp4' type='video/mp4' />
