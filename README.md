@@ -28,7 +28,7 @@ In order to set Fluid Player, three things are required:
 * A single Javascript line of code that attaches the player to the video tag.
 
 ```html
-<link rel="stylesheet" href="vast.css" type="text/css"/>
+<link rel="stylesheet" href="fluidplayer.css" type="text/css"/>
 <script src="fluidplayer.js"></script>
 
 <video id='my-video' controls style="width: 640px; height: 360px;">
@@ -47,7 +47,7 @@ The `fluidVideo()` function gets the video tag id as a first parameter, which is
 Fluid Player can be customized by setting some optional parameters:
 
 ```html
-<link rel="stylesheet" href="vast.css" type="text/css"/>
+<link rel="stylesheet" href="fluidplayer.css" type="text/css"/>
 <script src="fluidplayer.js"></script>
 
 <video id='my-video' controls style="width: 640px; height: 360px;">
