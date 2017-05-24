@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Release
+## 1.0.2
 * [Pull #18](https://github.com/fluid-player/fluid-player/pull/18) [Pull #19](https://github.com/fluid-player/fluid-player/pull/19) Update file names, add in min file versions
 
 ##1.0.1
