@@ -151,11 +151,11 @@ The Fluid Player code is found at https://github.com/fluid-player/ but is also a
 
 Specify the version:
 ```html  
-http://cdn.fluidplayer.com/1.0.2/fluidplay.min.js
-http://cdn.fluidplayer.com/1.0.2/fluidplay.min.css
+http://cdn.fluidplayer.com/1.0.2/fluidplayer.min.js
+http://cdn.fluidplayer.com/1.0.2/fluidplayer.min.css
 ```
 Or use the most recent version:
 ```html  
-http://cdn.fluidplayer.com/current/fluidplay.min.js
-http://cdn.fluidplayer.com/current/fluidplay.min.css
+http://cdn.fluidplayer.com/current/fluidplayer.min.js
+http://cdn.fluidplayer.com/current/fluidplayer.min.css
 ```
