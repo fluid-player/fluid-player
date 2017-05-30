@@ -143,3 +143,18 @@ Fluid Player is licensed under the MIT License. View the [License File](LICENSE)
 ## Changelog
 
 A full list of changes and updates can be found in the project [CHANGELOG](CHANGELOG.md).
+
+## Fluid Player CDN
+
+The Fluid Player code is found at https://github.com/fluid-player/ but is also available for direct linking at http://cdn.fluidplayer.com/ 
+
+Specify the version:
+```html  
+http://cdn.fluidplayer.com/1.0.2/fluidplayer.min.js
+http://cdn.fluidplayer.com/1.0.2/fluidplayer.min.css
+```
+Or use the most recent version:
+```html  
+http://cdn.fluidplayer.com/current/fluidplayer.min.js
+http://cdn.fluidplayer.com/current/fluidplayer.min.css
+```
