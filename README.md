@@ -94,8 +94,8 @@ Here is a description of the parameters which can be used when setting Fluid Pla
   * `vastTimeout` (VAST only): The number of milliseconds before the VAST Tag call timeouts. Default: `5000`.
   * Callback functions: can be used to execute custom code when some key events occur. Currently the following events are supported: `vastLoadedCallback`, `noVastVideoCallback`, `vastVideoSkippedCallback`, `vastVideoEndedCallback` and `playerInitCallback`.
   * `logo` put image with logo on video player, put here url to image. Default: null
-  * `logoPosition` if `logo` option is set then this param set position of logo on player, accept string with values: `top`, `bottom`, `left`, `right`. Default: `top left`,
-  * `logoOpacity`  if `logo` option is set this set opacity for logo image, can be float from `0` to `1`. Default: `0.1`
+  * `logoPosition` if `logo` option is set then this param set position of logo on player, accept string with one or two values: `top`, `bottom`, `left`, `right`. Default: `top left`,
+  * `logoOpacity`  if `logo` option is set this set opacity for logo image, can be float from `0` to `1`. Default: `1`
 ### Integration with popular frameworks
 
 #### Wordpress
