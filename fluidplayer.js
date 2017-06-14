@@ -1723,7 +1723,7 @@ var fluidPlayerClass = {
         };
 
         //Overriding the default options
-        for (var key in options) {ьг
+        for (var key in options) {
             player.displayOptions[key] = options[key];
         }
 
