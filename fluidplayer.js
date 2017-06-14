@@ -1704,7 +1704,8 @@ var fluidPlayerClass = {
             noVastVideoCallback:      (function() {}),
             vastVideoSkippedCallback: (function() {}),
             vastVideoEndedCallback:   (function() {}),
-            playerInitCallback:       (function() {})
+            playerInitCallback:       (function() {}),
+            autoPlay:                 false
         };
 
         //Overriding the default options
@@ -1745,5 +1746,9 @@ var fluidPlayerClass = {
         player.handleFullscreen();
 
         player.displayOptions.playerInitCallback();
+
+        if (player.displayOptions.autoPlay) {
+            videoPlayer.play();
+        }
     }
 };
