@@ -504,6 +504,8 @@ var fluidPlayerClass = {
                     player.addSkipButton();
                 }
 
+                player.addCTAButton();
+
                 videoPlayerTag.removeAttribute('controls'); //Remove the default Controls
 
                 if (player.displayOptions.layout !== 'browser') {
@@ -646,6 +648,7 @@ var fluidPlayerClass = {
 
         player.removeClickthrough();
         player.removeSkipButton();
+        player.removeCTAButton();
         player.vastOptions.adFinished = true;
         player.displayOptions.vastVideoEndedCallback();
 
@@ -685,6 +688,41 @@ var fluidPlayerClass = {
         videoPlayerTag.addEventListener('timeupdate', this.decreaseSkipOffset, false);
     },
 
+    addCTAButton: function() {
+        if (!this.displayOptions.adCTAText) {
+            return;
+        }
+        var player = this;
+        var videoPlayerTag = document.getElementById(this.videoPlayerId);
+
+        var ctaButton = document.createElement('div');
+        ctaButton.id = this.videoPlayerId + '_fluid_cta';
+        ctaButton.className = 'fluid_ad_cta';
+
+        var link = document.createElement('a');
+        link.href = player.vastOptions.clickthroughUrl;
+        link.target = '_blank';
+        link.innerText = this.displayOptions.adCTAText;
+        link.onclick = function() {
+            if (!videoPlayerTag.paused) {
+                videoPlayerTag.pause();
+            }
+
+            return true;
+        };
+
+        ctaButton.appendChild(link);
+
+        document.getElementById('fluid_video_wrapper_' + this.videoPlayerId).appendChild(ctaButton);
+    },
+
+    removeCTAButton: function() {
+        var btn = document.getElementById(this.videoPlayerId + '_fluid_cta');
+        if (btn) {
+            btn.parentElement.removeChild(btn);
+        }
+    },
+
     decreaseSkipOffset: function decreaseSkipOffset() {
         //"this" is the HTML5 video tag, because it disptches the "ended" event
         var videoPlayerTag = this;
@@ -716,6 +754,7 @@ var fluidPlayerClass = {
 
     pressSkipButton: function() {
         this.removeSkipButton();
+        this.removeCTAButton();
         this.displayOptions.vastVideoSkippedCallback();
 
         var event = document.createEvent('Event');
@@ -1704,7 +1743,8 @@ var fluidPlayerClass = {
             noVastVideoCallback:      (function() {}),
             vastVideoSkippedCallback: (function() {}),
             vastVideoEndedCallback:   (function() {}),
-            playerInitCallback:       (function() {})
+            playerInitCallback:       (function() {}),
+            adCTAText:                null
         };
 
         //Overriding the default options
