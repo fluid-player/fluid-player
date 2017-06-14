@@ -72,6 +72,16 @@ Fluid Player can be customized by setting some optional parameters:
 </script>
 ```
 
+Player can switch video quality by providing different video files:
+
+```html
+<video id='my-video' controls style="width: 640px; height: 360px;">
+	<source src='vid_480p.mp4' title='480p' type='video/mp4' />
+	<source src='vid_720p.mp4' title='720p' type='video/mp4' />
+	<source src='vid_1080p.mp4' title='1080p' type='video/mp4' />
+</video>
+```
+
 ### Syntax
 
 ```

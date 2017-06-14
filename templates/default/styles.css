@@ -239,6 +239,60 @@ _:-ms-lang(x),
     float: right;
 }
 
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button_video_source {
+    font-size: 16px;
+    height: 24px;
+    line-height: 24px;
+    float: right;
+    cursor: pointer;
+    position: relative;
+    text-align: right;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button_video_source .fluid_video_sources_title {
+    width: 80px;
+    overflow: hidden;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button_video_source .fluid_video_sources_list {
+    position: absolute;
+    bottom: 24px;
+    right: -5px;
+    z-index: 3;
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 0px 5px 5px 5px;
+    display: none;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button_video_source .fluid_video_sources_list .fluid_video_source_list_item {
+    float: none;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button_video_source .fluid_video_sources_list .fluid_video_source {
+    height: 24px;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button_video_source .fluid_video_sources_list .fluid_video_source.fluid_video_source_active {
+    font-weight: bold;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.mobile .fluid_controls_container .fluid_controls_right .fluid_button_video_source {
+    height: 48px;
+    font-size: 22px;
+    line-height: 48px;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.mobile .fluid_controls_container .fluid_controls_right .fluid_button_video_source .fluid_video_sources_list {
+    bottom: 40px;
+}
+
+
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_control_volume_container,
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button.fluid_button_volume,
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button.fluid_button_mute {

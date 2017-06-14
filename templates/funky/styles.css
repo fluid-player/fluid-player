@@ -99,7 +99,7 @@ _:-ms-lang(x),
 
 .fluid_video_wrapper.fluid_player_layout_funky .fluid_controls_container .fluid_controls_right {
     float: right;
-    width: 164px;
+    /* width: 164px;*/
     left: auto;
     right: auto;
 }
@@ -115,7 +115,7 @@ _:-ms-lang(x),
     height: 34px;
     position: absolute;
     left: 45px;
-    right: 170px;
+    right: 215px;
     z-index: 2;
     top: 0;
 }
@@ -174,7 +174,7 @@ _:-ms-lang(x),
     position: relative;
     height: 34px;
     width: 75px;
-    margin: 0 3px;
+    margin: 0 10px 0 3px;
     z-index: 2;
     left: auto;
     top: auto;
@@ -277,6 +277,53 @@ _:-ms-lang(x),
 .fluid_video_wrapper.fluid_player_layout_funky .fluid_controls_container .fluid_button.fluid_button_fullscreen_exit:before {
     background: none;
     display: none;
+}
+
+.fluid_video_wrapper.fluid_player_layout_funky .fluid_controls_container .fluid_controls_right .fluid_button_video_source {
+    font-size: 16px;
+    height: 32px;
+    line-height: 32px;
+    float: right;
+    cursor: pointer;
+    position: relative;
+    text-align: right;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
+}
+
+.fluid_video_wrapper.fluid_player_layout_funky .fluid_controls_container .fluid_controls_right .fluid_button_video_source .fluid_video_sources_title {
+    width: 50px;
+    overflow: hidden;
+}
+
+.fluid_video_wrapper.fluid_player_layout_funky .fluid_controls_container .fluid_controls_right .fluid_button_video_source .fluid_video_sources_list {
+    position: absolute;
+    bottom: 24px;
+    right: -5px;
+    z-index: 3;
+    background-color: #ebebeb;
+    padding: 0px 5px 5px 5px;
+    display: none;
+}
+
+.fluid_video_wrapper.fluid_player_layout_funky .fluid_controls_container .fluid_controls_right .fluid_button_video_source .fluid_video_sources_list .fluid_video_source_list_item {
+    float: none;
+}
+
+.fluid_video_wrapper.fluid_player_layout_funky .fluid_controls_container .fluid_controls_right .fluid_button_video_source .fluid_video_sources_list .fluid_video_source {
+    height: 24px;
+}
+
+.fluid_video_wrapper.fluid_player_layout_funky .fluid_controls_container .fluid_controls_right .fluid_button_video_source .fluid_video_sources_list .fluid_video_source.fluid_video_source_active {
+    font-weight: bold;
+}
+
+.fluid_video_wrapper.fluid_player_layout_funky.mobile .fluid_controls_container .fluid_controls_right .fluid_button_video_source {
+
 }
 
 .fluid_video_wrapper.fluid_player_layout_funky .fluid_controls_container .fluid_button.fluid_button_play {
