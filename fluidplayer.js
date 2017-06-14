@@ -59,6 +59,8 @@ var fluidPlayerClass = {
         'requestStylesheet', 'reqiestScript', 'isTouchDevice', 'vastOptions',
         'displayOptions', 'getEventOffsetX', 'getEventOffsetY', 'getTranslateX',
         'toggleElementText', 'getMobileOs', 'findClosestParent'],
+    version: '1.0.2',
+    homepage: 'https://www.fluidplayer.com/',
 
     getInstanceById: function(playerId) {
         for (var i = 0; i < this.instances.length; i++) {
@@ -1295,6 +1297,14 @@ var fluidPlayerClass = {
             '    <li id="' + player.videoPlayerId + 'context_option_play">Play</li>' +
             '    <li id="' + player.videoPlayerId + 'context_option_mute">Mute</li>' +
             '    <li id="' + player.videoPlayerId + 'context_option_fullscreen">Fullscreen</li>' +
+            '    <li id="' + player.videoPlayerId + 'context_option_homepage">' +
+            '       <a ' +
+            '           id="' + player.videoPlayerId + 'context_option_homepage_link" ' +
+            '           href="' + player.homepage + '" ' +
+            '           target="_blank">' +
+            '           Fluidplayer ' + player.version + '' +
+            '       </a>' +
+            '     </li>' +
             '</ul>';
 
         videoPlayerTag.parentNode.insertBefore(divContextMenu, videoPlayerTag.nextSibling);
@@ -1320,6 +1330,7 @@ var fluidPlayerClass = {
         var menuOptionPlay       = document.getElementById(player.videoPlayerId + 'context_option_play');
         var menuOptionMute       = document.getElementById(player.videoPlayerId + 'context_option_mute');
         var menuOptionFullscreen = document.getElementById(player.videoPlayerId + 'context_option_fullscreen');
+        var menuOptionHomepageLink   = document.getElementById(player.videoPlayerId + 'context_option_homepage_link');
 
         menuOptionPlay.addEventListener('click', function() {
             player.playPauseToggle(videoPlayerTag);
@@ -1332,6 +1343,9 @@ var fluidPlayerClass = {
         menuOptionFullscreen.addEventListener('click', function() {
             player.fullscreenToggle(player.videoPlayerId);
         }, false);
+
+        menuOptionHomepageLink.style.color = 'inherit';
+        menuOptionHomepageLink.style.textDecoration = 'inherit';
     },
 
     setDefaultLayout: function() {
@@ -1704,11 +1718,12 @@ var fluidPlayerClass = {
             noVastVideoCallback:      (function() {}),
             vastVideoSkippedCallback: (function() {}),
             vastVideoEndedCallback:   (function() {}),
-            playerInitCallback:       (function() {})
+            playerInitCallback:       (function() {}),
+            autoPlay:                 false
         };
 
         //Overriding the default options
-        for (var key in options) {
+        for (var key in options) {ьг
             player.displayOptions[key] = options[key];
         }
 
@@ -1745,5 +1760,9 @@ var fluidPlayerClass = {
         player.handleFullscreen();
 
         player.displayOptions.playerInitCallback();
+
+        if (player.displayOptions.autoPlay) {
+            videoPlayer.play();
+        }
     }
 };
