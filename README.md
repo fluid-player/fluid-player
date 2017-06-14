@@ -93,6 +93,7 @@ Here is a description of the parameters which can be used when setting Fluid Pla
   * `skipButtonClickCaption` (VAST only): The text, displayed when the Skip button is available for clicking.
   * `vastTimeout` (VAST only): The number of milliseconds before the VAST Tag call timeouts. Default: `5000`.
   * Callback functions: can be used to execute custom code when some key events occur. Currently the following events are supported: `vastLoadedCallback`, `noVastVideoCallback`, `vastVideoSkippedCallback`, `vastVideoEndedCallback` and `playerInitCallback`.
+  * `adText` Optional text to be shown on top right corner while ad is playing. Default: null
 
 ### Integration with popular frameworks
 
