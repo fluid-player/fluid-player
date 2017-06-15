@@ -149,9 +149,6 @@
     width : auto;
     word-spacing : normal;
     z-index : auto;
-    /* basic modern patch */
-    all: initial;
-    all: unset;
 }
 
 .fluid_video_wrapper:after, .fluid_video_wrapper:before {
