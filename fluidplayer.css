@@ -84,6 +84,16 @@
 	opacity: 0;
 }
 
+.fluid_html_on_pause {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    z-index: 0;
+}
+
 /*Mobile Layout*/
 .fluid_video_wrapper.mobile .skip_button {
     bottom: 75px;

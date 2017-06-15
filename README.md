@@ -93,6 +93,9 @@ Here is a description of the parameters which can be used when setting Fluid Pla
   * `skipButtonClickCaption` (VAST only): The text, displayed when the Skip button is available for clicking.
   * `vastTimeout` (VAST only): The number of milliseconds before the VAST Tag call timeouts. Default: `5000`.
   * Callback functions: can be used to execute custom code when some key events occur. Currently the following events are supported: `vastLoadedCallback`, `noVastVideoCallback`, `vastVideoSkippedCallback`, `vastVideoEndedCallback` and `playerInitCallback`.
+  * `htmlOnPauseBlock` string that could contain any html to be displayed when user pauses video, note: on click event triggers play event, if you don't need that behaviour then add `e.stopPropagation()` to your event. Default `null`
+  * `htmlOnPauseBlockHeight` integer, if `htmlOnPauseBlock` is set then it used to set container height (for center position). Default `null` 
+  * `htmlOnPauseBlockWidth` integer, if `htmlOnPauseBlock` is set then it used to set container width (for center position). Default `null`
 
 ### Integration with popular frameworks
 

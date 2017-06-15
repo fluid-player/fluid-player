@@ -1227,6 +1227,15 @@ var fluidPlayerClass = {
             //trigger the loading of the VAST Tag
             player.prepareVast();
         }
+
+        var blockOnPause = document.getElementById(player.videoPlayerId + '_fluid_html_on_pause');
+        if (blockOnPause && !player.isCurrentlyPlayingAd) {
+            if (videoPlayerTag.paused) {
+                blockOnPause.style.display = 'block';
+            } else {
+                blockOnPause.style.display = 'none';
+            }
+        }
     },
 
     setCustomControls: function() {
@@ -1670,6 +1679,33 @@ var fluidPlayerClass = {
 
     },
 
+    initHtmlOnPauseBlock: function() {
+        var player = this;
+        if (!player.displayOptions.htmlOnPauseBlock) {
+            return;
+        }
+
+        var videoPlayer = document.getElementById(player.videoPlayerId);
+        var containerDiv = document.createElement('div');
+        containerDiv.id = player.videoPlayerId + '_fluid_html_on_pause';
+        containerDiv.className = 'fluid_html_on_pause';
+        containerDiv.style.display = 'none';
+        containerDiv.innerHTML = player.displayOptions.htmlOnPauseBlock;
+        containerDiv.onclick = function(event) {
+            player.playPauseToggle(videoPlayer);
+        }
+
+        if (player.displayOptions.htmlOnPauseBlockWidth) {
+            containerDiv.style.width = player.displayOptions.htmlOnPauseBlockWidth + 'px';
+        }
+
+        if (player.displayOptions.htmlOnPauseBlockHeight) {
+            containerDiv.style.height = player.displayOptions.htmlOnPauseBlockHeight + 'px';
+        }
+
+        videoPlayer.parentNode.insertBefore(containerDiv, null);
+    },
+
     init: function(idVideoPlayer, vastTag, options) {
         var player = this;
         var videoPlayer = document.getElementById(idVideoPlayer);
@@ -1704,7 +1740,10 @@ var fluidPlayerClass = {
             noVastVideoCallback:      (function() {}),
             vastVideoSkippedCallback: (function() {}),
             vastVideoEndedCallback:   (function() {}),
-            playerInitCallback:       (function() {})
+            playerInitCallback:       (function() {}),
+            htmlOnPauseBlock:         null,
+            htmlOnPauseBlockWidth:    null,
+            htmlOnPauseBlockHeight:   null
         };
 
         //Overriding the default options
@@ -1743,6 +1782,8 @@ var fluidPlayerClass = {
 
         //Set the custom fullscreen behaviour
         player.handleFullscreen();
+
+        player.initHtmlOnPauseBlock();
 
         player.displayOptions.playerInitCallback();
     }
