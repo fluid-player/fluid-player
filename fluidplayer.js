@@ -1647,8 +1647,6 @@ var fluidPlayerClass = {
         divVideoWrapper.id = 'fluid_video_wrapper_' + player.videoPlayerId;
 
         //Assign the height/width dimensions to the wrapper
-        divVideoWrapper.style.height = videoPlayer.clientHeight + 'px';
-        divVideoWrapper.style.width = videoPlayer.clientWidth + 'px';
         videoPlayer.style.height = '100%';
         videoPlayer.style.width = '100%';
 
