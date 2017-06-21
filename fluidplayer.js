@@ -1691,7 +1691,10 @@ var fluidPlayerClass = {
         } else {
             logoImage.style.left = 0;
         }
-        logoImage.style.opacity = player.displayOptions.logoOpacity;
+        if (player.displayOptions.logoOpacity) {
+            logoImage.style.opacity = player.displayOptions.logoOpacity;
+        }
+        logoImage.style.pointerEvents = 'none';
 
         videoPlayer.parentNode.insertBefore(logoImage, null);
     },
