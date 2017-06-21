@@ -3,7 +3,6 @@
 .fluid_video_wrapper {
 	position:relative;
 	display: inline-block;
-    width: 100%;
 }
 
 .fluid_video_wrapper video {

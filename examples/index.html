@@ -19,23 +19,10 @@
 	<div class="main">
 		<div class="container_wrap clearfix">
 			<h1>Fluid Player - Default Skin</h1>
-			
-			<div class="demo_container clearfix">
-				<div class="demo_container_left">
-					<video id='test-video' controls style="width: 640px; height: 360px;">
-						<source src='video.mp4' type='video/mp4' />		
-					</video>
-				</div>
-				<div class="demo_container_right">
-					<ul>
-						<li>Supports VAST (Video Ad Serving Template).</li>
-						<li>Comes with its own design, which is easily customizable.</li>
-						<li>Timeline Preview.</li>
-						<li>Lightweight.</li>
-						<li>Compatible with modern web browsers.</li>
-					</ul>
-				</div>
-			</div>
+			<video id='test-video' controls style="width: 100%">
+				<source src='Relax_720p.mp4' type='video/mp4' title="720p" />
+				<source src='Relax_360p.mp4' type='video/mp4' title="360p" />
+			</video>
 		</div>
         
 		<div class="container_wrap clearfix">
@@ -44,7 +31,9 @@
 			<div class="demo_container clearfix">
 				<div class="demo_container_left">
 					<video id='test-video-2' controls style="width: 640px; height: 360px;">
-						<source src='video.mp4' type='video/mp4' />		
+						<source src='video.mp4' type='video/mp4' title="1080p" />
+						<source src='video.mp4' type='video/mp4' title="720p" />
+						<source src='video.mp4' type='video/mp4' title="480p" />
 					</video>
 				</div>
 				<div class="demo_container_right">
@@ -59,7 +48,9 @@
 			<div class="demo_container clearfix">
 				<div class="demo_container_left">
 					<video id='test-video-3' controls style="width: 640px; height: 360px;">
-						<source src='video.mp4' type='video/mp4' />		
+						<source src='video.mp4' type='video/mp4' title="1080p" />
+						<source src='video.mp4' type='video/mp4' title="720p" />
+						<source src='video.mp4' type='video/mp4' title="480p" />
 					</video>
 				</div>
 				<div class="demo_container_right">
@@ -74,7 +65,9 @@
 			<div class="demo_container clearfix">
 				<div class="demo_container_left">
 					<video id='test-video-4' controls style="width: 640px; height: 360px;">
-						<source src='video.mp4' type='video/mp4' />		
+						<source src='video.mp4' type='video/mp4' title="1080p" />
+						<source src='video.mp4' type='video/mp4' title="720p" />
+						<source src='video.mp4' type='video/mp4' title="480p" />
 					</video>
 				</div>
 				<div class="demo_container_right">
@@ -112,7 +105,16 @@
                 noVastVideoCallback: function() {console.log('no vast');},
                 vastVideoSkippedCallback: function() {console.log('vast skipped');},
                 vastVideoEndedCallback: function() {console.log('vast ended');},
-                playerInitCallback: function() {console.log('Player "test-video" initiation called');}
+                playerInitCallback: function() {console.log('Player "test-video" initiation called');},
+				logo: 'fluidplayer.png',
+				logoPosition: 'bottom left',
+				logoOpacity: 0.1,
+				adText: 'advertisement',
+				adCTAText: 'Visit Advertiser Website',
+				htmlOnPauseBlock: '<img style="width: 200px" src="http://portpool.ru/content/icons/transparent/imageready_couleur_3.png" />',
+				htmlOnPauseBlockHeight: 200,
+				htmlOnPauseBlockWidth: 200,
+				responsive: false
             }
         );
 
@@ -124,7 +126,9 @@
                     file: 'thumbnails.vtt',
                     type: 'VTT'
                 },
-                layout: 'funky'
+                layout: 'funky',
+				adCTAText: 'Visit Advertiser Website'
+
             }
         );
 

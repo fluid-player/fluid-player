@@ -1647,6 +1647,12 @@ var fluidPlayerClass = {
         divVideoWrapper.id = 'fluid_video_wrapper_' + player.videoPlayerId;
 
         //Assign the height/width dimensions to the wrapper
+        if (player.displayOptions.responsive) {
+            divVideoWrapper.style.width = '100%';
+        } else {
+            divVideoWrapper.style.height = videoPlayer.clientHeight + 'px';
+            divVideoWrapper.style.width = videoPlayer.clientWidth + 'px';
+        }
         videoPlayer.style.height = '100%';
         videoPlayer.style.width = '100%';
 
@@ -1702,7 +1708,8 @@ var fluidPlayerClass = {
             noVastVideoCallback:      (function() {}),
             vastVideoSkippedCallback: (function() {}),
             vastVideoEndedCallback:   (function() {}),
-            playerInitCallback:       (function() {})
+            playerInitCallback:       (function() {}),
+            responsive:               false
         };
 
         //Overriding the default options
