@@ -100,7 +100,36 @@
     padding: 5px;
 }
 
+.fluid_ad_cta {
+    position:absolute;
+    height:47px;
+    bottom: 50px;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    border: 1px solid #777777;
+    color:#ffffff;
+    font-size: 28px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 300;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    line-height: 41px;
+    z-index: 10;
+    padding: 0 28px 0 19px;
+}
+
+.fluid_ad_cta a {
+    text-decoration: none;
+    color: #ffffff;
+}
+
+.fluid_ad_cta:hover {
+    background-color: #000000;
+    border: 1px solid #ffffff;
+}
+
 /*Mobile Layout*/
-.fluid_video_wrapper.mobile .skip_button {
+.fluid_video_wrapper.mobile .skip_button, .fluid_video_wrapper.mobile .fluid_ad_cta {
     bottom: 75px;
 }

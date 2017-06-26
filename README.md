@@ -108,6 +108,7 @@ Here is a description of the parameters which can be used when setting Fluid Pla
   * `logoPosition`: If `logo` option is set then this parameter sets the position of the logo on the player. Accept a string with one or two values: `top`, `bottom`; `left`, `right`. Default: `top left`.
   * `logoOpacity`:  If `logo` option is set this set opacity for logo image, can be a float value from `0` to `1`. Default: `1`.
   * `adText`: Optional text to be shown on top right corner while an ad is playing. Default: `null`.
+  * `adCTAText`: Optional call to action text that is shown while an ad is playing. Default: `null`.
 
 ### Integration with popular frameworks
 
