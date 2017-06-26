@@ -516,6 +516,10 @@ var fluidPlayerClass = {
                     }
                 }
 
+                if (player.displayOptions.adText) {
+                    player.addAdPlayingText(player.displayOptions.adText);
+                }
+
                 player.toggleLoader(false);
                 videoPlayerTag.play();
 
@@ -648,6 +652,7 @@ var fluidPlayerClass = {
 
         player.removeClickthrough();
         player.removeSkipButton();
+        player.removeAdPlayingText();
         player.vastOptions.adFinished = true;
         player.displayOptions.vastVideoEndedCallback();
 
@@ -687,6 +692,24 @@ var fluidPlayerClass = {
         videoPlayerTag.addEventListener('timeupdate', this.decreaseSkipOffset, false);
     },
 
+    addAdPlayingText: function() {
+        var text = this.displayOptions.adText;
+
+        var adPlayingDiv = document.createElement('div');
+        adPlayingDiv.id = this.videoPlayerId + '_fluid_ad_playing';
+        adPlayingDiv.className = 'fluid_ad_playing';
+        adPlayingDiv.innerText = text;
+
+        document.getElementById('fluid_video_wrapper_' + this.videoPlayerId).appendChild(adPlayingDiv);
+    },
+
+    removeAdPlayingText: function() {
+        var div = document.getElementById(this.videoPlayerId + '_fluid_ad_playing');
+        if (div) {
+            div.parentElement.removeChild(div);
+        }
+    },
+
     decreaseSkipOffset: function decreaseSkipOffset() {
         //"this" is the HTML5 video tag, because it disptches the "ended" event
         var videoPlayerTag = this;
@@ -718,6 +741,7 @@ var fluidPlayerClass = {
 
     pressSkipButton: function() {
         this.removeSkipButton();
+        this.removeAdPlayingText();
         this.displayOptions.vastVideoSkippedCallback();
 
         var event = document.createEvent('Event');
@@ -1863,7 +1887,8 @@ var fluidPlayerClass = {
             autoPlay:                 false,
             logo:                     null,
             logoPosition:             "top left",
-            logoOpacity:              1
+            logoOpacity:              1,
+            adText:                   null
         };
 
         //Overriding the default options
