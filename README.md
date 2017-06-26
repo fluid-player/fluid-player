@@ -27,8 +27,8 @@ In order to set Fluid Player, three things are required:
 * A single Javascript line of code that attaches the player to the video tag.
 
 ```html
-<link rel="stylesheet" href="fluidplayer.css" type="text/css"/>
-<script src="fluidplayer.js"></script>
+<link rel="stylesheet" href="https://cdn.fluidplayer.com/current/fluidplayer.min.css" type="text/css"/>
+<script src="https://cdn.fluidplayer.com/current/fluidplayer.min.js"></script>
 
 <video id='my-video' controls style="width: 640px; height: 360px;">
 	<source src='vid.mp4' type='video/mp4' />
@@ -165,11 +165,11 @@ The Fluid Player code is found at https://github.com/fluid-player/ but is also a
 
 Specify the version:
 ```html  
-http://cdn.fluidplayer.com/1.0.2/fluidplayer.min.js
-http://cdn.fluidplayer.com/1.0.2/fluidplayer.min.css
+https://cdn.fluidplayer.com/1.0.2/fluidplayer.min.js
+https://cdn.fluidplayer.com/1.0.2/fluidplayer.min.css
 ```
 Or use the most recent version:
 ```html  
-http://cdn.fluidplayer.com/current/fluidplayer.min.js
-http://cdn.fluidplayer.com/current/fluidplayer.min.css
+https://cdn.fluidplayer.com/current/fluidplayer.min.js
+https://cdn.fluidplayer.com/current/fluidplayer.min.css
 ```
