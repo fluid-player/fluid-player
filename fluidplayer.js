@@ -1734,8 +1734,12 @@ var fluidPlayerClass = {
         divVideoWrapper.id = 'fluid_video_wrapper_' + player.videoPlayerId;
 
         //Assign the height/width dimensions to the wrapper
-        divVideoWrapper.style.height = videoPlayer.clientHeight + 'px';
-        divVideoWrapper.style.width = videoPlayer.clientWidth + 'px';
+        if (player.displayOptions.responsive) {
+            divVideoWrapper.style.width = '100%';
+        } else {
+            divVideoWrapper.style.height = videoPlayer.clientHeight + 'px';
+            divVideoWrapper.style.width = videoPlayer.clientWidth + 'px';
+        }
         videoPlayer.style.height = '100%';
         videoPlayer.style.width = '100%';
 
@@ -1967,7 +1971,8 @@ var fluidPlayerClass = {
             adCTAText:                null,
             htmlOnPauseBlock:         null,
             htmlOnPauseBlockWidth:    null,
-            htmlOnPauseBlockHeight:   null
+            htmlOnPauseBlockHeight:   null,
+            responsive:               false
         };
 
         //Overriding the default options

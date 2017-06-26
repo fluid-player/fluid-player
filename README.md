@@ -112,6 +112,7 @@ Here is a description of the parameters which can be used when setting Fluid Pla
   * `htmlOnPauseBlock`: A string that could contain any html to be displayed when user pauses video. Note: Clicking on the HTML area triggers a play event. If you don't need that behaviour then add `e.stopPropagation()` to your event. Default: `null`.
   * `htmlOnPauseBlockHeight`: An integer, if `htmlOnPauseBlock` is set then it used to set the container height (for center position). Default: `null` .
   * `htmlOnPauseBlockWidth`: An integer, if `htmlOnPauseBlock` is set then it used to set the container width (for center position). Default: `null`.
+  * `responsive`: If set to `true`, the player will stretch horizontally to 100% of its parent container width. Default: `false`.
 
 ### Integration with popular frameworks
 
