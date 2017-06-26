@@ -1796,6 +1796,34 @@ var fluidPlayerClass = {
         }
     },
 
+    initLogo: function() {
+        var player = this;
+        var videoPlayer = document.getElementById(player.videoPlayerId);
+        if (!player.displayOptions.logo) {
+            return;
+        }
+
+        var logoImage = document.createElement('img');
+        logoImage.src = player.displayOptions.logo;
+        logoImage.style.position = 'absolute';
+        var logoPosition = player.displayOptions.logoPosition.toLowerCase();
+        if (logoPosition.indexOf('bottom') !== -1) {
+            logoImage.style.bottom = 0;
+        } else {
+            logoImage.style.top = 0;
+        }
+        if (logoPosition.indexOf('right') !== -1) {
+            logoImage.style.right = 0;
+        } else {
+            logoImage.style.left = 0;
+        }
+        if (player.displayOptions.logoOpacity) {
+            logoImage.style.opacity = player.displayOptions.logoOpacity;
+        }
+        logoImage.style.pointerEvents = 'none';
+
+        videoPlayer.parentNode.insertBefore(logoImage, null);
+    },
 
     init: function(idVideoPlayer, vastTag, options) {
         var player = this;
@@ -1832,7 +1860,10 @@ var fluidPlayerClass = {
             vastVideoSkippedCallback: (function() {}),
             vastVideoEndedCallback:   (function() {}),
             playerInitCallback:       (function() {}),
-            autoPlay:                 false
+            autoPlay:                 false,
+            logo:                     null,
+            logoPosition:             "top left",
+            logoOpacity:              1
         };
 
         //Overriding the default options
@@ -1871,6 +1902,8 @@ var fluidPlayerClass = {
 
         //Set the custom fullscreen behaviour
         player.handleFullscreen();
+
+        player.initLogo();
 
         player.displayOptions.playerInitCallback();
 

@@ -103,7 +103,10 @@ Here is a description of the parameters which can be used when setting Fluid Pla
   * `skipButtonClickCaption` (VAST only): The text, displayed when the Skip button is available for clicking.
   * `vastTimeout` (VAST only): The number of milliseconds before the VAST Tag call timeouts. Default: `5000`.
   * Callback functions: can be used to execute custom code when some key events occur. Currently the following events are supported: `vastLoadedCallback`, `noVastVideoCallback`, `vastVideoSkippedCallback`, `vastVideoEndedCallback` and `playerInitCallback`.
-  * `autoPlay` starts playing video file after load (note: on mostly mobile browser auto play is disabled by browser), default is false
+  * `autoPlay`: Starts playing video file after load. Note: on most mobile browsers auto play is disabled by the browser. Default: `false`.
+  * `logo`: Put a logo image on the video player by providing the image URL. Default: `null`.
+  * `logoPosition`: If `logo` option is set then this parameter sets the position of the logo on the player. Accept a string with one or two values: `top`, `bottom`; `left`, `right`. Default: `top left`.
+  * `logoOpacity`:  If `logo` option is set this set opacity for logo image, can be a float value from `0` to `1`. Default: `1`.
 
 ### Integration with popular frameworks
 
