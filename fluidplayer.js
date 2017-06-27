@@ -1297,7 +1297,7 @@ var fluidPlayerClass = {
         var blockOnPause = document.getElementById(player.videoPlayerId + '_fluid_html_on_pause');
         if (blockOnPause && !player.isCurrentlyPlayingAd) {
             if (videoPlayerTag.paused) {
-                blockOnPause.style.display = 'block';
+                blockOnPause.style.display = 'flex';
             } else {
                 blockOnPause.style.display = 'none';
             }
