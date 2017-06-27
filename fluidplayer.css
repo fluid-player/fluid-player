@@ -292,6 +292,10 @@
     left: 0;
     margin: auto;
     z-index: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 /*Mobile Layout*/

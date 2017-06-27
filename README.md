@@ -109,9 +109,9 @@ Here is a description of the parameters which can be used when setting Fluid Pla
   * `logoOpacity`:  If `logo` option is set this set opacity for logo image, can be a float value from `0` to `1`. Default: `1`.
   * `adText`: Optional text to be shown on top right corner while an ad is playing. Default: `null`.
   * `adCTAText`: Optional call to action text that is shown while an ad is playing. Default: `null`.
-  * `htmlOnPauseBlock`: A string that could contain any html to be displayed when user pauses video. Note: Clicking on the HTML area triggers a play event. If you don't need that behaviour then add `e.stopPropagation()` to your event. Default: `null`.
-  * `htmlOnPauseBlockHeight`: An integer, if `htmlOnPauseBlock` is set then it used to set the container height (for center position). Default: `null` .
-  * `htmlOnPauseBlockWidth`: An integer, if `htmlOnPauseBlock` is set then it used to set the container width (for center position). Default: `null`.
+  * `htmlOnPauseBlock`: A string that could contain any html to be displayed in the center of the player when the user pauses the video. Note: Clicking on the HTML area triggers a play event. If you don't need that behaviour then add `e.stopPropagation()` to your event. Default: `null`.
+  * `htmlOnPauseBlockHeight`: An integer, if `htmlOnPauseBlock` is set then it used to set the container height. Default: `null` .
+  * `htmlOnPauseBlockWidth`: An integer, if `htmlOnPauseBlock` is set then it used to set the container width. Default: `null`.
   * `responsive`: If set to `true`, the player will stretch horizontally to 100% of its parent container width. Default: `false`.
 
 ### Integration with popular frameworks
