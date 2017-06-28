@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## 1.1.0
+* [Pull #34](https://github.com/fluid-player/fluid-player/pull/34) Various Improvements:
+  * Possibility to allow the user to switch between different video qualities. (Example, 720p, 1080p, etc...)
+  * Enable/Disable autoplay.
+  * Possibility to set a logo over the video player, with configurable position and opacity.
+  * Possibility to show a text when a video ad is being played. (Example : "Advertising")
+  * Possibility to show a call to action link when a video ad is being played. (Example : "Click here to learn more about this product.")
+  * Improved CSS management.
+  * Possibility to show a custom HTML code when the user pauses the video. (For example, a banner ad, or some related video links)
+  * The video player can be fully responsive.
+
 ## 1.0.2
 * [Pull #18](https://github.com/fluid-player/fluid-player/pull/18) [Pull #19](https://github.com/fluid-player/fluid-player/pull/19) Update file names, add in min file versions
 
