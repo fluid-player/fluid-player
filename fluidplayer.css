@@ -296,6 +296,11 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    pointer-events: none;
+}
+
+.fluid_html_on_pause * {
+    pointer-events: auto;
 }
 
 /*Mobile Layout*/
