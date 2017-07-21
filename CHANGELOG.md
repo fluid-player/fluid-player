@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 1.1.1
+* [Pull #38](https://github.com/fluid-player/fluid-player/pull/38) Reset the CSS box-sizing settings.
+
 ## 1.1.0
 * [Pull #34](https://github.com/fluid-player/fluid-player/pull/34) Various Improvements:
   * Possibility to allow the user to switch between different video qualities. (Example, 720p, 1080p, etc...)
