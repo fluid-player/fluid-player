@@ -52,6 +52,8 @@
     border-top-width : medium;
     bottom : auto;
     box-shadow : none;
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
     box-sizing : content-box;
     caption-side : top;
     clear : none;
@@ -149,6 +151,13 @@
     width : auto;
     word-spacing : normal;
     z-index : auto;
+}
+
+.fluid_video_wrapper,
+.fluid_video_wrapper * {
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
 }
 
 .fluid_video_wrapper:after, .fluid_video_wrapper:before {
