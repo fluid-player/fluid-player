@@ -59,7 +59,7 @@ var fluidPlayerClass = {
         'requestStylesheet', 'reqiestScript', 'isTouchDevice', 'vastOptions',
         'displayOptions', 'getEventOffsetX', 'getEventOffsetY', 'getTranslateX',
         'toggleElementText', 'getMobileOs', 'findClosestParent'],
-    version: '1.1.1',
+    version: '1.1.2',
     homepage: 'https://www.fluidplayer.com/',
 
     getInstanceById: function(playerId) {

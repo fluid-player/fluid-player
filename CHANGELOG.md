@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 1.1.2
+* [Pull #43](https://github.com/fluid-player/fluid-player/pull/43) Add two new skins.
+
 ## 1.1.1
 * [Pull #38](https://github.com/fluid-player/fluid-player/pull/38) Reset the CSS box-sizing settings.
 
