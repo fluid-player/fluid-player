@@ -1287,8 +1287,12 @@ var fluidPlayerClass = {
         } else {
             //Workaround for Chrome Mobile - otherwise it blocks the subsequent
             //play() command, because it considers it not being triggered by the user.
-            videoPlayerTag.src = fluidPlayerScriptLocation + 'blank.mp4';
-            videoPlayerTag.play();
+            var ua = window.navigator.userAgent;
+            var isMobileChecks = fluidPlayerClass.getMobileOs();
+            if ((isMobileChecks.userOs !== false || isMobileChecks.device !== false) && (!!window.chrome || -1 !== ua.indexOf("crios") || 0 === window.navigator.vendor.indexOf("Google") && -1 !== ua.indexOf("chrome"))) {
+                videoPlayerTag.src = fluidPlayerScriptLocation + 'blank.mp4';
+                videoPlayerTag.play();
+            }
 
             //trigger the loading of the VAST Tag
             player.prepareVast();
