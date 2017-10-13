@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## Master
+* [Pull #50](https://github.com/fluid-player/fluid-player/pull/50) Fix for double double render of blank video on some browsers
+
 ## 1.1.2
 * [Pull #43](https://github.com/fluid-player/fluid-player/pull/43) Add two new skins.
 
