@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Master
+## 1.1.3
 * [Pull #50](https://github.com/fluid-player/fluid-player/pull/50) Fix for double double render of blank video on some browsers
 
 ## 1.1.2
