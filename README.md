@@ -1,5 +1,5 @@
 # Fluid Player
-[![Latest version](https://img.shields.io/badge/Latest%20Version-1.0.2-blue.svg)](https://github.com/fluid-player/fluid-player/releases/latest)
+[![Latest version](https://img.shields.io/badge/Latest%20Version-1.1.3-blue.svg)](https://github.com/fluid-player/fluid-player/releases/latest)
 
 ## Overview
 
@@ -27,8 +27,8 @@ In order to set Fluid Player, three things are required:
 * A single Javascript line of code that attaches the player to the video tag.
 
 ```html
-<link rel="stylesheet" href="fluidplayer.css" type="text/css"/>
-<script src="fluidplayer.js"></script>
+<link rel="stylesheet" href="https://cdn.fluidplayer.com/current/fluidplayer.min.css" type="text/css"/>
+<script src="https://cdn.fluidplayer.com/current/fluidplayer.min.js"></script>
 
 <video id='my-video' controls style="width: 640px; height: 360px;">
 	<source src='vid.mp4' type='video/mp4' />
@@ -72,6 +72,16 @@ Fluid Player can be customized by setting some optional parameters:
 </script>
 ```
 
+Player can switch video quality by providing different video files:
+
+```html
+<video id='my-video' controls style="width: 640px; height: 360px;">
+	<source src='vid_480p.mp4' title='480p' type='video/mp4' />
+	<source src='vid_720p.mp4' title='720p' type='video/mp4' />
+	<source src='vid_1080p.mp4' title='1080p' type='video/mp4' />
+</video>
+```
+
 ### Syntax
 
 ```
@@ -93,6 +103,16 @@ Here is a description of the parameters which can be used when setting Fluid Pla
   * `skipButtonClickCaption` (VAST only): The text, displayed when the Skip button is available for clicking.
   * `vastTimeout` (VAST only): The number of milliseconds before the VAST Tag call timeouts. Default: `5000`.
   * Callback functions: can be used to execute custom code when some key events occur. Currently the following events are supported: `vastLoadedCallback`, `noVastVideoCallback`, `vastVideoSkippedCallback`, `vastVideoEndedCallback` and `playerInitCallback`.
+  * `autoPlay`: Starts playing video file after load. Note: on most mobile browsers auto play is disabled by the browser. Default: `false`.
+  * `logo`: Put a logo image on the video player by providing the image URL. Default: `null`.
+  * `logoPosition`: If `logo` option is set then this parameter sets the position of the logo on the player. Accept a string with one or two values: `top`, `bottom`; `left`, `right`. Default: `top left`.
+  * `logoOpacity`:  If `logo` option is set this set opacity for logo image, can be a float value from `0` to `1`. Default: `1`.
+  * `adText`: Optional text to be shown on top right corner while an ad is playing. Default: `null`.
+  * `adCTAText`: Optional call to action text that is shown while an ad is playing. When the button is clicked, the ad URL is open in a new tab. Default: `null`.
+  * `htmlOnPauseBlock`: A string that could contain any html to be displayed in the center of the player when the user pauses the video. Note: Clicking on the HTML area triggers a play event. If you don't need that behaviour then add `e.stopPropagation()` to your event. Default: `null`.
+  * `htmlOnPauseBlockHeight`: An integer. if `htmlOnPauseBlock` is set, then it sets the container height. Default: `null` .
+  * `htmlOnPauseBlockWidth`: An integer. if `htmlOnPauseBlock` is set, then it sets the container width. Default: `null`.
+  * `responsive`: If set to `true`, the player will stretch horizontally to 100% of its parent container width. Default: `false`.
 
 ### Integration with popular frameworks
 
@@ -150,11 +170,11 @@ The Fluid Player code is found at https://github.com/fluid-player/ but is also a
 
 Specify the version:
 ```html  
-http://cdn.fluidplayer.com/1.0.2/fluidplayer.min.js
-http://cdn.fluidplayer.com/1.0.2/fluidplayer.min.css
+https://cdn.fluidplayer.com/1.0.2/fluidplayer.min.js
+https://cdn.fluidplayer.com/1.0.2/fluidplayer.min.css
 ```
 Or use the most recent version:
 ```html  
-http://cdn.fluidplayer.com/current/fluidplayer.min.js
-http://cdn.fluidplayer.com/current/fluidplayer.min.css
+https://cdn.fluidplayer.com/current/fluidplayer.min.js
+https://cdn.fluidplayer.com/current/fluidplayer.min.css
 ```
