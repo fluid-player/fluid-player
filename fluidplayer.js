@@ -1900,7 +1900,16 @@ var fluidPlayerClass = {
         if (player.displayOptions.logoOpacity) {
             logoImage.style.opacity = player.displayOptions.logoOpacity;
         }
-        logoImage.style.pointerEvents = 'none';
+
+        if (player.displayOptions.logoUrl !== null) {
+            logoImage.style.cursor = 'pointer';
+            logoImage.addEventListener('click', function() {
+                var win = window.open(player.displayOptions.logoUrl, '_blank');
+                win.focus();
+            });
+        } else {
+            logoImage.style.pointerEvents = 'none';
+        }
 
         videoPlayer.parentNode.insertBefore(logoImage, null);
     },
@@ -1971,6 +1980,7 @@ var fluidPlayerClass = {
             logo:                     null,
             logoPosition:             "top left",
             logoOpacity:              1,
+            logoUrl:                  null,
             adText:                   null,
             adCTAText:                null,
             htmlOnPauseBlock:         null,

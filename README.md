@@ -107,6 +107,7 @@ Here is a description of the parameters which can be used when setting Fluid Pla
   * `logo`: Put a logo image on the video player by providing the image URL. Default: `null`.
   * `logoPosition`: If `logo` option is set then this parameter sets the position of the logo on the player. Accept a string with one or two values: `top`, `bottom`; `left`, `right`. Default: `top left`.
   * `logoOpacity`:  If `logo` option is set this set opacity for logo image, can be a float value from `0` to `1`. Default: `1`.
+  * `logoUrl`:  An optional URL. If the user clicks the logo this URL will be opened in a new tab.
   * `adText`: Optional text to be shown on top right corner while an ad is playing. Default: `null`.
   * `adCTAText`: Optional call to action text that is shown while an ad is playing. When the button is clicked, the ad URL is open in a new tab. Default: `null`.
   * `htmlOnPauseBlock`: A string that could contain any html to be displayed in the center of the player when the user pauses the video. Note: Clicking on the HTML area triggers a play event. If you don't need that behaviour then add `e.stopPropagation()` to your event. Default: `null`.
