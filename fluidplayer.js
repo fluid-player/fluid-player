@@ -1932,6 +1932,34 @@ var fluidPlayerClass = {
         videoPlayer.parentNode.insertBefore(containerDiv, null);
     },
 
+    isUserActive: function () {
+        player = this;
+        videoPlayer = document.getElementById(player.videoPlayerId);
+        divVastControls = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
+
+        resetDelay = function () {
+            clearTimeout(player.inactivityTimeout);
+            player.inactivityTimeout = setTimeout(function () {
+                divVastControls.style.display = 'none';
+                videoPlayer.style.cursor = 'none';
+            }, 2500);
+        };
+
+        var isMobileChecks = fluidPlayerClass.getMobileOs();
+        if ((isMobileChecks.userOs !== false || isMobileChecks.device !== false) && (!!window.chrome || -1 !== ua.indexOf("crios") || 0 === window.navigator.vendor.indexOf("Google") && -1 !== ua.indexOf("chrome"))) {
+            videoPlayer.addEventListener('tap', function () {
+                divVastControls.style.display = 'block';
+                resetDelay();
+            })
+        } else {
+            videoPlayer.addEventListener('mousemove', function () {
+                divVastControls.style.display = 'block';
+                videoPlayer.style.cursor = 'default';
+                resetDelay();
+            });
+        }
+    },
+
     init: function(idVideoPlayer, vastTag, options) {
         var player = this;
         var videoPlayer = document.getElementById(idVideoPlayer);
@@ -1951,6 +1979,7 @@ var fluidPlayerClass = {
         player.initialStart         = false;
         player.suppressClickthrough = false;
         player.timelinePreviewData  = [];
+        player.inactivityTimeout    = null;
 
         //Default options
         player.displayOptions = {
@@ -2023,6 +2052,8 @@ var fluidPlayerClass = {
         player.displayOptions.playerInitCallback();
 
         player.createVideoSourceSwitch();
+
+        player.isUserActive();
 
         if (player.displayOptions.autoPlay) {
             videoPlayer.play();
