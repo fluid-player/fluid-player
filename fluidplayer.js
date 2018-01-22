@@ -58,7 +58,8 @@ var fluidPlayerClass = {
     notCloned: ['notCloned', 'vttParserScript', 'instances', 'getInstanceById',
         'requestStylesheet', 'reqiestScript', 'isTouchDevice', 'vastOptions',
         'displayOptions', 'getEventOffsetX', 'getEventOffsetY', 'getTranslateX',
-        'toggleElementText', 'getMobileOs', 'findClosestParent'],
+        'toggleElementText', 'getMobileOs', 'findClosestParent',
+        'getInstanceByIdWrapperId'],
     version: '1.1.3',
     homepage: 'https://www.fluidplayer.com/',
 
@@ -70,6 +71,10 @@ var fluidPlayerClass = {
         }
         
         return null;
+    },
+
+    getInstanceByIdWrapperId: function(wraperId) {
+        return wraperId.replace('fluid_video_wrapper_', '');
     },
 
     requestStylesheet: function(cssId, url) {
@@ -1255,6 +1260,158 @@ var fluidPlayerClass = {
         }
     },
 
+
+    volumeChange: function(videoPlayerId, direction) {
+        var videoPlayerTag = document.getElementById(videoPlayerId);
+        var newVolume = videoPlayerTag.volume;
+
+        if(direction == 'asc'){
+            newVolume += 0.05;
+        } else if(direction == 'desc') {
+            newVolume -= 0.05;
+        }
+
+        if (newVolume < 0.05) {
+            newVolume = 0;
+        } else if (newVolume > 0.95) {
+            newVolume = 1;
+        }
+
+        videoPlayerTag.volume = newVolume;
+    },
+
+    currentTimeChange: function (videoPlayerId, keyCode) {
+        var videoInstanceId = fluidPlayerClass.getInstanceById(videoPlayerId);
+        if (videoInstanceId.isCurrentlyPlayingAd) {
+            return;
+        }
+
+        var videoPlayerTag = document.getElementById(videoPlayerId);
+
+        videoPlayerTag.currentTime = videoInstanceId.getNewCurrentTimeValueByKeyCode(keyCode, videoPlayerTag.currentTime, videoPlayerTag.duration);
+    },
+
+    getNewCurrentTimeValueByKeyCode: function (keyCode, currentTime, duration) {
+
+        var newCurrentTime = currentTime;
+
+        switch (keyCode) {
+
+            case 37://left arrow
+                newCurrentTime -= 5;
+                newCurrentTime = (newCurrentTime < 5)? 0 : newCurrentTime;
+                break;
+            case 39://right arrow
+                newCurrentTime += 5;
+                newCurrentTime = (newCurrentTime > duration - 5)? duration : newCurrentTime;
+                break;
+            case 35://End
+                newCurrentTime = duration;
+                break;
+            case 36://Home
+                newCurrentTime = 0;
+                break;
+            case 48://0
+            case 49://1
+            case 50://2
+            case 51://3
+            case 52://4
+            case 53://5
+            case 54://6
+            case 55://7
+            case 56://8
+            case 57://9
+                if (keyCode < 58 && keyCode > 46) {
+                    var percent = (keyCode - 48) * 10;
+                    newCurrentTime = duration * percent / 100;
+                }
+                break;
+        }
+
+
+        return newCurrentTime;
+    },
+
+
+    handleMouseenter: function () {
+        var videoInstanceId = fluidPlayerClass.getInstanceByIdWrapperId(this.getAttribute('id'));
+        var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
+        var videoPlayerTag = document.getElementById(videoInstanceId);
+
+        if (videoPlayerInstance.captureKey) {
+            return;
+        }
+
+        videoPlayerInstance.captureKey = function (event) {
+            event.stopPropagation();
+            var keyCode = event.keyCode;
+
+            switch (keyCode) {
+
+                case 70://f
+                    videoPlayerInstance.fullscreenToggle(videoInstanceId);
+                    event.preventDefault();
+                    break;
+                case 13://Enter
+                case 32://Space
+                    videoPlayerInstance.playPauseToggle(videoPlayerTag);
+                    event.preventDefault();
+                    break;
+                case 77://m
+                    videoPlayerInstance.muteToggle(videoInstanceId);
+                    event.preventDefault();
+                    break;
+                case 38://up arrow
+                    videoPlayerInstance.volumeChange(videoInstanceId, 'asc');
+                    event.preventDefault();
+                    break;
+                case 40://down arrow
+                    videoPlayerInstance.volumeChange(videoInstanceId, 'desc');
+                    event.preventDefault();
+                    break;
+                case 37://left arrow
+                case 39://right arrow
+                case 35://End
+                case 36://Home
+                case 48://0
+                case 49://1
+                case 50://2
+                case 51://3
+                case 52://4
+                case 53://5
+                case 54://6
+                case 55://7
+                case 56://8
+                case 57://9
+                    videoPlayerInstance.currentTimeChange(videoInstanceId, keyCode);
+                    event.preventDefault();
+                    break;
+            }
+
+            return false;
+
+        };
+        document.addEventListener('keydown', videoPlayerInstance.captureKey, true);
+
+    },
+
+    handleMouseleave: function () {
+        var player = this;
+
+        window.addEventListener('click', function (e) {
+            var videoInstanceId = fluidPlayerClass.getInstanceByIdWrapperId(player.getAttribute('id'));
+            var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
+
+            if (document.getElementById('fluid_video_wrapper_' + videoInstanceId).contains(e.target)
+                || (document.getElementById('skip_button_' + videoInstanceId) && document.getElementById('skip_button_' + videoInstanceId).contains(e.target))) {
+                // do nothing
+            } else {
+                document.removeEventListener('keydown', videoPlayerInstance.captureKey, true);
+                delete videoPlayerInstance["captureKey"];
+            }
+        });
+    },
+
     initialPlay: function() {
         var videoPlayerTag = this;
         var player = fluidPlayerClass.getInstanceById(videoPlayerTag.id)
@@ -2023,6 +2180,10 @@ var fluidPlayerClass = {
         player.displayOptions.playerInitCallback();
 
         player.createVideoSourceSwitch();
+
+        //Keyboard Controls
+        document.getElementById('fluid_video_wrapper_' + player.videoPlayerId).addEventListener('click', player.handleMouseenter, false);
+        document.getElementById('fluid_video_wrapper_' + player.videoPlayerId).addEventListener('mouseleave', player.handleMouseleave, false);
 
         if (player.displayOptions.autoPlay) {
             videoPlayer.play();
