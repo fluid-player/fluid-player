@@ -59,7 +59,7 @@ var fluidPlayerClass = {
         'requestStylesheet', 'reqiestScript', 'isTouchDevice', 'vastOptions',
         'displayOptions', 'getEventOffsetX', 'getEventOffsetY', 'getTranslateX',
         'toggleElementText', 'getMobileOs', 'findClosestParent',
-        'getInstanceByIdWrapperId'],
+        'getInstanceIdByWrapperId'],
     version: '1.1.3',
     homepage: 'https://www.fluidplayer.com/',
 
@@ -73,7 +73,7 @@ var fluidPlayerClass = {
         return null;
     },
 
-    getInstanceByIdWrapperId: function(wraperId) {
+    getInstanceIdByWrapperId: function(wraperId) {
         return wraperId.replace('fluid_video_wrapper_', '');
     },
 
@@ -1299,11 +1299,11 @@ var fluidPlayerClass = {
 
             case 37://left arrow
                 newCurrentTime -= 5;
-                newCurrentTime = (newCurrentTime < 5)? 0 : newCurrentTime;
+                newCurrentTime = (newCurrentTime < 5) ? 0 : newCurrentTime;
                 break;
             case 39://right arrow
                 newCurrentTime += 5;
-                newCurrentTime = (newCurrentTime > duration - 5)? duration : newCurrentTime;
+                newCurrentTime = (newCurrentTime > duration - 5) ? duration : newCurrentTime;
                 break;
             case 35://End
                 newCurrentTime = duration;
@@ -1321,7 +1321,7 @@ var fluidPlayerClass = {
             case 55://7
             case 56://8
             case 57://9
-                if (keyCode < 58 && keyCode > 46) {
+                if (keyCode < 58 && keyCode > 47) {
                     var percent = (keyCode - 48) * 10;
                     newCurrentTime = duration * percent / 100;
                 }
@@ -1334,7 +1334,7 @@ var fluidPlayerClass = {
 
 
     handleMouseenter: function () {
-        var videoInstanceId = fluidPlayerClass.getInstanceByIdWrapperId(this.getAttribute('id'));
+        var videoInstanceId = fluidPlayerClass.getInstanceIdByWrapperId(this.getAttribute('id'));
         var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
         var videoPlayerTag = document.getElementById(videoInstanceId);
 
@@ -1399,7 +1399,7 @@ var fluidPlayerClass = {
         var player = this;
 
         window.addEventListener('click', function (e) {
-            var videoInstanceId = fluidPlayerClass.getInstanceByIdWrapperId(player.getAttribute('id'));
+            var videoInstanceId = fluidPlayerClass.getInstanceIdByWrapperId(player.getAttribute('id'));
             var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
 
             if (document.getElementById('fluid_video_wrapper_' + videoInstanceId).contains(e.target)
