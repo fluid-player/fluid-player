@@ -58,9 +58,10 @@ var fluidPlayerClass = {
     notCloned: ['notCloned', 'vttParserScript', 'instances', 'getInstanceById',
         'requestStylesheet', 'reqiestScript', 'isTouchDevice', 'vastOptions',
         'displayOptions', 'getEventOffsetX', 'getEventOffsetY', 'getTranslateX',
-        'toggleElementText', 'getMobileOs', 'findClosestParent'],
+        'toggleElementText', 'getMobileOs', 'findClosestParent', 'activeVideoPlayerId'],
     version: '1.1.3',
     homepage: 'https://www.fluidplayer.com/',
+    activeVideoPlayerId: null,
 
     getInstanceById: function(playerId) {
         for (var i = 0; i < this.instances.length; i++) {
@@ -356,6 +357,30 @@ var fluidPlayerClass = {
         if (divClickThrough) {
             divClickThrough.style.width  = videoPlayer.offsetWidth + 'px';
             divClickThrough.style.height = videoPlayer.offsetHeight + 'px';
+        }
+
+        var requestFullscreenFunctionNames = this.checkFullscreenSupport('fluid_video_wrapper_' + idVideoPlayer);
+        var fullscreenButton = document.getElementById(idVideoPlayer + '_fluid_control_fullscreen');
+        var menuOptionFullscreen = document.getElementById(idVideoPlayer + 'context_option_fullscreen');
+
+        if (requestFullscreenFunctionNames) {
+            // this will go other way around because we alredy exited full screen
+            if (document[requestFullscreenFunctionNames.isFullscreen] === null) {
+                // Exit fullscreen
+                this.fullscreenOff(fullscreenButton, menuOptionFullscreen);
+            } else {
+                // Go fullscreen
+                this.fullscreenOn(fullscreenButton, menuOptionFullscreen);
+            }
+        } else {
+            //The browser does not support the Fullscreen API, so a pseudo-fullscreen implementation is used
+            if (fullscreenTag.className.search(/\bpseudo_fullscreen\b/g) !== -1) {
+                fullscreenTag.className += ' pseudo_fullscreen';
+                this.fullscreenOn(fullscreenButton, menuOptionFullscreen);
+            } else {
+                fullscreenTag.className = fullscreenTag.className.replace(/\bpseudo_fullscreen\b/g, '');
+                this.fullscreenOff(fullscreenButton, menuOptionFullscreen);
+            }
         }
     },
 
@@ -1066,7 +1091,23 @@ var fluidPlayerClass = {
         return false;
     },
 
+    fullscreenOff: function (fullscreenButton, menuOptionFullscreen) {
+        fullscreenButton.className = fullscreenButton.className.replace(/\bfluid_button_fullscreen_exit\b/g, 'fluid_button_fullscreen');
+        if (menuOptionFullscreen !== null) {
+            menuOptionFullscreen.innerHTML = 'Fullscreen';
+        }
+    },
+
+    fullscreenOn: function (fullscreenButton, menuOptionFullscreen) {
+        fullscreenButton.className = fullscreenButton.className.replace(/\bfluid_button_fullscreen\b/g, 'fluid_button_fullscreen_exit');
+        if (menuOptionFullscreen !== null) {
+            menuOptionFullscreen.innerHTML = 'Exit Fullscreen';
+        }
+    },
+
     fullscreenToggle: function(videoPlayerId) {
+        fluidPlayerClass.activeVideoPlayerId = videoPlayerId;
+
         var fullscreenTag = document.getElementById('fluid_video_wrapper_' + videoPlayerId);
         var requestFullscreenFunctionNames = this.checkFullscreenSupport('fluid_video_wrapper_' + videoPlayerId);
         var fullscreenButton = document.getElementById(videoPlayerId + '_fluid_control_fullscreen');
@@ -1078,20 +1119,11 @@ var fluidPlayerClass = {
             if (document[requestFullscreenFunctionNames.isFullscreen] === null) {
                 //Go fullscreen
                 functionNameToExecute = 'videoPlayerTag.' + requestFullscreenFunctionNames.goFullscreen + '();';
-                fullscreenButton.className = fullscreenButton.className.replace(/\bfluid_button_fullscreen\b/g, 'fluid_button_fullscreen_exit');
-
-                if (menuOptionFullscreen !== null) {
-                    menuOptionFullscreen.innerHTML = 'Exit Fullscreen';
-                }
-
+                this.fullscreenOn(fullscreenButton, menuOptionFullscreen);
             } else {
                 //Exit fullscreen
                 functionNameToExecute = 'document.' + requestFullscreenFunctionNames.exitFullscreen + '();';
-                fullscreenButton.className = fullscreenButton.className.replace(/\bfluid_button_fullscreen_exit\b/g, 'fluid_button_fullscreen');
-
-                if (menuOptionFullscreen !== null) {
-                    menuOptionFullscreen.innerHTML = 'Fullscreen';
-                }
+                this.fullscreenOff(fullscreenButton, menuOptionFullscreen);
             }
 
             new Function('videoPlayerTag', functionNameToExecute)(fullscreenTag);
@@ -1100,19 +1132,10 @@ var fluidPlayerClass = {
             //The browser does not support the Fullscreen API, so a pseudo-fullscreen implementation is used
             if (fullscreenTag.className.search(/\bpseudo_fullscreen\b/g) !== -1) {
                 fullscreenTag.className = fullscreenTag.className.replace(/\bpseudo_fullscreen\b/g, '');
-                fullscreenButton.className = fullscreenButton.className.replace(/\bfluid_button_fullscreen_exit\b/g, 'fluid_button_fullscreen');
-
-                if (menuOptionFullscreen !== null) {
-                    menuOptionFullscreen.innerHTML = 'Fullscreen';
-                }
-
+                this.fullscreenOff(fullscreenButton, menuOptionFullscreen);
             } else {
                 fullscreenTag.className += ' pseudo_fullscreen';
-                fullscreenButton.className = fullscreenButton.className.replace(/\bfluid_button_fullscreen\b/g, 'fluid_button_fullscreen_exit');
-
-                if (menuOptionFullscreen !== null) {
-                    menuOptionFullscreen.innerHTML = 'Exit Fullscreen';
-                }
+                this.fullscreenOn(fullscreenButton, menuOptionFullscreen);
             }
         }
 
@@ -1543,7 +1566,6 @@ var fluidPlayerClass = {
     },
 
     handleFullscreen: function() {
-        var videoPlayerId = this.videoPlayerId;
         var player = this;
 
         if (typeof document.vastFullsreenChangeEventListenersAdded === 'undefined') {
@@ -1552,7 +1574,7 @@ var fluidPlayerClass = {
 
                     if (typeof (document['on' + eventType]) === 'object') {
                         document.addEventListener(eventType, function(ev) {
-                            player.recalculateAdDimensions(videoPlayerId);
+                            player.recalculateAdDimensions(fluidPlayerClass.activeVideoPlayerId);
                         }, false);
                     }
                 }
