@@ -767,7 +767,7 @@ var fluidPlayerClass = {
 
             } else {
                 //make the button clickable
-                btn.innerHTML = '<a href="javascript:;" onclick="fluidPlayerClass.getInstanceById(\'' + player.videoPlayerId + '\').pressSkipButton();">'
+                btn.innerHTML = '<a href="javascript:;" id="skipHref_' + player.videoPlayerId + '" onclick="fluidPlayerClass.getInstanceById(\'' + player.videoPlayerId + '\').pressSkipButton();">'
                     + player.displayOptions.skipButtonClickCaption
                     + '</a>';
 
@@ -1403,13 +1403,21 @@ var fluidPlayerClass = {
             var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
 
             if (document.getElementById('fluid_video_wrapper_' + videoInstanceId).contains(e.target)
-                || (document.getElementById('skip_button_' + videoInstanceId) && document.getElementById('skip_button_' + videoInstanceId).contains(e.target))) {
+                || e.target.id == 'skipHref_' + videoInstanceId) {
                 // do nothing
             } else {
                 document.removeEventListener('keydown', videoPlayerInstance.captureKey, true);
                 delete videoPlayerInstance["captureKey"];
             }
         });
+    },
+
+    keyboardControl: function () {
+        var player = this;
+        var videoPlayer = document.getElementById('fluid_video_wrapper_' + player.videoPlayerId);
+
+        videoPlayer.addEventListener('click', player.handleMouseenter, false);
+        videoPlayer.addEventListener('mouseleave', player.handleMouseleave, false);
     },
 
     initialPlay: function() {
@@ -2133,7 +2141,8 @@ var fluidPlayerClass = {
             htmlOnPauseBlock:         null,
             htmlOnPauseBlockWidth:    null,
             htmlOnPauseBlockHeight:   null,
-            responsive:               false
+            responsive:               false,
+            keyboardControl:          true
         };
 
         //Overriding the default options
@@ -2181,12 +2190,14 @@ var fluidPlayerClass = {
 
         player.createVideoSourceSwitch();
 
-        //Keyboard Controls
-        document.getElementById('fluid_video_wrapper_' + player.videoPlayerId).addEventListener('click', player.handleMouseenter, false);
-        document.getElementById('fluid_video_wrapper_' + player.videoPlayerId).addEventListener('mouseleave', player.handleMouseleave, false);
-
         if (player.displayOptions.autoPlay) {
             videoPlayer.play();
         }
+
+        //Keyboard Controls
+        if (player.displayOptions.keyboardControl) {
+            player.keyboardControl();
+        }
+
     }
 };
