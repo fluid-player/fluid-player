@@ -242,6 +242,28 @@
     padding: 0 19px 0 28px;
 }
 
+.close_button {
+    position: absolute;
+    background: #000000 url("images/close.png") no-repeat scroll center center;
+    height: 16px;
+    width: 16px;
+    top: 0;
+    right: 0;
+    border: none;
+    cursor: pointer;
+}
+
+.fluid_nonLinear_container {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.7);
+    border: 1px solid #777777;
+}
+
+.close_button:hover {
+    background-color: #000000;
+    border: 1px solid #ffffff;
+}
+
 .vast_clickthrough_layer {
 	/*IE Fix*/
 	background-color: white;

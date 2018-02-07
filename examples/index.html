@@ -107,7 +107,7 @@
     <script type="text/javascript">
         var testVideo = fluidPlayer(
             'test-video',
-            'vast.xml',
+            null,
             {
                 timelinePreview: {
                     file: 'thumbnails.vtt',
@@ -123,7 +123,13 @@
                 logoOpacity: 0.5,
                 adText: 'advertisement',
                 adCTAText: 'Visit Advertiser Website',
-                responsive: false
+                responsive: false,
+                adList: {
+                    midRoll: {
+                        'vastTag': 'vast.xml',
+                        'timer': 5
+                    },
+                }
             }
         );
 
