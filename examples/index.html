@@ -125,24 +125,28 @@
                 adCTAText: 'Visit Advertiser Website',
                 responsive: false,
                 adList: {
-                    midRoll: {
-                        'vastTag': 'vast.xml',
-                        'timer': 5
-                    },
+                    preRoll: {
+                        'vastTag': 'vast.xml'
+                    }
                 }
             }
         );
 
         var testVideo2 = fluidPlayer(
             'test-video-2',
-            'vast.xml',
+            null,
             {
                 timelinePreview: {
                     file: 'thumbnails.vtt',
                     type: 'VTT'
                 },
                 layout: 'funky',
-                adCTAText: 'Visit Advertiser Website'
+                adCTAText: 'Visit Advertiser Website',
+                adList: {
+                    preRoll: {
+                        'vastTag': 'vast.xml'
+                    }
+                }
 
             }
         );

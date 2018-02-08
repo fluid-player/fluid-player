@@ -183,6 +183,19 @@ var fluidPlayerClass = {
         return false;
     },
 
+
+    getClickThroughUrlFromNonLinear: function (nonLinear) {
+        var result = '';
+        var nonLinearClickThrough = nonLinear.getElementsByTagName('NonLinearClickThrough');
+
+        if (nonLinearClickThrough.length) {//There should be exactly 1 node
+            result = nonLinearClickThrough[0].childNodes[0].nodeValue;
+        }
+
+        return result;
+    },
+
+
     getTrackingFromLinear: function(linear) {
         var trackingEvents = linear.getElementsByTagName('TrackingEvents');
 
@@ -203,6 +216,27 @@ var fluidPlayerClass = {
         return false;
     },
 
+    getDurationFromNonLinear: function(tag) {
+        var result = 0;
+        var nonLinear = tag.getElementsByTagName('NonLinear');
+        if (nonLinear.length && (typeof nonLinear[0].getAttribute('minSuggestedDuration') !== 'undefined')) {
+            result = this.convertTimeStringToSeconds(nonLinear[0].getAttribute('minSuggestedDuration'));
+        }
+        return result;
+    },
+
+
+    getCreativeTypeFromStaticResources: function(tag) {
+        var result = '';
+        var nonLinears = tag.getElementsByTagName('NonLinear');
+
+        if (nonLinears.length && (typeof nonLinears[0].childNodes[0] !== 'undefined')) {//There should be exactly 1 StaticResource node
+            result = nonLinears[0].getElementsByTagName('StaticResource')[0].getAttribute('creativeType');
+        }
+
+        return result;
+    },
+
     getMediaFilesFromLinear: function(linear) {
         var mediaFiles = linear.getElementsByTagName('MediaFiles');
 
@@ -214,13 +248,14 @@ var fluidPlayerClass = {
     },
 
     getStaticResourcesFromNonLinear: function(linear) {
+        var result = [];
         var nonLinears = linear.getElementsByTagName('NonLinear');
 
         if (nonLinears.length) {//There should be exactly 1 StaticResource node
-            return nonLinears[0].getElementsByTagName('StaticResource');
+            result = nonLinears[0].getElementsByTagName('StaticResource');
         }
 
-        return [];
+        return result;
     },
 
     getMediaFileFromLinear: function(linear) {
@@ -378,6 +413,18 @@ var fluidPlayerClass = {
         return result;
     },
 
+
+    getNonLinearClickTrackingEvents: function (nonLinear) {
+        var result = '';
+        var clickTracking = nonLinear.getElementsByTagName('NonLinearClickTracking');
+
+        if (clickTracking.length) {//There should be exactly 1 node
+            result = clickTracking[0].childNodes[0].nodeValue;
+        }
+
+        return result;
+    },
+
     callUris: function(uris) {
         for (var i = 0; i < uris.length; i++) {
             new Image().src = uris[i];
@@ -420,7 +467,7 @@ var fluidPlayerClass = {
                 this.fullscreenOff(fullscreenButton, menuOptionFullscreen);
             }
         }
-        this.recalcPositon();
+        this.recalcPosition();
     },
 
     prepareVast: function(roll) {
@@ -470,7 +517,7 @@ var fluidPlayerClass = {
         player.toggleLoader(false);
         player.displayOptions.noVastVideoCallback();
 
-        if (player.vastOptions) {
+        if (!player.vastOptions || typeof this.vastOptions.errorUrl === 'undefined') {
             player.announceLocalError(errorCode);
         } else{
             player.announceError(errorCode);
@@ -507,7 +554,7 @@ var fluidPlayerClass = {
 
                 if ((xmlHttpReq.readyState === 4) && (xmlHttpReq.status !== 200)) {
 
-                    //Removing the ad from inventory
+                    //Set the error flag for the Ad
                     player.adList[roll].error = true;
 
                     //The response returned an error. Proceeding with the main video.
@@ -568,12 +615,11 @@ var fluidPlayerClass = {
                         tmpOptions.adType = 'nonLinear';
 
                         //Extract the necessary data from the Linear node
-                        tmpOptions.adDuration      = player.convertTimeStringToSeconds(creativeNonLinear.getElementsByTagName('NonLinear')[0].getAttribute('minSuggestedDuration'));
-                        tmpOptions.clickthroughUrl = player.getClickThroughUrlFromLinear(creativeNonLinear);
-                        tmpOptions.clicktracking   = player.getClickTrackingEvents(creativeNonLinear);
-                        tmpOptions.duration        = player.getDurationFromLinear(creativeNonLinear);
+                        tmpOptions.clickthroughUrl = player.getClickThroughUrlFromNonLinear(creativeNonLinear);
+                        tmpOptions.clicktracking   = player.getNonLinearClickTrackingEvents(creativeNonLinear);
+                        tmpOptions.duration        = player.getDurationFromNonLinear(creativeNonLinear);
                         tmpOptions.staticResource  = player.getStaticResourceFromNonLinear(creativeNonLinear);
-                        tmpOptions.staticResource  = player.getStaticResourceFromNonLinear(creativeNonLinear);
+                        tmpOptions.creativeType    = player.getCreativeTypeFromStaticResources(creativeNonLinear);
 
                         player.registerTrackingEvents(creativeNonLinear, tmpOptions);
                     }
@@ -581,7 +627,7 @@ var fluidPlayerClass = {
                     player.adList[roll].adType = tmpOptions.adType? tmpOptions.adType : 'unknown';
 
                     if (typeof tmpOptions.mediaFile !== 'undefined' || typeof tmpOptions.staticResource !== 'undefined') {
-                        // tmpOptions.vastLoaded = true;
+
                         player.adList[roll].vastLoaded = true;
                         player.displayOptions.vastLoadedCallback();
                         player.adPool[roll] = Object.assign({}, tmpOptions);
@@ -667,7 +713,7 @@ var fluidPlayerClass = {
                 videoPlayerTag.play();
 
                 //Announce the impressions
-                trackSingleEvent('impression');
+                player.trackSingleEvent('impression');
 
                 videoPlayerTag.removeEventListener('loadedmetadata', player.switchPlayerToVastMode);
             };
@@ -688,55 +734,6 @@ var fluidPlayerClass = {
             videoPlayerTag.addEventListener('ended', player.onVastAdEnded);
         };
 
-        var trackSingleEvent = function(eventType, eventSubType) {
-            var trackingUris = [];
-            trackingUris.length = 0;
-
-            switch (eventType) {
-                case 'start':
-                case 'firstQuartile':
-                case 'midpoint':
-                case 'thirdQuartile':
-                case 'complete':
-                    if (player.vastOptions.stopTracking[eventType] === false) {
-                        if (player.vastOptions.tracking[eventType] !== null) {
-                            trackingUris = player.vastOptions.tracking[eventType];
-                        }
-
-                        player.vastOptions.stopTracking[eventType] = true;
-                    }
-
-                    break;
-
-                case 'progress':
-                    player.vastOptions.tracking['progress'][eventSubType].elements.forEach(function(currentValue, index) {
-                        if (
-                            (player.vastOptions.tracking['progress'][eventSubType].stopTracking === false) &&
-                            (player.vastOptions.tracking['progress'][eventSubType].elements.length)
-                        ) {
-                            trackingUris = player.vastOptions.tracking['progress'][eventSubType].elements;
-                        }
-
-                        player.vastOptions.tracking['progress'][eventSubType].stopTracking = true;
-                    });
-                    break;
-
-                case 'impression':
-                    if (
-                        (typeof player.vastOptions.impression !== 'undefined') &&
-                        (player.vastOptions.impression !== null) &&
-                        (typeof player.vastOptions.impression.length !== 'unknown')
-                    ) {
-                        trackingUris = player.vastOptions.impression;
-                    }
-                    break;
-
-                default:
-                    break;
-            }
-
-            player.callUris(trackingUris);
-        };
 
         /**
          * Sends requests to the tracking URIs
@@ -748,34 +745,9 @@ var fluidPlayerClass = {
             }
 
             var currentTime = Math.floor(videoPlayerTag.currentTime);
-
-            if (currentTime == 0) {
-                trackSingleEvent('start');
-            }
-
-            if (
-                (typeof player.vastOptions.tracking['progress'] !== 'undefined') &&
-                (player.vastOptions.tracking['progress'].length) &&
-                (typeof player.vastOptions.tracking['progress'][currentTime] !== 'undefined')
-            ) {
-                trackSingleEvent('progress', currentTime);
-            }
-
-            if (currentTime == (Math.floor(player.vastOptions.duration / 4))) {
-                trackSingleEvent('firstQuartile');
-            }
-
-            if (currentTime == (Math.floor(player.vastOptions.duration / 2))) {
-                trackSingleEvent('midpoint');
-            }
-
-            if (currentTime == (Math.floor(player.vastOptions.duration * 3 / 4))) {
-                trackSingleEvent('thirdQuartile');
-            }
+            player.scheduleTrackingEvent(currentTime, player.vastOptions.duration);
 
             if (currentTime >= (player.vastOptions.duration - 1 )) {
-                trackSingleEvent('complete');
-
                 videoPlayerTag.removeEventListener('timeupdate', videoPlayerTimeUpdate);
                 player.adFinished = true;
             }
@@ -786,14 +758,108 @@ var fluidPlayerClass = {
         videoPlayerTag.addEventListener('timeupdate', videoPlayerTimeUpdate);
     },
 
+    scheduleTrackingEvent : function(currentTime, duration) {
+        var player = this;
+        if (currentTime == 0) {
+            player.trackSingleEvent('start');
+        }
+
+        if (
+            (typeof player.vastOptions.tracking['progress'] !== 'undefined') &&
+            (player.vastOptions.tracking['progress'].length) &&
+            (typeof player.vastOptions.tracking['progress'][currentTime] !== 'undefined')
+        ) {
+            player.trackSingleEvent('progress', currentTime);
+        }
+
+        if (currentTime == (Math.floor(duration / 4))) {
+            player.trackSingleEvent('firstQuartile');
+        }
+
+        if (currentTime == (Math.floor(duration / 2))) {
+            player.trackSingleEvent('midpoint');
+        }
+
+        if (currentTime == (Math.floor(duration * 3 / 4))) {
+            player.trackSingleEvent('thirdQuartile');
+        }
+
+        if (currentTime >= (duration - 1 )) {
+            player.trackSingleEvent('complete');
+        }
+    },
+
+    trackSingleEvent : function(eventType, eventSubType) {
+        var player = this;
+        var trackingUris = [];
+        trackingUris.length = 0;
+
+        switch (eventType) {
+            case 'start':
+            case 'firstQuartile':
+            case 'midpoint':
+            case 'thirdQuartile':
+            case 'complete':
+                if (player.vastOptions.stopTracking[eventType] === false) {
+                    if (player.vastOptions.tracking[eventType] !== null) {
+                        trackingUris = player.vastOptions.tracking[eventType];
+                    }
+
+                    player.vastOptions.stopTracking[eventType] = true;
+                }
+
+                break;
+
+            case 'progress':
+                player.vastOptions.tracking['progress'][eventSubType].elements.forEach(function(currentValue, index) {
+                    if (
+                        (player.vastOptions.tracking['progress'][eventSubType].stopTracking === false) &&
+                        (player.vastOptions.tracking['progress'][eventSubType].elements.length)
+                    ) {
+                        trackingUris = player.vastOptions.tracking['progress'][eventSubType].elements;
+                    }
+
+                    player.vastOptions.tracking['progress'][eventSubType].stopTracking = true;
+                });
+                break;
+
+            case 'impression':
+                if (
+                    (typeof player.vastOptions.impression !== 'undefined') &&
+                    (player.vastOptions.impression !== null) &&
+                    (typeof player.vastOptions.impression.length !== 'unknown')
+                ) {
+                    trackingUris = player.vastOptions.impression;
+                }
+                break;
+
+            default:
+                break;
+        }
+
+        player.callUris(trackingUris);
+    },
+
+
+    completeNonLinearStatic: function () {
+        var player = this;
+        player.closeNonLinear();
+        if(player.adFinished == false) {
+            player.adFinished = true;
+            player.trackSingleEvent('complete');
+        }
+        clearInterval(player.nonLinearTracking);
+    },
+
 
     /**
      * Show up a nonLinear static creative
      */
     createNonLinearStatic: function (roll) {
         var player = this;
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
-        if (!player.adPool.hasOwnProperty(roll)) {
+        if (!player.adPool.hasOwnProperty(roll) || player.adPool[roll].error === true) {
             player.announceLocalError(101);
             return;
         }
@@ -801,15 +867,50 @@ var fluidPlayerClass = {
         //get the proper ad
         player.vastOptions = player.adPool[roll];
         player.createBoard(roll);
+
+        player.adFinished = false;
+        player.trackSingleEvent('start');
+
+        duration = (player.vastOptions.duration) ? player.vastOptions.duration : player.nonLinearDuration;
+
+        player.nonLinearTracking = setInterval(function () {
+
+            if (player.adFinished !== true) {
+
+                var currentTime = Math.floor(videoPlayerTag.currentTime);
+                player.scheduleTrackingEvent(currentTime, duration);
+
+                if (currentTime >= (duration - 1 )) {
+                    player.adFinished = true;
+                }
+            }
+        }, 400);
+
+
+        if (roll == 'midRoll' && typeof player.adList.midRoll.timer !== 'undefined') {
+            offset = (roll == 'midRoll') ? player.adList.midRoll.timer : 0;
+        }
+
+        time = parseInt(player.mainVideoCurrentTime) + parseInt(duration) + parseInt(offset);
+        player.scheduleTask({time: time, closeStaticAd: roll});
     },
 
 
     /**
      * Adds a nonLinear static Image banner
+     *
+     * currently only image/jpeg supported
      */
     createBoard: function (roll) {
 
         var player = this;
+
+        if (typeof player.vastOptions.staticResource === 'undefined'
+            || player.vastOptions.creativeType.toLowerCase() != 'image/jpeg') {
+            player.adList[roll].error = true;
+            return;
+        }
+
         player.adList[roll].played = true;
         var wrapper = document.getElementById('fluid_video_wrapper_' + player.videoPlayerId);
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
@@ -834,27 +935,42 @@ var fluidPlayerClass = {
         board.style.height = bannerHeight + 'px';
         board.style.width = bannerWidth + 'px';
 
+        //Bind the Onclick event
+        board.onclick = function () {
+            if (typeof player.vastOptions.clickthroughUrl !== 'undefined') {
+                window.open(player.vastOptions.clickthroughUrl);
+            }
+
+            //Tracking the NonLinearClickTracking events
+            if (typeof player.vastOptions.clicktracking !== 'undefined') {
+                player.callUris([player.vastOptions.clicktracking]);
+            }
+        };
+
+        if (typeof player.vastOptions.clickthroughUrl !== 'undefined') {
+            board.style.cursor = 'pointer';
+        }
+
         var closeBtn = document.createElement('div');
         closeBtn.id = 'close_button_' + player.videoPlayerId;
         closeBtn.className = 'close_button';
         closeBtn.innerHTML = '';
-        closeBtn.onclick = function () {
+        closeBtn.onclick = function (event) {
             this.parentElement.remove(player);
-            return true;
+            if (typeof event.stopImmediatePropagation !== 'undefined') {
+                event.stopImmediatePropagation();
+            }
+            player.adFinished = true;
+            clearInterval(player.nonLinearTracking);
+            return false;
         };
-
-
-        var duration = (player.vastOptions.adDuration) ? player.vastOptions.adDuration : 15;
 
         board.appendChild(closeBtn);
         videoPlayerTag.parentNode.insertBefore(board, videoPlayerTag.nextSibling);
-
-        time = player.mainVideoCurrentTime + duration;
-        player.scheduleTask({time: time, closeNonLinear: roll});
     },
 
 
-    recalcPositon: function () {
+    recalcPosition: function () {
         var wrapper = document.getElementById('fluid_video_wrapper_' + this.videoPlayerId);
         var board = document.getElementById('nonLinear_' + this.videoPlayerId);
 
@@ -955,28 +1071,34 @@ var fluidPlayerClass = {
                 if (player.timerPool[keyTime] && player.timerPool[keyTime].hasOwnProperty('playRoll')) {
 
                     var rollToCheck = player.timerPool[keyTime].playRoll;
+
                     if(player.adList[rollToCheck].played == false) {
 
-                        player.toggleLoader(true);
                         player.vastOptions = player.adPool[rollToCheck];
+
                         if(player.vastOptions.adType == 'linear'){
+                            player.toggleLoader(true);
                             player.playRoll(rollToCheck);
                         }
                         if(player.vastOptions.adType == 'nonLinear'){
                             player.createNonLinearStatic(rollToCheck);
                         }
-                        //remove ad from the play list
+
+                        //Remove ad from the play list
                         delete player.timerPool[keyTime];
                     }
 
                 }
 
+
                 //Task: close nonLinear ads
-                if (player.timerPool[keyTime] && player.timerPool[keyTime].hasOwnProperty('closeNonLinear')) {
-                    var rollToCheck = player.timerPool[keyTime].closeNonLinear;
+                if (player.timerPool[keyTime] && player.timerPool[keyTime].hasOwnProperty('closeStaticAd')) {
+                    var rollToCheck = player.timerPool[keyTime].closeStaticAd;
+
                     if(player.adList[rollToCheck].played == true) {
-                        player.closeNonLinear();
-                        //remove ad from the play list
+                        player.completeNonLinearStatic();
+
+                        //Remove ad from the play list
                         delete player.timerPool[keyTime];
                     }
 
@@ -1051,9 +1173,7 @@ var fluidPlayerClass = {
 
         //we can remove timer as no more ad will be shown
         if (Math.floor(player.getCurrentTime()) >= Math.floor(player.mainVideoDuration)) {
-            if (!player.adList.hasOwnProperty('postRoll') || player.adList.postRoll.played == true) {
-                clearInterval(player.timer);
-            }
+            clearInterval(player.timer);
         }
 
     },
@@ -1506,7 +1626,7 @@ var fluidPlayerClass = {
         }
 
         this.recalculateAdDimensions();
-        this.recalcPositon();
+        this.recalcPosition();
     },
 
     findClosestParent: function(el, selector) {
@@ -1650,6 +1770,21 @@ var fluidPlayerClass = {
         var ads = {};
         var def = {played: false, vastLoaded: false, error: false};
 
+        var validateVastList = function (roll, item) {
+            var hasError = false;
+
+            switch (roll) {
+                case 'midRoll':
+
+                    if (typeof item.timer === 'undefined') {
+                        hasError = false;
+                    }
+                    break;
+            }
+            return hasError;
+        };
+
+
         if (typeof vastTag !== 'undefined' && vastTag !== null ) {
             ads.preRoll = Object.assign({vastTag: vastTag}, def);
         }
@@ -1662,6 +1797,8 @@ var fluidPlayerClass = {
 
             if (player.displayOptions.adList.hasOwnProperty('midRoll')) {
                 ads.midRoll = Object.assign(player.displayOptions.adList.midRoll, def);
+                ads.midRoll.error = validateVastList('midRoll', ads.midRoll);
+
             }
 
             if (player.displayOptions.adList.hasOwnProperty('postRoll')) {
@@ -2399,6 +2536,7 @@ var fluidPlayerClass = {
         player.timerPool            = {};
         player.adList               = {};
         player.autoplayAfterAd      = true;
+        player.nonLinearDuration    = 15;
 
         //Default options
         player.displayOptions = {
