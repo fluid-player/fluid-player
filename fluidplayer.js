@@ -186,10 +186,13 @@ var fluidPlayerClass = {
 
     getClickThroughUrlFromNonLinear: function (nonLinear) {
         var result = '';
-        var nonLinearClickThrough = nonLinear.getElementsByTagName('NonLinearClickThrough');
+        var nonLinears = nonLinear.getElementsByTagName('NonLinear');
 
-        if (nonLinearClickThrough.length) {//There should be exactly 1 node
-            result = nonLinearClickThrough[0].childNodes[0].nodeValue;
+        if (nonLinears.length) {//There should be exactly 1 node
+            var nonLinearClickThrough = nonLinear.getElementsByTagName('NonLinearClickThrough');
+            if (nonLinearClickThrough.length) {//There should be exactly 1 node
+                result = nonLinearClickThrough[0].childNodes[0].nodeValue;
+            }
         }
 
         return result;
@@ -226,7 +229,7 @@ var fluidPlayerClass = {
     },
 
 
-    getCreativeTypeFromStaticResources: function(tag) {
+    getCreativeTypeFromStaticResources: function (tag) {
         var result = '';
         var nonLinears = tag.getElementsByTagName('NonLinear');
 
@@ -234,7 +237,7 @@ var fluidPlayerClass = {
             result = nonLinears[0].getElementsByTagName('StaticResource')[0].getAttribute('creativeType');
         }
 
-        return result;
+        return result.toLowerCase();
     },
 
     getMediaFilesFromLinear: function(linear) {
@@ -416,10 +419,13 @@ var fluidPlayerClass = {
 
     getNonLinearClickTrackingEvents: function (nonLinear) {
         var result = '';
-        var clickTracking = nonLinear.getElementsByTagName('NonLinearClickTracking');
+        var nonLinears = nonLinear.getElementsByTagName('NonLinear');
 
-        if (clickTracking.length) {//There should be exactly 1 node
-            result = clickTracking[0].childNodes[0].nodeValue;
+        if (nonLinears.length) {//There should be exactly 1 node
+            var clickTracking = nonLinear.getElementsByTagName('NonLinearClickTracking');
+            if (clickTracking.length) {//There should be exactly 1 node
+                result = clickTracking[0].childNodes[0].nodeValue;
+            }
         }
 
         return result;
@@ -899,41 +905,69 @@ var fluidPlayerClass = {
     /**
      * Adds a nonLinear static Image banner
      *
-     * currently only image/jpeg supported
+     * currently only image/gif, image/jpeg, image/png supported
      */
     createBoard: function (roll) {
 
         var player = this;
 
         if (typeof player.vastOptions.staticResource === 'undefined'
-            || player.vastOptions.creativeType.toLowerCase() != 'image/jpeg') {
+            || player.supportedStaticTypes.indexOf(player.vastOptions.creativeType) === -1) {
             player.adList[roll].error = true;
             return;
         }
 
         player.adList[roll].played = true;
-        var wrapper = document.getElementById('fluid_video_wrapper_' + player.videoPlayerId);
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
-        var playerWidth = wrapper.style.width.replace('px', '');
-        var playerHeight = wrapper.style.height.replace('px', '');
-        var bannerWidth = 468;
-        var bannerHeight = 60;
+        var playerWidth = videoPlayerTag.clientWidth;
+        var playerHeight = videoPlayerTag.clientHeight;
+        var bannerWidth = 468; //default size
+        var bannerHeight = 60; //default size
 
         var posX = Math.floor((playerWidth - bannerWidth) / 2);
         var posY = 50;
 
-        var creative = document.createElement('img');
-        creative.src = player.vastOptions.staticResource;
-
         var board = document.createElement('div');
+
+        var creative = new Image();
+        creative.src = player.vastOptions.staticResource;
+        creative.id = 'nonLinear_imgCreative_' + roll + '_' + player.videoPlayerId;
+        creative.onload = function () {
+
+            origWidth = creative.width;
+            origHeight = creative.height;
+
+            if (origWidth > playerWidth) {
+                newBannerWidth = playerWidth - 5;
+                newBannerHeight = origHeight * newBannerWidth / origWidth;
+            } else {
+                newBannerWidth = origWidth;
+                newBannerHeight = origHeight;
+            }
+
+            img = document.getElementById(creative.id);
+            img.width = newBannerWidth;
+            img.height = newBannerHeight;
+
+            posX = Math.floor((playerWidth - newBannerWidth) / 2);
+            posY = 50;
+
+            board.style.bottom = posY + 'px';
+            board.style.left = posX + 'px';
+            board.style.width = newBannerWidth + 'px';
+            board.style.height = newBannerHeight + 'px';
+            board.style.display = 'block';
+        };
+
         board.id = 'nonLinear_' + player.videoPlayerId;
         board.className = 'fluid_nonLinear_container';
         board.innerHTML = creative.outerHTML;
         board.style.bottom = posY + 'px';
         board.style.left = posX + 'px';
-        board.style.height = bannerHeight + 'px';
         board.style.width = bannerWidth + 'px';
+        board.style.height = bannerHeight + 'px';
+        board.style.display = 'none';
 
         //Bind the Onclick event
         board.onclick = function () {
@@ -967,6 +1001,7 @@ var fluidPlayerClass = {
 
         board.appendChild(closeBtn);
         videoPlayerTag.parentNode.insertBefore(board, videoPlayerTag.nextSibling);
+
     },
 
 
@@ -2537,6 +2572,7 @@ var fluidPlayerClass = {
         player.adList               = {};
         player.autoplayAfterAd      = true;
         player.nonLinearDuration    = 15;
+        player.supportedStaticTypes = ['image/gif', 'image/jpeg', 'image/png'];
 
         //Default options
         player.displayOptions = {
