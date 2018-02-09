@@ -58,7 +58,6 @@ Fluid Player can be customized by setting some optional parameters:
 <script type="text/javascript">
 	var testVideo = fluidPlayer(
         'my-video',
-        'http://example.com/vast.xml',
         {
             timelinePreview: {
                 file: 'thumbnails.vtt',
@@ -68,7 +67,12 @@ Fluid Player can be customized by setting some optional parameters:
             vastLoadedCallback: function() {console.log('vast loaded')},
             noVastVideoCallback: function() {console.log('no vast')},
             vastVideoSkippedCallback: function() {console.log('vast skipped')},
-            vastVideoEndedCallback: function() {console.log('vast ended')}
+            vastVideoEndedCallback: function() {console.log('vast ended')},
+            adList: {
+                preRoll: {
+                    vastTag: 'http://example.com/vast.xml',
+                    }
+            }
         }
     );
 </script>
@@ -95,7 +99,6 @@ fluidPlayer(idVideoPlayer[, vastTag, options]);
 Here is a description of the parameters which can be used when setting Fluid Player:
 
 * `idVideoPlayer`: The id of the html video tag, containing the main video to be played.
-* `vastTag`: The URL of the VAST Tag, which returns an XML describing the VAST ad to be displayed. (Deprecated, but kept for backward compatibility. Use the `adList` property.)
 * `options`: Various options for tweaking the appearance and behaviour of the player:
   * `timelinePreview`: Sets the timeline preview, visible when hovering over the progress bar. The provided `file` contains a description of the thumbnail images used for the preview. The `type` sets the format of the file. Currently only the VTT format is supported. The timeline preview only works if the `default` layout is chosen (see below).
   * `layout`: Several options are available. The default layout is `default`. It provides own skin to the player. Another option is `browser`, meaning that the standard video player layout and behaviour, specific for each browser, is used. Also, a custom layout may be used: in this case there should be a folder with the given name inside the `/templates` folder, containing a file `styles.css`. _Note: on iPhone devices the player always switches automatically to the `browser` layout._

@@ -25,7 +25,7 @@ var fluidPlayerScriptLocation = function() {
     return '';
 }();
 
-fluidPlayer = function(idVideoPlayer, vastTag, options) {
+fluidPlayer = function(idVideoPlayer, options) {
     var inArray = function(needle, haystack) {
         var length = haystack.length;
 
@@ -47,7 +47,7 @@ fluidPlayer = function(idVideoPlayer, vastTag, options) {
 
     fluidPlayerClass.instances.push(copy);
 
-    copy.init(idVideoPlayer, vastTag, options);
+    copy.init(idVideoPlayer, options);
 
     return copy;
 };
@@ -1816,7 +1816,7 @@ var fluidPlayerClass = {
         }
     },
 
-    setVastList: function (vastTag) {
+    setVastList: function () {
         var player = this;
         var ads = {};
         var def = {played: false, vastLoaded: false, error: false};
@@ -1835,10 +1835,6 @@ var fluidPlayerClass = {
             return hasError;
         };
 
-
-        if (typeof vastTag !== 'undefined' && vastTag !== null ) {
-            ads.preRoll = Object.assign({vastTag: vastTag}, def);
-        }
 
         if (player.displayOptions.hasOwnProperty('adList')) {
 
@@ -2559,7 +2555,7 @@ var fluidPlayerClass = {
         }
     },
 
-    init: function(idVideoPlayer, vastTag, options) {
+    init: function(idVideoPlayer, options) {
         var player = this;
         var videoPlayer = document.getElementById(idVideoPlayer);
 
@@ -2665,7 +2661,7 @@ var fluidPlayerClass = {
 
         player.createVideoSourceSwitch();
 
-        player.setVastList(vastTag);
+        player.setVastList();
 
         if (player.displayOptions.autoPlay) {
             videoPlayer.play();
