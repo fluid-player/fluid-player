@@ -92,6 +92,25 @@
         </div>
 
         <div class="container_wrap clearfix">
+            <h1>Fluid Player - Multiple VAST and NonLinear Ad</h1>
+
+            <div class="demo_container clearfix">
+                <div class="demo_container_left">
+                    <video id='test-video-5' controls style="width: 640px; height: 360px;">
+                        <source src='video.mp4' type='video/mp4' title="720p" />
+                        <source src='video360.mp4' type='video/mp4' title="360p" />
+                    </video>
+                </div>
+                <div class="demo_container_right">
+                    <ul>
+                        <li>Ability to have more than 1 VAST (example: pre-roll and mid-roll).</li>
+                        <li>Ability to show non Linear (Banner) ads.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container_wrap clearfix">
             <div class="demo_container clearfix">
                 <div class="demo_container_left">
                     <div style="font-size: 11px; margin-top: 15px;">
@@ -107,7 +126,6 @@
     <script type="text/javascript">
         var testVideo = fluidPlayer(
             'test-video',
-            'vast.xml',
             {
                 timelinePreview: {
                     file: 'thumbnails.vtt',
@@ -123,40 +141,87 @@
                 logoOpacity: 0.5,
                 adText: 'advertisement',
                 adCTAText: 'Visit Advertiser Website',
-                responsive: false
+                responsive: false,
+                adList: {
+                    preRoll: {
+                        vastTag: 'vastLinear.xml'
+                    }
+                }
             }
         );
 
         var testVideo2 = fluidPlayer(
             'test-video-2',
-            'vast.xml',
             {
                 timelinePreview: {
                     file: 'thumbnails.vtt',
                     type: 'VTT'
                 },
                 layout: 'funky',
-                adCTAText: 'Visit Advertiser Website'
+                adCTAText: 'Visit Advertiser Website',
+                adList: {
+                    preRoll: {
+                        vastTag: 'vastLinear.xml'
+                    }
+                }
 
             }
         );
 
         var testVideo3 = fluidPlayer(
             'test-video-3',
-            'vast.xml',
             {
                 timelinePreview: {
                     file: 'thumbnails.vtt',
                     type: 'VTT'
                 },
-                layout: 'metal'
+                layout: 'metal',
+                adList: {
+                    preRoll: {
+                        vastTag: 'vastLinear.xml'
+                    }
+                }
             }
         );
 
         var testVideo4 = fluidPlayer(
             'test-video-4',
-            'vast.xml',
-            {layout: 'browser'}
+            {
+                layout: 'browser',
+                adList: {
+                    preRoll: {
+                        vastTag: 'vastLinear.xml'
+                    }
+                }
+            }
+        );
+
+        var testVideo5 = fluidPlayer(
+                'test-video-5',
+                {
+                    timelinePreview: {
+                        file: 'thumbnails.vtt',
+                        type: 'VTT'
+                    },
+                    vastLoadedCallback: function() {console.log('vast loaded');},
+                    noVastVideoCallback: function() {console.log('no vast');},
+                    vastVideoSkippedCallback: function() {console.log('vast skipped');},
+                    vastVideoEndedCallback: function() {console.log('vast ended');},
+                    playerInitCallback: function() {console.log('Player "test-video" initiation called');},
+                    logo: 'fluidplayer.png',
+                    logoPosition: 'top left',
+                    logoOpacity: 0.5,
+                    responsive: false,
+                    adList: {
+                        preRoll: {
+                            vastTag: 'vastLinear.xml'
+                        },
+                        midRoll: {
+                            vastTag: 'vastNonLinear.xml',
+                            timer: 3
+                        }
+                    }
+                }
         );
     </script>
 </body>

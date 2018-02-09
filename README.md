@@ -12,6 +12,8 @@ Fluid Player is a new free HTML5 video player. It is lightweight, easy to integr
 * Lightweight.
 * Compatible with modern web browsers.
 * Ability to have more than 1 player per page.
+* Supports multiple VAST tags (pre-roll, mid-roll, post-roll).
+* Supports non linear VAST tags (banner images (gif/jpg/png)).
 
 ![Fluid Player - VAST Ad](examples/ScreenshotFluidPlayerVastAd.jpg)
 
@@ -56,7 +58,6 @@ Fluid Player can be customized by setting some optional parameters:
 <script type="text/javascript">
 	var testVideo = fluidPlayer(
         'my-video',
-        'http://example.com/vast.xml',
         {
             timelinePreview: {
                 file: 'thumbnails.vtt',
@@ -66,7 +67,12 @@ Fluid Player can be customized by setting some optional parameters:
             vastLoadedCallback: function() {console.log('vast loaded')},
             noVastVideoCallback: function() {console.log('no vast')},
             vastVideoSkippedCallback: function() {console.log('vast skipped')},
-            vastVideoEndedCallback: function() {console.log('vast ended')}
+            vastVideoEndedCallback: function() {console.log('vast ended')},
+            adList: {
+                preRoll: {
+                    vastTag: 'http://example.com/vast.xml',
+                    }
+            }
         }
     );
 </script>
@@ -93,13 +99,13 @@ fluidPlayer(idVideoPlayer[, vastTag, options]);
 Here is a description of the parameters which can be used when setting Fluid Player:
 
 * `idVideoPlayer`: The id of the html video tag, containing the main video to be played.
-* `vastTag`: The URL of the VAST Tag, which returns an XML describing the VAST ad to be displayed.
 * `options`: Various options for tweaking the appearance and behaviour of the player:
   * `timelinePreview`: Sets the timeline preview, visible when hovering over the progress bar. The provided `file` contains a description of the thumbnail images used for the preview. The `type` sets the format of the file. Currently only the VTT format is supported. The timeline preview only works if the `default` layout is chosen (see below).
   * `layout`: Several options are available. The default layout is `default`. It provides own skin to the player. Another option is `browser`, meaning that the standard video player layout and behaviour, specific for each browser, is used. Also, a custom layout may be used: in this case there should be a folder with the given name inside the `/templates` folder, containing a file `styles.css`. _Note: on iPhone devices the player always switches automatically to the `browser` layout._
   * `templateLocation`: A custom folder where the template is located.
   * `scriptsLocation`: A custom folder where additional scripts are located.
   * `skipButtonCaption` (VAST only): The text, displayed on the Skip button. The text can contain the placeholder `[seconds]`. The default value is `Skip ad in [seconds]`.
+  * `closeButtonCaption` (VAST only): The alt text, displayed on the Close button.
   * `skipButtonClickCaption` (VAST only): The text, displayed when the Skip button is available for clicking.
   * `vastTimeout` (VAST only): The number of milliseconds before the VAST Tag call timeouts. Default: `5000`.
   * Callback functions: can be used to execute custom code when some key events occur. Currently the following events are supported: `vastLoadedCallback`, `noVastVideoCallback`, `vastVideoSkippedCallback`, `vastVideoEndedCallback` and `playerInitCallback`.
@@ -114,6 +120,20 @@ Here is a description of the parameters which can be used when setting Fluid Pla
   * `htmlOnPauseBlockHeight`: An integer. if `htmlOnPauseBlock` is set, then it sets the container height. Default: `null` .
   * `htmlOnPauseBlockWidth`: An integer. if `htmlOnPauseBlock` is set, then it sets the container width. Default: `null`.
   * `responsive`: If set to `true`, the player will stretch horizontally to 100% of its parent container width. Default: `false`.
+  * `adList`: Setup one or multiple VastTag. Available timeline positions: `preRoll`, `midRoll`, `postRoll`. For example play a pre-roll Ad at the beginning of the video and one other after 8 seconds:
+    ```javascript
+    // ...
+    adList: {
+            preRoll:{
+                vastTag: "vastPreRoll.xml"
+            },
+            midRoll:{
+                vastTag: "vastMidRoll.xml",
+                timer: 8
+            }
+    }
+    // ...
+    ```
 
 ### Integration with popular frameworks
 
