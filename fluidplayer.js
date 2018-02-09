@@ -2838,7 +2838,7 @@ var fluidPlayerClass = {
             }
         }, 300);
 
-        var listenTo = (player.isTabletDevice()) ? 'tap' : 'mousemove';
+        var listenTo = (fluidPlayerClass.isTouchDevice()) ? 'touchstart' : 'mousemove';
         videoPlayer.addEventListener(listenTo, activity);
     },
 
@@ -2881,15 +2881,9 @@ var fluidPlayerClass = {
             }
         }
 
-        if (!videoPlayerInstance.isTabletDevice()) {
+        if (!fluidPlayerClass.isTouchDevice()) {
             videoPlayerTag.style.cursor = 'default';
         }
-    },
-
-    isTabletDevice: function () {
-        var ua = window.navigator.userAgent;
-        var isMobileChecks = fluidPlayerClass.getMobileOs();
-        return (isMobileChecks.userOs !== false || isMobileChecks.device !== false) && (!!window.chrome || -1 !== ua.indexOf("crios") || 0 === window.navigator.vendor.indexOf("Google") && -1 !== ua.indexOf("chrome"));
     },
 
     fadeOut: function (element) {
