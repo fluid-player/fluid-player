@@ -58,7 +58,8 @@ var fluidPlayerClass = {
     notCloned: ['notCloned', 'vttParserScript', 'instances', 'getInstanceById',
         'requestStylesheet', 'reqiestScript', 'isTouchDevice', 'vastOptions',
         'displayOptions', 'getEventOffsetX', 'getEventOffsetY', 'getTranslateX',
-        'toggleElementText', 'getMobileOs', 'findClosestParent', 'activeVideoPlayerId'],
+        'toggleElementText', 'getMobileOs', 'findClosestParent', 'activeVideoPlayerId',
+        'timer', 'timerPool', 'adList', 'adPool'],
     version: '1.1.3',
     homepage: 'https://www.fluidplayer.com/',
     activeVideoPlayerId: null,
@@ -228,6 +229,19 @@ var fluidPlayerClass = {
         return result;
     },
 
+    getDimensionFromNonLinear: function (tag) {
+        var result = {'width': null, 'height': null};
+        var nonLinear = tag.getElementsByTagName('NonLinear');
+        if (nonLinear.length) {
+            if (typeof nonLinear[0].getAttribute('width') !== 'undefined') {
+                result.width = nonLinear[0].getAttribute('width');
+            }
+            if (typeof nonLinear[0].getAttribute('height') !== 'undefined') {
+                result.height = nonLinear[0].getAttribute('height');
+            }
+        }
+        return result;
+    },
 
     getCreativeTypeFromStaticResources: function (tag) {
         var result = '';
@@ -624,6 +638,7 @@ var fluidPlayerClass = {
                         tmpOptions.clickthroughUrl = player.getClickThroughUrlFromNonLinear(creativeNonLinear);
                         tmpOptions.clicktracking   = player.getNonLinearClickTrackingEvents(creativeNonLinear);
                         tmpOptions.duration        = player.getDurationFromNonLinear(creativeNonLinear);
+                        tmpOptions.dimension       = player.getDimensionFromNonLinear(creativeNonLinear);
                         tmpOptions.staticResource  = player.getStaticResourceFromNonLinear(creativeNonLinear);
                         tmpOptions.creativeType    = player.getCreativeTypeFromStaticResources(creativeNonLinear);
 
@@ -935,8 +950,8 @@ var fluidPlayerClass = {
         creative.id = 'nonLinear_imgCreative_' + roll + '_' + player.videoPlayerId;
         creative.onload = function () {
 
-            origWidth = creative.width;
-            origHeight = creative.height;
+            origWidth = (player.vastOptions.dimension.width !== null) ? player.vastOptions.dimension.width : creative.width;
+            origHeight = (player.vastOptions.dimension.height !== null) ? player.vastOptions.dimension.height : creative.height;
 
             if (origWidth > playerWidth) {
                 newBannerWidth = playerWidth - 5;
@@ -989,6 +1004,7 @@ var fluidPlayerClass = {
         closeBtn.id = 'close_button_' + player.videoPlayerId;
         closeBtn.className = 'close_button';
         closeBtn.innerHTML = '';
+        closeBtn.title = player.displayOptions.closeButtonCaption;
         closeBtn.onclick = function (event) {
             this.parentElement.remove(player);
             if (typeof event.stopImmediatePropagation !== 'undefined') {
@@ -2567,9 +2583,9 @@ var fluidPlayerClass = {
         player.mainVideoDuration    = 0;
         player.isTimer              = false;
         player.timer                = null;
-        player.adPool               = {};
         player.timerPool            = {};
         player.adList               = {};
+        player.adPool               = {};
         player.autoplayAfterAd      = true;
         player.nonLinearDuration    = 15;
         player.supportedStaticTypes = ['image/gif', 'image/jpeg', 'image/png'];
@@ -2579,6 +2595,7 @@ var fluidPlayerClass = {
             mediaType:                'video/mp4',//TODO: should be taken from the VAST Tag; consider removing it completely, since the supported format is browser-dependent
             skipButtonCaption:        'Skip ad in [seconds]',
             skipButtonClickCaption:   'Skip ad <span class="skip_button_icon"></span>',
+            closeButtonCaption:       'Close',
             layout:                   'default', //options: 'default', 'browser', '<custom>'
             templateLocation:         fluidPlayerScriptLocation + 'templates/', //Custom folder where the template is located
             scriptsLocation:          fluidPlayerScriptLocation + 'scripts/', //Custom folder where additional scripts are located

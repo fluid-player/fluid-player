@@ -251,6 +251,7 @@
     right: 0;
     border: none;
     cursor: pointer;
+    opacity: 0.6;
 }
 
 .fluid_nonLinear_container {

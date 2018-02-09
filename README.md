@@ -12,6 +12,8 @@ Fluid Player is a new free HTML5 video player. It is lightweight, easy to integr
 * Lightweight.
 * Compatible with modern web browsers.
 * Ability to have more than 1 player per page.
+* Supports multiple VAST tags (pre-roll, mid-roll, post-roll).
+* Supports non linear VAST tags (banner images (gif/jpg/png)).
 
 ![Fluid Player - VAST Ad](examples/ScreenshotFluidPlayerVastAd.jpg)
 
@@ -100,6 +102,7 @@ Here is a description of the parameters which can be used when setting Fluid Pla
   * `templateLocation`: A custom folder where the template is located.
   * `scriptsLocation`: A custom folder where additional scripts are located.
   * `skipButtonCaption` (VAST only): The text, displayed on the Skip button. The text can contain the placeholder `[seconds]`. The default value is `Skip ad in [seconds]`.
+  * `closeButtonCaption` (VAST only): The alt text, displayed on the Close button.
   * `skipButtonClickCaption` (VAST only): The text, displayed when the Skip button is available for clicking.
   * `vastTimeout` (VAST only): The number of milliseconds before the VAST Tag call timeouts. Default: `5000`.
   * Callback functions: can be used to execute custom code when some key events occur. Currently the following events are supported: `vastLoadedCallback`, `noVastVideoCallback`, `vastVideoSkippedCallback`, `vastVideoEndedCallback` and `playerInitCallback`.
