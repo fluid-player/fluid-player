@@ -59,7 +59,8 @@ var fluidPlayerClass = {
         'requestStylesheet', 'reqiestScript', 'isTouchDevice', 'vastOptions',
         'displayOptions', 'getEventOffsetX', 'getEventOffsetY', 'getTranslateX',
         'toggleElementText', 'getMobileOs', 'findClosestParent', 'activeVideoPlayerId',
-        'getInstanceIdByWrapperId', 'timer', 'timerPool', 'adList', 'adPool'],
+        'getInstanceIdByWrapperId', 'timer', 'timerPool', 'adList', 'adPool',
+        'isUserActive'],
     version: '1.1.3',
     homepage: 'https://www.fluidplayer.com/',
     activeVideoPlayerId: null,
@@ -74,8 +75,8 @@ var fluidPlayerClass = {
         return null;
     },
 
-    getInstanceIdByWrapperId: function(wraperId) {
-        return wraperId.replace('fluid_video_wrapper_', '');
+    getInstanceIdByWrapperId: function(wrapperId) {
+        return typeof wrapperId != "undefined" ? wrapperId.replace('fluid_video_wrapper_', '') : null;
     },
 
     requestStylesheet: function(cssId, url) {
@@ -2796,6 +2797,124 @@ var fluidPlayerClass = {
             player.mainVideoDuration = videoPlayerTag.duration;
         }
     },
+    
+    userActivityChecker: function () {
+        var player = this;
+        var videoPlayer = document.getElementById('fluid_video_wrapper_' + player.videoPlayerId);
+        player.newActivity = null;
+
+        var activity = function () {
+            player.newActivity = true;
+        };
+
+        activityCheck = setInterval(function () {
+
+            if (player.newActivity === true) {
+                player.newActivity = false;
+
+                var videoPlayerTag = document.getElementById(player.videoPlayerId);
+                if (player.isUserActive === false) {
+                    var videoPlayerTag = document.getElementById(player.videoPlayerId);
+                    var event = new CustomEvent("userActive");
+                    videoPlayerTag.dispatchEvent(event);
+                    player.isUserActive = true;
+                }
+
+                clearTimeout(player.inactivityTimeout);
+
+                player.inactivityTimeout = setTimeout(function () {
+
+                    if (player.newActivity !== true) {
+                        player.isUserActive = false;
+                        event = new CustomEvent("userInactive");
+                        videoPlayerTag.dispatchEvent(event);
+                    } else {
+                        clearTimeout(player.inactivityTimeout);
+                    }
+
+                }, player.displayOptions.controlBar.autoHideTimeout);
+
+
+            }
+        }, 300);
+
+        var listenTo = (fluidPlayerClass.isTouchDevice()) ? 'touchstart' : 'mousemove';
+        videoPlayer.addEventListener(listenTo, activity);
+    },
+
+    hasControlBar: function () {
+        return (document.getElementById(this.videoPlayerId + '_fluid_controls_container') && this.displayOptions.layout != "browser") ? true : false;
+    },
+
+    hideControlBar: function () {
+        var videoInstanceId = fluidPlayerClass.getInstanceIdByWrapperId(this.getAttribute('id'));
+        var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
+        var videoPlayerTag = document.getElementById(videoInstanceId);
+
+        if (videoPlayerInstance.hasControlBar()) {
+            var divVastControls = document.getElementById(videoPlayerInstance.videoPlayerId + '_fluid_controls_container');
+
+            if (videoPlayerInstance.displayOptions.controlBar.animated) {
+                videoPlayerInstance.fadeOut(divVastControls);
+            } else {
+                divVastControls.style.display = 'none';
+            }
+
+        }
+
+        videoPlayerTag.style.cursor = 'none';
+    },
+
+    showControlBar: function () {
+
+        var videoInstanceId = fluidPlayerClass.getInstanceIdByWrapperId(this.getAttribute('id'));
+        var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
+        var videoPlayerTag = document.getElementById(videoInstanceId);
+
+        if (videoPlayerInstance.hasControlBar()) {
+            var divVastControls = document.getElementById(videoPlayerInstance.videoPlayerId + '_fluid_controls_container');
+
+            if (videoPlayerInstance.displayOptions.controlBar.animated) {
+                videoPlayerInstance.fadeIn(divVastControls);
+            } else {
+                divVastControls.style.display = 'block';
+            }
+        }
+
+        if (!fluidPlayerClass.isTouchDevice()) {
+            videoPlayerTag.style.cursor = 'default';
+        }
+    },
+
+    fadeOut: function (element) {
+        var opacity = 1;
+        var timer = setInterval(function () {
+            if (opacity <= 0.1) {
+                clearInterval(timer);
+            }
+            element.style.opacity = opacity;
+            opacity -= 0.1;
+        }, 50);
+    },
+
+    fadeIn: function (element) {
+        var opacity = 0.1;
+        var timer = setInterval(function () {
+            if (opacity >= 1) {
+                clearInterval(timer);
+            } else {
+                element.style.opacity = opacity;
+                opacity += 0.1;
+            }
+        }, 10);
+    },
+
+    linkControlBarUserActivity: function () {
+        var player = this;
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);
+        videoPlayerTag.addEventListener('userInactive', player.hideControlBar);
+        videoPlayerTag.addEventListener('userActive', player.showControlBar);
+    },
 
     init: function(idVideoPlayer, options) {
         var player = this;
@@ -2827,6 +2946,8 @@ var fluidPlayerClass = {
         player.autoplayAfterAd      = true;
         player.nonLinearDuration    = 15;
         player.supportedStaticTypes = ['image/gif', 'image/jpeg', 'image/png'];
+        player.inactivityTimeout    = null;
+        player.isUserActive         = null;
 
         //Default options
         player.displayOptions = {
@@ -2856,12 +2977,25 @@ var fluidPlayerClass = {
             htmlOnPauseBlockHeight:   null,
             responsive:               false,
             adList:                   {},
-            keyboardControl:          true
+            keyboardControl:          true,
+            controlBar: {
+                autoHide: false,
+                autoHideTimeout: 3000,
+                animated: true
+            }
         };
 
         //Overriding the default options
         for (var key in options) {
-            player.displayOptions[key] = options[key];
+
+            if(typeof options[key] == "object") {
+                for (var subKey in options[key]) {
+                    player.displayOptions[key][subKey] = options[key][subKey];
+                }
+            } else {
+                player.displayOptions[key] = options[key];
+            }
+
         }
 
         if (player.displayOptions.templateLocation.slice(-1) !== '/') {
@@ -2904,6 +3038,7 @@ var fluidPlayerClass = {
         player.displayOptions.playerInitCallback();
 
         player.createVideoSourceSwitch();
+        player.userActivityChecker();
 
         player.setVastList();
 
@@ -2916,5 +3051,8 @@ var fluidPlayerClass = {
             player.keyboardControl();
         }
 
+        if (player.displayOptions.controlBar.autoHide) {
+            player.linkControlBarUserActivity();
+        }
     }
 };
