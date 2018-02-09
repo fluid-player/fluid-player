@@ -39,7 +39,7 @@ In order to set Fluid Player, three things are required:
 </script>
 ```
 
-The `fluidVideo()` function gets the video tag id as a first parameter, which is the only required one.
+The `fluidPlayer()` function gets the video tag id as a first parameter, which is the only required one.
 
 ### Integration Using Optional Parameters
 
