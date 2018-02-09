@@ -14,6 +14,7 @@ Fluid Player is a new free HTML5 video player. It is lightweight, easy to integr
 * Ability to have more than 1 player per page.
 * Supports multiple VAST tags (pre-roll, mid-roll, post-roll).
 * Supports non linear VAST tags (banner images (gif/jpg/png)).
+* Keyboard Shortcuts by key.
 
 ![Fluid Player - VAST Ad](examples/ScreenshotFluidPlayerVastAd.jpg)
 
@@ -168,6 +169,15 @@ The easiest way to create a custom skin is to make a copy of one of the existing
 When loading a template, the video wrapper element of the player (`id="fluid_video_wrapper_<VIDEO PLAYER ID>"`) will have the template name as an additional class name assigned, prefiexed with `fluid_player_layout_`. This makes it possible for several templates to be used on different instances of Fluid Player on the same page.
 
 For example, if a new skin, called `my_custom_skin` is created, all CSS selectors should start with `.fluid_video_wrapper.fluid_player_layout_my_custom_skin`.
+
+## Keyboard Shortcut
+  * `Space/Enter`: Pause/Play video playback
+  * `Left/Right arrow`: Go back/forward 5 seconds
+  * `Home/End`: Go to beginning/end of video
+  * `Numbers 0-9`: Skip to a particular section of the video (e.g., 5 goes to the video midpoint)
+  * `Up/Down arrow`: Increase/Decrease volume 5%
+  * `m key`: Mute/Unmute video volume
+  * `f key`: Go to Full Screen mode
 
 ## <a name="what-is-vast"></a>What is VAST
 
