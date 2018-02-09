@@ -1329,7 +1329,7 @@ var fluidPlayerClass = {
 
             } else {
                 //make the button clickable
-                btn.innerHTML = '<a href="javascript:;" onclick="fluidPlayerClass.getInstanceById(\'' + player.videoPlayerId + '\').pressSkipButton();">'
+                btn.innerHTML = '<a href="javascript:;" id="skipHref_' + player.videoPlayerId + '" onclick="fluidPlayerClass.getInstanceById(\'' + player.videoPlayerId + '\').pressSkipButton();">'
                     + player.displayOptions.skipButtonClickCaption
                     + '</a>';
 
@@ -1923,6 +1923,166 @@ var fluidPlayerClass = {
         player.adList = ads;
     },
 
+
+
+    volumeChange: function(videoPlayerId, direction) {
+        var videoPlayerTag = document.getElementById(videoPlayerId);
+        var newVolume = videoPlayerTag.volume;
+
+        if(direction == 'asc'){
+            newVolume += 0.05;
+        } else if(direction == 'desc') {
+            newVolume -= 0.05;
+        }
+
+        if (newVolume < 0.05) {
+            newVolume = 0;
+        } else if (newVolume > 0.95) {
+            newVolume = 1;
+        }
+
+        videoPlayerTag.volume = newVolume;
+    },
+
+    currentTimeChange: function (videoPlayerId, keyCode) {
+        var videoInstanceId = fluidPlayerClass.getInstanceById(videoPlayerId);
+        if (videoInstanceId.isCurrentlyPlayingAd) {
+            return;
+        }
+
+        var videoPlayerTag = document.getElementById(videoPlayerId);
+
+        videoPlayerTag.currentTime = videoInstanceId.getNewCurrentTimeValueByKeyCode(keyCode, videoPlayerTag.currentTime, videoPlayerTag.duration);
+    },
+
+    getNewCurrentTimeValueByKeyCode: function (keyCode, currentTime, duration) {
+
+        var newCurrentTime = currentTime;
+
+        switch (keyCode) {
+
+            case 37://left arrow
+                newCurrentTime -= 5;
+                newCurrentTime = (newCurrentTime < 5) ? 0 : newCurrentTime;
+                break;
+            case 39://right arrow
+                newCurrentTime += 5;
+                newCurrentTime = (newCurrentTime > duration - 5) ? duration : newCurrentTime;
+                break;
+            case 35://End
+                newCurrentTime = duration;
+                break;
+            case 36://Home
+                newCurrentTime = 0;
+                break;
+            case 48://0
+            case 49://1
+            case 50://2
+            case 51://3
+            case 52://4
+            case 53://5
+            case 54://6
+            case 55://7
+            case 56://8
+            case 57://9
+                if (keyCode < 58 && keyCode > 47) {
+                    var percent = (keyCode - 48) * 10;
+                    newCurrentTime = duration * percent / 100;
+                }
+                break;
+        }
+
+
+        return newCurrentTime;
+    },
+
+
+    handleMouseenter: function () {
+        var videoInstanceId = fluidPlayerClass.getInstanceIdByWrapperId(this.getAttribute('id'));
+        var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
+        var videoPlayerTag = document.getElementById(videoInstanceId);
+
+        if (videoPlayerInstance.captureKey) {
+            return;
+        }
+
+        videoPlayerInstance.captureKey = function (event) {
+            event.stopPropagation();
+            var keyCode = event.keyCode;
+
+            switch (keyCode) {
+
+                case 70://f
+                    videoPlayerInstance.fullscreenToggle(videoInstanceId);
+                    event.preventDefault();
+                    break;
+                case 13://Enter
+                case 32://Space
+                    videoPlayerInstance.playPauseToggle(videoPlayerTag);
+                    event.preventDefault();
+                    break;
+                case 77://m
+                    videoPlayerInstance.muteToggle(videoInstanceId);
+                    event.preventDefault();
+                    break;
+                case 38://up arrow
+                    videoPlayerInstance.volumeChange(videoInstanceId, 'asc');
+                    event.preventDefault();
+                    break;
+                case 40://down arrow
+                    videoPlayerInstance.volumeChange(videoInstanceId, 'desc');
+                    event.preventDefault();
+                    break;
+                case 37://left arrow
+                case 39://right arrow
+                case 35://End
+                case 36://Home
+                case 48://0
+                case 49://1
+                case 50://2
+                case 51://3
+                case 52://4
+                case 53://5
+                case 54://6
+                case 55://7
+                case 56://8
+                case 57://9
+                    videoPlayerInstance.currentTimeChange(videoInstanceId, keyCode);
+                    event.preventDefault();
+                    break;
+            }
+
+            return false;
+
+        };
+        document.addEventListener('keydown', videoPlayerInstance.captureKey, true);
+
+    },
+
+    handleMouseleave: function () {
+        var player = this;
+
+        window.addEventListener('click', function (e) {
+            var videoInstanceId = fluidPlayerClass.getInstanceIdByWrapperId(player.getAttribute('id'));
+            var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
+
+            if (document.getElementById('fluid_video_wrapper_' + videoInstanceId).contains(e.target)
+                || e.target.id == 'skipHref_' + videoInstanceId) {
+                // do nothing
+            } else {
+                document.removeEventListener('keydown', videoPlayerInstance.captureKey, true);
+                delete videoPlayerInstance["captureKey"];
+            }
+        });
+    },
+
+    keyboardControl: function () {
+        var player = this;
+        var videoPlayer = document.getElementById('fluid_video_wrapper_' + player.videoPlayerId);
+
+        videoPlayer.addEventListener('click', player.handleMouseenter, false);
+        videoPlayer.addEventListener('mouseleave', player.handleMouseleave, false);
+    },
 
     initialPlay: function() {
         var videoPlayerTag = this;
@@ -2823,6 +2983,7 @@ var fluidPlayerClass = {
             htmlOnPauseBlockHeight:   null,
             responsive:               false,
             adList:                   {},
+            keyboardControl:          true,
             controlBar: {
                 autoHide: false,
                 autoHideTimeout: 3000,
@@ -2889,6 +3050,11 @@ var fluidPlayerClass = {
 
         if (player.displayOptions.autoPlay) {
             videoPlayer.play();
+        }
+
+        //Keyboard Controls
+        if (player.displayOptions.keyboardControl) {
+            player.keyboardControl();
         }
 
         if (player.displayOptions.controlBar.autoHide) {
