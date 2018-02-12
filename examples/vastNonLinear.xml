@@ -21,7 +21,7 @@
                             <Tracking event="thirdQuartile"><![CDATA[http://example.com/view?tracking_event=thirdQuartile&idzone=9999999]]></Tracking>
                             <Tracking event="complete"><![CDATA[http://example.com/view?tracking_event=complete&idzone=9999999]]></Tracking>
                         </TrackingEvents>
-                        <NonLinear width="468" height="60" minSuggestedDuration="00:00:03">
+                        <NonLinear width="468" height="60" minSuggestedDuration="00:00:05">
                             <StaticResource creativeType="image/jpeg"><![CDATA[468x60Ad.jpg]]></StaticResource>
                             <NonLinearClickThrough><![CDATA[http://example.com/]]></NonLinearClickThrough>
                             <NonLinearClickTracking><![CDATA[http://example.com/view?tracking_event=click&idzone=9999999]]></NonLinearClickTracking>

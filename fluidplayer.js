@@ -495,14 +495,20 @@ var fluidPlayerClass = {
         this.recalcPosition();
     },
 
-    prepareVast: function(roll) {
+    prepareVast: function (roll) {
         var player = this;
         var videoPlayerTag = document.getElementById(this.videoPlayerId);
+        var list = [];
+        list.length = 0;
 
-        if (player.adList.hasOwnProperty(roll) && player.adList[roll].vastLoaded !== true && player.adList[roll].error !== true) {
-            if (player.adList[roll].vastLoaded !== true) {
-                player.parseVastTag(player.adList[roll].vastTag, roll);
-                videoPlayerTag.addEventListener('vReady_' + roll, player[roll]);
+        list = player.findRoll(roll);
+
+        for (var i = 0; i < list.length; i++) {
+            var adListId = list[i];
+
+            if (player.adList[adListId].vastLoaded !== true && player.adList[adListId].error !== true) {
+                player.parseVastTag(player.adList[adListId].vastTag, adListId);
+                videoPlayerTag.addEventListener('adId_' + adListId, player[roll]);
             }
         }
     },
@@ -557,9 +563,9 @@ var fluidPlayerClass = {
      * Parse the VAST Tag
      *
      * @param vastTag
-     * @param roll
+     * @param adListId
      */
-    parseVastTag: function(vastTag, roll) {
+    parseVastTag: function(vastTag, adListId) {
         var player = this;
 
         var tmpOptions = {
@@ -580,7 +586,7 @@ var fluidPlayerClass = {
                 if ((xmlHttpReq.readyState === 4) && (xmlHttpReq.status !== 200)) {
 
                     //Set the error flag for the Ad
-                    player.adList[roll].error = true;
+                    player.adList[adListId].error = true;
 
                     //The response returned an error. Proceeding with the main video.
                     player.playMainVideoWhenVastFails(900);
@@ -650,26 +656,26 @@ var fluidPlayerClass = {
                         player.registerTrackingEvents(creativeNonLinear, tmpOptions);
                     }
 
-                    player.adList[roll].adType = tmpOptions.adType? tmpOptions.adType : 'unknown';
+                    player.adList[adListId].adType = tmpOptions.adType? tmpOptions.adType : 'unknown';
 
                     if (typeof tmpOptions.mediaFile !== 'undefined' || typeof tmpOptions.staticResource !== 'undefined') {
 
-                        player.adList[roll].vastLoaded = true;
+                        player.adList[adListId].vastLoaded = true;
                         player.displayOptions.vastLoadedCallback();
-                        player.adPool[roll] = Object.assign({}, tmpOptions);
+                        player.adPool[adListId] = Object.assign({}, tmpOptions);
                         var event = document.createEvent('Event');
-                        event.initEvent('vReady_' + roll, false, true);
+                        event.initEvent('adId_' + adListId, false, true);
                         document.getElementById(player.videoPlayerId).dispatchEvent(event);
                         return;
                     } else {
                         //announceError the main video
-                        player.adList[roll].error = true;
+                        player.adList[adListId].error = true;
                         player.playMainVideoWhenVastFails(101);
                         return;
                     }
                 } else {
                     //announceError the main video
-                    player.adList[roll].error = true;
+                    player.adList[adListId].error = true;
                     player.playMainVideoWhenVastFails(101);
                     return;
                 }
@@ -678,17 +684,18 @@ var fluidPlayerClass = {
         );
     },
 
-    playRoll: function(roll) {
+    playRoll: function(adListId) {
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
-        if (!player.adPool.hasOwnProperty(roll)) {
+        if (!player.adPool.hasOwnProperty(adListId)) {
             player.announceLocalError(101);
             return;
         }
+        var roll = player.adPool[adListId].roll;
 
         //get the proper ad
-        player.vastOptions = player.adPool[roll];
+        player.vastOptions = player.adPool[adListId];
 
         //spec configs by roll
         switch (roll) {
@@ -734,7 +741,7 @@ var fluidPlayerClass = {
                 }
 
                 player.toggleLoader(false);
-                player.adList[roll].played = true;
+                player.adList[adListId].played = true;
                 player.adFinished = false;
                 videoPlayerTag.play();
 
@@ -779,7 +786,7 @@ var fluidPlayerClass = {
             }
         };
 
-        playVideoPlayer(roll);
+        playVideoPlayer(adListId);
 
         videoPlayerTag.addEventListener('timeupdate', videoPlayerTimeUpdate);
     },
@@ -867,7 +874,7 @@ var fluidPlayerClass = {
     },
 
 
-    completeNonLinearStatic: function () {
+    completeNonLinearStatic: function (adListId) {
         var player = this;
         player.closeNonLinear();
         if(player.adFinished == false) {
@@ -881,18 +888,18 @@ var fluidPlayerClass = {
     /**
      * Show up a nonLinear static creative
      */
-    createNonLinearStatic: function (roll) {
+    createNonLinearStatic: function (adListId) {
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
-        if (!player.adPool.hasOwnProperty(roll) || player.adPool[roll].error === true) {
+        if (!player.adPool.hasOwnProperty(adListId) || player.adPool[adListId].error === true) {
             player.announceLocalError(101);
             return;
         }
 
         //get the proper ad
-        player.vastOptions = player.adPool[roll];
-        player.createBoard(roll);
+        player.vastOptions = player.adPool[adListId];
+        player.createBoard(adListId);
 
         player.adFinished = false;
         player.trackSingleEvent('start');
@@ -913,12 +920,15 @@ var fluidPlayerClass = {
         }, 400);
 
 
-        if (roll == 'midRoll' && typeof player.adList.midRoll.timer !== 'undefined') {
-            offset = (roll == 'midRoll') ? player.adList.midRoll.timer : 0;
+        if (player.adList[adListId].roll == 'midRoll' && typeof player.adList[adListId].timer !== 'undefined') {
+            offset = (player.adPool[adListId].roll == 'midRoll') ? player.adList[adListId].timer : 0;
+        } else {
+            offset = 0;
+
         }
 
-        time = parseInt(player.mainVideoCurrentTime) + parseInt(duration) + parseInt(offset);
-        player.scheduleTask({time: time, closeStaticAd: roll});
+        time = parseInt(player.getCurrentTime()) + parseInt(duration) + parseInt(offset);
+        player.scheduleTask({time: time, closeStaticAd: adListId});
     },
 
 
@@ -927,17 +937,17 @@ var fluidPlayerClass = {
      *
      * currently only image/gif, image/jpeg, image/png supported
      */
-    createBoard: function (roll) {
+    createBoard: function (adListId) {
 
         var player = this;
 
         if (typeof player.vastOptions.staticResource === 'undefined'
             || player.supportedStaticTypes.indexOf(player.vastOptions.creativeType) === -1) {
-            player.adList[roll].error = true;
+            player.adList[adListId].error = true;
             return;
         }
 
-        player.adList[roll].played = true;
+        player.adList[adListId].played = true;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
         var playerWidth = videoPlayerTag.clientWidth;
@@ -952,7 +962,7 @@ var fluidPlayerClass = {
 
         var creative = new Image();
         creative.src = player.vastOptions.staticResource;
-        creative.id = 'nonLinear_imgCreative_' + roll + '_' + player.videoPlayerId;
+        creative.id = 'nonLinear_imgCreative_' + adListId + '_' + player.videoPlayerId;
         creative.onload = function () {
 
             origWidth = (player.vastOptions.dimension.width !== null) ? player.vastOptions.dimension.width : creative.width;
@@ -1054,54 +1064,57 @@ var fluidPlayerClass = {
     },
 
 
-    preRoll: function () {
+    preRoll: function (event) {
         var player = fluidPlayerClass.getInstanceById(this.id);
         var videoPlayerTag = document.getElementById(this.getAttribute('id'));
-        videoPlayerTag.removeEventListener('vReady_preRoll', player.preRoll);
+        videoPlayerTag.removeEventListener(event.type, player.preRoll);
         player.initialStart = true;
+        adListId = event.type.replace('adId_', '');
 
-        if (player.adList['preRoll'].played === true) {
+        if (player.adList[adListId].played === true) {
             return;
         }
 
-        if (player.adList['preRoll'].adType == 'linear') {
+        if (player.adList[adListId].adType == 'linear') {
             player.toggleLoader(true);
-            player.playRoll('preRoll');
+            player.playRoll(adListId);
         }
 
-        if (player.adList['preRoll'].adType == 'nonLinear') {
+        if (player.adList[adListId].adType == 'nonLinear') {
             videoPlayerTag.play();
-            player.createNonLinearStatic('preRoll');
+            player.createNonLinearStatic(adListId);
         }
 
     },
 
 
-    midRoll: function () {
+    midRoll: function (event) {
         var player = fluidPlayerClass.getInstanceById(this.id);
         var videoPlayerTag = document.getElementById(this.getAttribute('id'));
-        videoPlayerTag.removeEventListener('vReady_midRoll', player.midRoll);
+        videoPlayerTag.removeEventListener(event.type, player.midRoll); //todo pass id?!
 
-        if(player.adList['midRoll'].played === true){
+        adListId = event.type.replace('adId_', '');
+        if(player.adList[adListId].played === true){
             return;
         }
 
-        var time = player.adList.midRoll.timer;
+        var time = player.adList[adListId].timer;
 
         if(typeof time == 'string' && time.indexOf("%") !== -1) {
             time = time.replace('%', '');
             time = Math.floor(player.mainVideoDuration / 100 * time);
         }
 
-        player.scheduleTask({time: time, playRoll: 'midRoll'});
+        player.scheduleTask({time: time, playRoll: 'midRoll', adListId: adListId});
     },
 
 
-    postRoll: function () {
+    postRoll: function (event) {
         var player = fluidPlayerClass.getInstanceById(this.id);
         var videoPlayerTag = document.getElementById(this.getAttribute('id'));
-        videoPlayerTag.removeEventListener('vReady_postRoll', player.postRoll);
-        player.scheduleTask({time: Math.floor(player.mainVideoDuration), playRoll: 'postRoll'});
+        videoPlayerTag.removeEventListener(event.type, player.postRoll);
+        adListId = event.type.replace('adId_', '');
+        player.scheduleTask({time: Math.floor(player.mainVideoDuration), playRoll: 'postRoll', adListId: adListId});
     },
 
 
@@ -1126,18 +1139,18 @@ var fluidPlayerClass = {
                 //Task: playRoll
                 if (player.timerPool[keyTime] && player.timerPool[keyTime].hasOwnProperty('playRoll')) {
 
-                    var rollToCheck = player.timerPool[keyTime].playRoll;
+                    var adIdToCheck = player.timerPool[keyTime].adListId;
 
-                    if(player.adList[rollToCheck].played == false) {
+                    if(player.adList[adIdToCheck].played == false) {
 
-                        player.vastOptions = player.adPool[rollToCheck];
+                        player.vastOptions = player.adPool[adIdToCheck];
 
                         if(player.vastOptions.adType == 'linear'){
                             player.toggleLoader(true);
-                            player.playRoll(rollToCheck);
+                            player.playRoll(adIdToCheck);
                         }
                         if(player.vastOptions.adType == 'nonLinear'){
-                            player.createNonLinearStatic(rollToCheck);
+                            player.createNonLinearStatic(adIdToCheck);
                         }
 
                         //Remove ad from the play list
@@ -1149,10 +1162,10 @@ var fluidPlayerClass = {
 
                 //Task: close nonLinear ads
                 if (player.timerPool[keyTime] && player.timerPool[keyTime].hasOwnProperty('closeStaticAd')) {
-                    var rollToCheck = player.timerPool[keyTime].closeStaticAd;
+                    var adListId = player.timerPool[keyTime].closeStaticAd;
 
-                    if(player.adList[rollToCheck].played == true) {
-                        player.completeNonLinearStatic();
+                    if(player.adList[adListId].played == true) {
+                        player.completeNonLinearStatic(adListId);
 
                         //Remove ad from the play list
                         delete player.timerPool[keyTime];
@@ -1885,43 +1898,80 @@ var fluidPlayerClass = {
     setVastList: function () {
         var player = this;
         var ads = {};
-        var def = {played: false, vastLoaded: false, error: false};
+        var def = {id: null, roll: null, played: false, vastLoaded: false, error: false};
 
-        var validateVastList = function (roll, item) {
+        var validateVastList = function (item) {
             var hasError = false;
 
-            switch (roll) {
-                case 'midRoll':
+            switch (item.roll) {
 
+                case 'midRoll':
                     if (typeof item.timer === 'undefined') {
-                        hasError = false;
+                        hasError = true;
                     }
                     break;
+
             }
+
             return hasError;
         };
 
 
+        var validateRequiredParams = function (item) {
+            var hasError = false;
+
+            if (!item.vastTag|| !item.roll || player.availableRolls.indexOf(item.roll) === -1) {
+                hasError = true;
+            }
+
+            return hasError;
+        };
+
+
+        var idPart = 0;
         if (player.displayOptions.hasOwnProperty('adList')) {
 
-            if (player.displayOptions.adList.hasOwnProperty('preRoll')) {
-                ads.preRoll = Object.assign({vastTag: player.displayOptions.adList.preRoll.vastTag}, def);
+            for (var key in player.displayOptions.adList) {
+
+                adItem = player.displayOptions.adList[key];
+
+                if(validateRequiredParams(adItem)) {
+                    player.announceLocalError(102, 'Wrong adList parameters.');
+                    continue;
+                }
+
+                ads['ID' + idPart] = Object.assign({}, def);
+                ads['ID' + idPart] = Object.assign(ads['ID' + idPart], player.displayOptions.adList[key]);
+                if (adItem.roll == 'midRoll') {
+                    ads['ID' + idPart].error = validateVastList('midRoll', adItem);
+                }
+                idPart++;
+
             }
-
-            if (player.displayOptions.adList.hasOwnProperty('midRoll')) {
-                ads.midRoll = Object.assign(player.displayOptions.adList.midRoll, def);
-                ads.midRoll.error = validateVastList('midRoll', ads.midRoll);
-
-            }
-
-            if (player.displayOptions.adList.hasOwnProperty('postRoll')) {
-                ads.postRoll = Object.assign({vastTag: player.displayOptions.adList.postRoll.vastTag}, def);
-           }
-
         }
 
         player.adList = ads;
     },
+
+
+    findRoll: function(roll) {
+        var player = this;
+        ids = [];
+        ids.length = 0;
+
+        if(!roll || !player.hasOwnProperty('adList')) {
+            return;
+        }
+
+        for (var key in player.adList) {
+            if (player.adList[key].roll == roll) {
+                ids.push(key);
+            }
+        }
+
+        return ids;
+    },
+
 
 
 
@@ -2099,9 +2149,10 @@ var fluidPlayerClass = {
         var player = fluidPlayerClass.getInstanceById(videoPlayerTag.id);
         var initialStartJustSet = false;
 
-        if (player.initialStart || (!player.adList.hasOwnProperty('preRoll'))) {
+        preRolls = player.findRoll('preRoll');
+        if (player.initialStart || preRolls.length == 0) {
 
-            if (!(player.initialStart || player.adList.hasOwnProperty('preRoll'))) {
+            if (!(player.initialStart || preRolls.length > 0)) {
                 player.initialStart = true;
                 initialStartJustSet = true;
                 player.displayOptions.noVastVideoCallback();
@@ -2951,6 +3002,7 @@ var fluidPlayerClass = {
         player.timerPool            = {};
         player.adList               = {};
         player.adPool               = {};
+        player.availableRolls       = ['preRoll', 'midRoll', 'postRoll'];
         player.autoplayAfterAd      = true;
         player.nonLinearDuration    = 15;
         player.supportedStaticTypes = ['image/gif', 'image/jpeg', 'image/png'];
