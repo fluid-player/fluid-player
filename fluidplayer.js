@@ -2166,6 +2166,8 @@ var fluidPlayerClass = {
                 }
             }
 
+            player.initHtmlOnPauseBlock();
+
         } else {
             //Workaround for Chrome Mobile - otherwise it blocks the subsequent
             //play() command, because it considers it not being triggered by the user.
@@ -3093,8 +3095,6 @@ var fluidPlayerClass = {
         player.handleFullscreen();
 
         player.initLogo();
-
-        player.initHtmlOnPauseBlock();
 
         player.initMute();
 
