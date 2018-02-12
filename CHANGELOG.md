@@ -1,7 +1,12 @@
 # CHANGELOG
 
-## Master
+## 1.2.0
 * [Pull #68](https://github.com/fluid-player/fluid-player/pull/68) Controls remain fullscreen after escaping fullscreen
+* [Pull #66](https://github.com/fluid-player/fluid-player/pull/66) Optional logoUrl for clickable logo
+* [Pull #74](https://github.com/fluid-player/fluid-player/pull/74) Add ability to grab and slide the volume slider and timeline scrubber.
+* [Pull #75](https://github.com/fluid-player/fluid-player/pull/75) [Pull #77](https://github.com/fluid-player/fluid-player/pull/77) Adding mid/post roll support and initial VAST nonLinear support.
+* [Pull #67](https://github.com/fluid-player/fluid-player/pull/67) Adding key controls.
+* [Pull #69](https://github.com/fluid-player/fluid-player/pull/69) Adding controls hiding functionality.
 
 ## 1.1.3
 * [Pull #50](https://github.com/fluid-player/fluid-player/pull/50) Fix for double double render of blank video on some browsers
