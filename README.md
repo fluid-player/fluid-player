@@ -1,5 +1,5 @@
 # Fluid Player
-[![Latest version](https://img.shields.io/badge/Latest%20Version-1.1.3-blue.svg)](https://github.com/fluid-player/fluid-player/releases/latest)
+[![Latest version](https://img.shields.io/badge/Latest%20Version-1.2.0-blue.svg)](https://github.com/fluid-player/fluid-player/releases/latest)
 
 ## Overview
 
