@@ -2,6 +2,7 @@
 
 ## Master
 * [Pull #68](https://github.com/fluid-player/fluid-player/pull/68) Controls remain fullscreen after escaping fullscreen
+* [Pull #66](https://github.com/fluid-player/fluid-player/pull/66) Optional logoUrl for clickable logo
 
 ## 1.1.3
 * [Pull #50](https://github.com/fluid-player/fluid-player/pull/50) Fix for double double render of blank video on some browsers
