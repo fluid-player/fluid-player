@@ -25,7 +25,7 @@ var fluidPlayerScriptLocation = function() {
     return '';
 }();
 
-fluidPlayer = function(idVideoPlayer, options) {
+fluidPlayer = function(idVideoPlayer, vastTag, options) {
     var inArray = function(needle, haystack) {
         var length = haystack.length;
 
@@ -47,7 +47,13 @@ fluidPlayer = function(idVideoPlayer, options) {
 
     fluidPlayerClass.instances.push(copy);
 
-    copy.init(idVideoPlayer, options);
+    //Keeping the vastTag as backwards compatibility
+    if (typeof vastTag !== 'undefined' && typeof vastTag !== "string") {
+        options = vastTag;
+        vastTag = null;
+    }
+
+    copy.init(idVideoPlayer, vastTag, options);
 
     return copy;
 };
@@ -1895,10 +1901,11 @@ var fluidPlayerClass = {
         document.addEventListener('touchmove', onVolumebarMouseMove);
     },
 
-    setVastList: function () {
+    setVastList: function (vastTag) {
         var player = this;
         var ads = {};
         var def = {id: null, roll: null, played: false, vastLoaded: false, error: false};
+        var idPart = 0;
 
         var validateVastList = function (item) {
             var hasError = false;
@@ -1916,6 +1923,13 @@ var fluidPlayerClass = {
             return hasError;
         };
 
+        //Keeping the vastTag as backwards compatibility
+        if (typeof vastTag !== 'undefined' && typeof vastTag === "string") {
+            ads['ID' + idPart] = Object.assign({}, def);
+            ads['ID' + idPart].roll = 'preRoll';
+            ads['ID' + idPart].vastTag = vastTag;
+            idPart++;
+        }
 
         var validateRequiredParams = function (item) {
             var hasError = false;
@@ -1928,7 +1942,6 @@ var fluidPlayerClass = {
         };
 
 
-        var idPart = 0;
         if (player.displayOptions.hasOwnProperty('adList')) {
 
             for (var key in player.displayOptions.adList) {
@@ -2977,7 +2990,7 @@ var fluidPlayerClass = {
         }
     },
 
-    init: function(idVideoPlayer, options) {
+    init: function(idVideoPlayer, vastTag, options) {
         var player = this;
         var videoPlayer = document.getElementById(idVideoPlayer);
 
@@ -3103,7 +3116,7 @@ var fluidPlayerClass = {
         player.createVideoSourceSwitch();
         player.userActivityChecker();
 
-        player.setVastList();
+        player.setVastList(vastTag);
 
         if (player.displayOptions.autoPlay) {
             videoPlayer.play();
