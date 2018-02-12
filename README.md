@@ -6,15 +6,23 @@
 Fluid Player is a new free HTML5 video player. It is lightweight, easy to integrate and has advanced VAST[\*](#what-is-vast) capabilities.
 
 ## Features
-* Supports the VAST standard.
+* Supports the VAST standard
+  * Multiple VAST tags (pre-roll, mid-roll, post-roll).
+  * Linear (video) ads
+  * Non linear VAST tags (banner images (gif/jpg/png)).
 * Comes with its own design, which is easily customizable. Ability to use the browser default layout.
 * Timeline Preview.
 * Lightweight.
+* Responsive.
 * Compatible with modern web browsers.
 * Ability to have more than 1 player per page.
-* Supports multiple VAST tags (pre-roll, mid-roll, post-roll).
-* Supports non linear VAST tags (banner images (gif/jpg/png)).
 * Keyboard Shortcuts by key.
+* Allows adding multiple video sources for user to switch between different video quality.
+* Autoplay control.
+* Allows adding a custom logo.
+* Custom call to action text when playing a video ad.
+* Wordpress Plugin.
+* Scripts and resources available via CDN.
 
 ![Fluid Player - VAST Ad](examples/ScreenshotFluidPlayerVastAd.jpg)
 
