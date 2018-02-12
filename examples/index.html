@@ -142,11 +142,7 @@
                 adText: 'advertisement',
                 adCTAText: 'Visit Advertiser Website',
                 responsive: false,
-                adList: {
-                    preRoll: {
-                        vastTag: 'vastLinear.xml'
-                    }
-                },
+                adList: [{roll: 'preRoll', vastTag: 'vastLinear.xml'}],
                 controlBar: {
                     autoHide: true
                 }
@@ -162,12 +158,7 @@
                 },
                 layout: 'funky',
                 adCTAText: 'Visit Advertiser Website',
-                adList: {
-                    preRoll: {
-                        vastTag: 'vastLinear.xml'
-                    }
-                }
-
+                adList: [{roll: 'preRoll', vastTag: 'vastLinear.xml'}]
             }
         );
 
@@ -179,11 +170,7 @@
                     type: 'VTT'
                 },
                 layout: 'metal',
-                adList: {
-                    preRoll: {
-                        vastTag: 'vastLinear.xml'
-                    }
-                }
+                adList: [{roll: 'preRoll', vastTag: 'vastLinear.xml'}]
             }
         );
 
@@ -191,11 +178,7 @@
             'test-video-4',
             {
                 layout: 'browser',
-                adList: {
-                    preRoll: {
-                        vastTag: 'vastLinear.xml'
-                    }
-                }
+                adList: [{roll: 'preRoll', vastTag: 'vastLinear.xml'}]
             }
         );
 
@@ -210,20 +193,22 @@
                     noVastVideoCallback: function() {console.log('no vast');},
                     vastVideoSkippedCallback: function() {console.log('vast skipped');},
                     vastVideoEndedCallback: function() {console.log('vast ended');},
-                    playerInitCallback: function() {console.log('Player "test-video" initiation called');},
+                    playerInitCallback: function() {console.log('Player "test-video-5" initiation called');},
                     logo: 'fluidplayer.png',
                     logoPosition: 'top left',
                     logoOpacity: 0.5,
                     responsive: false,
-                    adList: {
-                        preRoll: {
+                    adList: [
+                        {
+                            roll: 'preRoll',
                             vastTag: 'vastLinear.xml'
                         },
-                        midRoll: {
+                        {
+                            roll: 'midRoll',
                             vastTag: 'vastNonLinear.xml',
-                            timer: 3
+                            timer: 10
                         }
-                    }
+                    ]
                 }
         );
     </script>

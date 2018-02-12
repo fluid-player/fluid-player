@@ -77,11 +77,7 @@ Fluid Player can be customized by setting some optional parameters:
             noVastVideoCallback: function() {console.log('no vast')},
             vastVideoSkippedCallback: function() {console.log('vast skipped')},
             vastVideoEndedCallback: function() {console.log('vast ended')},
-            adList: {
-                preRoll: {
-                    vastTag: 'http://example.com/vast.xml',
-                    }
-            }
+            adList: [{roll: 'preRoll', vastTag: 'http://example.com/vast.xml'}]
         }
     );
 </script>
@@ -132,18 +128,28 @@ Here is a description of the parameters which can be used when setting Fluid Pla
   * `adList`: Setup one or multiple VastTag. Available timeline positions: `preRoll`, `midRoll`, `postRoll`. For example play a pre-roll Ad at the beginning of the video and one other after 8 seconds:
     ```javascript
     // ...
-    adList: {
-            preRoll:{
-                vastTag: "vastPreRoll.xml"
-            },
-            midRoll:{
-                vastTag: "vastMidRoll.xml",
-                timer: 8
-            }
-    }
+    adList: [
+        {
+            roll: 'preRoll',
+            vastTag: "vastPreRoll.xml"
+        },
+        {
+            roll: 'midRoll',
+            vastTag: "vastMidRoll.xml",
+            timer: 8
+        }
+    ]
     // ...
     ```
   * `mute`: If set to `true`, the player will be muted by default on page load. Default: `  false`.
+  * `controlBar`: Autohiding the control bar after 3 seconds. The feature is disabled by default. To enable set:
+    ```javascript
+    // ...
+    controlBar: {
+        autoHide: true
+        }
+    // ...
+    ```
 
 ### Integration with popular frameworks
 
