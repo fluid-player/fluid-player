@@ -2916,6 +2916,14 @@ var fluidPlayerClass = {
         videoPlayerTag.addEventListener('userActive', player.showControlBar);
     },
 
+    initMute: function() {
+        var player = this;
+        if (player.displayOptions.mute === true) {
+            var videoPlayerTag = document.getElementById(player.videoPlayerId);
+            videoPlayerTag.volume = 0;
+        }
+    },
+
     init: function(idVideoPlayer, options) {
         var player = this;
         var videoPlayer = document.getElementById(idVideoPlayer);
@@ -2982,7 +2990,8 @@ var fluidPlayerClass = {
                 autoHide: false,
                 autoHideTimeout: 3000,
                 animated: true
-            }
+            },
+            mute:                     false
         };
 
         //Overriding the default options
@@ -3034,6 +3043,8 @@ var fluidPlayerClass = {
         player.initLogo();
 
         player.initHtmlOnPauseBlock();
+
+        player.initMute();
 
         player.displayOptions.playerInitCallback();
 

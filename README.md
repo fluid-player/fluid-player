@@ -135,6 +135,7 @@ Here is a description of the parameters which can be used when setting Fluid Pla
     }
     // ...
     ```
+  * `mute`: If set to `true`, the player will be muted by default on page load. Default: `  false`.
 
 ### Integration with popular frameworks
 
