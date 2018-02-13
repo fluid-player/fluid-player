@@ -125,7 +125,7 @@ Here is a description of the parameters which can be used when setting Fluid Pla
   * `htmlOnPauseBlockHeight`: An integer. if `htmlOnPauseBlock` is set, then it sets the container height. Default: `null` .
   * `htmlOnPauseBlockWidth`: An integer. if `htmlOnPauseBlock` is set, then it sets the container width. Default: `null`.
   * `responsive`: If set to `true`, the player will stretch horizontally to 100% of its parent container width. Default: `false`.
-  * `adList`: Setup one or multiple VastTag. Available timeline positions: `preRoll`, `midRoll`, `postRoll`. For example play a pre-roll Ad at the beginning of the video and one other after 8 seconds:
+  * `adList` (VAST only): Setup one or multiple VastTag. Available timeline positions: `preRoll`, `midRoll`, `postRoll`. For example play a pre-roll Ad at the beginning of the video and one other after 8 seconds:
     ```javascript
     // ...
     adList: [
@@ -141,6 +141,25 @@ Here is a description of the parameters which can be used when setting Fluid Pla
     ]
     // ...
     ```
+    It is possible to set multiple mid-rol Ads however only one pre-roll and one post-roll Ad is supported. The mid-roll Ad requires a `timer` property which can schedule the show as below:
+    * `timer: number` Ad plays after the specified number of seconds (Example `timer: 10`)
+    * `timer: "xx%"` Ad plays after xx percent of the content
+        ```javascript
+        // ...
+        adList: [
+            {
+                roll: 'midRoll',
+                vastTag: "vastMidRoll.xml",
+                timer: 10
+            },
+            {
+                roll: 'midRoll',
+                vastTag: "vastMidRoll.xml",
+                timer: '50%'
+            }
+        ]
+        // ...
+        ```
   * `mute`: If set to `true`, the player will be muted by default on page load. Default: `  false`.
   * `controlBar`: Autohiding the control bar after 3 seconds. The feature is disabled by default. To enable set:
     ```javascript
@@ -150,6 +169,11 @@ Here is a description of the parameters which can be used when setting Fluid Pla
         }
     // ...
     ```
+    Some customization options are available for the controlBar:
+    * `autoHide: true/false` Turn the feature on/off. Default: `false`
+    * `autoHideTimeout: number`The number of seconds before hiding the control bar. Default: `3`
+    * `animated: true/false` Enable/disable the fade out effect. Default: `true`
+  * `keyboardControl`: Enable/disable the keyboard shortcuts. Find more details here:[Keyboard Shortcuts](#keyboard-shortcuts)
 
 ### Integration with popular frameworks
 
@@ -185,7 +209,7 @@ When loading a template, the video wrapper element of the player (`id="fluid_vid
 
 For example, if a new skin, called `my_custom_skin` is created, all CSS selectors should start with `.fluid_video_wrapper.fluid_player_layout_my_custom_skin`.
 
-## Keyboard Shortcut
+## Keyboard Shortcuts
   * `Space/Enter`: Pause/Play video playback
   * `Left/Right arrow`: Go back/forward 5 seconds
   * `Home/End`: Go to beginning/end of video
