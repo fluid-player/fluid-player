@@ -125,41 +125,46 @@ Here is a description of the parameters which can be used when setting Fluid Pla
   * `htmlOnPauseBlockHeight`: An integer. if `htmlOnPauseBlock` is set, then it sets the container height. Default: `null` .
   * `htmlOnPauseBlockWidth`: An integer. if `htmlOnPauseBlock` is set, then it sets the container width. Default: `null`.
   * `responsive`: If set to `true`, the player will stretch horizontally to 100% of its parent container width. Default: `false`.
-  * `adList` (VAST only): Setup one or multiple VastTag. Available timeline positions: `preRoll`, `midRoll`, `postRoll`. For example play a pre-roll Ad at the beginning of the video and a mid-roll Ad after 8 seconds:
+  * `adList` (VAST only): Setup one or multiple VastTag.
+    * `roll` (mandatory): The available timeline positions: `preRoll`, `midRoll`, `postRoll`.
+    * `vastTag` (mandatory): The url of the VAST XML (Please find the supported tags/attributes [vastLinear.xml](examples/vastLinear.xml))
+    * `timer` (only for mid-roll): the `timer` property schedules the Ad as below:
+      * `timer: number` Ad plays after the specified number of seconds (Example `timer: 10`)
+      * `timer: 'xx%'` Ad plays after xx percent of the content
+    `adList` example 1: play a pre-roll Ad at the beginning of the video and a mid-roll Ad after 8 seconds:
     ```javascript
     // ...
     adList: [
         {
             roll: 'preRoll',
-            vastTag: "vastPreRoll.xml"
+            vastTag: 'vastPreRoll.xml'
         },
         {
             roll: 'midRoll',
-            vastTag: "vastMidRoll.xml",
+            vastTag: 'vastMidRoll.xml',
             timer: 8
         }
     ]
     // ...
     ```
-    It is possible to set multiple mid-roll Ads however only one pre-roll and one post-roll Ad is supported. The mid-roll Ad requires a `timer` property which can schedule the show as below:
-    * `timer: number` Ad plays after the specified number of seconds (Example `timer: 10`)
-    * `timer: "xx%"` Ad plays after xx percent of the content
-        ```javascript
-        // ...
-        adList: [
-            {
-                roll: 'midRoll',
-                vastTag: "vastMidRoll.xml",
-                timer: 10
-            },
-            {
-                roll: 'midRoll',
-                vastTag: "vastMidRoll.xml",
-                timer: '50%'
-            }
-        ]
-        // ...
-        ```
+    It is possible to set multiple mid-roll Ads however only one pre-roll and one post-roll Ad is supported.
+    `adList` example 2: for showing two mid-roll Ads:
+    ```javascript
+    // ...
+    adList: [
+        {
+            roll: 'midRoll',
+            vastTag: 'vastMidRoll.xml',
+            timer: 10
+        },
+        {
+            roll: 'midRoll',
+            vastTag: 'vastMidRoll.xml',
+            timer: '50%'
+        }
+    ]
+    // ...
+    ```
   * `mute`: If set to `true`, the player will be muted by default on page load. Default: `  false`.
   * `controlBar`: Autohiding the control bar after 3 seconds. The feature is disabled by default. To enable set:
     ```javascript
