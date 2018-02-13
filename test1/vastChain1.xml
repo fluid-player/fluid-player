@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VAST version="3.0">
+
+    <Ad id="1">
+        <Wrapper>
+            <AdSystem>oh noo RTB</AdSystem>
+            <VASTAdTagURI><![CDATA[https://admin.vagrant.test/fluid-player/test1/vastChain2.xml]]></VASTAdTagURI>
+            <VASTAdTsagURI><![CDATA[https://admin.vagrant.test/fluid-player/test1/aa.php?LR_SCHEMA=vast2#sthash.I98E97KQ.dpuf]]></VASTAdTsagURI>
+            <Impression id="example"><![CDATA[http://example.com/view?tracking_event=impression&idzone=9999999]]></Impression>
+            <Impression id="example2"><![CDATA[http://example.com/view2?tracking_event=impression&idzone=9999999]]></Impression>
+            <Error><![CDATA[http://www.mytracker.com?vast3_error_[ERRORCODE].gif]]></Error>
+            <Creatives>
+                <Creative>
+                    <Linear>
+                        <TrackingEvents>
+                            <Tracking event="complete"><![CDATA[http://www.mytracker.com?complete.gif]]></Tracking>
+                            <Tracking event="firstQuartile"><![CDATA[http://www.mytracker.com?firstQuartile.gif]]></Tracking>
+                            <Tracking event="fullscreen"><![CDATA[http://www.mytracker.com?fullscreen.gif]]></Tracking>
+                            <Tracking event="midpoint"><![CDATA[http://www.mytracker.com?midpoint.gif]]></Tracking>
+                            <Tracking event="mute"><![CDATA[http://www.mytracker.com?mute.gif]]></Tracking>
+                            <Tracking event="pause"><![CDATA[http://www.mytracker.com?pause.gif]]></Tracking>
+                            <Tracking event="resume"><![CDATA[http://www.mytracker.com?resume.gif]]></Tracking>
+                            <Tracking event="rewind"><![CDATA[http://www.mytracker.com?rewind.gif]]></Tracking>
+                            <Tracking event="start"><![CDATA[http://www.mytracker.com?start.gif]]></Tracking>
+                            <Tracking event="thirdQuartile"><![CDATA[http://www.mytracker.com?thirdQuartile.gif]]></Tracking>
+                            <Tracking event="unmute"><![CDATA[http://www.mytracker.com?unmute.gif]]></Tracking>
+                        </TrackingEvents>
+                        <VideoClicks>
+                            <ClickTracking><![CDATA[http://www.mytracker.com?click.gif]]></ClickTracking>
+                        </VideoClicks>
+
+                    </Linear>
+                </Creative>
+            </Creatives>
+        </Wrapper>
+    </Ad>
+
+    <Ad id="2">
+        <InLine>
+            <AdSystem>Example</AdSystem>
+            <AdTitle/>
+            <Impression id="example"><![CDATA[http://example.com/view?tracking_event=impression&idzone=9999999]]></Impression>
+            <Impression id="example2"><![CDATA[http://example.com/view2?tracking_event=impression&idzone=9999999]]></Impression>
+            <Creatives>
+                <Creative sequence="1" id="1">
+                    <Linear skipoffset="00:00:03">
+                        <TrackingEvents>
+                            <Tracking event="progress" offset="00:00:01.000"><![CDATA[http://example.com/view?tracking_event=progress&progress=00:00:01.000&idzone=9999999]]></Tracking>
+                            <Tracking event="progress" offset="00:00:02.000"><![CDATA[http://example.com/view?tracking_event=progress&progress=00:00:02.000&idzone=9999999]]></Tracking>
+                            <Tracking event="progress" offset="00:00:05.000"><![CDATA[http://example.com/view?tracking_event=progress&progress=00:00:05.000&idzone=9999999]]></Tracking>
+                            <Tracking event="progress" offset="00:00:05.000"><![CDATA[http://example.com/view2?tracking_event=progress&progress=00:00:05.000&idzone=9999999]]></Tracking>
+                            <Tracking event="progress" offset="00:00:09.000"><![CDATA[http://example.com/view?tracking_event=progress&progress=00:00:09.000&idzone=9999999]]></Tracking>
+                            <Tracking event="start"><![CDATA[http://example.com/view?tracking_event=start&idzone=9999999]]></Tracking>
+                            <Tracking event="firstQuartile"><![CDATA[http://example.com/view?tracking_event=firstQuartile&idzone=9999999]]></Tracking>
+                            <Tracking event="midpoint"><![CDATA[http://example.com/view?tracking_event=midpoint&idzone=9999999]]></Tracking>
+                            <Tracking event="midpoint"><![CDATA[http://example.com/view2?tracking_event=midpoint&idzone=9999999]]></Tracking>
+                            <Tracking event="midpoint"><![CDATA[http://example.com/view3?tracking_event=midpoint&idzone=9999999]]></Tracking>
+                            <Tracking event="thirdQuartile"><![CDATA[http://example.com/view?tracking_event=thirdQuartile&idzone=9999999]]></Tracking>
+                            <Tracking event="complete"><![CDATA[http://example.com/view?tracking_event=complete&idzone=9999999]]></Tracking>
+                        </TrackingEvents>
+                        <VideoClicks>
+                            <ClickThrough><![CDATA[http://example.com/]]></ClickThrough>
+                            <ClickTracking><![CDATA[http://example.com/view?tracking_event=click&idzone=9999999]]></ClickTracking>
+                            <ClickTracking><![CDATA[http://example.com/view2?tracking_event=click&idzone=9999999]]></ClickTracking>
+                        </VideoClicks>
+                        <MediaFiles>
+                            <MediaFile delivery="progressive" type="video/mp4"><![CDATA[pre-ad.mp4]]></MediaFile>
+                        </MediaFiles>
+                    </Linear>
+                </Creative>
+            </Creatives>
+        </InLine>
+    </Ad>
+
+</VAST>
