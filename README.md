@@ -125,7 +125,7 @@ Here is a description of the parameters which can be used when setting Fluid Pla
   * `htmlOnPauseBlockHeight`: An integer. if `htmlOnPauseBlock` is set, then it sets the container height. Default: `null` .
   * `htmlOnPauseBlockWidth`: An integer. if `htmlOnPauseBlock` is set, then it sets the container width. Default: `null`.
   * `responsive`: If set to `true`, the player will stretch horizontally to 100% of its parent container width. Default: `false`.
-  * `adList` (VAST only): Setup one or multiple VastTag. Available timeline positions: `preRoll`, `midRoll`, `postRoll`. For example play a pre-roll Ad at the beginning of the video and one other after 8 seconds:
+  * `adList` (VAST only): Setup one or multiple VastTag. Available timeline positions: `preRoll`, `midRoll`, `postRoll`. For example play a pre-roll Ad at the beginning of the video and a mid-roll Ad after 8 seconds:
     ```javascript
     // ...
     adList: [
@@ -141,7 +141,7 @@ Here is a description of the parameters which can be used when setting Fluid Pla
     ]
     // ...
     ```
-    It is possible to set multiple mid-rol Ads however only one pre-roll and one post-roll Ad is supported. The mid-roll Ad requires a `timer` property which can schedule the show as below:
+    It is possible to set multiple mid-roll Ads however only one pre-roll and one post-roll Ad is supported. The mid-roll Ad requires a `timer` property which can schedule the show as below:
     * `timer: number` Ad plays after the specified number of seconds (Example `timer: 10`)
     * `timer: "xx%"` Ad plays after xx percent of the content
         ```javascript
@@ -171,9 +171,9 @@ Here is a description of the parameters which can be used when setting Fluid Pla
     ```
     Some customization options are available for the controlBar:
     * `autoHide: true/false` Turn the feature on/off. Default: `false`
-    * `autoHideTimeout: number`The number of seconds before hiding the control bar. Default: `3`
+    * `autoHideTimeout: number` The number of seconds before hiding the control bar. Default: `3`
     * `animated: true/false` Enable/disable the fade out effect. Default: `true`
-  * `keyboardControl`: Enable/disable the keyboard shortcuts. Find more details here:[Keyboard Shortcuts](#keyboard-shortcuts)
+  * `keyboardControl: true/false` Enable/disable the keyboard shortcuts. Find more details here:[Keyboard Shortcuts](#keyboard-shortcuts)
 
 ### Integration with popular frameworks
 
