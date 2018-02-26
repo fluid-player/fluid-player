@@ -1,5 +1,5 @@
 # Fluid Player
-[![Latest version](https://img.shields.io/badge/Latest%20Version-1.2.0-blue.svg)](https://github.com/fluid-player/fluid-player/releases/latest)
+[![Latest version](https://img.shields.io/badge/Latest%20Version-1.2.1-blue.svg)](https://github.com/fluid-player/fluid-player/releases/latest)
 
 ## Overview
 
@@ -24,9 +24,9 @@ Fluid Player is a new free HTML5 video player. It is lightweight, easy to integr
 * Wordpress Plugin
 * Scripts and resources available via CDN
 
-![Fluid Player - VAST Ad](examples/ScreenshotFluidPlayerVastAd.jpg)
+![Fluid Player - VAST Ad](docs/demo/ScreenshotFluidPlayerVastAd.jpg)
 
-![Fluid Player](examples/ScreenshotFluidPlayerMain.jpg)
+![Fluid Player](docs/demo/ScreenshotFluidPlayerMain.jpg)
 
 ## Integration Guide
 
