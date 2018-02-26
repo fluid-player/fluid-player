@@ -1,7 +1,7 @@
 # CHANGELOG
 
 ## 1.2.1
-* [Pull #86](https://github.com/fluid-player/fluid-player/pull/86)[Pull #87](https://github.com/fluid-player/fluid-player/pull/87) Mid roll current time fix
+* [Pull #86](https://github.com/fluid-player/fluid-player/pull/86) [Pull #87](https://github.com/fluid-player/fluid-player/pull/87) Mid roll current time fix
 
 ## 1.2.0
 * [Pull #68](https://github.com/fluid-player/fluid-player/pull/68) Controls remain fullscreen after escaping fullscreen
