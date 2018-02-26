@@ -67,7 +67,7 @@ var fluidPlayerClass = {
         'toggleElementText', 'getMobileOs', 'findClosestParent', 'activeVideoPlayerId',
         'getInstanceIdByWrapperId', 'timer', 'timerPool', 'adList', 'adPool',
         'isUserActive'],
-    version: '1.2.0',
+    version: '1.2.1',
     homepage: 'https://www.fluidplayer.com/',
     activeVideoPlayerId: null,
 
@@ -77,7 +77,7 @@ var fluidPlayerClass = {
                 return this.instances[i];
             }
         }
-        
+
         return null;
     },
 
@@ -180,7 +180,7 @@ var fluidPlayerClass = {
 
         return 0;
     },
-    
+
     getClickThroughUrlFromLinear: function(linear) {
         var videoClicks = linear.getElementsByTagName('VideoClicks');
 
@@ -690,7 +690,7 @@ var fluidPlayerClass = {
         );
     },
 
-    playRoll: function(adListId) {
+    playRoll: function(adListId, playRoll) {
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
@@ -698,13 +698,12 @@ var fluidPlayerClass = {
             player.announceLocalError(101);
             return;
         }
-        var roll = player.adPool[adListId].roll;
 
         //get the proper ad
         player.vastOptions = player.adPool[adListId];
 
         //spec configs by roll
-        switch (roll) {
+        switch (playRoll) {
             case 'midRoll':
                 videoPlayerTag.mainVideoCurrentTime = videoPlayerTag.currentTime - 1;
                 break;
@@ -1146,6 +1145,7 @@ var fluidPlayerClass = {
                 if (player.timerPool[keyTime] && player.timerPool[keyTime].hasOwnProperty('playRoll')) {
 
                     var adIdToCheck = player.timerPool[keyTime].adListId;
+                    var playRoll = player.timerPool[keyTime].playRoll;
 
                     if(player.adList[adIdToCheck].played == false) {
 
@@ -1153,7 +1153,7 @@ var fluidPlayerClass = {
 
                         if(player.vastOptions.adType == 'linear'){
                             player.toggleLoader(true);
-                            player.playRoll(adIdToCheck);
+                            player.playRoll(adIdToCheck, playRoll);
                         }
                         if(player.vastOptions.adType == 'nonLinear'){
                             player.createNonLinearStatic(adIdToCheck);
