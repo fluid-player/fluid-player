@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 1.2.1
+* [Pull #86](https://github.com/fluid-player/fluid-player/pull/86) Mid roll current time fix
+
 ## 1.2.0
 * [Pull #68](https://github.com/fluid-player/fluid-player/pull/68) Controls remain fullscreen after escaping fullscreen
 * [Pull #66](https://github.com/fluid-player/fluid-player/pull/66) Optional logoUrl for clickable logo

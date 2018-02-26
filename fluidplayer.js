@@ -77,7 +77,7 @@ var fluidPlayerClass = {
                 return this.instances[i];
             }
         }
-        
+
         return null;
     },
 
@@ -180,7 +180,7 @@ var fluidPlayerClass = {
 
         return 0;
     },
-    
+
     getClickThroughUrlFromLinear: function(linear) {
         var videoClicks = linear.getElementsByTagName('VideoClicks');
 
