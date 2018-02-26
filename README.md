@@ -127,7 +127,7 @@ Here is a description of the parameters which can be used when setting Fluid Pla
   * `responsive`: If set to `true`, the player will stretch horizontally to 100% of its parent container width. Default: `false`.
   * `adList` (VAST only): Setup one or multiple VastTag.
     * `roll` (mandatory): The available timeline positions: `preRoll`, `midRoll`, `postRoll`.
-    * `vastTag` (mandatory): The url of the VAST XML (Please find the supported tags/attributes [vastLinear.xml](examples/vastLinear.xml))
+    * `vastTag` (mandatory): The url of the VAST XML (Please find the supported tags/attributes [vastLinear.xml](docs/demo/vastLinear.xml))
     * `timer` (only for mid-roll): the `timer` property schedules the Ad as below:
       * `timer: number` Ad plays after the specified number of seconds (Example `timer: 10`)
       * `timer: 'xx%'` Ad plays after xx percent of the content
