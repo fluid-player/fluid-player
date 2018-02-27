@@ -342,19 +342,22 @@
     position: absolute;
     left: 50%;
     margin-right: -50%;
-    transform: translate(-50%, -50%)
+    z-index: 20;
 }
 
 .nonLinear_top {
-    top: 40px;
+    top: 20px;
+    transform: translate(-50%);
 }
 
 .nonLinear_middle {
     top: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .nonLinear_bottom {
-    bottom: 20px;
+    bottom: 50px;
+    transform: translate(-50%);
 }
 
 .fluid_html_on_pause * {

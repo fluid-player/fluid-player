@@ -413,14 +413,16 @@ var fluidPlayerClass = {
     },
 
 
-    announceLocalError: function(code) {
+    announceLocalError: function (code, msg) {
         if (typeof(code) !== 'undefined') {
             code = parseInt(code);
         } else {
             //Set a default code (900 Unidentified error)
             code = 900;
         }
-        console.log('[Error] ('+ code + '): Failed to load Vast');
+        message = '[Error] (' + code + '): ';
+        message += (!msg) ? 'Failed to load Vast' : msg;
+        console.log(message);
     },
 
     getClickTrackingEvents: function(linear) {
@@ -909,7 +911,7 @@ var fluidPlayerClass = {
         player.adFinished = false;
         player.trackSingleEvent('start');
 
-        duration = (player.vastOptions.duration) ? player.vastOptions.duration : player.nonLinearDuration;
+        var duration = (player.adList[adListId].nonlinearDuration) ? player.adList[adListId].nonlinearDuration : videoPlayerTag.duration;
 
         player.nonLinearTracking = setInterval(function () {
 
@@ -929,7 +931,6 @@ var fluidPlayerClass = {
             offset = (player.adList[adListId].roll == 'midRoll') ? player.adList[adListId].timer : 0;
         } else {
             offset = 0;
-
         }
 
         time = parseInt(player.getCurrentTime()) + parseInt(duration) + parseInt(offset);
@@ -965,8 +966,20 @@ var fluidPlayerClass = {
         creative.id = 'nonLinear_imgCreative_' + adListId + '_' + player.videoPlayerId;
         creative.onload = function () {
 
-            origWidth = (player.vastOptions.dimension.width !== null) ? player.vastOptions.dimension.width : creative.width;
-            origHeight = (player.vastOptions.dimension.height !== null) ? player.vastOptions.dimension.height : creative.height;
+            //Set banner size based on the below priority
+            // 1. adList -> roll -> size
+            // 2. VAST XML width/height attriubute (VAST 3.)
+            // 3. VAST XML static resource dimension
+            if(typeof player.adList[adListId].size !== 'undefined') {
+                origWidth = player.adList[adListId].size.split('x')[0];
+                origHeight = player.adList[adListId].size.split('x')[1];
+            } else if(player.vastOptions.dimension.width && player.vastOptions.dimension.height) {
+                origWidth = player.vastOptions.dimension.width;
+                origHeight = player.vastOptions.dimension.height;
+            } else {
+                origWidth = creative.width;
+                origHeight = creative.height;
+            }
 
             if (origWidth > playerWidth) {
                 newBannerWidth = playerWidth - 5;
@@ -1895,7 +1908,23 @@ var fluidPlayerClass = {
         var validateRequiredParams = function (item) {
             var hasError = false;
 
-            if (!item.vastTag|| !item.roll || player.availableRolls.indexOf(item.roll) === -1) {
+            if (!item.vastTag) {
+                player.announceLocalError(102, '"vastTag" property is missing from adList.');
+                hasError = true;
+            }
+
+            if (!item.roll) {
+                player.announceLocalError(102, '"roll" is missing from adList.');
+                hasError = true;
+            }
+
+            if (player.availableRolls.indexOf(item.roll) === -1) {
+                player.announceLocalError(102, 'Only ' + player.availableRolls.join(',') +  ' rolls are supported.');
+                hasError = true;
+            }
+
+            if (item.size && player.supportedNonLinearAd.indexOf(item.size) === -1) {
+                player.announceLocalError(102, 'Only ' + player.supportedNonLinearAd.join(',') +  ' size are supported.');
                 hasError = true;
             }
 
@@ -2979,8 +3008,8 @@ var fluidPlayerClass = {
         player.adList               = {};
         player.adPool               = {};
         player.availableRolls       = ['preRoll', 'midRoll', 'postRoll'];
+        player.supportedNonLinearAd = ['300x250', '468x60', '728x90'];
         player.autoplayAfterAd      = true;
-        player.nonLinearDuration    = 15;
         player.supportedStaticTypes = ['image/gif', 'image/jpeg', 'image/png'];
         player.inactivityTimeout    = null;
         player.isUserActive         = null;
