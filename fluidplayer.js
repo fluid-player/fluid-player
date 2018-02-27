@@ -911,7 +911,7 @@ var fluidPlayerClass = {
         player.adFinished = false;
         player.trackSingleEvent('start');
 
-        var duration = (player.adList[adListId].nonlinearDuration) ? player.adList[adListId].nonlinearDuration : videoPlayerTag.duration;
+        var duration = (player.adList[adListId].nonLinearDuration) ? player.adList[adListId].nonLinearDuration : videoPlayerTag.duration;
 
         player.nonLinearTracking = setInterval(function () {
 
@@ -963,7 +963,7 @@ var fluidPlayerClass = {
 
         var creative = new Image();
         creative.src = player.vastOptions.staticResource;
-        creative.id = 'nonLinear_imgCreative_' + adListId + '_' + player.videoPlayerId;
+        creative.id = 'fluid_nonLinear_imgCreative_' + adListId + '_' + player.videoPlayerId;
         creative.onload = function () {
 
             //Set banner size based on the below priority
@@ -995,8 +995,8 @@ var fluidPlayerClass = {
 
         };
 
-        board.id = 'nonLinear_' + player.videoPlayerId;
-        board.className = 'nonLinear_' + vAlign;
+        board.id = 'fluid_nonLinear_' + player.videoPlayerId;
+        board.className = 'fluid_nonLinear_' + vAlign;
         board.innerHTML = creative.outerHTML;
 
         //Bind the Onclick event
@@ -1037,7 +1037,7 @@ var fluidPlayerClass = {
 
 
     closeNonLinear: function () {
-        var element = document.getElementById('nonLinear_' + this.videoPlayerId);
+        var element = document.getElementById('fluid_nonLinear_' + this.videoPlayerId);
         if(element) {
             element.remove();
         }

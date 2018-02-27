@@ -165,6 +165,9 @@ Here is a description of the parameters which can be used when setting Fluid Pla
     ]
     // ...
     ```
+    * `vAlign` (optional): The available vertical positions for nonLinear Ads: `top`, `middle`, `bottom`. Default: `bottom`.
+    * `nonLinearDuration` (optional): The number of seconds until the nonLinear Ad will be shown. If not set nor the minSuggestedDuration attribute of VAST XML than wont close until end of video.
+    * `size` (optional): The dimension of the Ad. Supported sizes: `468x60`, `300x250`, `728x90`.
   * `mute`: If set to `true`, the player will be muted by default on page load. Default: `  false`.
   * `controlBar`: Autohiding the control bar after 3 seconds. The feature is disabled by default. To enable set:
     ```javascript

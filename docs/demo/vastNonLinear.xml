@@ -3,6 +3,7 @@
     <Ad id="1">
         <InLine>
             <AdSystem>Example NonLinear Ad</AdSystem>
+            <AdTitle/>
             <Impression id="exampleNonLinear"><![CDATA[http://example.com/view?tracking_event=impression&idzone=9999999]]></Impression>
             <Impression id="exampleNonLinear2"><![CDATA[http://example.com/view2?tracking_event=impression&idzone=9999999]]></Impression>
             <Creatives>
