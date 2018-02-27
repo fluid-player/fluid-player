@@ -331,6 +331,32 @@
     pointer-events: none;
 }
 
+.nonLinear_top, .nonLinear_middle, .nonLinear_bottom {
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    vertical-align: middle;
+    align-content: center;
+    border: none;
+    position: absolute;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%)
+}
+
+.nonLinear_top {
+    top: 40px;
+}
+
+.nonLinear_middle {
+    top: 50%;
+}
+
+.nonLinear_bottom {
+    bottom: 20px;
+}
+
 .fluid_html_on_pause * {
     pointer-events: auto;
 }

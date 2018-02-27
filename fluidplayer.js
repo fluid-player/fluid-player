@@ -498,7 +498,6 @@ var fluidPlayerClass = {
                 this.fullscreenOff(fullscreenButton, menuOptionFullscreen);
             }
         }
-        this.recalcPosition();
     },
 
     prepareVast: function (roll) {
@@ -926,7 +925,7 @@ var fluidPlayerClass = {
 
 
         if (player.adList[adListId].roll == 'midRoll' && typeof player.adList[adListId].timer !== 'undefined') {
-            offset = (player.adPool[adListId].roll == 'midRoll') ? player.adList[adListId].timer : 0;
+            offset = (player.adList[adListId].roll == 'midRoll') ? player.adList[adListId].timer : 0;
         } else {
             offset = 0;
 
@@ -957,13 +956,8 @@ var fluidPlayerClass = {
 
         var playerWidth = videoPlayerTag.clientWidth;
         var playerHeight = videoPlayerTag.clientHeight;
-        var bannerWidth = 468; //default size
-        var bannerHeight = 60; //default size
-
-        var posX = Math.floor((playerWidth - bannerWidth) / 2);
-        var posY = 50;
-
         var board = document.createElement('div');
+        var vAlign = (player.adList[adListId].vAlign) ? player.adList[adListId].vAlign : player.nonLinearVerticalAlign;
 
         var creative = new Image();
         creative.src = player.vastOptions.staticResource;
@@ -985,24 +979,11 @@ var fluidPlayerClass = {
             img.width = newBannerWidth;
             img.height = newBannerHeight;
 
-            posX = Math.floor((playerWidth - newBannerWidth) / 2);
-            posY = 50;
-
-            board.style.bottom = posY + 'px';
-            board.style.left = posX + 'px';
-            board.style.width = newBannerWidth + 'px';
-            board.style.height = newBannerHeight + 'px';
-            board.style.display = 'block';
         };
 
         board.id = 'nonLinear_' + player.videoPlayerId;
-        board.className = 'fluid_nonLinear_container';
+        board.className = 'nonLinear_' + vAlign;
         board.innerHTML = creative.outerHTML;
-        board.style.bottom = posY + 'px';
-        board.style.left = posX + 'px';
-        board.style.width = bannerWidth + 'px';
-        board.style.height = bannerHeight + 'px';
-        board.style.display = 'none';
 
         //Bind the Onclick event
         board.onclick = function () {
@@ -1038,26 +1019,6 @@ var fluidPlayerClass = {
         board.appendChild(closeBtn);
         videoPlayerTag.parentNode.insertBefore(board, videoPlayerTag.nextSibling);
 
-    },
-
-
-    recalcPosition: function () {
-        var wrapper = document.getElementById('fluid_video_wrapper_' + this.videoPlayerId);
-        var board = document.getElementById('nonLinear_' + this.videoPlayerId);
-
-        if (!board || !wrapper) {
-            return;
-        }
-
-        var videoPlayerTag = document.getElementById(this.videoPlayerId);
-        var playerWidth = videoPlayerTag.clientWidth;
-        var boardWidth = board.style.width.replace('px', '');
-
-        var posX = Math.floor((playerWidth - boardWidth) / 2);
-        var posY = 50;
-
-        board.style.bottom = posY + 'px';
-        board.style.left = posX + 'px';
     },
 
 
@@ -1701,7 +1662,6 @@ var fluidPlayerClass = {
         }
 
         this.recalculateAdDimensions();
-        this.recalcPosition();
     },
 
     findClosestParent: function(el, selector) {
@@ -3023,6 +2983,7 @@ var fluidPlayerClass = {
         player.supportedStaticTypes = ['image/gif', 'image/jpeg', 'image/png'];
         player.inactivityTimeout    = null;
         player.isUserActive         = null;
+        player.nonLinearVerticalAlign = 'bottom';
 
         //Default options
         player.displayOptions = {
