@@ -689,7 +689,7 @@ var fluidPlayerClass = {
         );
     },
 
-    playRoll: function(adListId, playRoll) {
+    playRoll: function(adListId) {
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
@@ -697,12 +697,13 @@ var fluidPlayerClass = {
             player.announceLocalError(101);
             return;
         }
+        var roll = player.adList[adListId].roll;
 
         //get the proper ad
         player.vastOptions = player.adPool[adListId];
 
         //spec configs by roll
-        switch (playRoll) {
+        switch (roll) {
             case 'midRoll':
                 videoPlayerTag.mainVideoCurrentTime = videoPlayerTag.currentTime - 1;
                 break;
@@ -1114,7 +1115,7 @@ var fluidPlayerClass = {
 
                         if(player.vastOptions.adType == 'linear'){
                             player.toggleLoader(true);
-                            player.playRoll(adIdToCheck, playRoll);
+                            player.playRoll(adIdToCheck);
                         }
                         if(player.vastOptions.adType == 'nonLinear'){
                             player.createNonLinearStatic(adIdToCheck);
