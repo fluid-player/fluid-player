@@ -66,7 +66,7 @@ var fluidPlayerClass = {
         'displayOptions', 'getEventOffsetX', 'getEventOffsetY', 'getTranslateX',
         'toggleElementText', 'getMobileOs', 'findClosestParent', 'activeVideoPlayerId',
         'getInstanceIdByWrapperId', 'timer', 'timerPool', 'adList', 'adPool',
-        'isUserActive'],
+        'isUserActive', 'isCurrentlyPlayingAd'],
     version: '1.2.1',
     homepage: 'https://www.fluidplayer.com/',
     activeVideoPlayerId: null,
@@ -883,7 +883,7 @@ var fluidPlayerClass = {
 
     completeNonLinearStatic: function (adListId) {
         var player = this;
-        player.closeNonLinear();
+        player.closeNonLinear(adListId);
         if(player.adFinished == false) {
             player.adFinished = true;
             player.trackSingleEvent('complete');
@@ -911,7 +911,7 @@ var fluidPlayerClass = {
         player.adFinished = false;
         player.trackSingleEvent('start');
 
-        var duration = (player.adList[adListId].nonLinearDuration) ? player.adList[adListId].nonLinearDuration : videoPlayerTag.duration;
+        var duration = (player.adList[adListId].nonLinearDuration) ? player.adList[adListId].nonLinearDuration : player.vastOptions.duration;
 
         player.nonLinearTracking = setInterval(function () {
 
@@ -927,13 +927,7 @@ var fluidPlayerClass = {
         }, 400);
 
 
-        if (player.adList[adListId].roll == 'midRoll' && typeof player.adList[adListId].timer !== 'undefined') {
-            offset = (player.adList[adListId].roll == 'midRoll') ? player.adList[adListId].timer : 0;
-        } else {
-            offset = 0;
-        }
-
-        time = parseInt(player.getCurrentTime()) + parseInt(duration) + parseInt(offset);
+        time = parseInt(player.getCurrentTime()) + parseInt(duration);
         player.scheduleTask({time: time, closeStaticAd: adListId});
     },
 
@@ -946,9 +940,10 @@ var fluidPlayerClass = {
     createBoard: function (adListId) {
 
         var player = this;
+        var vastSettings = player.adPool[adListId];
 
-        if (typeof player.vastOptions.staticResource === 'undefined'
-            || player.supportedStaticTypes.indexOf(player.vastOptions.creativeType) === -1) {
+        if (typeof vastSettings.staticResource === 'undefined'
+            || player.supportedStaticTypes.indexOf(vastSettings.creativeType) === -1) {
             player.adList[adListId].error = true;
             return;
         }
@@ -962,7 +957,7 @@ var fluidPlayerClass = {
         var vAlign = (player.adList[adListId].vAlign) ? player.adList[adListId].vAlign : player.nonLinearVerticalAlign;
 
         var creative = new Image();
-        creative.src = player.vastOptions.staticResource;
+        creative.src = vastSettings.staticResource;
         creative.id = 'fluid_nonLinear_imgCreative_' + adListId + '_' + player.videoPlayerId;
         creative.onload = function () {
 
@@ -973,9 +968,9 @@ var fluidPlayerClass = {
             if(typeof player.adList[adListId].size !== 'undefined') {
                 origWidth = player.adList[adListId].size.split('x')[0];
                 origHeight = player.adList[adListId].size.split('x')[1];
-            } else if(player.vastOptions.dimension.width && player.vastOptions.dimension.height) {
-                origWidth = player.vastOptions.dimension.width;
-                origHeight = player.vastOptions.dimension.height;
+            } else if(vastSettings.dimension.width && vastSettings.dimension.height) {
+                origWidth = vastSettings.dimension.width;
+                origHeight = vastSettings.dimension.height;
             } else {
                 origWidth = creative.width;
                 origHeight = creative.height;
@@ -995,23 +990,23 @@ var fluidPlayerClass = {
 
         };
 
-        board.id = 'fluid_nonLinear_' + player.videoPlayerId;
+        board.id = 'fluid_nonLinear_' + adListId;
         board.className = 'fluid_nonLinear_' + vAlign;
         board.innerHTML = creative.outerHTML;
 
         //Bind the Onclick event
         board.onclick = function () {
-            if (typeof player.vastOptions.clickthroughUrl !== 'undefined') {
-                window.open(player.vastOptions.clickthroughUrl);
+            if (typeof vastSettings.clickthroughUrl !== 'undefined') {
+                window.open(vastSettings.clickthroughUrl);
             }
 
             //Tracking the NonLinearClickTracking events
-            if (typeof player.vastOptions.clicktracking !== 'undefined') {
-                player.callUris([player.vastOptions.clicktracking]);
+            if (typeof vastSettings.clicktracking !== 'undefined') {
+                player.callUris([vastSettings.clicktracking]);
             }
         };
 
-        if (typeof player.vastOptions.clickthroughUrl !== 'undefined') {
+        if (typeof vastSettings.clickthroughUrl !== 'undefined') {
             board.style.cursor = 'pointer';
         }
 
@@ -1036,8 +1031,8 @@ var fluidPlayerClass = {
     },
 
 
-    closeNonLinear: function () {
-        var element = document.getElementById('fluid_nonLinear_' + this.videoPlayerId);
+    closeNonLinear: function (adListId) {
+        var element = document.getElementById('fluid_nonLinear_' + adListId);
         if(element) {
             element.remove();
         }
@@ -1095,6 +1090,82 @@ var fluidPlayerClass = {
         videoPlayerTag.removeEventListener(event.type, player.postRoll);
         adListId = event.type.replace('adId_', '');
         player.scheduleTask({time: Math.floor(player.mainVideoDuration), playRoll: 'postRoll', adListId: adListId});
+    },
+
+
+    onPauseRoll: function (event) {
+        var player = fluidPlayerClass.getInstanceById(this.id);
+        var videoPlayerTag = document.getElementById(this.getAttribute('id'));
+        videoPlayerTag.removeEventListener(event.type, player.onPauseRoll);
+        adListId = event.type.replace('adId_', '');
+
+        if (player.adList[adListId].adType == 'nonLinear') {
+            if (!player.adPool.hasOwnProperty(adListId) || player.adPool[adListId].error === true) {
+                player.announceLocalError(101);
+                return;
+            }
+
+
+            player.createBoard(adListId);
+            onPauseAd = document.getElementById('fluid_nonLinear_' + adListId);
+            onPauseAd.style.display = 'none';
+        }
+    },
+
+
+    /**
+     * Check if player has a valid nonLinear onPause Ad
+     */
+    hasValidOnPauseAd: function() {
+        var player = this;
+        var onPauseAd = player.findRoll('onPauseRoll'); //should be only one. todo add validator to allow only one onPause roll
+
+        return (onPauseAd.length != 0 && player.adList[onPauseAd[0]] && player.adList[onPauseAd[0]].error === false);
+    },
+
+
+    /**
+     * Hide/show nonLinear onPause Ad
+     */
+    toggleOnPauseAd: function() {
+        var player = this;
+        var videoPlayerTag = document.getElementById(this.videoPlayerId);
+
+        if (player.hasValidOnPauseAd() && !player.isCurrentlyPlayingAd) {
+
+            onPauseRoll = player.findRoll('onPauseRoll');
+            adListId = onPauseRoll[0];
+            player.vastOptions = player.adPool[adListId];
+            onPauseAd = document.getElementById('fluid_nonLinear_' + adListId);
+
+            if (onPauseAd && videoPlayerTag.paused) {
+                onPauseAd.style.display = 'flex';
+                player.adList[adListId].played = false;
+                player.trackingOnPauseNonLinearAd(adListId, 'start');
+            } else if (onPauseAd && !videoPlayerTag.paused) {
+                onPauseAd.style.display = 'none';
+                player.adFinished = true;
+                player.trackingOnPauseNonLinearAd(adListId, 'complete');
+            }
+
+        }
+
+    },
+
+
+    /**
+     * Helper function for tracking onPause Ads
+     */
+    trackingOnPauseNonLinearAd: function (adListId, status) {
+        var player = this;
+
+        if (!player.adPool.hasOwnProperty(adListId) || player.adPool[adListId].error === true) {
+            player.announceLocalError(101);
+            return;
+        }
+
+        player.vastOptions = player.adPool[adListId];
+        player.trackSingleEvent(status);
     },
 
 
@@ -1942,12 +2013,14 @@ var fluidPlayerClass = {
                     player.announceLocalError(102, 'Wrong adList parameters.');
                     continue;
                 }
+                id = 'ID' + idPart;
 
-                ads['ID' + idPart] = Object.assign({}, def);
-                ads['ID' + idPart] = Object.assign(ads['ID' + idPart], player.displayOptions.adList[key]);
+                ads[id] = Object.assign({}, def);
+                ads[id] = Object.assign(ads[id], player.displayOptions.adList[key]);
                 if (adItem.roll == 'midRoll') {
-                    ads['ID' + idPart].error = validateVastList('midRoll', adItem);
+                    ads[id].error = validateVastList('midRoll', adItem);
                 }
+                ads[id].id = id;
                 idPart++;
 
             }
@@ -2171,6 +2244,8 @@ var fluidPlayerClass = {
 
             player.initHtmlOnPauseBlock();
 
+            player.toggleOnPauseAd();
+
         } else {
             //Workaround for Chrome Mobile - otherwise it blocks the subsequent
             //play() command, because it considers it not being triggered by the user.
@@ -2187,6 +2262,7 @@ var fluidPlayerClass = {
             player.prepareVast('preRoll');
         }
 
+        player.prepareVast('onPauseRoll');
         player.prepareVast('postRoll');
         player.prepareVast('midRoll');
 
@@ -2817,6 +2893,12 @@ var fluidPlayerClass = {
 
     initHtmlOnPauseBlock: function() {
         var player = this;
+
+        //If onPauseRoll is defined than HtmlOnPauseBlock won't be shown
+        if (player.hasValidOnPauseAd()) {
+            return;
+        }
+
         if (!player.displayOptions.htmlOnPauseBlock) {
             return;
         }
@@ -3007,7 +3089,7 @@ var fluidPlayerClass = {
         player.timerPool            = {};
         player.adList               = {};
         player.adPool               = {};
-        player.availableRolls       = ['preRoll', 'midRoll', 'postRoll'];
+        player.availableRolls       = ['preRoll', 'midRoll', 'postRoll', 'onPauseRoll'];
         player.supportedNonLinearAd = ['300x250', '468x60', '728x90'];
         player.autoplayAfterAd      = true;
         player.supportedStaticTypes = ['image/gif', 'image/jpeg', 'image/png'];

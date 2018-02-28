@@ -7,7 +7,7 @@ Fluid Player is a new free HTML5 video player. It is lightweight, easy to integr
 
 ## Features
 * Supports the VAST standard
-  * Multiple VAST tags (pre-roll, mid-roll, post-roll)
+  * Multiple VAST tags (pre-roll, mid-roll, post-roll, onpause-roll)
   * Linear (video) ads
   * Non linear VAST tags (banner images (gif/jpg/png))
 * Comes with its own design, which is easily customizable. Ability to use the browser default layout
@@ -126,7 +126,7 @@ Here is a description of the parameters which can be used when setting Fluid Pla
   * `htmlOnPauseBlockWidth`: An integer. if `htmlOnPauseBlock` is set, then it sets the container width. Default: `null`.
   * `responsive`: If set to `true`, the player will stretch horizontally to 100% of its parent container width. Default: `false`.
   * `adList` (VAST only): Setup one or multiple VastTag.
-    * `roll` (mandatory): The available timeline positions: `preRoll`, `midRoll`, `postRoll`.
+    * `roll` (mandatory): The available timeline positions: `preRoll`, `midRoll`, `postRoll`, `onPauseRoll`.
     * `vastTag` (mandatory): The url of the VAST XML (Please find the supported tags/attributes [vastLinear.xml](docs/demo/vastLinear.xml))
     * `timer` (only for mid-roll): the `timer` property schedules the Ad as below:
       * `timer: number` Ad plays after the specified number of seconds (Example `timer: 10`)
@@ -165,9 +165,9 @@ Here is a description of the parameters which can be used when setting Fluid Pla
     ]
     // ...
     ```
-    * `vAlign` (optional): The available vertical positions for nonLinear Ads: `top`, `middle`, `bottom`. Default: `bottom`.
-    * `nonLinearDuration` (optional): The number of seconds until the nonLinear Ad will be shown. If not set nor the minSuggestedDuration attribute of VAST XML than wont close until end of video.
-    * `size` (optional): The dimension of the Ad. Supported sizes: `468x60`, `300x250`, `728x90`.
+    * `vAlign` (only for nonLinear, optional): The available vertical positions for nonLinear Ads: `top`, `middle`, `bottom`. Default: `bottom`.
+    * `nonLinearDuration` (only for nonLinear, optional): The number of seconds until the nonLinear Ad will be shown. If not set nor the minSuggestedDuration attribute of VAST XML than wont close until end of video.
+    * `size` (only for nonLinear, optional): The dimension of the Ad. Supported sizes: `468x60`, `300x250`, `728x90`.
   * `mute`: If set to `true`, the player will be muted by default on page load. Default: `  false`.
   * `controlBar`: Autohiding the control bar after 3 seconds. The feature is disabled by default. To enable set:
     ```javascript
