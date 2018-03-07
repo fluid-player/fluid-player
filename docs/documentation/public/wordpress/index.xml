@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Wordpresses on Fluid Player Documentation</title>
+    <link>http://docs.fluidplayer.com/wordpress/</link>
+    <description>Recent content in Wordpresses on Fluid Player Documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    
+	<atom:link href="http://docs.fluidplayer.com/wordpress/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>WordPress</title>
+      <link>http://docs.fluidplayer.com/wordpress/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://docs.fluidplayer.com/wordpress/</guid>
+      <description>A plugin has been developed to embed Fluid Player in WordPress blogs: https://wordpress.org/plugins/fluid-player/
+Fluid Player can be easily embedded by using the custom [fluid-player] shortcode. The initial version accepts the following list of named parameters:
+ video: path to actual video to be used by the player. If no value is passed it will fall back to the plugin sample video. vast_file: path to vast file (optional) vtt_file: path to VTT file (optional) vtt_sprite: path to VTT sprites file (optional) layout: any of the following themes are provided with the player: default/funky/metal, if no value is passed it will fall back to &amp;lsquo;default&amp;rsquo;  Provided below is a generic example of how such a call would look like:</description>
+    </item>
+    
+  </channel>
+</rss>

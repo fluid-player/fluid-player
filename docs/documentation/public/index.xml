@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Fluid Player Documentation</title>
+    <link>http://docs.fluidplayer.com/</link>
+    <description>Recent content on Fluid Player Documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 10 Aug 2016 15:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://docs.fluidplayer.com/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Changelog</title>
+      <link>http://docs.fluidplayer.com/changelog/</link>
+      <pubDate>Wed, 10 Aug 2016 15:00:00 +0000</pubDate>
+      
+      <guid>http://docs.fluidplayer.com/changelog/</guid>
+      <description>1.2.2  Pull #88 Improve nonlinear ads  1.2.1  Pull #86 Pull #87 Mid roll current time fix  1.2.0  Pull #68 Controls remain fullscreen after escaping fullscreen Pull #66 Optional logoUrl for clickable logo Pull #74 Add ability to grab and slide the volume slider and timeline scrubber. Pull #75 Pull #77 Adding mid/post roll support and initial VAST nonLinear support. Pull #67 Adding key controls. Pull #69 Adding controls hiding functionality.</description>
+    </item>
+    
+    <item>
+      <title>Fluid Player</title>
+      <link>http://docs.fluidplayer.com/</link>
+      <pubDate>Wed, 10 Aug 2016 15:00:00 +0000</pubDate>
+      
+      <guid>http://docs.fluidplayer.com/</guid>
+      <description>What is Fluid Player Fluid Player is a free HTML5 video player. It is lightweight, easy to integrate and has advanced VAST capabilities.
+
+  
+What is VAST The IAB Digital Video Ad Serving Template (VAST) specification is a universal XML schema for serving ads to digital video players, and describes expected video player behavior when executing VAST-formatted ad responses.
+In short, VAST makes it possible for an ad provider to serve ads to various video players using a universal way of communication which all these players understand.</description>
+    </item>
+    
+    <item>
+      <title>Configuration</title>
+      <link>http://docs.fluidplayer.com/configuration/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://docs.fluidplayer.com/configuration/</guid>
+      <description>There are optional parameters that can be used to customise the Fluid Player. No parameters are required and will default if not passed through. Layout controls relate to the functionality and styling of the player itself. Vast options relate to the ads served and the how the player handles them
+
+Layout Controls The full list of layoutControls are below:
+fluidPlayer( &#39;my-video&#39;, { layoutControls: { primaryColor: false, playButtonShowing: true, playPauseAnimation: true, fillToContainer: false, autoPlay: false, mute: false, keyboardControl: true, layout: &#39;default&#39;, logo: { imageUrl: null, position: &#39;top left&#39;, clickUrl: null, opacity: 1 }, controlBar: { autoHide: true, autoHideTimeout: 3, animated: true }, timelinePreview: {}, htmlOnPauseBlock: { html: null, height: null, width: null }, playerInitCallback: (function() {}) } } );  None of the options are required but can be tailored to better suit your own design.</description>
+    </item>
+    
+    <item>
+      <title>Contact Us</title>
+      <link>http://docs.fluidplayer.com/help/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://docs.fluidplayer.com/help/</guid>
+      <description>If you have a technical issue or question, please submit it on GitHub
+For any other query, please submit it through our contact form</description>
+    </item>
+    
+    <item>
+      <title>Demo</title>
+      <link>http://docs.fluidplayer.com/examples/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://docs.fluidplayer.com/examples/</guid>
+      <description>Default Layout  Supports VAST (Video Ad Serving Template). Comes with its own design, which is easily customizable. Timeline Preview. Lightweight. Compatible with modern web browsers.    Custom Themed Layout  Easily customised with our primaryColor configuration.    Browser-Based Layout  Ability to have more than 1 player per page. Ability to use the default video layout for the current browser.    Multiple VAST and NonLinear Ad  Ability to have more than 1 VAST (example: pre-roll and mid-roll).</description>
+    </item>
+    
+    <item>
+      <title>Integration</title>
+      <link>http://docs.fluidplayer.com/integration/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://docs.fluidplayer.com/integration/</guid>
+      <description>Quick Integration In order to set Fluid Player, three things are required:
+ The Javascript and CSS files of the player; An HTML5 &amp;lt;video&amp;gt; tag; A single Javascript line of code that attaches the player to the video tag.  &amp;lt;html&amp;gt; &amp;lt;head&amp;gt; &amp;lt;title&amp;gt;Fluid Player&amp;lt;/title&amp;gt; &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;https://cdn.fluidplayer.com/v2/current/fluidplayer.min.css&amp;quot; type=&amp;quot;text/css&amp;quot;/&amp;gt; &amp;lt;script src=&amp;quot;https://cdn.fluidplayer.com/v2/current/fluidplayer.min.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt; &amp;lt;/head&amp;gt; &amp;lt;body&amp;gt; &amp;lt;video id=&#39;my-video&#39;&amp;gt; &amp;lt;source src=&#39;vid.mp4&#39; type=&#39;video/mp4&#39; /&amp;gt; &amp;lt;/video&amp;gt; &amp;lt;script type=&amp;quot;text/javascript&amp;quot;&amp;gt; fluidPlayer(&#39;my-video&#39;); &amp;lt;/script&amp;gt; &amp;lt;/body&amp;gt; &amp;lt;/html&amp;gt;  The fluidPlayer() function gets the video tag id as a first parameter, which is required.</description>
+    </item>
+    
+    <item>
+      <title>WordPress</title>
+      <link>http://docs.fluidplayer.com/wordpress/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://docs.fluidplayer.com/wordpress/</guid>
+      <description>A plugin has been developed to embed Fluid Player in WordPress blogs: https://wordpress.org/plugins/fluid-player/
+Fluid Player can be easily embedded by using the custom [fluid-player] shortcode. The initial version accepts the following list of named parameters:
+ video: path to actual video to be used by the player. If no value is passed it will fall back to the plugin sample video. vast_file: path to vast file (optional) vtt_file: path to VTT file (optional) vtt_sprite: path to VTT sprites file (optional) layout: any of the following themes are provided with the player: default/funky/metal, if no value is passed it will fall back to &amp;lsquo;default&amp;rsquo;  Provided below is a generic example of how such a call would look like:</description>
+    </item>
+    
+  </channel>
+</rss>

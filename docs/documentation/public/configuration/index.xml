@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Configurations on Fluid Player Documentation</title>
+    <link>http://docs.fluidplayer.com/configuration/</link>
+    <description>Recent content in Configurations on Fluid Player Documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    
+	<atom:link href="http://docs.fluidplayer.com/configuration/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Configuration</title>
+      <link>http://docs.fluidplayer.com/configuration/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://docs.fluidplayer.com/configuration/</guid>
+      <description>There are optional parameters that can be used to customise the Fluid Player. No parameters are required and will default if not passed through. Layout controls relate to the functionality and styling of the player itself. Vast options relate to the ads served and the how the player handles them
+
+Layout Controls The full list of layoutControls are below:
+fluidPlayer( &#39;my-video&#39;, { layoutControls: { primaryColor: false, playButtonShowing: true, playPauseAnimation: true, fillToContainer: false, autoPlay: false, mute: false, keyboardControl: true, layout: &#39;default&#39;, logo: { imageUrl: null, position: &#39;top left&#39;, clickUrl: null, opacity: 1 }, controlBar: { autoHide: true, autoHideTimeout: 3, animated: true }, timelinePreview: {}, htmlOnPauseBlock: { html: null, height: null, width: null }, playerInitCallback: (function() {}) } } );  None of the options are required but can be tailored to better suit your own design.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Examples on Fluid Player Documentation</title>
+    <link>http://docs.fluidplayer.com/examples/</link>
+    <description>Recent content in Examples on Fluid Player Documentation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    
+	<atom:link href="http://docs.fluidplayer.com/examples/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Demo</title>
+      <link>http://docs.fluidplayer.com/examples/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://docs.fluidplayer.com/examples/</guid>
+      <description>Default Layout  Supports VAST (Video Ad Serving Template). Comes with its own design, which is easily customizable. Timeline Preview. Lightweight. Compatible with modern web browsers.    Custom Themed Layout  Easily customised with our primaryColor configuration.    Browser-Based Layout  Ability to have more than 1 player per page. Ability to use the default video layout for the current browser.    Multiple VAST and NonLinear Ad  Ability to have more than 1 VAST (example: pre-roll and mid-roll).</description>
+    </item>
+    
+  </channel>
+</rss>
