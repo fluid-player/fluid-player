@@ -254,12 +254,6 @@
     opacity: 0.6;
 }
 
-.fluid_nonLinear_container {
-    position: absolute;
-    background-color: rgba(0, 0, 0, 0.7);
-    border: 1px solid #777777;
-}
-
 .close_button:hover {
     background-color: #000000;
     border: 1px solid #ffffff;
@@ -329,6 +323,36 @@
     justify-content: center;
     align-items: center;
     pointer-events: none;
+}
+
+.fluid_nonLinear_top, .fluid_nonLinear_middle, .fluid_nonLinear_bottom {
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    vertical-align: middle;
+    align-content: center;
+    border: 1px solid #777777;
+    position: absolute;
+    left: 50%;
+    margin-right: -50%;
+    z-index: 20;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.fluid_nonLinear_top {
+    top: 20px;
+    transform: translate(-50%);
+}
+
+.fluid_nonLinear_middle {
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.fluid_nonLinear_bottom {
+    bottom: 50px;
+    transform: translate(-50%);
 }
 
 .fluid_html_on_pause * {

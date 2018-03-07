@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 1.2.2
+* [Pull #88](https://github.com/fluid-player/fluid-player/pull/88) Improve nonlinear ads
+
 ## 1.2.1
 * [Pull #86](https://github.com/fluid-player/fluid-player/pull/86) [Pull #87](https://github.com/fluid-player/fluid-player/pull/87) Mid roll current time fix
 
