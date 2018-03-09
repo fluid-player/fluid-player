@@ -6,7 +6,7 @@
 Fluid Player is a new free HTML5 video player. It is lightweight, easy to integrate and has advanced VAST capabilities.
 The idea behind VAST, as well as the full VAST specification, can be found here: [VAST 4.0](https://www.iab.com/guidelines/digital-video-ad-serving-template-vast-4-0/).
 
-## Documention
+## Documentation
 The integration and configuration of Fluid Player is fully outlined in [Fluid Player Documentation](docs.fluidplayer.com)
 
 
