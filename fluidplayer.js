@@ -53,7 +53,7 @@ fluidPlayer = function(idVideoPlayer, options) {
 };
 
 var fluidPlayerClass = {
-    vttParserScript: 'https://cdn.fluidplayer.com/current/scripts/webvtt.js',
+    vttParserScript: '/scripts/webvtt.js',
     instances: [],
     notCloned: ['notCloned', 'vttParserScript', 'instances', 'getInstanceById',
         'requestStylesheet', 'reqiestScript', 'isTouchDevice', 'vastOptions',
@@ -2443,8 +2443,8 @@ var fluidPlayerClass = {
         });
     },
 
-    // Create the timeline preview only if the vtt previews aren't enabled
-    createTimelinePreview: function() {
+    // Create the time position preview only if the vtt previews aren't enabled
+    createTimePositionPreview: function() {
         var player = this;
         videoPlayer = document.getElementById(player.videoPlayerId);
 
@@ -2462,26 +2462,26 @@ var fluidPlayerClass = {
 
         progressContainer.appendChild(previewContainer);
 
-        // Set up hover for timeline preview display
+        // Set up hover for time position preview display
         document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container').addEventListener('mousemove', function(event) {
             var progressContainer = document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container');
             var totalWidth = progressContainer.clientWidth;
-            timeThing = document.getElementById(player.videoPlayerId + '_fluid_timeline_preview');
+            hoverTimeItem = document.getElementById(player.videoPlayerId + '_fluid_timeline_preview');
             var hoverQ = fluidPlayerClass.getEventOffsetX(event, progressContainer);
 
             hoverSecondQ = player.currentVideoDuration * hoverQ / totalWidth;
             showad = player.pad(parseInt(hoverSecondQ / 60)) + ':' + player.pad(parseInt(hoverSecondQ % 60));
-            timeThing.innerText = showad;
+            hoverTimeItem.innerText = showad;
 
-            timeThing.style.display = 'block';
-            timeThing.style.left = (hoverSecondQ / videoPlayer.duration * 100) + "%";
+            hoverTimeItem.style.display = 'block';
+            hoverTimeItem.style.left = (hoverSecondQ / videoPlayer.duration * 100) + "%";
 
         }, false);
 
         // Hide timeline preview on mouseout
         document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container').addEventListener('mouseout', function() {
-            timeThing = document.getElementById(player.videoPlayerId + '_fluid_timeline_preview');
-            timeThing.style.display = 'none';
+            hoverTimeItem = document.getElementById(player.videoPlayerId + '_fluid_timeline_preview');
+            hoverTimeItem.style.display = 'none';
         }, false);
     },
 
@@ -2613,7 +2613,7 @@ var fluidPlayerClass = {
 
         player.setupThumbnailPreview();
 
-        player.createTimelinePreview();
+        player.createTimePositionPreview();
 
         player.initPlayButton();
     },
@@ -2834,7 +2834,7 @@ var fluidPlayerClass = {
             switch (player.displayOptions.layoutControls.timelinePreview.type) {
                 case 'VTT':
                     fluidPlayerClass.requestScript(
-                        fluidPlayerClass.vttParserScript,
+                        fluidPlayerScriptLocation + fluidPlayerClass.vttParserScript,
                         player.setupThumbnailPreviewVtt.bind(this)
                     );
 
@@ -3367,21 +3367,13 @@ var fluidPlayerClass = {
 
         // Overriding the default options
         for (var key in options) {
-
             if(typeof options[key] == "object") {
                 for (var subKey in options[key]) {
-                    if(typeof options[key][subKey] == "object") {
-                        for (var subKiev in options[key][subKey]) {
-                            player.displayOptions[key][subKey][subKiev] = options[key][subKey][subKiev];
-                        }
-                    } else {
-                        player.displayOptions[key][subKey] = options[key][subKey];
-                    }
+                    player.displayOptions[key][subKey] = options[key][subKey];
                 }
             } else {
                 player.displayOptions[key] = options[key];
             }
-
         }
 
         player.setupPlayerWrapper();
