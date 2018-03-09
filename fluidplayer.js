@@ -60,7 +60,7 @@ var fluidPlayerClass = {
         'displayOptions', 'getEventOffsetX', 'getEventOffsetY', 'getTranslateX',
         'toggleElementText', 'getMobileOs', 'findClosestParent', 'activeVideoPlayerId',
         'getInstanceIdByWrapperId', 'timer', 'timerPool', 'adList', 'adPool',
-        'isUserActive', 'isCurrentlyPlayingAd'],
+        'isUserActive', 'isCurrentlyPlayingAd', 'initialAnimationSet'],
     version: '2.0',
     homepage: 'https://www.fluidplayer.com/',
     activeVideoPlayerId: null,
@@ -1674,7 +1674,7 @@ var fluidPlayerClass = {
 
             playPauseButton.className = playPauseButton.className.replace(/\bfluid_button_pause\b/g, 'fluid_button_play');
             controlsDisplay.classList.add('initial_controls_show');
-         
+
             if (menuOptionPlay !== null) {
                 menuOptionPlay.innerHTML = 'Play';
             }
@@ -1956,6 +1956,7 @@ var fluidPlayerClass = {
 
     onProgressbarMouseDown: function(videoPlayerId) {
         var player = fluidPlayerClass.getInstanceById(videoPlayerId);
+        player.displayOptions.layoutControls.playPauseAnimation = false;
 
         if (player.isCurrentlyPlayingAd) {
             return;
@@ -1993,6 +1994,10 @@ var fluidPlayerClass = {
             }
             if (!initiallyPaused) {
                 videoPlayerTag.play();
+            }
+            // Waut till video played then reenable the animations
+            if (player.initialAnimationSet) {
+                setTimeout(function() { player.displayOptions.layoutControls.playPauseAnimation = player.initialAnimationSet; }, 200);
             }
         }
 
@@ -2404,7 +2409,7 @@ var fluidPlayerClass = {
             player.contolProgressbarUpdate(player.videoPlayerId);
             player.contolDurationUpdate(player.videoPlayerId);
         });
-        
+
         document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container').addEventListener('mousedown', function(event) {
             player.onProgressbarMouseDown(player.videoPlayerId);
         }, false);
@@ -3109,7 +3114,7 @@ var fluidPlayerClass = {
             player.mainVideoDuration = videoPlayerTag.duration;
         }
     },
-    
+
     userActivityChecker: function () {
         var player = this;
         var videoPlayer = document.getElementById('fluid_video_wrapper_' + player.videoPlayerId);
@@ -3308,6 +3313,7 @@ var fluidPlayerClass = {
         player.isUserActive            = null;
         player.nonLinearVerticalAlign  = 'bottom';
         player.showTimeOnHover         = true;
+        player.initialAnimationSet     = true;
 
         //Default options
         player.displayOptions = {
@@ -3399,6 +3405,9 @@ var fluidPlayerClass = {
 
         //Set the volume control state
         player.latestVolume = videoPlayer.volume;
+
+        // Set the default animation setting
+        player.initialAnimationSet = player.displayOptions.layoutControls.playPauseAnimation;
 
         //Set the custom fullscreen behaviour
         player.handleFullscreen();

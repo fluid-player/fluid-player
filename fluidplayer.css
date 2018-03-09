@@ -257,14 +257,14 @@
 
 .close_button {
     position: absolute;
-    background: #000000 url("images/close.png") no-repeat scroll center center;
+    background: #000000 url("images/close-icon.svg") no-repeat scroll center center;
     height: 16px;
     width: 16px;
     top: 0;
     right: 0;
-    border: none;
+    background-size: 18px 18px;
     cursor: pointer;
-    opacity: 0.6;
+    padding: 1px;
 }
 
 .close_button:hover {
