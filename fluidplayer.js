@@ -2920,15 +2920,21 @@ var fluidPlayerClass = {
             sourceChangeList.className = 'fluid_video_sources_list';
             sourceChangeList.style.display = 'none';
 
-
+            firstSource = true;
             player.videoSources.forEach(function(source) {
+                var sourceSelected = (firstSource) ? "source_selected" :  "";
+                firstSource = false;
                 var sourceChangeDiv = document.createElement('div');
                 sourceChangeDiv.className = 'fluid_video_source_list_item';
-                sourceChangeDiv.innerText = source.title;
+                sourceChangeDiv.innerHTML = '<span class="source_button_icon ' + sourceSelected + '"></span>' + source.title;
 
                 sourceChangeDiv.addEventListener('click', function(event) {
                     event.stopPropagation();
                     var videoChangedTo = this;
+                    Array.from(document.getElementsByClassName('source_button_icon')).forEach(function(item) {
+                        item.classList.remove('source_selected');
+                    });
+                    this.firstChild.classList.add('source_selected');
 
                     player.videoSources.forEach(function(source) {
                         if (source.title == videoChangedTo.innerText) {

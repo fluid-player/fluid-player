@@ -881,3 +881,17 @@ _:-ms-lang(x),
     bottom: 50px;
     transform: translate(-50%);
 }
+
+.source_button_icon {
+    background: url('images/fluid_icons.svg') no-repeat;
+    float: left;
+    cursor:pointer;
+    height: 18px;
+    width: 18px;
+    background-position: -274px -21px;
+    opacity: 0;
+}
+
+.source_selected {
+    opacity: 1 !important;
+}
