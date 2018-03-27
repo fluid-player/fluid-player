@@ -298,21 +298,23 @@
 
 .fluid_ad_cta {
     position:absolute;
-    bottom: 50px;
+    right: 0px;
+    bottom: 100px;
     background-color: rgba(0, 0, 0, 0.8);
     color:#ffffff;
     font-size: 13px;
     font-family: 'Roboto', sans-serif;
     font-weight: normal;
-    text-align: start;
+    text-align: right;
     cursor: pointer;
     z-index: 10;
-    padding: 13px 21px 13px 21px;
+    padding: 13px 21px 13px 13px;
 }
 
 .fluid_ad_cta a {
     text-decoration: none;
     color: #ffffff;
+    line-height: 18px;
 }
 
 .fluid_ad_cta:hover {
@@ -880,4 +882,18 @@ _:-ms-lang(x),
 .fluid_nonLinear_bottom {
     bottom: 50px;
     transform: translate(-50%);
+}
+
+.add_icon_clickthrough {
+    color: #F2C94C;
+    line-height:18px;
+}
+.add_icon_clickthrough:before {
+    background: url('images/fluid_icons.svg') no-repeat;
+    height: 18px;
+    width: 18px;
+    top: 30px;
+    padding: 1px 22px 0px 0px;
+    content: "";
+    background-position: -162px -57px;
 }
