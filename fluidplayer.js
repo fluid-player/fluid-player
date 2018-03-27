@@ -2919,7 +2919,7 @@ var fluidPlayerClass = {
             sourceChangeList.className = 'fluid_video_sources_list';
             sourceChangeList.style.display = 'none';
 
-            firstSource = true;
+            var firstSource = true;
             player.videoSources.forEach(function(source) {
                 var sourceSelected = (firstSource) ? "source_selected" :  "";
                 firstSource = false;
@@ -2930,10 +2930,11 @@ var fluidPlayerClass = {
                 sourceChangeDiv.addEventListener('click', function(event) {
                     event.stopPropagation();
                     var videoChangedTo = this;
-                    Array.from(document.getElementsByClassName('source_button_icon')).forEach(function(item) {
-                        item.classList.remove('source_selected');
-                    });
-                    this.firstChild.classList.add('source_selected');
+                    var sourceIcons = document.getElementsByClassName('source_button_icon');
+                    for (var i = 0; i < sourceIcons.length; i++) {
+                        sourceIcons[i].className = sourceIcons[i].className.replace("source_selected", "");
+                    }
+                    videoChangedTo.firstChild.className += ' source_selected';
 
                     player.videoSources.forEach(function(source) {
                         if (source.title == videoChangedTo.innerText) {
