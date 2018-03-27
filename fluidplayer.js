@@ -3014,6 +3014,7 @@ var fluidPlayerClass = {
         var logoImage = document.createElement('img');
         logoImage.src = player.displayOptions.layoutControls.logo.imageUrl;
         logoImage.style.position = 'absolute';
+        logoImage.style.margin = '2px';
         var logoPosition = player.displayOptions.layoutControls.logo.position.toLowerCase();
         if (logoPosition.indexOf('bottom') !== -1) {
             logoImage.style.bottom = 0;
@@ -3431,29 +3432,29 @@ var fluidPlayerClass = {
 
     // "API" Functions
     play: function() {
-        videoPlayer = document.getElementById(this.videoPlayerId);
+        var videoPlayer = document.getElementById(this.videoPlayerId);
         videoPlayer.play();
         return true;
     },
 
     pause: function() {
-        videoPlayer = document.getElementById(this.videoPlayerId);
+        var videoPlayer = document.getElementById(this.videoPlayerId);
         videoPlayer.pause();
         return true;
     },
 
     skipTo: function(time) {
-        videoPlayer = document.getElementById(this.videoPlayerId);
+        var videoPlayer = document.getElementById(this.videoPlayerId);
         videoPlayer.currentTime = time;
     },
 
     setPlaybackSpeed: function(speed) {
-        videoPlayer = document.getElementById(this.videoPlayerId);
+        var videoPlayer = document.getElementById(this.videoPlayerId);
         videoPlayer.playbackRate = speed;
     },
 
     setVolume: function(passedVolume) {
-        videoPlayer = document.getElementById(this.videoPlayerId);
+        var videoPlayer = document.getElementById(this.videoPlayerId);
         videoPlayer.volume = passedVolume;
     },
 
@@ -3462,8 +3463,8 @@ var fluidPlayerClass = {
             return false;
         }
 
-        videoPlayer = document.getElementById(this.videoPlayerId);
-        htmlBlock = document.getElementById(this.videoPlayerId + "_fluid_html_on_pause");
+        var videoPlayer = document.getElementById(this.videoPlayerId);
+        var htmlBlock = document.getElementById(this.videoPlayerId + "_fluid_html_on_pause");
 
         // We create the HTML block from scratch if it doesn't already exist
         if (!htmlBlock) {
@@ -3500,8 +3501,8 @@ var fluidPlayerClass = {
     },
 
     toggleControlBar: function(show) {
-        videoPlayer = document.getElementById(this.videoPlayerId);
-        controlBar = document.getElementById(this.videoPlayerId + "_fluid_controls_container");
+        var videoPlayer = document.getElementById(this.videoPlayerId);
+        var controlBar = document.getElementById(this.videoPlayerId + "_fluid_controls_container");
 
         if (show) {
             controlBar.classList.add('initial_controls_show');
@@ -3525,7 +3526,7 @@ var fluidPlayerClass = {
     },
 
     on: function(eventCall, functionCall) {
-        videoPlayer = document.getElementById(this.videoPlayerId);
+        var videoPlayer = document.getElementById(this.videoPlayerId);
         switch(eventCall) {
             case 'play':
                 videoPlayer.onplay = functionCall;
