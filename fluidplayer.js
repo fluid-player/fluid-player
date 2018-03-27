@@ -3368,7 +3368,7 @@ var fluidPlayerClass = {
                 skipButtonCaption:            'Skip ad in [seconds]',
                 skipButtonClickCaption:       'Skip ad <span class="skip_button_icon"></span>',
                 adText:                       null,
-                adCTAText:                    null, //Remove
+                adCTAText:                    'Visit now!',
                 vastTimeout:                  5000,
 
                 vastAdvanced: {
