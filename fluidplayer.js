@@ -3051,6 +3051,7 @@ var fluidPlayerClass = {
         var logoImage = document.createElement('img');
         logoImage.src = player.displayOptions.layoutControls.logo.imageUrl;
         logoImage.style.position = 'absolute';
+        logoImage.style.margin = '2px';
         var logoPosition = player.displayOptions.layoutControls.logo.position.toLowerCase();
         if (logoPosition.indexOf('bottom') !== -1) {
             logoImage.style.bottom = 0;
@@ -3573,8 +3574,113 @@ var fluidPlayerClass = {
         }
     },
 
+    // "API" Functions
+    play: function() {
+        var videoPlayer = document.getElementById(this.videoPlayerId);
+        videoPlayer.play();
+        return true;
+    },
+
+    pause: function() {
+        var videoPlayer = document.getElementById(this.videoPlayerId);
+        videoPlayer.pause();
+        return true;
+    },
+
+    skipTo: function(time) {
+        var videoPlayer = document.getElementById(this.videoPlayerId);
+        videoPlayer.currentTime = time;
+    },
+
     setPlaybackSpeed: function(speed) {
         var videoPlayer = document.getElementById(this.videoPlayerId);
         videoPlayer.playbackRate = speed;
+    },
+
+    setVolume: function(passedVolume) {
+        var videoPlayer = document.getElementById(this.videoPlayerId);
+        videoPlayer.volume = passedVolume;
+    },
+
+    setHtmlOnPauseBlock: function(passedHtml) {
+        if (typeof passedHtml != 'object' || typeof passedHtml.html == 'undefined') {
+            return false;
+        }
+
+        var videoPlayer = document.getElementById(this.videoPlayerId);
+        var htmlBlock = document.getElementById(this.videoPlayerId + "_fluid_html_on_pause");
+
+        // We create the HTML block from scratch if it doesn't already exist
+        if (!htmlBlock) {
+            var videoPlayer = document.getElementById(player.videoPlayerId);
+            var containerDiv = document.createElement('div');
+            containerDiv.id = player.videoPlayerId + '_fluid_html_on_pause';
+            containerDiv.className = 'fluid_html_on_pause';
+            containerDiv.style.display = 'none';
+            containerDiv.innerHTML = passedHtml.html;
+            containerDiv.onclick = function() {
+                player.playPauseToggle(videoPlayer);
+            };
+
+            if (passedHtml.width) {
+                containerDiv.style.width = passedHtml.width + 'px';
+            }
+
+            if (passedHtml.height) {
+                containerDiv.style.height = passedHtml.height + 'px';
+            }
+
+            videoPlayer.parentNode.insertBefore(containerDiv, null);
+        } else {
+            htmlBlock.innerHTML = passedHtml.html;
+
+            if (passedHtml.width) {
+                htmlBlock.style.width = passedHtml.width + 'px';
+            }
+
+            if (passedHtml.height) {
+                htmlBlock.style.height = passedHtml.height + 'px';
+            }
+        }
+    },
+
+    toggleControlBar: function(show) {
+        var videoPlayer = document.getElementById(this.videoPlayerId);
+        var controlBar = document.getElementById(this.videoPlayerId + "_fluid_controls_container");
+
+        if (show) {
+            controlBar.className += " initial_controls_show";
+        } else {
+            controlBar.className = controlBar.className.replace(" initial_controls_show", "");
+        }
+    },
+
+    toggleFullscreen: function(fullscreen) {
+        var fullscreenTag = document.getElementById('fluid_video_wrapper_' + this.videoPlayerId);
+        var fullscreenButton = document.getElementById(this.videoPlayerId + '_fluid_control_fullscreen');
+        var menuOptionFullscreen = document.getElementById(this.videoPlayerId + 'context_option_fullscreen');
+
+        if (fullscreen) {
+            fullscreenTag.className += ' pseudo_fullscreen';
+            this.fullscreenOn(fullscreenButton, menuOptionFullscreen);
+        } else {
+            fullscreenTag.className = fullscreenTag.className.replace(/\bpseudo_fullscreen\b/g, '');
+            this.fullscreenOff(fullscreenButton, menuOptionFullscreen);
+        }
+    },
+
+    on: function(eventCall, functionCall) {
+        var videoPlayer = document.getElementById(this.videoPlayerId);
+        switch(eventCall) {
+            case 'play':
+                videoPlayer.onplay = functionCall;
+                break;
+            case 'pause':
+                videoPlayer.onpause = functionCall;
+                break;
+            default:
+                console.log('[FP_ERROR] Event not recognised');
+                break;
+        }
     }
 };
