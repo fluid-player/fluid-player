@@ -297,6 +297,16 @@ var fluidPlayerClass = {
         return fallbackMediaFile;
     },
 
+    getIconClickFromLinear: function (linear) {
+        var iconClickThrough = linear.getElementsByTagName('IconClicks');
+
+        if (iconClickThrough.length) {
+            return iconClickThrough[0].getElementsByTagName('IconClickThrough')[0].innerHTML;
+        }
+
+        return '';
+    },
+
     getStaticResourceFromNonLinear: function(linear) {
         var fallbackStaticResource;
         var staticResources = this.getStaticResourcesFromNonLinear(linear);
@@ -551,7 +561,7 @@ var fluidPlayerClass = {
 
         if (!player.vastOptions || typeof this.vastOptions.errorUrl === 'undefined') {
             player.announceLocalError(errorCode);
-        } else{
+        } else {
             player.announceError(errorCode);
         }
 
@@ -635,8 +645,13 @@ var fluidPlayerClass = {
                         tmpOptions.clicktracking   = player.getClickTrackingEvents(creativeLinear);
                         tmpOptions.duration        = player.getDurationFromLinear(creativeLinear);
                         tmpOptions.mediaFile       = player.getMediaFileFromLinear(creativeLinear);
+                        tmpOptions.iconClick       = player.getIconClickFromLinear(creativeLinear);
 
                         player.registerTrackingEvents(creativeLinear, tmpOptions);
+                    }
+
+                    if ((typeof tmpOptions.iconClick !== 'undefined') && (tmpOptions.iconClick !== null) && tmpOptions.iconClick.length) {
+                        player.adList[adListId].landingPage = tmpOptions.iconClick;
                     }
 
                     var arrayCreativeNonLinears = creative[0].getElementsByTagName('NonLinearAds');
@@ -713,7 +728,7 @@ var fluidPlayerClass = {
         }
 
 
-        var playVideoPlayer = function() {
+        var playVideoPlayer = function(adListId) {
             player.switchPlayerToVastMode = function() {
                 //Get the actual duration from the video file if it is not present in the VAST XML
                 if (!player.vastOptions.duration) {
@@ -725,7 +740,7 @@ var fluidPlayerClass = {
                     player.addSkipButton();
                 }
 
-                player.addCTAButton();
+                player.addCTAButton(player.adList[adListId].landingPage);
 
                 player.addAdCountdown();
 
@@ -1408,7 +1423,7 @@ var fluidPlayerClass = {
         }
     },
 
-    addCTAButton: function() {
+    addCTAButton: function(landingPage) {
         if (!this.displayOptions.vastOptions.adCTAText) {
             return;
         }
@@ -1422,7 +1437,7 @@ var fluidPlayerClass = {
         var link = document.createElement('a');
         link.href = player.vastOptions.clickthroughUrl;
         link.target = '_blank';
-        link.innerText = this.displayOptions.vastOptions.adCTAText;
+        link.innerHTML = this.displayOptions.vastOptions.adCTAText + "<br/><span class=\"add_icon_clickthrough\">" + landingPage + "</span>";
         link.onclick = function() {
             if (!videoPlayerTag.paused) {
                 videoPlayerTag.pause();
@@ -1630,7 +1645,10 @@ var fluidPlayerClass = {
             '</div>' +
             '<div class="fluid_controls_right">' +
             '   <div id="' + this.videoPlayerId + '_fluid_control_fullscreen" class="fluid_button fluid_button_fullscreen"></div>' +
+            '   <div id="' + this.videoPlayerId + '_fluid_control_theatre" class="fluid_button fluid_button_theatre"></div>' +
             '   <div id="' + this.videoPlayerId + '_fluid_control_video_source" class="fluid_button fluid_button_video_source"></div>' +
+            '   <div id="' + this.videoPlayerId + '_fluid_control_playback_rate" class="fluid_button fluid_button_playback_rate"></div>' +
+            '   <div id="' + this.videoPlayerId + '_fluid_control_download" class="fluid_button fluid_button_download"></div>' +
             '   <div id="' + this.videoPlayerId + '_fluid_control_volume_container" class="fluid_control_volume_container fluid_slider">' +
             '       <div id="' + this.videoPlayerId + '_fluid_control_volume" class="fluid_control_volume">' +
             '           <div id="' + this.videoPlayerId + '_fluid_control_currentvolume" class="fluid_control_currentvolume">' +
@@ -1995,7 +2013,7 @@ var fluidPlayerClass = {
             if (!initiallyPaused) {
                 videoPlayerTag.play();
             }
-            // Waut till video played then reenable the animations
+            // Wait till video played then reenable the animations
             if (player.initialAnimationSet) {
                 setTimeout(function() { player.displayOptions.layoutControls.playPauseAnimation = player.initialAnimationSet; }, 200);
             }
@@ -2345,8 +2363,6 @@ var fluidPlayerClass = {
                 }
             }
 
-            player.initHtmlOnPauseBlock();
-
             player.toggleOnPauseAd();
 
         } else {
@@ -2441,6 +2457,15 @@ var fluidPlayerClass = {
         document.getElementById(player.videoPlayerId + '_fluid_control_fullscreen').addEventListener('click', function(){
             player.fullscreenToggle(player.videoPlayerId);
         });
+
+        // Theatre mode
+        if (player.displayOptions.layoutControls.allowTheatre) {
+            document.getElementById(player.videoPlayerId + '_fluid_control_theatre').addEventListener('click', function () {
+                player.theatreToggle(player.videoPlayerId);
+            });
+        } else {
+            document.getElementById(player.videoPlayerId + '_fluid_control_theatre').style.display = 'none';
+        }
     },
 
     // Create the time position preview only if the vtt previews aren't enabled
@@ -2609,6 +2634,8 @@ var fluidPlayerClass = {
             var initiateVolumebarTimerId = setInterval(initiateVolumebar, 100);
         }
 
+        player.initHtmlOnPauseBlock();
+
         player.setCustomControls();
 
         player.setupThumbnailPreview();
@@ -2616,6 +2643,10 @@ var fluidPlayerClass = {
         player.createTimePositionPreview();
 
         player.initPlayButton();
+
+        player.createPlaybackList();
+
+        player.createDownload();
     },
 
     /**
@@ -2911,7 +2942,6 @@ var fluidPlayerClass = {
         });
 
         player.videoSources = sources;
-
         if (player.videoSources.length > 1) {
             var sourceChangeButton = document.getElementById(player.videoPlayerId + '_fluid_control_video_source');
 
@@ -2920,15 +2950,22 @@ var fluidPlayerClass = {
             sourceChangeList.className = 'fluid_video_sources_list';
             sourceChangeList.style.display = 'none';
 
-
+            var firstSource = true;
             player.videoSources.forEach(function(source) {
+                var sourceSelected = (firstSource) ? "source_selected" :  "";
+                firstSource = false;
                 var sourceChangeDiv = document.createElement('div');
                 sourceChangeDiv.className = 'fluid_video_source_list_item';
-                sourceChangeDiv.innerText = source.title;
+                sourceChangeDiv.innerHTML = '<span class="source_button_icon ' + sourceSelected + '"></span>' + source.title;
 
                 sourceChangeDiv.addEventListener('click', function(event) {
                     event.stopPropagation();
                     var videoChangedTo = this;
+                    var sourceIcons = document.getElementsByClassName('source_button_icon');
+                    for (var i = 0; i < sourceIcons.length; i++) {
+                        sourceIcons[i].className = sourceIcons[i].className.replace("source_selected", "");
+                    }
+                    videoChangedTo.firstChild.className += ' source_selected';
 
                     player.videoSources.forEach(function(source) {
                         if (source.title == videoChangedTo.innerText) {
@@ -2969,7 +3006,7 @@ var fluidPlayerClass = {
             var mouseOut = function(event) {
                 sourceChangeListContainer.removeEventListener('mouseleave', mouseOut);
                 sourceChangeList.style.display = 'none';
-            }
+            };
             sourceChangeListContainer.addEventListener('mouseleave', mouseOut);
         } else {
             sourceChangeList.style.display = 'none';
@@ -3063,7 +3100,7 @@ var fluidPlayerClass = {
         containerDiv.innerHTML = player.displayOptions.layoutControls.htmlOnPauseBlock.html;
         containerDiv.onclick = function(event) {
             player.playPauseToggle(videoPlayer);
-        }
+        };
 
         if (player.displayOptions.layoutControls.htmlOnPauseBlock.width) {
             containerDiv.style.width = player.displayOptions.layoutControls.htmlOnPauseBlock.width + 'px';
@@ -3169,7 +3206,7 @@ var fluidPlayerClass = {
         var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
         var videoPlayerTag = document.getElementById(videoInstanceId);
 
-        if (videoPlayerInstance.isCurrentlyPlayingAd) {
+        if (videoPlayerInstance.isCurrentlyPlayingAd && !videoPlayerTag.paused) {
             videoPlayerInstance.toggleAdCountdown(true);
         }
 
@@ -3192,7 +3229,7 @@ var fluidPlayerClass = {
         var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
         var videoPlayerTag = document.getElementById(videoInstanceId);
 
-        if (videoPlayerInstance.isCurrentlyPlayingAd) {
+        if (videoPlayerInstance.isCurrentlyPlayingAd && !videoPlayerTag.paused) {
             videoPlayerInstance.toggleAdCountdown(false);
         }
 
@@ -3278,6 +3315,107 @@ var fluidPlayerClass = {
         var progressInterval = setInterval(logProgress, 500);
     },
 
+    createPlaybackList: function() {
+        var player = this;
+        var playbackRates = ['x2', 'x1.5', 'x1', 'x0.5'];
+
+        if (player.displayOptions.layoutControls.playbackRateEnabled) {
+            var sourceChangeButton = document.getElementById(player.videoPlayerId + '_fluid_control_playback_rate');
+
+            var sourceChangeList = document.createElement('div');
+            sourceChangeList.id = player.videoPlayerId + '_fluid_control_video_playback_rate';
+            sourceChangeList.className = 'fluid_video_playback_rates';
+            sourceChangeList.style.display = 'none';
+
+            playbackRates.forEach(function(rate) {
+                var sourceChangeDiv = document.createElement('div');
+                sourceChangeDiv.className = 'fluid_video_playback_rates_item';
+                sourceChangeDiv.innerText = rate;
+
+                sourceChangeDiv.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    playbackRate = this.innerText.replace('x','');
+                    player.setPlaybackSpeed(playbackRate);
+                    player.openCloseVideoPlaybackRate();
+
+                });
+                sourceChangeList.appendChild(sourceChangeDiv);
+            });
+
+            sourceChangeButton.appendChild(sourceChangeList);
+            sourceChangeButton.addEventListener('click', function() {
+                player.openCloseVideoPlaybackRate();
+            });
+
+        } else {
+            // No other video sources
+            document.getElementById(player.videoPlayerId + '_fluid_control_playback_rate').style.display = 'none';
+        }
+    },
+
+    openCloseVideoPlaybackRate: function() {
+        var player = this;
+        var sourceChangeList = document.getElementById(this.videoPlayerId + '_fluid_control_video_playback_rate');
+        var sourceChangeListContainer = document.getElementById(this.videoPlayerId + '_fluid_control_playback_rate');
+
+        if (player.isCurrentlyPlayingAd) {
+            sourceChangeList.style.display = 'none';
+            return;
+        }
+
+        if (sourceChangeList.style.display == 'none') {
+            sourceChangeList.style.display = 'block';
+            var mouseOut = function() {
+                sourceChangeListContainer.removeEventListener('mouseleave', mouseOut);
+                sourceChangeList.style.display = 'none';
+            };
+            sourceChangeListContainer.addEventListener('mouseleave', mouseOut);
+        } else {
+            sourceChangeList.style.display = 'none';
+        }
+    },
+
+    createDownload: function() {
+        player = this;
+        var downloadOption = document.getElementById(this.videoPlayerId + '_fluid_control_download');
+        if (player.displayOptions.layoutControls.allowDownload) {
+            downloadClick = document.createElement('a');
+            downloadClick.id = this.videoPlayerId + '_download';
+            downloadOption.appendChild(downloadClick);
+
+            downloadOption.addEventListener('click', function() {
+                var downloadItem = document.getElementById(player.videoPlayerId + '_download');
+                downloadItem.download = player.originalSrc;
+                downloadItem.href = player.originalSrc;
+                downloadClick.click();
+            });
+        } else {
+            downloadOption.style.display = 'none';
+        }
+    },
+
+    theatreToggle: function() {
+        var downloadItem = document.getElementById('fluid_video_wrapper_' + this.videoPlayerId);
+        if (!player.theatreMode) {
+            downloadItem.classList.add('fluid_theatre_mode');
+            lessFullHeight = (screen.height / 100) * 75;
+            downloadItem.style.width = '100%';
+            downloadItem.style.height = "75%";
+            downloadItem.style.maxHeight = lessFullHeight + "px";
+            player.theatreMode = true;
+        } else {
+            downloadItem.classList.remove('fluid_theatre_mode');
+            if (!player.displayOptions.layoutControls.fillToContainer) {
+                downloadItem.style.width = player.originalWidth + 'px';
+                downloadItem.style.height = player.originalHeight + 'px';
+            } else {
+                downloadItem.style.width = '100%';
+                downloadItem.style.height = '100%';
+            }
+            player.theatreMode = false;
+        }
+    },
+
     init: function(idVideoPlayer, options) {
         var player = this;
         var videoPlayer = document.getElementById(idVideoPlayer);
@@ -3305,7 +3443,7 @@ var fluidPlayerClass = {
         player.timerPool               = {};
         player.adList                  = {};
         player.adPool                  = {};
-        player.availableRolls          = ['preRoll', 'midRoll', 'postRoll'];
+        player.availableRolls          = ['preRoll', 'midRoll', 'postRoll', 'onPauseRoll'];
         player.supportedNonLinearAd    = ['300x250', '468x60', '728x90'];
         player.autoplayAfterAd         = true;
         player.nonLinearDuration       = 15;
@@ -3315,6 +3453,9 @@ var fluidPlayerClass = {
         player.nonLinearVerticalAlign  = 'bottom';
         player.showTimeOnHover         = true;
         player.initialAnimationSet     = true;
+        player.theatreMode             = false;
+        player.originalWidth           = videoPlayer.offsetWidth;
+        player.originalHeight          = videoPlayer.offsetHeight;
 
         //Default options
         player.displayOptions = {
@@ -3329,6 +3470,9 @@ var fluidPlayerClass = {
                 autoPlay:                     false,
                 mute:                         false,
                 keyboardControl:              true,
+                allowDownload:                false,
+                playbackRateEnabled:          false,
+                allowTheatre:                 true,
                 logo: {
                     imageUrl:                 null,
                     position:                 'top left',
@@ -3354,7 +3498,7 @@ var fluidPlayerClass = {
                 skipButtonCaption:            'Skip ad in [seconds]',
                 skipButtonClickCaption:       'Skip ad <span class="skip_button_icon"></span>',
                 adText:                       null,
-                adCTAText:                    null, //Remove
+                adCTAText:                    'Visit now!',
                 vastTimeout:                  5000,
 
                 vastAdvanced: {
