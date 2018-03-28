@@ -61,7 +61,7 @@ var fluidPlayerClass = {
         'toggleElementText', 'getMobileOs', 'findClosestParent', 'activeVideoPlayerId',
         'getInstanceIdByWrapperId', 'timer', 'timerPool', 'adList', 'adPool',
         'isUserActive', 'isCurrentlyPlayingAd', 'initialAnimationSet'],
-    version: '2.0.0',
+    version: '2.1.0',
     homepage: 'https://www.fluidplayer.com/',
     activeVideoPlayerId: null,
 
@@ -302,6 +302,8 @@ var fluidPlayerClass = {
 
         if (iconClickThrough.length) {
             return iconClickThrough[0].getElementsByTagName('IconClickThrough')[0].innerHTML;
+        } else {
+            this.displayOptions.vastOptions.adCTAText = false;
         }
 
         return '';
