@@ -3505,9 +3505,9 @@ var fluidPlayerClass = {
         var controlBar = document.getElementById(this.videoPlayerId + "_fluid_controls_container");
 
         if (show) {
-            controlBar.classList.add('initial_controls_show');
+            controlBar.className += " initial_controls_show";
         } else {
-            controlBar.classList.remove('initial_controls_show');
+            controlBar.className = controlBar.className.replace(" initial_controls_show", "");
         }
     },
 
