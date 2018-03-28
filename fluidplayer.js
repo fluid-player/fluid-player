@@ -3553,7 +3553,7 @@ var fluidPlayerClass = {
     },
 
     setPlaybackSpeed: function(speed) {
-        videoPlayer = document.getElementById(this.videoPlayerId);
+        var videoPlayer = document.getElementById(this.videoPlayerId);
         videoPlayer.playbackRate = speed;
     }
 };
