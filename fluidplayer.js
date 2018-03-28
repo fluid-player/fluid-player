@@ -297,6 +297,16 @@ var fluidPlayerClass = {
         return fallbackMediaFile;
     },
 
+    getIconClickFromLinear: function (linear) {
+        var iconClickThrough = linear.getElementsByTagName('IconClicks');
+
+        if (iconClickThrough.length) {
+            return iconClickThrough[0].getElementsByTagName('IconClickThrough')[0].innerHTML;
+        }
+
+        return '';
+    },
+
     getStaticResourceFromNonLinear: function(linear) {
         var fallbackStaticResource;
         var staticResources = this.getStaticResourcesFromNonLinear(linear);
@@ -551,7 +561,7 @@ var fluidPlayerClass = {
 
         if (!player.vastOptions || typeof this.vastOptions.errorUrl === 'undefined') {
             player.announceLocalError(errorCode);
-        } else{
+        } else {
             player.announceError(errorCode);
         }
 
@@ -635,8 +645,13 @@ var fluidPlayerClass = {
                         tmpOptions.clicktracking   = player.getClickTrackingEvents(creativeLinear);
                         tmpOptions.duration        = player.getDurationFromLinear(creativeLinear);
                         tmpOptions.mediaFile       = player.getMediaFileFromLinear(creativeLinear);
+                        tmpOptions.iconClick       = player.getIconClickFromLinear(creativeLinear);
 
                         player.registerTrackingEvents(creativeLinear, tmpOptions);
+                    }
+
+                    if ((typeof tmpOptions.iconClick !== 'undefined') && (tmpOptions.iconClick !== null) && tmpOptions.iconClick.length) {
+                        player.adList[adListId].landingPage = tmpOptions.iconClick;
                     }
 
                     var arrayCreativeNonLinears = creative[0].getElementsByTagName('NonLinearAds');
@@ -713,7 +728,7 @@ var fluidPlayerClass = {
         }
 
 
-        var playVideoPlayer = function() {
+        var playVideoPlayer = function(adListId) {
             player.switchPlayerToVastMode = function() {
                 //Get the actual duration from the video file if it is not present in the VAST XML
                 if (!player.vastOptions.duration) {
@@ -725,7 +740,7 @@ var fluidPlayerClass = {
                     player.addSkipButton();
                 }
 
-                player.addCTAButton();
+                player.addCTAButton(player.adList[adListId].landingPage);
 
                 player.addAdCountdown();
 
@@ -1408,7 +1423,7 @@ var fluidPlayerClass = {
         }
     },
 
-    addCTAButton: function() {
+    addCTAButton: function(landingPage) {
         if (!this.displayOptions.vastOptions.adCTAText) {
             return;
         }
@@ -1422,7 +1437,7 @@ var fluidPlayerClass = {
         var link = document.createElement('a');
         link.href = player.vastOptions.clickthroughUrl;
         link.target = '_blank';
-        link.innerText = this.displayOptions.vastOptions.adCTAText;
+        link.innerHTML = this.displayOptions.vastOptions.adCTAText + "<br/><span class=\"add_icon_clickthrough\">" + landingPage + "</span>";
         link.onclick = function() {
             if (!videoPlayerTag.paused) {
                 videoPlayerTag.pause();
@@ -1998,7 +2013,7 @@ var fluidPlayerClass = {
             if (!initiallyPaused) {
                 videoPlayerTag.play();
             }
-            // Waut till video played then reenable the animations
+            // Wait till video played then reenable the animations
             if (player.initialAnimationSet) {
                 setTimeout(function() { player.displayOptions.layoutControls.playPauseAnimation = player.initialAnimationSet; }, 200);
             }
@@ -2348,8 +2363,6 @@ var fluidPlayerClass = {
                 }
             }
 
-            player.initHtmlOnPauseBlock();
-
             player.toggleOnPauseAd();
 
         } else {
@@ -2620,6 +2633,8 @@ var fluidPlayerClass = {
         if (player.checkShouldDisplayVolumeControls()) {
             var initiateVolumebarTimerId = setInterval(initiateVolumebar, 100);
         }
+
+        player.initHtmlOnPauseBlock();
 
         player.setCustomControls();
 
@@ -3427,7 +3442,7 @@ var fluidPlayerClass = {
         player.timerPool               = {};
         player.adList                  = {};
         player.adPool                  = {};
-        player.availableRolls          = ['preRoll', 'midRoll', 'postRoll'];
+        player.availableRolls          = ['preRoll', 'midRoll', 'postRoll', 'onPauseRoll'];
         player.supportedNonLinearAd    = ['300x250', '468x60', '728x90'];
         player.autoplayAfterAd         = true;
         player.nonLinearDuration       = 15;
@@ -3482,7 +3497,7 @@ var fluidPlayerClass = {
                 skipButtonCaption:            'Skip ad in [seconds]',
                 skipButtonClickCaption:       'Skip ad <span class="skip_button_icon"></span>',
                 adText:                       null,
-                adCTAText:                    null, //Remove
+                adCTAText:                    'Visit now!',
                 vastTimeout:                  5000,
 
                 vastAdvanced: {

@@ -202,12 +202,8 @@
     position:absolute;
     bottom: 50px;
     right: 0;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.7);
     padding: 13px 21px 13px 21px;
-}
-
-.skip_button:not(.skip_button_disabled):hover {
-    border: 1px solid #ffffff;
 }
 
 .skip_button, .skip_button a {
@@ -298,26 +294,28 @@
 
 .fluid_ad_cta {
     position:absolute;
-    bottom: 50px;
-    background-color: rgba(0, 0, 0, 0.8);
+    right: 0px;
+    bottom: 100px;
+    background-color: rgba(0, 0, 0, 0.7);
     color:#ffffff;
     font-size: 13px;
     font-family: 'Roboto', sans-serif;
     font-weight: normal;
-    text-align: start;
+    text-align: right;
     cursor: pointer;
     z-index: 10;
-    padding: 13px 21px 13px 21px;
+    padding: 13px 21px 13px 13px;
 }
 
 .fluid_ad_cta a {
     text-decoration: none;
     color: #ffffff;
+    line-height: 18px;
 }
 
-.fluid_ad_cta:hover {
-    background-color: #000000;
-    border: 1px solid #ffffff;
+.fluid_ad_cta:hover,
+.skip_button:not(.skip_button_disabled):hover {
+    background-color: rgba(0, 0, 0, 1);
 }
 
 .fluid_html_on_pause {
@@ -899,6 +897,21 @@ _:-ms-lang(x),
 .fluid_nonLinear_bottom {
     bottom: 50px;
     transform: translate(-50%);
+}
+
+.add_icon_clickthrough {
+    color: #F2C94C;
+    line-height:18px;
+}
+
+.add_icon_clickthrough:before {
+    background: url('images/fluid_icons.svg') no-repeat;
+    height: 18px;
+    width: 18px;
+    top: 30px;
+    padding: 1px 22px 0px 0px;
+    content: "";
+    background-position: -162px -57px;
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_theatre,
