@@ -231,7 +231,7 @@
     position: absolute;
     height: 18px;
     width: 18px;
-    top: 4px;
+    top: 6px;
     content: "";
     opacity: 0.8;
     -webkit-transition: opacity 0.3s ease-in-out;
