@@ -61,7 +61,7 @@ var fluidPlayerClass = {
         'toggleElementText', 'getMobileOs', 'findClosestParent', 'activeVideoPlayerId',
         'getInstanceIdByWrapperId', 'timer', 'timerPool', 'adList', 'adPool',
         'isUserActive', 'isCurrentlyPlayingAd', 'initialAnimationSet'],
-    version: '2.1.0',
+    version: '2.1.1',
     homepage: 'https://www.fluidplayer.com/',
     activeVideoPlayerId: null,
 
@@ -1354,7 +1354,7 @@ var fluidPlayerClass = {
         var divAdCountdown = document.createElement('div');
 
         // Create element
-        var adCountdown = player.pad(parseInt(player.currentVideoDuration / 60)) + ':' + player.pad(parseInt(player.currentVideoDuration % 60));
+        var adCountdown = this.pad(parseInt(this.currentVideoDuration / 60)) + ':' + this.pad(parseInt(this.currentVideoDuration % 60));
         var durationText = parseInt(adCountdown);
         divAdCountdown.id = 'ad_countdown' + this.videoPlayerId;
         divAdCountdown.className = 'ad_countdown';
