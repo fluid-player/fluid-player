@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 2.1.1
+* [Pull #107](https://github.com/fluid-player/fluid-player/pull/107) Download and Theatre fixes
+
 ## 2.1
 * [Pull #101](https://github.com/fluid-player/fluid-player/pull/101) Quality indicator
 * [Pull #102](https://github.com/fluid-player/fluid-player/pull/102) API functions
