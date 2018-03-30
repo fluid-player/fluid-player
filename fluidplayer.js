@@ -3675,16 +3675,14 @@ var fluidPlayerClass = {
     },
 
     toggleFullscreen: function(fullscreen) {
-        var fullscreenTag = document.getElementById('fluid_video_wrapper_' + this.videoPlayerId);
-        var fullscreenButton = document.getElementById(this.videoPlayerId + '_fluid_control_fullscreen');
-        var menuOptionFullscreen = document.getElementById(this.videoPlayerId + 'context_option_fullscreen');
+        if (this.fullscreenMode != fullscreen) {
 
-        if (fullscreen) {
-            fullscreenTag.className += ' pseudo_fullscreen';
-            this.fullscreenOn(fullscreenButton, menuOptionFullscreen);
-        } else {
-            fullscreenTag.className = fullscreenTag.className.replace(/\bpseudo_fullscreen\b/g, '');
-            this.fullscreenOff(fullscreenButton, menuOptionFullscreen);
+            // If we're turning fullscreen on and we're in theatre mode, remove theatre
+            if (fullscreen && this.theatreMode) {
+                this.theatreToggle();
+            }
+
+            this.fullscreenToggle();
         }
     },
 
