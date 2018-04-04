@@ -297,11 +297,11 @@ var fluidPlayerClass = {
         return fallbackMediaFile;
     },
 
-    getIconClickFromLinear: function (linear) {
-        var iconClickThrough = linear.getElementsByTagName('IconClicks');
+    getIconClickThroughFromLinear: function (linear) {
+        var iconClickThrough = linear.getElementsByTagName('IconClickThrough');
 
         if (iconClickThrough.length) {
-            return iconClickThrough[0].getElementsByTagName('IconClickThrough')[0].innerHTML;
+            return iconClickThrough[0].innerHTML;
         } else {
             this.displayOptions.vastOptions.adCTAText = false;
         }
@@ -647,7 +647,7 @@ var fluidPlayerClass = {
                         tmpOptions.clicktracking   = player.getClickTrackingEvents(creativeLinear);
                         tmpOptions.duration        = player.getDurationFromLinear(creativeLinear);
                         tmpOptions.mediaFile       = player.getMediaFileFromLinear(creativeLinear);
-                        tmpOptions.iconClick       = player.getIconClickFromLinear(creativeLinear);
+                        tmpOptions.iconClick       = player.getIconClickThroughFromLinear(creativeLinear);
 
                         player.registerTrackingEvents(creativeLinear, tmpOptions);
                     }
