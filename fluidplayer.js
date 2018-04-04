@@ -1619,6 +1619,16 @@ var fluidPlayerClass = {
         }, 100);
     },
 
+    checkShouldDisplayVolumeBar: function() {
+        var deviceType = fluidPlayerClass.getMobileOs();
+
+        if (deviceType.userOs === 'iOS') {
+            return false;
+        }
+
+        return true;
+    },
+
     generateCustomControlTags: function() {
         return '<div class="fluid_controls_left">' +
             '   <div id="' + this.videoPlayerId + '_fluid_control_playpause" class="fluid_button fluid_button_play"></div>' +
@@ -1752,7 +1762,7 @@ var fluidPlayerClass = {
             player.latestVolume = videoPlayerTag.volume;
         }
 
-        if (videoPlayerTag.volume) {
+        if (videoPlayerTag.volume && !videoPlayerTag.muted) {
             muteButtonTag.className = muteButtonTag.className.replace(/\bfluid_button_mute\b/g, 'fluid_button_volume');
 
             if (menuOptionMute !== null) {
@@ -1774,11 +1784,12 @@ var fluidPlayerClass = {
         var player = fluidPlayerClass.getInstanceById(videoPlayerId);
         var videoPlayerTag = document.getElementById(videoPlayerId);
 
-        if (videoPlayerTag.volume) {
+        if (videoPlayerTag.volume && !videoPlayerTag.muted) {
             videoPlayerTag.volume = 0;
-
+            videoPlayerTag.muted = true;
         } else {
             videoPlayerTag.volume = player.latestVolume;
+            videoPlayerTag.muted = false;
         }
     },
 
@@ -2029,11 +2040,14 @@ var fluidPlayerClass = {
 
                 if (newVolume < 0.05) {
                     newVolume = 0;
-
+                    videoPlayerTag.muted = true;
                 } else if (newVolume > 0.95) {
                     newVolume = 1;
                 }
 
+                if (videoPlayerTag.muted && newVolume > 0) {
+                    videoPlayerTag.muted = false;
+                }
                 videoPlayerTag.volume = newVolume;
             }
         }
@@ -2590,9 +2604,14 @@ var fluidPlayerClass = {
 
         player.setCustomContextMenu();
 
+        var classForDisablingVolumeBar = '';
+        if (!player.checkShouldDisplayVolumeBar()) {
+            classForDisablingVolumeBar = ' no_volume_bar';
+        }
+
         var divVastControls = document.createElement('div');
         divVastControls.id = player.videoPlayerId + '_fluid_controls_container';
-        divVastControls.className = 'fluid_controls_container';
+        divVastControls.className = 'fluid_controls_container' + classForDisablingVolumeBar;
         divVastControls.innerHTML = player.generateCustomControlTags();
 
         videoPlayerTag.parentNode.insertBefore(divVastControls, videoPlayerTag.nextSibling);

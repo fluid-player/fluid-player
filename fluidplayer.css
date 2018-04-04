@@ -383,7 +383,7 @@
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_fluid_control_duration {
     display: inline-block;
     position: absolute;
-    left: 40px;
+    left: 32px;
     height: 24px;
     font-family: 'Roboto', sans-serif;
     font-size: 13px;
@@ -652,14 +652,8 @@ _:-ms-lang(x),
     border-radius: 6px;
 }
 
-.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container.no_volume_controls .fluid_controls_right .fluid_control_volume_container,
-.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container.no_volume_controls .fluid_controls_right .fluid_button_volume,
-.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container.no_volume_controls .fluid_controls_right .fluid_button_mute {
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container.no_volume_bar .fluid_controls_right .fluid_control_volume_container {
     display: none;
-}
-
-.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container.no_volume_controls .fluid_controls_progress_container {
-    right: 35px;
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button,
@@ -955,6 +949,9 @@ _:-ms-lang(x),
 @media only screen and (min-device-width: 375px) {
     .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_fluid_control_duration {
         left: 105px;
+    }
+    .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container.no_volume_bar .fluid_fluid_control_duration {
+        left: 32px;
     }
     .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_control_volume_container {
         display: block;
