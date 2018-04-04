@@ -1360,10 +1360,6 @@ var fluidPlayerClass = {
         divAdCountdown.className = 'ad_countdown';
         divAdCountdown.innerHTML = "Ad - " + durationText;
 
-        if (!this.isUserActive) {
-            divAdCountdown.style.display = 'inline-block';
-        }
-
         videoWrapper.appendChild(divAdCountdown);
 
         videoPlayerTag.addEventListener('timeupdate', this.decreaseAdCountdown, false);
@@ -1623,7 +1619,7 @@ var fluidPlayerClass = {
         }, 100);
     },
 
-    checkShouldDisplayVolumeControls: function() {
+    checkShouldDisplayVolumeBar: function() {
         var deviceType = fluidPlayerClass.getMobileOs();
 
         if (deviceType.userOs === 'iOS') {
@@ -1766,7 +1762,7 @@ var fluidPlayerClass = {
             player.latestVolume = videoPlayerTag.volume;
         }
 
-        if (videoPlayerTag.volume) {
+        if (videoPlayerTag.volume && !videoPlayerTag.muted) {
             muteButtonTag.className = muteButtonTag.className.replace(/\bfluid_button_mute\b/g, 'fluid_button_volume');
 
             if (menuOptionMute !== null) {
@@ -1788,11 +1784,12 @@ var fluidPlayerClass = {
         var player = fluidPlayerClass.getInstanceById(videoPlayerId);
         var videoPlayerTag = document.getElementById(videoPlayerId);
 
-        if (videoPlayerTag.volume) {
+        if (videoPlayerTag.volume && !videoPlayerTag.muted) {
             videoPlayerTag.volume = 0;
-
+            videoPlayerTag.muted = true;
         } else {
             videoPlayerTag.volume = player.latestVolume;
+            videoPlayerTag.muted = false;
         }
     },
 
@@ -2043,11 +2040,14 @@ var fluidPlayerClass = {
 
                 if (newVolume < 0.05) {
                     newVolume = 0;
-
+                    videoPlayerTag.muted = true;
                 } else if (newVolume > 0.95) {
                     newVolume = 1;
                 }
 
+                if (videoPlayerTag.muted && newVolume > 0) {
+                    videoPlayerTag.muted = false;
+                }
                 videoPlayerTag.volume = newVolume;
             }
         }
@@ -2309,7 +2309,11 @@ var fluidPlayerClass = {
         var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
 
         if (videoPlayerInstance.isCurrentlyPlayingAd) {
-            videoPlayerInstance.toggleAdCountdown(true);
+            setTimeout(function() {
+                if (!videoPlayerInstance.isControlBarVisible()) {
+                    videoPlayerInstance.toggleAdCountdown(true);
+                }
+            }, 600);
         }
 
         window.addEventListener('click', function (e) {
@@ -2378,11 +2382,12 @@ var fluidPlayerClass = {
             player.toggleOnPauseAd();
 
         } else {
-            //Workaround for Chrome Mobile - otherwise it blocks the subsequent
+            //Workaround for Chrome/Safari Mobile - otherwise it blocks the subsequent
             //play() command, because it considers it not being triggered by the user.
             var ua = window.navigator.userAgent;
             var isMobileChecks = fluidPlayerClass.getMobileOs();
-            if ((isMobileChecks.userOs !== false || isMobileChecks.device !== false) && (!!window.chrome || -1 !== ua.indexOf("crios") || 0 === window.navigator.vendor.indexOf("Google") && -1 !== ua.indexOf("chrome"))) {
+
+            if ((isMobileChecks.userOs !== false || isMobileChecks.device !== false) && (/^((?!chrome|android).)*safari/i.test(ua) || !!window.chrome || -1 !== ua.indexOf("crios") || 0 === window.navigator.vendor.indexOf("Google") && -1 !== ua.indexOf("chrome"))) {
                 videoPlayerTag.src = fluidPlayerScriptLocation + 'blank.mp4';
                 videoPlayerTag.play();
             }
@@ -2599,14 +2604,14 @@ var fluidPlayerClass = {
 
         player.setCustomContextMenu();
 
-        var classForDisablingVolumeControls = '';
-        if (!player.checkShouldDisplayVolumeControls()) {
-            classForDisablingVolumeControls = ' no_volume_controls';
+        var classForDisablingVolumeBar = '';
+        if (!player.checkShouldDisplayVolumeBar()) {
+            classForDisablingVolumeBar = ' no_volume_bar';
         }
 
         var divVastControls = document.createElement('div');
         divVastControls.id = player.videoPlayerId + '_fluid_controls_container';
-        divVastControls.className = 'fluid_controls_container' + classForDisablingVolumeControls;
+        divVastControls.className = 'fluid_controls_container' + classForDisablingVolumeBar;
         divVastControls.innerHTML = player.generateCustomControlTags();
 
         videoPlayerTag.parentNode.insertBefore(divVastControls, videoPlayerTag.nextSibling);
@@ -2642,9 +2647,7 @@ var fluidPlayerClass = {
             }
         };
 
-        if (player.checkShouldDisplayVolumeControls()) {
-            var initiateVolumebarTimerId = setInterval(initiateVolumebar, 100);
-        }
+        var initiateVolumebarTimerId = setInterval(initiateVolumebar, 100);
 
         player.initHtmlOnPauseBlock();
 
@@ -2680,20 +2683,9 @@ var fluidPlayerClass = {
         return true;
     },
 
-    forceLayoutIfNeeded: function() {
-        var userAgent = window.navigator.userAgent;
-
-        //Force "browser" mode for Mobile Safari on iPhone
-        if (userAgent.match(/iPhone/i) && userAgent.match(/WebKit/i) && !userAgent.match(/CriOS/i)) {
-            this.displayOptions.layoutControls.layout = 'browser';
-        }
-    },
-
     setLayout: function() {
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
-
-        player.forceLayoutIfNeeded();
 
         //Mobile Safari - because it does not emit a click event on initial click of the video
         videoPlayerTag.addEventListener('play', player.initialPlay, false);
@@ -3213,6 +3205,12 @@ var fluidPlayerClass = {
         return (document.getElementById(this.videoPlayerId + '_fluid_controls_container') && this.displayOptions.layoutControls.layout != "browser") ? true : false;
     },
 
+    isControlBarVisible: function() {
+        var controlBar = document.getElementById(this.videoPlayerId + '_fluid_controls_container');
+        var style = window.getComputedStyle(controlBar, null);
+        return !(style.opacity == 0 || style.visibility == 'hidden');
+    },
+
     hideControlBar: function () {
         var videoInstanceId = fluidPlayerClass.getInstanceIdByWrapperId(this.getAttribute('id'));
         var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
@@ -3437,6 +3435,9 @@ var fluidPlayerClass = {
     init: function(idVideoPlayer, options) {
         var player = this;
         var videoPlayer = document.getElementById(idVideoPlayer);
+
+        videoPlayer.setAttribute('playsinline', '');
+        videoPlayer.setAttribute('webkit-playsinline', '');
 
         player.vastOptions = {
             vastTagUrl:   '',
