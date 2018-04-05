@@ -1,7 +1,8 @@
 # CHANGELOG
 
 ## Master
-* [Pull #110](https://github.com/fluid-player/fluid-player/pull/110) improvements for iOs safari (use default skin) and mobile screens
+* [Pull #108](https://github.com/fluid-player/fluid-player/pull/108) Fullscreen API call fix
+* [Pull #110](https://github.com/fluid-player/fluid-player/pull/110) Improvements for iOs safari (use default skin) and mobile screens
 * [Pull #111](https://github.com/fluid-player/fluid-player/pull/111) Adjust how iconClickThrough is gotten
 
 ## 2.1.1
