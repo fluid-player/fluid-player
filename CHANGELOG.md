@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## Master
+* [Pull #111](https://github.com/fluid-player/fluid-player/pull/111) Adjust how iconClickThrough is gotten
+
 ## 2.1.1
 * [Pull #107](https://github.com/fluid-player/fluid-player/pull/107) Download and Theatre fixes
 
