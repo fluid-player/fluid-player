@@ -1551,6 +1551,7 @@ var fluidPlayerClass = {
 
             } else {
                 openClickthrough();
+                videoPlayerTag.pause();
             }
         };
     },
