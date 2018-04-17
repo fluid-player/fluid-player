@@ -181,8 +181,8 @@ var fluidPlayerClass = {
         if (videoClicks.length) {//There should be exactly 1 node
             var clickThroughs = videoClicks[0].getElementsByTagName('ClickThrough');
 
-            if (clickThroughs.length) {//There should be exactly 1 node
-                return clickThroughs[0].childNodes[0].nodeValue;
+            if (clickThroughs.length) {
+                return this.extractNodeData(clickThroughs[0]);
             }
         }
 
@@ -196,8 +196,8 @@ var fluidPlayerClass = {
 
         if (nonLinears.length) {//There should be exactly 1 node
             var nonLinearClickThrough = nonLinear.getElementsByTagName('NonLinearClickThrough');
-            if (nonLinearClickThrough.length) {//There should be exactly 1 node
-                result = nonLinearClickThrough[0].childNodes[0].nodeValue;
+            if (nonLinearClickThrough.length) {
+                result = this.extractNodeData(nonLinearClickThrough[0]);
             }
         }
 
@@ -218,8 +218,9 @@ var fluidPlayerClass = {
     getDurationFromLinear: function(linear) {
         var duration = linear.getElementsByTagName('Duration');
 
-        if (duration.length && (typeof duration[0].childNodes[0] !== 'undefined')) {//There should be exactly 1 Duration node and it should have a value
-            return this.convertTimeStringToSeconds(duration[0].childNodes[0].nodeValue);
+        if (duration.length && (typeof duration[0].childNodes[0] !== 'undefined')) {
+            var nodeDuration = this.extractNodeData(duration[0]);
+            return this.convertTimeStringToSeconds(nodeDuration);
         }
 
         return false;
@@ -280,17 +281,32 @@ var fluidPlayerClass = {
         return result;
     },
 
+    extractNodeData: function(parentNode) {
+        var contentAsString = "";
+        for(var n = 0; n < parentNode.childNodes.length; n ++)
+        {
+            var child = parentNode.childNodes[n];
+            if (child.nodeType === 8 || (child.nodeType === 3 && /^\s*$/.test(child.nodeValue))) {
+                // Comments or text with no content
+            } else {
+                contentAsString += child.nodeValue;
+            }
+        }
+        var tidyString = contentAsString.replace(/(^\s+|\s+$)/g,'');
+        return tidyString;
+    },
+
     getMediaFileFromLinear: function(linear) {
         var fallbackMediaFile;
         var mediaFiles = this.getMediaFilesFromLinear(linear);
 
         for (var i = 0; i < mediaFiles.length; i++) {
             if (!mediaFiles[i].getAttribute('type')) {
-                fallbackMediaFile = mediaFiles[i].childNodes[0].nodeValue;
+                fallbackMediaFile = this.extractNodeData(mediaFiles[i]);
             }
 
             if (mediaFiles[i].getAttribute('type') === this.displayOptions.layoutControls.mediaType) {
-                return mediaFiles[i].childNodes[0].nodeValue;
+                return this.extractNodeData(mediaFiles[i]);
             }
         }
 
@@ -301,7 +317,7 @@ var fluidPlayerClass = {
         var iconClickThrough = linear.getElementsByTagName('IconClickThrough');
 
         if (iconClickThrough.length) {
-            return iconClickThrough[0].innerHTML;
+            return this.extractNodeData(iconClickThrough[0]);
         } else {
             this.displayOptions.vastOptions.adCTAText = false;
         }
@@ -315,11 +331,11 @@ var fluidPlayerClass = {
 
         for (var i = 0; i < staticResources.length; i++) {
             if (!staticResources[i].getAttribute('type')) {
-                fallbackStaticResource = staticResources[i].childNodes[0].nodeValue;
+                fallbackStaticResource = this.extractNodeData(staticResources[i]);
             }
 
             if (staticResources[i].getAttribute('type') === this.displayOptions.staticResource) {
-                return staticResources[i].childNodes[0].nodeValue;
+                return this.extractNodeData(staticResources[i]);
             }
         }
 
@@ -381,7 +397,8 @@ var fluidPlayerClass = {
             tmpOptions.impression = [];
 
             for (var i = 0; i < impressionTags.length; i++) {
-                tmpOptions.impression.push(impressionTags[i].childNodes[0].nodeValue);
+                var impressionEvent = this.extractNodeData(impressionTags[i]);
+                tmpOptions.impression.push(impressionEvent);
             }
         }
     },
@@ -441,7 +458,8 @@ var fluidPlayerClass = {
 
             if (clickTracking.length) {
                 for (var i = 0; i < clickTracking.length; i++) {
-                    result.push(clickTracking[i].childNodes[0].nodeValue);
+                    var clickTrackingEvent = this.extractNodeData(clickTracking[i]);
+                    result.push(clickTrackingEvent);
                 }
             }
         }
@@ -456,8 +474,8 @@ var fluidPlayerClass = {
 
         if (nonLinears.length) {//There should be exactly 1 node
             var clickTracking = nonLinear.getElementsByTagName('NonLinearClickTracking');
-            if (clickTracking.length) {//There should be exactly 1 node
-                result = clickTracking[0].childNodes[0].nodeValue;
+            if (clickTracking.length) {
+                result = this.extractNodeData(clickTracking[0]);
             }
         }
 
