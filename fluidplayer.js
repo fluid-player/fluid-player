@@ -3026,7 +3026,7 @@ var fluidPlayerClass = {
         } else {
             var play = false;
             if (!videoPlayerTag.paused) {
-                player.playPauseToggle(videoPlayerTag);
+                videoPlayerTag.pause();
                 var play = true;
             }
 
@@ -3036,9 +3036,9 @@ var fluidPlayerClass = {
                 videoPlayerTag.removeEventListener('loadedmetadata', videoSwitchedEvent);
                 videoPlayerTag.currentTime = currentTime;
                 if (play) {
-                    player.playPauseToggle(videoPlayerTag);
+                    videoPlayerTag.play();
                 }
-            }
+            };
             videoPlayerTag.addEventListener('loadedmetadata', videoSwitchedEvent);
             videoPlayerTag.src = url;
             player.originalSrc = url;
