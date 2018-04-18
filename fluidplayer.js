@@ -1630,6 +1630,21 @@ var fluidPlayerClass = {
         return null;
     },
 
+    /**
+     * Gets the type value of the first source element of the video tag.
+     *
+     * @returns string|null
+     */
+    getCurrentSrcMediaType: function() {
+        var sources = document.getElementById(this.videoPlayerId).getElementsByTagName('source');
+
+        if (sources.length) {
+            return sources[0].getAttribute('type');
+        }
+
+        return null;
+    },
+
     convertTimeStringToSeconds: function(str) {
         if (str && str.match(/^(\d){2}(:[0-5][0-9]){2}(.(\d){1,3})?$/)) {
             var timeParts = str.split(':');
@@ -2407,6 +2422,43 @@ var fluidPlayerClass = {
         }
     },
 
+    browserSupportsVideoType: function(video, source, sourceMediaType) {
+        var supportedMediaTypes = ['video/webm', 'video/ogg', 'video/mp4'];
+        // sourceMediaType is value from current <source ... type='video/webm' >
+        if (typeof sourceMediaType == 'undefined' || sourceMediaType == null || sourceMediaType == "") {
+            var sourceExtensionType = source.split('.').pop(); // if sourceMediaType is empty try using current src filename extension
+        }
+
+        var formatExtension = {
+            webm: 'video/webm; codecs="vp8, vorbis"',
+            ogg:  'video/ogg; codecs="theora, vorbis"',
+            mp4:  'video/mp4; codecs="avc1.42E01E, mp4a.40.2"', // H.264
+            vp9:  'video/webm; codecs="vp9"',
+            hls:  'application/x-mpegURL; codecs="avc1.42E01E"'
+        };
+
+        var formatMediaType = {
+            video_webm: formatExtension['webm'],
+            video_ogg:  formatExtension['ogg'],
+            video_mp4:  formatExtension['mp4'], // H.264
+            video_vp9:  formatExtension['vp9'],
+            video_hls:  formatExtension['hls']
+        };
+
+        var isVideoSupported = false;
+        if (typeof sourceMediaType != 'undefined' && sourceMediaType != "" && sourceMediaType != null) {
+            isVideoSupported = video.canPlayType(formatMediaType[sourceMediaType.replace("/", "_").toLowerCase()] || sourceMediaType);
+        } else if (typeof sourceExtensionType != 'undefined' && sourceExtensionType != "" && sourceExtensionType != null && supportedMediaTypes.indexOf("video/"+sourceExtensionType) !== -1) {
+            isVideoSupported = video.canPlayType(formatExtension[sourceExtensionType.toLowerCase()] || sourceExtensionType);
+        }
+
+        if (isVideoSupported != "") {
+            return true;
+        }
+
+        return false;
+    },
+
     playPauseToggle: function(videoPlayerTag) {
         var player = fluidPlayerClass.getInstanceById(videoPlayerTag.id);
         var initialStartJustSet = false;
@@ -2424,7 +2476,12 @@ var fluidPlayerClass = {
                 if (videoPlayerTag.paused) {
                     videoPlayerTag.play();
                 } else if (!initialStartJustSet) {
-                    videoPlayerTag.pause();
+                    var currentSrc = player.getCurrentSrc();
+                    var currentSrcMediaType = player.getCurrentSrcMediaType();
+                    var isVideoSupported = fluidPlayerClass.browserSupportsVideoType(videoPlayerTag, currentSrc, currentSrcMediaType);
+                    if (isVideoSupported) {
+                        videoPlayerTag.pause();
+                    }
                 }
             }
 
