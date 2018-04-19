@@ -1134,7 +1134,7 @@ var fluidPlayerClass = {
             return;
         }
 
-        var time = player.adList[adListId].timer;
+        var time = parseInt(player.adList[adListId].timer);
 
         if(typeof time == 'string' && time.indexOf("%") !== -1) {
             time = time.replace('%', '');
@@ -3204,6 +3204,8 @@ var fluidPlayerClass = {
         if(player.mainVideoDuration == 0) {
             player.mainVideoDuration = videoPlayerTag.duration;
         }
+
+        videoPlayerTag.removeEventListener('loadedmetadata', player.mainVideoReady);
     },
 
     userActivityChecker: function () {
@@ -3596,7 +3598,7 @@ var fluidPlayerClass = {
         videoPlayer.addEventListener('fullscreenchange', player.recalculateAdDimensions, false);
         videoPlayer.addEventListener('waiting', player.onRecentWaiting, false);
         videoPlayer.addEventListener('pause', player.onFluidPlayerPause, false);
-        videoPlayer.addEventListener('loadeddata', player.mainVideoReady, false);
+        videoPlayer.addEventListener('loadedmetadata', player.mainVideoReady, false);
         videoPlayer.addEventListener('durationchange', function() {player.currentVideoDuration = player.getCurrentVideoDuration();}, false);
         videoPlayer.addEventListener('error', player.onErrorDetection, false);
 
