@@ -1123,6 +1123,46 @@ var fluidPlayerClass = {
 
     },
 
+    createAdMarker: function (adListId, time) {
+        var player = this;
+        var markersHolder = document.getElementById(player.videoPlayerId + '_ad_markers_holder');
+        var adMarker = document.createElement('div');
+        adMarker.id = 'ad_marker_' + player.videoPlayerId + "_" + adListId;
+        adMarker.className = 'fluid_controls_ad_marker';
+        adMarker.style.left = (time / player.currentVideoDuration * 100) + '%';
+        adMarker.style.display = 'none';
+        markersHolder.appendChild(adMarker);
+    },
+
+    hideAdMarker: function (adListId) {
+        var player = this;
+        var element = document.getElementById('ad_marker_' + player.videoPlayerId + "_" + adListId);
+        if (element) {
+            element.style.display = 'none';
+        }
+    },
+
+    showAdMarkers: function () {
+        var player = this;
+        var adMarkers = document.getElementsByClassName('fluid_controls_ad_marker');
+        var idPrefix = 'ad_marker_' + player.videoPlayerId + "_";
+        for (var i = 0; i < adMarkers.length; ++i) {
+            var item = adMarkers[i];
+            var adListId = item.id.replace(idPrefix, '');
+            if (player.adList[adListId].played === false) {
+                item.style.display = '';
+            }
+        }
+    },
+
+    hideAdMarkers: function () {
+        var player = this;
+        var adMarkers = document.getElementsByClassName('fluid_controls_ad_marker');
+        for (var i = 0; i < adMarkers.length; ++i) {
+            var item = adMarkers[i];
+            item.style.display = 'none';
+        }
+    },
 
     midRoll: function (event) {
         var player = fluidPlayerClass.getInstanceById(this.id);
@@ -1139,6 +1179,11 @@ var fluidPlayerClass = {
         if(typeof time == 'string' && time.indexOf("%") !== -1) {
             time = time.replace('%', '');
             time = Math.floor(player.mainVideoDuration / 100 * time);
+        }
+
+        if (player.displayOptions.vastOptions.showProgressbarMarkers &&
+            player.adList[adListId].adType === "nonLinear") {
+            player.createAdMarker(adListId, time);
         }
 
         player.scheduleTask({time: time, playRoll: 'midRoll', adListId: adListId});
@@ -1259,11 +1304,17 @@ var fluidPlayerClass = {
                         player.vastOptions = player.adPool[adIdToCheck];
 
                         if(player.vastOptions.adType == 'linear'){
+                            if (player.displayOptions.vastOptions.showProgressbarMarkers) {
+                                player.hideAdMarkers();
+                            }
                             player.toggleLoader(true);
                             player.playRoll(adIdToCheck);
                         }
                         if(player.vastOptions.adType == 'nonLinear'){
                             player.createNonLinearStatic(adIdToCheck);
+                            if (player.displayOptions.vastOptions.showProgressbarMarkers) {
+                                player.hideAdMarker(adIdToCheck);
+                            }
                         }
 
                         //Remove ad from the play list
@@ -1349,9 +1400,13 @@ var fluidPlayerClass = {
 
     onVastAdEnded: function() {
         //"this" is the HTML5 video tag, because it disptches the "ended" event
-        fluidPlayerClass.getInstanceById(this.id).switchToMainVideo();
-        fluidPlayerClass.getInstanceById(this.id).vastOptions = null;
-        fluidPlayerClass.getInstanceById(this.id).adFinished = true;
+        var player = fluidPlayerClass.getInstanceById(this.id);
+        player.switchToMainVideo();
+        if (player.displayOptions.vastOptions.showProgressbarMarkers) {
+            player.showAdMarkers();
+        }
+        player.vastOptions = null;
+        player.adFinished = true;
     },
 
     onMainVideoEnded: function () {
@@ -1689,6 +1744,7 @@ var fluidPlayerClass = {
             '      </div>' +
             '   </div>' +
             '   <div id="' + this.videoPlayerId + '_buffered_amount" class="fluid_controls_buffered"></div>' +
+            '   <div id="' + this.videoPlayerId + '_ad_markers_holder" class="fluid_controls_ad_markers_holder"></div>' +
             '</div>' +
             '<div class="fluid_controls_right">' +
             '   <div id="' + this.videoPlayerId + '_fluid_control_fullscreen" class="fluid_button fluid_button_fullscreen"></div>' +
@@ -3569,6 +3625,7 @@ var fluidPlayerClass = {
                 adText:                       null,
                 adCTAText:                    'Visit now!',
                 vastTimeout:                  5000,
+                showProgressbarMarkers:       false,
 
                 vastAdvanced: {
                     vastLoadedCallback:       (function() {}),
