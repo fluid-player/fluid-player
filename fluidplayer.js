@@ -889,7 +889,7 @@ var fluidPlayerClass = {
 
                 }
 
-                if (numberOfJumps >= player.maxVastTagJumps && !player.InLineFound) {
+                if (numberOfJumps >= player.displayOptions.vastOptions.maxVastTagJumps && !player.InLineFound) {
                     player.playMainVideoWhenVastFails(101);
                 }
 
@@ -901,12 +901,12 @@ var fluidPlayerClass = {
 
             };
 
-            if (numberOfJumps < player.maxVastTagJumps) {
+            if (numberOfJumps < player.displayOptions.vastOptions.maxVastTagJumps) {
 
                 player.sendRequest(
                     vastTag,
                     true,
-                    player.displayOptions.vastTimeout,
+                    player.displayOptions.vastOptions.vastTimeout,
                     handleXmlHttpReq
                 );
 
@@ -4177,6 +4177,7 @@ var fluidPlayerClass = {
                 adCTATextPosition:            'bottom right',
                 vastTimeout:                  5000,
                 showProgressbarMarkers:       false,
+                maxVastTagJumps:              3,
 
                 vastAdvanced: {
                     vastLoadedCallback:       (function() {}),
