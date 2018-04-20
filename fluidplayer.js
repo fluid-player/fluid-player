@@ -748,6 +748,8 @@ var fluidPlayerClass = {
 
                 videoPlayerTag.removeAttribute('controls'); //Remove the default Controls
 
+                player.vastLogoBehaviour(true);
+
                 if (player.displayOptions.layoutControls.layout!== 'browser') {
                     var progressbarContainer = document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container');
 
@@ -1278,6 +1280,7 @@ var fluidPlayerClass = {
         player.removeAdCountdown();
         player.removeAdPlayingText();
         player.removeCTAButton();
+        player.vastLogoBehaviour(false);
         player.adFinished = true;
         player.displayOptions.vastOptions.vastAdvanced.vastVideoEndedCallback();
         player.vastOptions = null;
@@ -1297,6 +1300,24 @@ var fluidPlayerClass = {
         if (player.displayOptions.layoutControls.layout=== 'browser') {
             videoPlayerTag.setAttribute('controls', 'controls');
         }
+    },
+
+    vastLogoBehaviour: function (vastPlaying) {
+        var logoHolder = document.getElementById(this.videoPlayerId + '_logo');
+        var logoImage = document.getElementById(this.videoPlayerId + '_logo_image');
+
+        if (!logoHolder || !logoImage) {
+            return;
+        }
+
+        if (!this.displayOptions.layoutControls.logo.showOverAds) {
+            var logoDisplay = (vastPlaying) ? 'none' : 'inline';
+            logoHolder.style.display = logoDisplay;
+        } else {
+            var imageSrc = (vastPlaying) ? this.displayOptions.layoutControls.logo.showOverAds : this.displayOptions.layoutControls.logo.imageUrl;
+            logoImage.src = (imageSrc) ? imageSrc : '';
+        }
+
     },
 
     onVastAdEnded: function() {
@@ -1664,6 +1685,7 @@ var fluidPlayerClass = {
         var menuOptionPlay = document.getElementById(videoPlayerId + 'context_option_play');
         var player = fluidPlayerClass.getInstanceById(videoPlayerId);
         var controlsDisplay = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
+        var fpLogo = document.getElementById(player.videoPlayerId + '_logo');
 
         var initialPlay = document.getElementById(videoPlayerId + '_fluid_initial_play');
         if (initialPlay) {
@@ -1678,6 +1700,9 @@ var fluidPlayerClass = {
 
             playPauseButton.className = playPauseButton.className.replace(/\bfluid_button_play\b/g, 'fluid_button_pause');
             controlsDisplay.classList.remove('initial_controls_show');
+            if (fpLogo) {
+                fpLogo.classList.remove('initial_controls_show');
+            }
 
             if (menuOptionPlay !== null) {
                 menuOptionPlay.innerHTML = 'Pause';
@@ -1690,6 +1715,9 @@ var fluidPlayerClass = {
 
             playPauseButton.className = playPauseButton.className.replace(/\bfluid_button_pause\b/g, 'fluid_button_play');
             controlsDisplay.classList.add('initial_controls_show');
+            if (fpLogo) {
+                fpLogo.classList.add('initial_controls_show');
+            }
 
             if (menuOptionPlay !== null) {
                 menuOptionPlay.innerHTML = 'Play';
@@ -2348,7 +2376,9 @@ var fluidPlayerClass = {
 
         if (!player.displayOptions.layoutControls.playButtonShowing) {
             var initialControlsDisplay = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
+            var fpPlayer = document.getElementById(player.videoPlayerId + '_logo');
             initialControlsDisplay.classList.remove('initial_controls_show');
+            fpPlayer.classList.remove('initial_controls_show');
         }
 
         if (!player.initialStart) {
@@ -3048,14 +3078,28 @@ var fluidPlayerClass = {
     initLogo: function() {
         var player = this;
         var videoPlayer = document.getElementById(player.videoPlayerId);
-        if (!player.displayOptions.layoutControls.logo.imageUrl) {
+        if (!player.displayOptions.layoutControls.logo.imageUrl && !player.displayOptions.layoutControls.logo.showOverAds) {
             return;
         }
 
+        // Container div for the logo
+        // This is to allow for fade in and out logo_maintain_display
+        var logoHolder = document.createElement('div');
+        logoHolder.id = player.videoPlayerId + '_logo';
+        var hideClass = 'logo_maintain_display';
+        if (player.displayOptions.layoutControls.logo.hideWithControls) {
+            hideClass = 'initial_controls_show';
+        }
+        logoHolder.classList.add(hideClass, 'fp_logo');
+
+        // The logo itself
         var logoImage = document.createElement('img');
-        logoImage.src = player.displayOptions.layoutControls.logo.imageUrl;
+        logoImage.id = player.videoPlayerId + '_logo_image';
+        if (player.displayOptions.layoutControls.logo.imageUrl) {
+            logoImage.src = player.displayOptions.layoutControls.logo.imageUrl;
+        }
         logoImage.style.position = 'absolute';
-        logoImage.style.margin = '2px';
+        logoImage.style.margin = player.displayOptions.layoutControls.logo.imageMargin;
         var logoPosition = player.displayOptions.layoutControls.logo.position.toLowerCase();
         if (logoPosition.indexOf('bottom') !== -1) {
             logoImage.style.bottom = 0;
@@ -3077,11 +3121,21 @@ var fluidPlayerClass = {
                 var win = window.open(player.displayOptions.layoutControls.logo.clickUrl, '_blank');
                 win.focus();
             });
-        } else {
-            logoImage.style.pointerEvents = 'none';
         }
 
-        videoPlayer.parentNode.insertBefore(logoImage, null);
+        // If a mouseOverImage is provided then we must set up the listeners for it
+        if (player.displayOptions.layoutControls.logo.mouseOverImageUrl) {
+            logoImage.addEventListener('mouseover', function(){ logoImage.src = player.displayOptions.layoutControls.logo.mouseOverImageUrl; }, false);
+            logoImage.addEventListener('mouseout', function(){ logoImage.src = player.displayOptions.layoutControls.logo.imageUrl; }, false);
+        }
+
+        // We can set the logo via API callm it's possible the logo is initialised in an ad
+        if (player.isCurrentlyPlayingAd && player.displayOptions.layoutControls.logo.showOverAds) {
+            logoImage.src = player.displayOptions.layoutControls.logo.showOverAds;
+        }
+
+        videoPlayer.parentNode.insertBefore(logoHolder, null);
+        logoHolder.appendChild(logoImage, null);
     },
 
     initHtmlOnPauseBlock: function() {
@@ -3222,11 +3276,18 @@ var fluidPlayerClass = {
 
         if (videoPlayerInstance.hasControlBar()) {
             var divVastControls = document.getElementById(videoPlayerInstance.videoPlayerId + '_fluid_controls_container');
+            var fpLogo = document.getElementById(videoPlayerInstance.videoPlayerId + '_logo');
 
             if (videoPlayerInstance.displayOptions.layoutControls.controlBar.animated) {
                 videoPlayerInstance.fadeOut(divVastControls);
+                if (fpLogo) {
+                    videoPlayerInstance.fadeOut(fpLogo);
+                }
             } else {
                 divVastControls.style.display = 'none';
+                if (fpLogo){
+                    fpLogo.style.display = 'none';
+                }
             }
 
         }
@@ -3245,11 +3306,18 @@ var fluidPlayerClass = {
 
         if (videoPlayerInstance.hasControlBar()) {
             var divVastControls = document.getElementById(videoPlayerInstance.videoPlayerId + '_fluid_controls_container');
+            var fpLogo = document.getElementById(videoPlayerInstance.videoPlayerId + '_logo');
 
             if (videoPlayerInstance.displayOptions.layoutControls.controlBar.animated) {
                 videoPlayerInstance.fadeIn(divVastControls);
+                if (fpLogo) {
+                    videoPlayerInstance.fadeIn(fpLogo);
+                }
             } else {
                 divVastControls.style.display = 'block';
+                if (fpLogo) {
+                    fpLogo.style.display = 'block';
+                }
             }
         }
 
@@ -3497,7 +3565,11 @@ var fluidPlayerClass = {
                     imageUrl:                 null,
                     position:                 'top left',
                     clickUrl:                 null,
-                    opacity:                  1
+                    opacity:                  1,
+                    mouseOverImageUrl:        null,
+                    imageMargin:              '2px',
+                    hideWithControls:         false,
+                    showOverAds:              false
                 },
                 controlBar: {
                     autoHide:                 false,
@@ -3700,5 +3772,28 @@ var fluidPlayerClass = {
                 console.log('[FP_ERROR] Event not recognised');
                 break;
         }
+    },
+
+    toggleLogo: function(logo) {
+        if (typeof logo != 'object' || (!logo.imageUrl && !logo.showOverAds)) {
+            return false;
+        }
+        var logoBlock = document.getElementById(this.videoPlayerId + "_logo");
+
+        // We create the logo from scratch if it doesn't already exist, they might not give everything correctly so we
+        this.displayOptions.layoutControls.logo.imageUrl = (logo.imageUrl) ? logo.imageUrl : null;
+        this.displayOptions.layoutControls.logo.position = (logo.position) ? logo.position : 'top left';
+        this.displayOptions.layoutControls.logo.clickUrl = (logo.clickUrl) ? logo.clickUrl : null;
+        this.displayOptions.layoutControls.logo.opacity = (logo.opacity) ? logo.opacity : 1;
+        this.displayOptions.layoutControls.logo.mouseOverImageUrl = (logo.mouseOverImageUrl) ? logo.mouseOverImageUrl : null;
+        this.displayOptions.layoutControls.logo.imageMargin = (logo.imageMargin) ? logo.imageMargin : '2px';
+        this.displayOptions.layoutControls.logo.hideWithControls = (logo.hideWithControls) ? logo.hideWithControls : false;
+        this.displayOptions.layoutControls.logo.showOverAds= (logo.showOverAds) ? logo.showOverAds : false;
+
+        if (logoBlock) {
+            logoBlock.remove();
+        }
+
+        this.initLogo();
     }
 };
