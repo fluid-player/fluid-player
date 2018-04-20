@@ -829,6 +829,9 @@ var fluidPlayerClass = {
             //Load the PreRoll ad
             videoPlayerTag.src = player.vastOptions.mediaFile;
             player.isCurrentlyPlayingAd = true;
+            if (player.displayOptions.vastOptions.showProgressbarMarkers) {
+                player.hideAdMarkers();
+            }
             videoPlayerTag.load();
 
             //Handle the ending of the Pre-Roll ad
@@ -1104,7 +1107,7 @@ var fluidPlayerClass = {
         var player = fluidPlayerClass.getInstanceById(this.id);
         var videoPlayerTag = document.getElementById(this.getAttribute('id'));
         videoPlayerTag.removeEventListener(event.type, player.preRoll);
-        player.initialStart = true;
+        player.firstPlayLaunched = true;
         var adListId = event.type.replace('adId_', '');
 
         if (player.adList[adListId].played === true) {
@@ -1129,8 +1132,10 @@ var fluidPlayerClass = {
         var adMarker = document.createElement('div');
         adMarker.id = 'ad_marker_' + player.videoPlayerId + "_" + adListId;
         adMarker.className = 'fluid_controls_ad_marker';
-        adMarker.style.left = (time / player.currentVideoDuration * 100) + '%';
-        adMarker.style.display = 'none';
+        adMarker.style.left = (time / player.mainVideoDuration * 100) + '%';
+        if (player.isCurrentlyPlayingAd) {
+            adMarker.style.display = 'none';
+        }
         markersHolder.appendChild(adMarker);
     },
 
@@ -1144,7 +1149,8 @@ var fluidPlayerClass = {
 
     showAdMarkers: function () {
         var player = this;
-        var adMarkers = document.getElementsByClassName('fluid_controls_ad_marker');
+        var markersHolder = document.getElementById(player.videoPlayerId + '_ad_markers_holder');
+        var adMarkers = markersHolder.getElementsByClassName('fluid_controls_ad_marker');
         var idPrefix = 'ad_marker_' + player.videoPlayerId + "_";
         for (var i = 0; i < adMarkers.length; ++i) {
             var item = adMarkers[i];
@@ -1157,7 +1163,8 @@ var fluidPlayerClass = {
 
     hideAdMarkers: function () {
         var player = this;
-        var adMarkers = document.getElementsByClassName('fluid_controls_ad_marker');
+        var markersHolder = document.getElementById(player.videoPlayerId + '_ad_markers_holder');
+        var adMarkers = markersHolder.getElementsByClassName('fluid_controls_ad_marker');
         for (var i = 0; i < adMarkers.length; ++i) {
             var item = adMarkers[i];
             item.style.display = 'none';
@@ -1304,9 +1311,6 @@ var fluidPlayerClass = {
                         player.vastOptions = player.adPool[adIdToCheck];
 
                         if(player.vastOptions.adType == 'linear'){
-                            if (player.displayOptions.vastOptions.showProgressbarMarkers) {
-                                player.hideAdMarkers();
-                            }
                             player.toggleLoader(true);
                             player.playRoll(adIdToCheck);
                         }
@@ -1396,15 +1400,16 @@ var fluidPlayerClass = {
         if (player.displayOptions.layoutControls.layout=== 'browser') {
             videoPlayerTag.setAttribute('controls', 'controls');
         }
+
+        if (player.displayOptions.vastOptions.showProgressbarMarkers) {
+            player.showAdMarkers();
+        }
     },
 
     onVastAdEnded: function() {
         //"this" is the HTML5 video tag, because it disptches the "ended" event
         var player = fluidPlayerClass.getInstanceById(this.id);
         player.switchToMainVideo();
-        if (player.displayOptions.vastOptions.showProgressbarMarkers) {
-            player.showAdMarkers();
-        }
         player.vastOptions = null;
         player.adFinished = true;
     },
@@ -2456,7 +2461,7 @@ var fluidPlayerClass = {
             initialControlsDisplay.classList.remove('initial_controls_show');
         }
 
-        if (!player.initialStart) {
+        if (!player.firstPlayLaunched) {
             player.playPauseToggle(videoPlayerTag);
 
             videoPlayerTag.removeEventListener('play', player.initialPlay);
@@ -2465,21 +2470,20 @@ var fluidPlayerClass = {
 
     playPauseToggle: function(videoPlayerTag) {
         var player = fluidPlayerClass.getInstanceById(videoPlayerTag.id);
-        var initialStartJustSet = false;
+        var isFirstStart = !player.firstPlayLaunched;
 
         var preRolls = player.findRoll('preRoll');
-        if (player.initialStart || preRolls.length == 0) {
+        if (!isFirstStart || preRolls.length == 0) {
 
-            if (!(player.initialStart || preRolls.length > 0)) {
-                player.initialStart = true;
-                initialStartJustSet = true;
+            if (isFirstStart && preRolls.length == 0) {
+                player.firstPlayLaunched = true;
                 player.displayOptions.vastOptions.vastAdvanced.noVastVideoCallback();
             }
 
             if (player.displayOptions.layoutControls.layout !== 'browser') { //The original player play/pause toggling is managed by the browser
                 if (videoPlayerTag.paused) {
                     videoPlayerTag.play();
-                } else if (!initialStartJustSet) {
+                } else if (!isFirstStart) {
                     videoPlayerTag.pause();
                 }
             }
@@ -2497,15 +2501,25 @@ var fluidPlayerClass = {
                 videoPlayerTag.play();
             }
 
-            player.initialStart = true;
+            player.firstPlayLaunched = true;
 
             //trigger the loading of the VAST Tag
             player.prepareVast('preRoll');
         }
 
-        player.prepareVast('onPauseRoll');
-        player.prepareVast('postRoll');
-        player.prepareVast('midRoll');
+        var prepareVastAdsThatKnowDuration = function() {
+            player.prepareVast('onPauseRoll');
+            player.prepareVast('postRoll');
+            player.prepareVast('midRoll');
+        };
+
+        if (isFirstStart) {
+            if (player.mainVideoDuration > 0) {
+                prepareVastAdsThatKnowDuration();
+            } else {
+                videoPlayerTag.addEventListener('mainVideoDurationSet', prepareVastAdsThatKnowDuration);
+            }
+        }
 
         player.adTimer();
 
@@ -2526,7 +2540,7 @@ var fluidPlayerClass = {
         //Set the Play/Pause behaviour
         document.getElementById(this.videoPlayerId + '_fluid_control_playpause').addEventListener('click', function() {
 
-            if (!player.initialStart) {
+            if (!player.firstPlayLaunched) {
                 videoPlayerTag.removeEventListener('play', player.initialPlay);
             }
 
@@ -3257,8 +3271,10 @@ var fluidPlayerClass = {
         var videoPlayerTag = this;
         var player = fluidPlayerClass.getInstanceById(this.id);
 
-        if(player.mainVideoDuration == 0) {
+        if (player.mainVideoDuration == 0 && !player.isCurrentlyPlayingAd) {
             player.mainVideoDuration = videoPlayerTag.duration;
+            var event = new CustomEvent("mainVideoDurationSet");
+            videoPlayerTag.dispatchEvent(event);
         }
     },
 
@@ -3557,7 +3573,7 @@ var fluidPlayerClass = {
         player.recentWaiting           = false;
         player.latestVolume            = 1;
         player.currentVideoDuration    = 0;
-        player.initialStart            = false;
+        player.firstPlayLaunched       = false;
         player.suppressClickthrough    = false;
         player.timelinePreviewData     = [];
         player.mainVideoCurrentTime    = 0;
