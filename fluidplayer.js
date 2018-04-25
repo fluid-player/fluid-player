@@ -337,9 +337,7 @@ var fluidPlayerClass = {
                 fallbackMediaFile = mediaFiles[i].childNodes[0].nodeValue;
             }
 
-            if (mediaFiles[i].getAttribute('type') === this.displayOptions.layoutControls.mediaType) {
-                return mediaFiles[i].childNodes[0].nodeValue;
-            }
+            return mediaFiles[i].childNodes[0].nodeValue;
         }
 
         return fallbackMediaFile;
@@ -826,7 +824,8 @@ var fluidPlayerClass = {
             //Store the current time of the main video
             player.mainVideoCurrentTime = videoPlayerTag.currentTime;
 
-            //Load the PreRoll ad
+            player.detachStreamers();
+
             videoPlayerTag.src = player.vastOptions.mediaFile;
             player.isCurrentlyPlayingAd = true;
             videoPlayerTag.load();
@@ -1303,6 +1302,8 @@ var fluidPlayerClass = {
 
         videoPlayerTag.src = player.originalSrc;
 
+        player.initialiseStreamers();
+
         videoPlayerTag.load();
 
         player.setBuffering();
@@ -1313,7 +1314,11 @@ var fluidPlayerClass = {
             videoPlayerTag.currentTime = 0;
         }
 
-        videoPlayerTag.play();
+        if (player.dashPlayer && player.autoplayAfterAd) {
+            player.dashPlayer.play();
+        } else {
+            videoPlayerTag.play();
+        }
 
         if (player.autoplayAfterAd == false) {
             videoPlayerTag.pause();
@@ -1625,6 +1630,19 @@ var fluidPlayerClass = {
 
         if (sources.length) {
             return sources[0].getAttribute('src');
+        }
+
+        return null;
+    },
+
+    /**
+     * Src types required for streaming elements
+     */
+    getCurrentSrcType: function() {
+        var sources = document.getElementById(this.videoPlayerId).getElementsByTagName('source');
+
+        if (sources.length) {
+            return sources[0].getAttribute('type');
         }
 
         return null;
@@ -2065,7 +2083,11 @@ var fluidPlayerClass = {
                 shiftTime(videoPlayerId, clickedX);
             }
             if (!initiallyPaused) {
-                videoPlayerTag.play();
+                if (player.dashPlayer) {
+                    player.dashPlayer.play();
+                } else {
+                    videoPlayerTag.play();
+                }
             }
             // Wait till video played then reenable the animations
             if (player.initialAnimationSet) {
@@ -2448,7 +2470,6 @@ var fluidPlayerClass = {
         }
 
         player.prepareVast('onPauseRoll');
-        player.prepareVast('postRoll');
         player.prepareVast('midRoll');
 
         player.adTimer();
@@ -2557,7 +2578,7 @@ var fluidPlayerClass = {
         document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container').addEventListener('mousemove', function(event) {
             var progressContainer = document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container');
             var totalWidth = progressContainer.clientWidth;
-            hoverTimeItem = document.getElementById(player.videoPlayerId + '_fluid_timeline_preview');
+            var hoverTimeItem = document.getElementById(player.videoPlayerId + '_fluid_timeline_preview');
             var hoverQ = fluidPlayerClass.getEventOffsetX(event, progressContainer);
 
             hoverSecondQ = player.currentVideoDuration * hoverQ / totalWidth;
@@ -2571,7 +2592,7 @@ var fluidPlayerClass = {
 
         // Hide timeline preview on mouseout
         document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container').addEventListener('mouseout', function() {
-            hoverTimeItem = document.getElementById(player.videoPlayerId + '_fluid_timeline_preview');
+            var hoverTimeItem = document.getElementById(player.videoPlayerId + '_fluid_timeline_preview');
             hoverTimeItem.style.display = 'none';
         }, false);
     },
@@ -3201,9 +3222,15 @@ var fluidPlayerClass = {
         var videoPlayerTag = this;
         var player = fluidPlayerClass.getInstanceById(this.id);
 
+        if (player.isCurrentlyPlayingAd) {
+            return;
+        }
+
         if(player.mainVideoDuration == 0) {
             player.mainVideoDuration = videoPlayerTag.duration;
         }
+
+        player.prepareVast('postRoll');
     },
 
     userActivityChecker: function () {
@@ -3481,6 +3508,44 @@ var fluidPlayerClass = {
         }
     },
 
+    initialiseStreamers: function() {
+        switch (this.displayOptions.layoutControls.mediaType) {
+            case 'application/dash+xml': // MPEG-DASH
+                this.detachStreamers();
+                if (!this.dashPlayer) { // First time trying adding in DASH streamer, get the script
+                    this.dashPlayer = true; // Prevent errors while waiting for callback
+                    fluidPlayerClass.requestScript('https://cdn.dashjs.org/latest/dash.mediaplayer.min.js', this.initialiseDash.bind(this));
+                } else {
+                    this.initialiseDash();
+                }
+                break;
+            case 'application/x-mpegURL': // HLS
+        }
+    },
+
+    initialiseDash: function() {
+        if (typeof dashjs == "undefined") {
+            console.log('[FP_ERROR] Missing dashjs script, cannot play media type.');
+            return;
+        }
+
+        if ( typeof ( window.MediaSource || window.WebKitMediaSource ) === "function" ) {
+            var playVideo = (!this.autoplayAfterAd) ? this.autoplayAfterAd : this.displayOptions.layoutControls.autoPlay; // If false we want to override the autoPlay, as it comes from postRoll
+            var dashPlayer = dashjs.MediaPlayer().create();
+            dashPlayer.getDebug().setLogToBrowserConsole(false); // Remove default logging that clogs up the console
+            dashPlayer.initialize(videoPlayer, this.originalSrc, playVideo);
+            this.dashPlayer = dashPlayer;
+        } else {
+            console.log('[FP_ERROR] Media type not supported by this browser. (application/dash+xml)');
+        }
+    },
+
+    detachStreamers: function() {
+        if (this.dashPlayer) {
+            this.dashPlayer.reset();
+        }
+    },
+
     init: function(idVideoPlayer, options) {
         var player = this;
         var videoPlayer = document.getElementById(idVideoPlayer);
@@ -3525,11 +3590,12 @@ var fluidPlayerClass = {
         player.fullscreenMode          = false;
         player.originalWidth           = videoPlayer.offsetWidth;
         player.originalHeight          = videoPlayer.offsetHeight;
+        player.dashPlayer              = false;
 
         //Default options
         player.displayOptions = {
             layoutControls: {
-                mediaType:                    'video/mp4',//TODO: should be taken from the VAST Tag; consider removing it completely, since the supported format is browser-dependent
+                mediaType:                    player.getCurrentSrcType(),
                 primaryColor:                 false,
                 adProgressColor:              '#f9d300',
                 playButtonShowing:            true,
@@ -3590,6 +3656,8 @@ var fluidPlayerClass = {
             }
         }
 
+        player.initialiseStreamers();
+
         player.setupPlayerWrapper();
 
         videoPlayer.addEventListener('webkitfullscreenchange', player.recalculateAdDimensions, false);
@@ -3629,7 +3697,7 @@ var fluidPlayerClass = {
 
         player.setVastList();
 
-        if (player.displayOptions.layoutControls.autoPlay) {
+        if (player.displayOptions.layoutControls.autoPlay && !player.dashPlayer) {
             videoPlayer.play();
         }
 
@@ -3646,13 +3714,17 @@ var fluidPlayerClass = {
     // "API" Functions
     play: function() {
         var videoPlayer = document.getElementById(this.videoPlayerId);
-        videoPlayer.play();
+        if (videoPlayer.paused) {
+            this.playPauseToggle(videoPlayer);
+        }
         return true;
     },
 
     pause: function() {
         var videoPlayer = document.getElementById(this.videoPlayerId);
-        videoPlayer.pause();
+        if (!videoPlayer.paused) {
+            this.playPauseToggle(videoPlayer);
+        }
         return true;
     },
 
@@ -3676,7 +3748,6 @@ var fluidPlayerClass = {
             return false;
         }
 
-        var videoPlayer = document.getElementById(this.videoPlayerId);
         var htmlBlock = document.getElementById(this.videoPlayerId + "_fluid_html_on_pause");
 
         // We create the HTML block from scratch if it doesn't already exist
