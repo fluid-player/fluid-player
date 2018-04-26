@@ -1305,7 +1305,6 @@ var fluidPlayerClass = {
 
         videoPlayerTag.load();
 
-        player.setBuffering();
 
         if (typeof videoPlayerTag.mainVideoCurrentTime !== 'undefined') {
             videoPlayerTag.currentTime = videoPlayerTag.mainVideoCurrentTime;
@@ -1331,6 +1330,7 @@ var fluidPlayerClass = {
         player.vastOptions = null;
 
         if (player.displayOptions.layoutControls.layout!== 'browser') {
+            player.setBuffering();
             var progressbarContainer = document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container');
 
             if (progressbarContainer !== null) {
@@ -2356,8 +2356,9 @@ var fluidPlayerClass = {
         var player = this;
         var videoInstanceId = fluidPlayerClass.getInstanceIdByWrapperId(player.getAttribute('id'));
         var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
+        var videoPlayerTag = document.getElementById(videoInstanceId);
 
-        if (videoPlayerInstance.isCurrentlyPlayingAd) {
+        if (videoPlayerInstance.isCurrentlyPlayingAd && !videoPlayerTag.paused && videoPlayerInstance.displayOptions.layoutControls.layout !== 'browser') {
             setTimeout(function() {
                 if (!videoPlayerInstance.isControlBarVisible()) {
                     videoPlayerInstance.toggleAdCountdown(true);
@@ -2736,9 +2737,6 @@ var fluidPlayerClass = {
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
-        //Mobile Safari - because it does not emit a click event on initial click of the video
-        videoPlayerTag.addEventListener('play', player.initialPlay, false);
-
         //All other browsers
         document.getElementById(this.videoPlayerId).addEventListener('click', function() {
             player.playPauseToggle(videoPlayerTag);
@@ -2750,6 +2748,8 @@ var fluidPlayerClass = {
                 break;
 
             default:
+                //Mobile Safari - because it does not emit a click event on initial click of the video
+                videoPlayerTag.addEventListener('play', player.initialPlay, false);
                 this.setDefaultLayout();
                 break;
         }
@@ -2954,6 +2954,7 @@ var fluidPlayerClass = {
         //Assign the height/width dimensions to the wrapper
         if (player.displayOptions.layoutControls.fillToContainer) {
             divVideoWrapper.style.width = '100%';
+            divVideoWrapper.style.height = '100%';
         } else {
             divVideoWrapper.style.height = videoPlayer.clientHeight + 'px';
             divVideoWrapper.style.width = videoPlayer.clientWidth + 'px';
@@ -3265,7 +3266,7 @@ var fluidPlayerClass = {
         var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
         var videoPlayerTag = document.getElementById(videoInstanceId);
 
-        if (videoPlayerInstance.isCurrentlyPlayingAd && !videoPlayerTag.paused) {
+        if (videoPlayerInstance.isCurrentlyPlayingAd && !videoPlayerTag.paused && videoPlayerInstance.displayOptions.layoutControls.layout !== 'browser') {
             videoPlayerInstance.toggleAdCountdown(true);
         }
 
@@ -3288,7 +3289,7 @@ var fluidPlayerClass = {
         var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
         var videoPlayerTag = document.getElementById(videoInstanceId);
 
-        if (videoPlayerInstance.isCurrentlyPlayingAd && !videoPlayerTag.paused) {
+        if (videoPlayerInstance.isCurrentlyPlayingAd && !videoPlayerTag.paused && videoPlayerInstance.displayOptions.layoutControls.layout !== 'browser') {
             videoPlayerInstance.toggleAdCountdown(false);
         }
 
