@@ -1303,21 +1303,17 @@ var fluidPlayerClass = {
     },
 
     vastLogoBehaviour: function (vastPlaying) {
-        var logoHolder = document.getElementById(this.videoPlayerId + '_logo');
-        var logoImage = document.getElementById(this.videoPlayerId + '_logo_image');
-
-        if (!logoHolder || !logoImage) {
-            return;
-        }
-
         if (!this.displayOptions.layoutControls.logo.showOverAds) {
+            var logoHolder = document.getElementById(this.videoPlayerId + '_logo');
+            var logoImage = document.getElementById(this.videoPlayerId + '_logo_image');
+
+            if (!logoHolder || !logoImage) {
+                return;
+            }
+
             var logoDisplay = (vastPlaying) ? 'none' : 'inline';
             logoHolder.style.display = logoDisplay;
-        } else {
-            var imageSrc = (vastPlaying) ? this.displayOptions.layoutControls.logo.showOverAds : this.displayOptions.layoutControls.logo.imageUrl;
-            logoImage.src = (imageSrc) ? imageSrc : '';
         }
-
     },
 
     onVastAdEnded: function() {
@@ -3078,7 +3074,7 @@ var fluidPlayerClass = {
     initLogo: function() {
         var player = this;
         var videoPlayer = document.getElementById(player.videoPlayerId);
-        if (!player.displayOptions.layoutControls.logo.imageUrl && !player.displayOptions.layoutControls.logo.showOverAds) {
+        if (!player.displayOptions.layoutControls.logo.imageUrl) {
             return;
         }
 
@@ -3127,11 +3123,6 @@ var fluidPlayerClass = {
         if (player.displayOptions.layoutControls.logo.mouseOverImageUrl) {
             logoImage.addEventListener('mouseover', function(){ logoImage.src = player.displayOptions.layoutControls.logo.mouseOverImageUrl; }, false);
             logoImage.addEventListener('mouseout', function(){ logoImage.src = player.displayOptions.layoutControls.logo.imageUrl; }, false);
-        }
-
-        // We can set the logo via API callm it's possible the logo is initialised in an ad
-        if (player.isCurrentlyPlayingAd && player.displayOptions.layoutControls.logo.showOverAds) {
-            logoImage.src = player.displayOptions.layoutControls.logo.showOverAds;
         }
 
         videoPlayer.parentNode.insertBefore(logoHolder, null);
@@ -3775,7 +3766,7 @@ var fluidPlayerClass = {
     },
 
     toggleLogo: function(logo) {
-        if (typeof logo != 'object' || (!logo.imageUrl && !logo.showOverAds)) {
+        if (typeof logo != 'object' || !logo.imageUrl) {
             return false;
         }
         var logoBlock = document.getElementById(this.videoPlayerId + "_logo");
@@ -3788,7 +3779,7 @@ var fluidPlayerClass = {
         this.displayOptions.layoutControls.logo.mouseOverImageUrl = (logo.mouseOverImageUrl) ? logo.mouseOverImageUrl : null;
         this.displayOptions.layoutControls.logo.imageMargin = (logo.imageMargin) ? logo.imageMargin : '2px';
         this.displayOptions.layoutControls.logo.hideWithControls = (logo.hideWithControls) ? logo.hideWithControls : false;
-        this.displayOptions.layoutControls.logo.showOverAds= (logo.showOverAds) ? logo.showOverAds : false;
+        this.displayOptions.layoutControls.logo.showOverAds = (logo.showOverAds) ? logo.showOverAds : false;
 
         if (logoBlock) {
             logoBlock.remove();
