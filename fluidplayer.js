@@ -2745,6 +2745,8 @@ var fluidPlayerClass = {
         player.createPlaybackList();
 
         player.createDownload();
+
+        player.posterImage();
     },
 
     /**
@@ -3515,6 +3517,14 @@ var fluidPlayerClass = {
         }
     },
 
+    // Set the poster for the video, taken from custom params
+    posterImage: function() {
+        if (this.displayOptions.layoutControls.posterImage) {
+            var videoPlayer = document.getElementById(this.videoPlayerId);
+            videoPlayer.poster = this.displayOptions.layoutControls.posterImage;
+        }
+    },
+
     init: function(idVideoPlayer, options) {
         var player = this;
         var videoPlayer = document.getElementById(idVideoPlayer);
@@ -3565,6 +3575,7 @@ var fluidPlayerClass = {
             layoutControls: {
                 mediaType:                    'video/mp4',//TODO: should be taken from the VAST Tag; consider removing it completely, since the supported format is browser-dependent
                 primaryColor:                 false,
+                posterImage:                  false,
                 adProgressColor:              '#f9d300',
                 playButtonShowing:            true,
                 playPauseAnimation:           true,
