@@ -338,8 +338,12 @@
 }
 
 /*Mobile Layout*/
-.fluid_video_wrapper.mobile .skip_button, .fluid_video_wrapper.mobile .fluid_ad_cta {
-    bottom: 75px;
+.fluid_video_wrapper.mobile .skip_button {
+        bottom: 75px;
+}
+
+.fluid_video_wrapper.mobile .fluid_ad_cta {
+        bottom: 125px;
 }
 
 .fluid_initial_play {
