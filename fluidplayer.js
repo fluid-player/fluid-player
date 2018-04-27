@@ -618,13 +618,10 @@ var fluidPlayerClass = {
         xmlHttpReq.send();
     },
 
-    playMainVideoWhenVastFails: function(errorCode) {
+    playMainVideoWhenVastFails: function(errorCode, adListId) {
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
-        videoPlayerTag.removeEventListener('loadedmetadata', player.switchPlayerToVastMode);
-        videoPlayerTag.pause();
-        player.toggleLoader(false);
         player.displayOptions.vastOptions.vastAdvanced.noVastVideoCallback();
 
         if (!player.vastOptions || typeof this.vastOptions.errorUrl === 'undefined') {
@@ -633,7 +630,14 @@ var fluidPlayerClass = {
             player.announceError(errorCode);
         }
 
-        player.switchToMainVideo();
+        //Try to switch main video only if it is a preRoll scenario
+        if (typeof adListId !== 'undefined' && player.adList[adListId]['roll'] == 'preRoll') {
+            videoPlayerTag.removeEventListener('loadedmetadata', player.switchPlayerToVastMode);
+            videoPlayerTag.pause();
+            player.switchToMainVideo();
+            player.toggleLoader(false);
+        }
+
     },
 
     switchPlayerToVastMode: function() {},
@@ -668,7 +672,7 @@ var fluidPlayerClass = {
                     player.adList[adListId].error = true;
 
                     //The response returned an error. Proceeding with the main video.
-                    player.playMainVideoWhenVastFails(900);
+                    player.playMainVideoWhenVastFails(900, adListId);
                     return;
                 }
 
@@ -754,13 +758,13 @@ var fluidPlayerClass = {
                     } else {
                         //announceError the main video
                         player.adList[adListId].error = true;
-                        player.playMainVideoWhenVastFails(101);
+                        player.playMainVideoWhenVastFails(101, adListId);
                         return;
                     }
                 } else {
                     //announceError the main video
                     player.adList[adListId].error = true;
-                    player.playMainVideoWhenVastFails(101);
+                    player.playMainVideoWhenVastFails(101, adListId);
                     return;
                 }
                 player.displayOptions.vastOptions.vastAdvanced.vastLoadedCallback();
