@@ -1321,7 +1321,7 @@ var fluidPlayerClass = {
 
                 time = Math.floor(player.getCurrentTime());
                 if(time != keyTime || player.isCurrentlyPlayingAd) {
-                    break
+                    continue;
                 }
 
                 //Task: playRoll
