@@ -3678,7 +3678,6 @@ var fluidPlayerClass = {
         player.videoPlayerId           = idVideoPlayer;
         player.originalSrc             = player.getCurrentSrc();
         player.isCurrentlyPlayingAd    = false;
-        player.isCurrentlyPlayingVideo = false;
         player.recentWaiting           = false;
         player.latestVolume            = 1;
         player.currentVideoDuration    = 0;
@@ -3816,6 +3815,49 @@ var fluidPlayerClass = {
 
         player.setVastList();
 
+        videoPlayer.promiseIcan = null;
+        var _play_videoPlayer = videoPlayer.play;
+        videoPlayer.play = function() {
+            var videoPlayerTag = this;
+            var player = fluidPlayerClass.getInstanceById(videoPlayerTag.id);
+            videoPlayer.promiseIcan = _play_videoPlayer.apply(this, arguments);
+
+            setTimeout(function () {
+                if ((videoPlayer.promiseIcan === undefined || videoPlayer.promiseIcan === null) && player.isCurrentlyPlayingAd) {
+                    player.switchToMainVideo();
+                }
+            }, 1000);
+
+        };
+
+        var _pause_videoPlayer = videoPlayer.pause;
+        videoPlayer.pause = function() {
+            var videoPlayer = this;
+            var isPlaying = null;
+            var player = fluidPlayerClass.getInstanceById(videoPlayer.id);
+
+            if (videoPlayer.promiseIcan !== undefined && videoPlayer.promiseIcan !== null) {
+                // return _pause_videoPlayer.apply(this, arguments);
+                videoPlayer.promiseIcan.then(_ => {
+                    isPlaying = player.isCurrentlyPlayingVideo(videoPlayer);
+                    if (isPlaying) {
+                        return _pause_videoPlayer.apply(this, arguments);
+                    }
+                }).catch(error => {
+                    //
+                });
+
+                //double check if promise was not working and there were no error
+                isPlaying = player.isCurrentlyPlayingVideo(videoPlayer);
+                if (isPlaying) {
+                    return _pause_videoPlayer.apply(this, arguments);
+                }
+
+            }
+
+
+        };
+
         if (player.displayOptions.layoutControls.autoPlay) {
             videoPlayer.play();
         }
@@ -3856,6 +3898,10 @@ var fluidPlayerClass = {
     setVolume: function(passedVolume) {
         var videoPlayer = document.getElementById(this.videoPlayerId);
         videoPlayer.volume = passedVolume;
+    },
+
+    isCurrentlyPlayingVideo: function(instance) {
+        return instance && instance.currentTime > 0 && !instance.paused && !instance.ended && instance.readyState > 2;
     },
 
     setHtmlOnPauseBlock: function(passedHtml) {
