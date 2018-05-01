@@ -794,7 +794,6 @@ var fluidPlayerClass = {
             case 'postRoll':
                 videoPlayerTag.mainVideoCurrentTime = 0;
                 player.autoplayAfterAd = false;
-                videoPlayerTag.autoplayAfterAd = false;
                 videoPlayerTag.currentTime = player.mainVideoDuration;
                 break;
         }
@@ -3826,7 +3825,7 @@ var fluidPlayerClass = {
                 if ((videoPlayer.promiseIcan === undefined || videoPlayer.promiseIcan === null) && player.isCurrentlyPlayingAd) {
                     player.switchToMainVideo();
                 }
-            }, 1000);
+            }, 3500);
 
         };
 
@@ -3837,17 +3836,13 @@ var fluidPlayerClass = {
             var player = fluidPlayerClass.getInstanceById(videoPlayer.id);
 
             if (videoPlayer.promiseIcan !== undefined && videoPlayer.promiseIcan !== null) {
-                // return _pause_videoPlayer.apply(this, arguments);
                 videoPlayer.promiseIcan.then(_ => {
-                    isPlaying = player.isCurrentlyPlayingVideo(videoPlayer);
-                    if (isPlaying) {
-                        return _pause_videoPlayer.apply(this, arguments);
-                    }
+                    return _pause_videoPlayer.apply(this, arguments);
                 }).catch(error => {
-                    //
+                    player.announceLocalError(103, 'Failed to play video.');
                 });
 
-                //double check if promise was not working and there were no error
+                //double check if promise was not working and it is actually playing
                 isPlaying = player.isCurrentlyPlayingVideo(videoPlayer);
                 if (isPlaying) {
                     return _pause_videoPlayer.apply(this, arguments);
