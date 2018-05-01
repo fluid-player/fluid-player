@@ -438,7 +438,8 @@
     transition: visibility 0.5s, opacity 0.5s;
 }
 
-.fluid_video_wrapper.fluid_player_layout_default:hover .fluid_controls_container {
+.fluid_video_wrapper.fluid_player_layout_default:hover .fluid_controls_container,
+.fluid_video_wrapper.fluid_player_layout_default:hover .fp_logo {
     visibility: visible;
     opacity: 1;
 }
