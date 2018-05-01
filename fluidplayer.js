@@ -618,10 +618,13 @@ var fluidPlayerClass = {
         xmlHttpReq.send();
     },
 
-    playMainVideoWhenVastFails: function(errorCode, adListId) {
+    playMainVideoWhenVastFails: function(errorCode) {
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
+        videoPlayerTag.removeEventListener('loadedmetadata', player.switchPlayerToVastMode);
+        videoPlayerTag.pause();
+        player.toggleLoader(false);
         player.displayOptions.vastOptions.vastAdvanced.noVastVideoCallback();
 
         if (!player.vastOptions || typeof this.vastOptions.errorUrl === 'undefined') {
@@ -630,14 +633,7 @@ var fluidPlayerClass = {
             player.announceError(errorCode);
         }
 
-        //Try to switch main video only if it is a preRoll scenario
-        if (typeof adListId !== 'undefined' && player.adList[adListId]['roll'] == 'preRoll') {
-            videoPlayerTag.removeEventListener('loadedmetadata', player.switchPlayerToVastMode);
-            videoPlayerTag.pause();
-            player.switchToMainVideo();
-            player.toggleLoader(false);
-        }
-
+        player.switchToMainVideo();
     },
 
     switchPlayerToVastMode: function() {},
@@ -672,7 +668,12 @@ var fluidPlayerClass = {
                     player.adList[adListId].error = true;
 
                     //The response returned an error. Proceeding with the main video.
-                    player.playMainVideoWhenVastFails(900, adListId);
+                    //Try to switch main video only if it is a preRoll scenario
+                    if (typeof adListId !== 'undefined' && player.adList[adListId]['roll'] == 'preRoll') {
+                        player.playMainVideoWhenVastFails(900);
+                    } else {
+                        player.announceLocalError(101);
+                    }
                     return;
                 }
 
@@ -756,15 +757,27 @@ var fluidPlayerClass = {
                         document.getElementById(player.videoPlayerId).dispatchEvent(event);
                         return;
                     } else {
-                        //announceError the main video
                         player.adList[adListId].error = true;
-                        player.playMainVideoWhenVastFails(101, adListId);
+                        //announceError the main video
+                        //Try to switch main video only if it is a preRoll scenario
+                        if (typeof adListId !== 'undefined' && player.adList[adListId]['roll'] == 'preRoll') {
+                            player.playMainVideoWhenVastFails(101);
+                        } else {
+                            player.announceLocalError(101);
+                        }
+
                         return;
                     }
                 } else {
-                    //announceError the main video
                     player.adList[adListId].error = true;
-                    player.playMainVideoWhenVastFails(101, adListId);
+                    //announceError the main video
+                    //Try to switch to main video only if it is a preRoll scenario otherwise just ignore
+                    if (typeof adListId !== 'undefined' && player.adList[adListId]['roll'] == 'preRoll') {
+                        player.playMainVideoWhenVastFails(101);
+                    } else {
+                        player.announceLocalError(101);
+                    }
+
                     return;
                 }
                 player.displayOptions.vastOptions.vastAdvanced.vastLoadedCallback();
