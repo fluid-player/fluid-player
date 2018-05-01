@@ -3828,41 +3828,68 @@ var fluidPlayerClass = {
         player.setVastList();
 
         videoPlayer.promiseIcan = null;
+        player.promiseTimeout = null;
+        videoPlayer.successfullyPlaying = false;
         var _play_videoPlayer = videoPlayer.play;
-        videoPlayer.play = function() {
+        videoPlayer.play = function () {
             var videoPlayerTag = this;
             var player = fluidPlayerClass.getInstanceById(videoPlayerTag.id);
-            videoPlayer.promiseIcan = _play_videoPlayer.apply(this, arguments);
 
-            setTimeout(function () {
-                if ((videoPlayer.promiseIcan === undefined || videoPlayer.promiseIcan === null) && player.isCurrentlyPlayingAd) {
-                    player.switchToMainVideo();
-                }
-            }, 3500);
+            try {
+                var timeoutMessenger = function (videoPlayer) {
+
+                    if (videoPlayer.successfullyPlaying === false) {
+                        player.announceLocalError(202, "Waiting for this file to play has timed out!!!" + error);
+                    } else {
+                        //seems okay
+                        clearTimeout(player.promiseTimeout);
+                    }
+                };
+
+                var realWork = function (resolve, reject, paramThis, paramArgument) {
+                    videoPlayer.promiseIcan = _play_videoPlayer.apply(paramThis, paramArgument);
+                    videoPlayer.successfullyPlaying = true;
+                    resolve(videoPlayer.promiseIcan);
+                    clearTimeout(player.promiseTimeout);
+                };
+
+                player.promiseFallback(5000, timeoutMessenger, realWork, this, arguments);
+
+            } catch (error) {
+                player.announceLocalError(201, 'Failed to play video: ' + error);
+            }
 
         };
 
         var _pause_videoPlayer = videoPlayer.pause;
-        videoPlayer.pause = function() {
+        videoPlayer.pause = function () {
             var videoPlayer = this;
-            var isPlaying = null;
             var player = fluidPlayerClass.getInstanceById(videoPlayer.id);
-
             if (videoPlayer.promiseIcan !== undefined && videoPlayer.promiseIcan !== null) {
+
                 videoPlayer.promiseIcan.then(_ => {
-                    return _pause_videoPlayer.apply(this, arguments);
-                }).catch(error => {
-                    player.announceLocalError(103, 'Failed to play video.');
+                     _pause_videoPlayer.apply(this, arguments)
+                }).catch(function (error) {
+                    player.announceLocalError(201, 'Failed to play video: ' + error);
                 });
 
-                //double check if promise was not working and it is actually playing
                 isPlaying = player.isCurrentlyPlayingVideo(videoPlayer);
                 if (isPlaying) {
                     return _pause_videoPlayer.apply(this, arguments);
                 }
+            } else {
+                //just in case
+                var player = fluidPlayerClass.getInstanceById(videoPlayer.id);
+                var isPlaying = player.isCurrentlyPlayingVideo(videoPlayer);
+                if (isPlaying) {
+                    try {
+                        return _pause_videoPlayer.apply(this, arguments);
+                    } catch (e) {
+                        player.announceLocalError(203, 'Failed to play video.');
+                    }
+                }
 
             }
-
 
         };
 
@@ -3885,6 +3912,24 @@ var fluidPlayerClass = {
         var videoPlayer = document.getElementById(this.videoPlayerId);
         videoPlayer.play();
         return true;
+    },
+
+    promiseFallback: function(timeout, timeoutMessenger, callback, videoPlayerInstance, argumentParams) {
+        var player = this;
+
+        return new Promise(function(resolve, reject) {
+
+                callback(resolve, reject, videoPlayerInstance, argumentParams);
+                player.promiseTimeout = setTimeout(timeoutMessenger(videoPlayerInstance), timeout);
+
+            }).catch(
+
+                (error) => {
+                player.announceLocalError(204, 'Failed to play video: ' + error);
+
+            }
+        );
+
     },
 
     pause: function() {
