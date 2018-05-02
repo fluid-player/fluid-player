@@ -826,6 +826,8 @@ var fluidPlayerClass = {
                     player.addAdPlayingText(player.displayOptions.vastOptions.adText);
                 }
 
+                player.positionTextElements();
+
                 player.toggleLoader(false);
                 player.adList[adListId].played = true;
                 player.adFinished = false;
@@ -1551,10 +1553,81 @@ var fluidPlayerClass = {
             adPlayingDiv.style.backgroundColor = player.displayOptions.layoutControls.primaryColor;
             adPlayingDiv.style.opacity = 1;
         }
+
         adPlayingDiv.className = 'fluid_ad_playing';
         adPlayingDiv.innerText = text;
 
         document.getElementById('fluid_video_wrapper_' + this.videoPlayerId).appendChild(adPlayingDiv);
+    },
+
+    positionTextElements: function() {
+        var player = this;
+
+        var skipButton = document.getElementById('skip_button_' + player.videoPlayerId);
+        var adPlayingDiv = document.getElementById(player.videoPlayerId + '_fluid_ad_playing');
+        var ctaButton = document.getElementById(player.videoPlayerId + '_fluid_cta');
+
+        var ctaButtonHeight = 0;
+        var skipButtonHeight = 0;
+        var adPlayingDivHeight = 0;
+        var ctaIsBottom = false;
+        var ctaIsRight = false;
+        var pixelSpacing = 8;
+
+        var ctaVertical = false;
+        var ctaHorizontal = false;
+
+        if (skipButton !== null) {
+            skipButtonHeight = skipButton.offsetHeight + pixelSpacing;
+        }
+
+        if (ctaButton !== null) {
+
+            ctaButtonHeight = ctaButton.offsetHeight + pixelSpacing;
+
+            var CTATextPosition = player.displayOptions.vastOptions.adCTATextPosition.toLowerCase();
+
+            if (CTATextPosition.indexOf('bottom') !== -1) {
+                ctaVertical = 'bottom';
+                ctaButton.style.bottom = 50 + skipButtonHeight + 'px';
+            } else {
+                ctaVertical = 'top';
+                ctaButton.style.top = 34;
+            }
+
+            if (CTATextPosition.indexOf('right') !== -1) {
+                ctaButton.style.right = '0px';
+            } else {
+                ctaButton.style.left = '34px';
+            }
+        }
+
+        if (adPlayingDiv !== null) {
+
+            var adPlayingDivPosition = this.displayOptions.vastOptions.adTextPosition.toLowerCase();
+
+            adPlayingDivHeight = adPlayingDiv.offsetHeight;
+
+            if (adPlayingDivPosition.indexOf('bottom') !== -1) {
+                if (ctaVertical == 'bottom') {
+                    adPlayingDiv.style.bottom = 50 + skipButtonHeight + ctaButtonHeight + 'px';
+                } else {
+                    adPlayingDiv.style.bottom = 50 + skipButtonHeight;
+                }
+            } else {
+                adPlayingDiv.style.top = '34px';
+            }
+
+            if (adPlayingDivPosition.indexOf('right') !== -1) {
+                adPlayingDiv.style.right = '0px';
+            } else {
+                adPlayingDiv.style.left = '34px';
+            }
+        }
+        
+        console.log(skipButtonHeight);
+        console.log(ctaButtonHeight);
+        console.log(adPlayingDivHeight);
     },
 
     removeAdPlayingText: function() {
@@ -3852,7 +3925,9 @@ var fluidPlayerClass = {
                 skipButtonCaption:            'Skip ad in [seconds]',
                 skipButtonClickCaption:       'Skip Ad <span class="skip_button_icon"></span>',
                 adText:                       null,
+                adTextPosition:               'top left',
                 adCTAText:                    'Visit now!',
+                adCTAPosition:                'bottom right',
                 vastTimeout:                  5000,
                 showProgressbarMarkers:       false,
 

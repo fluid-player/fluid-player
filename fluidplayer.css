@@ -278,8 +278,8 @@
     background-color: black;
     opacity: 0.8;
     position: absolute;
-    top: 34px;
-    left: 34px;
+    /*top: 34px;*/
+    /*left: 34px;*/
     border-radius: 1px;
     color:#ffffff;
     font-size: 13px;
@@ -294,8 +294,8 @@
 
 .fluid_ad_cta {
     position:absolute;
-    right: 0px;
-    bottom: 100px;
+    /*right: 0px;*/
+    /*bottom: 100px;*/
     background-color: rgba(0, 0, 0, 0.7);
     color:#ffffff;
     font-size: 13px;
