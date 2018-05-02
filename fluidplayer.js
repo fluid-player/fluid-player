@@ -3953,10 +3953,10 @@ var fluidPlayerClass = {
                     }).catch(function (error) {
 
                         var deviceInfo = fluidPlayerClass.getMobileOs();
-                        var iOsAbortError = (deviceInfo.userOs === 'iOS') && (typeof error.name != 'undefined' && error.name == 'AbortError');
+                        var isAbortError = (deviceInfo.userOs === 'iOS' || deviceInfo.userOs === 'Android') && (typeof error.name != 'undefined' && error.name == 'AbortError');
 
-                        //On iOS the some cases throws an "AbortError" which does not happens other devices
-                        if(iOsAbortError) {
+                        //On iOS and Android devices in some cases throws an "AbortError" which does not happens otherwise
+                        if(isAbortError) {
                             // Ignore AbortError error reporting
                         } else {
                             player.announceLocalError(202, 'Failed to play video.');
