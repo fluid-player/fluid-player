@@ -438,7 +438,8 @@
     transition: visibility 0.5s, opacity 0.5s;
 }
 
-.fluid_video_wrapper.fluid_player_layout_default:hover .fluid_controls_container {
+.fluid_video_wrapper.fluid_player_layout_default:hover .fluid_controls_container,
+.fluid_video_wrapper.fluid_player_layout_default:hover .fp_logo {
     visibility: visible;
     opacity: 1;
 }
@@ -546,6 +547,7 @@ _:-ms-lang(x),
     width: 100%;
     height: 4px;
     background-color: rgba(255, 255, 255, 0.25);
+    z-index: 3;
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_progress_container .fluid_controls_buffered {
@@ -564,7 +566,8 @@ _:-ms-lang(x),
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_progress_container:hover .fluid_controls_progress,
-.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_progress_container:hover .fluid_controls_buffered {
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_progress_container:hover .fluid_controls_buffered,
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_progress_container:hover .fluid_controls_ad_markers_holder{
     margin-top: -1px;
     height: 5px;
 }
@@ -601,7 +604,7 @@ _:-ms-lang(x),
     top: 5px;
     width: 100%;
     height: 3px;
-    z-index: 3;
+    z-index: 4;
 }
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_ad_marker {
     position: absolute;
