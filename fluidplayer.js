@@ -1993,7 +1993,7 @@ var fluidPlayerClass = {
         } else if (videoPlayerTag.requestFullscreen) {
             return {goFullscreen: 'requestFullscreen', exitFullscreen: 'exitFullscreen', isFullscreen: 'fullscreenElement'};
 
-        } else if (videoPlayer.webkitSupportsFullscreen) {
+        } else if (videoPlayerTag.webkitSupportsFullscreen) {
             return {goFullscreen: 'webkitEnterFullscreen', exitFullscreen: 'webkitExitFullscreen', isFullscreen: 'webkitDisplayingFullscreen'};
 
         }
@@ -2588,12 +2588,12 @@ var fluidPlayerClass = {
             player.toggleOnPauseAd();
 
         } else {
-            //Workaround for Chrome/Safari Mobile - otherwise it blocks the subsequent
+            //Workaround for Safari or Mobile Chrome - otherwise it blocks the subsequent
             //play() command, because it considers it not being triggered by the user.
             var ua = window.navigator.userAgent;
             var isMobileChecks = fluidPlayerClass.getMobileOs();
 
-            if ((isMobileChecks.userOs !== false || isMobileChecks.device !== false) && (/^((?!chrome|android).)*safari/i.test(ua) || !!window.chrome || -1 !== ua.indexOf("crios") || 0 === window.navigator.vendor.indexOf("Google") && -1 !== ua.indexOf("chrome"))) {
+            if (/^((?!chrome|android).)*safari/i.test(ua) || ((isMobileChecks.userOs !== false || isMobileChecks.device !== false) && (!!window.chrome || -1 !== ua.indexOf("crios") || 0 === window.navigator.vendor.indexOf("Google") && -1 !== ua.indexOf("chrome")))) {
                 videoPlayerTag.src = fluidPlayerScriptLocation + 'blank.mp4';
                 videoPlayerTag.play();
             }
@@ -3762,7 +3762,7 @@ var fluidPlayerClass = {
         var sources = document.getElementById(this.videoPlayerId).getElementsByTagName('source');
 
         if (sources.length) {
-            for (var i = 0; i < sources.length; i++) {
+            for (var i = 0; i < sources.length - 1; i++) {
                 if (sources[i].getAttribute('src') == this.originalSrc && sources[i + 1].getAttribute('src')) {
                     this.setVideoSource(sources[i + 1].getAttribute('src'));
                     return;
