@@ -666,7 +666,12 @@ var fluidPlayerClass = {
                     player.adList[adListId].error = true;
 
                     //The response returned an error. Proceeding with the main video.
-                    player.playMainVideoWhenVastFails(900);
+                    //Try to switch main video only if it is a preRoll scenario
+                    if (typeof adListId !== 'undefined' && player.adList[adListId]['roll'] == 'preRoll') {
+                        player.playMainVideoWhenVastFails(900);
+                    } else {
+                        player.announceLocalError(101);
+                    }
                     return;
                 }
 
@@ -750,15 +755,27 @@ var fluidPlayerClass = {
                         document.getElementById(player.videoPlayerId).dispatchEvent(event);
                         return;
                     } else {
-                        //announceError the main video
                         player.adList[adListId].error = true;
-                        player.playMainVideoWhenVastFails(101);
+                        //announceError the main video
+                        //Try to switch main video only if it is a preRoll scenario
+                        if (typeof adListId !== 'undefined' && player.adList[adListId]['roll'] == 'preRoll') {
+                            player.playMainVideoWhenVastFails(101);
+                        } else {
+                            player.announceLocalError(101);
+                        }
+
                         return;
                     }
                 } else {
-                    //announceError the main video
                     player.adList[adListId].error = true;
-                    player.playMainVideoWhenVastFails(101);
+                    //announceError the main video
+                    //Try to switch to main video only if it is a preRoll scenario otherwise just ignore
+                    if (typeof adListId !== 'undefined' && player.adList[adListId]['roll'] == 'preRoll') {
+                        player.playMainVideoWhenVastFails(101);
+                    } else {
+                        player.announceLocalError(101);
+                    }
+
                     return;
                 }
                 player.displayOptions.vastOptions.vastAdvanced.vastLoadedCallback();
@@ -788,7 +805,6 @@ var fluidPlayerClass = {
             case 'postRoll':
                 videoPlayerTag.mainVideoCurrentTime = 0;
                 player.autoplayAfterAd = false;
-                videoPlayerTag.autoplayAfterAd = false;
                 videoPlayerTag.currentTime = player.mainVideoDuration;
                 break;
         }
@@ -1316,8 +1332,8 @@ var fluidPlayerClass = {
             for (var keyTime in player.timerPool) {
 
                 time = Math.floor(player.getCurrentTime());
-                if(time != keyTime) {
-                    break
+                if(time != keyTime || player.isCurrentlyPlayingAd) {
+                    continue;
                 }
 
                 //Task: playRoll
@@ -3773,7 +3789,6 @@ var fluidPlayerClass = {
         player.videoPlayerId           = idVideoPlayer;
         player.originalSrc             = player.getCurrentSrc();
         player.isCurrentlyPlayingAd    = false;
-        player.isCurrentlyPlayingVideo = false;
         player.recentWaiting           = false;
         player.latestVolume            = 1;
         player.currentVideoDuration    = 0;
@@ -3805,6 +3820,7 @@ var fluidPlayerClass = {
         player.hlsPlayer               = false;
         player.dashScriptLoaded        = false;
         player.hlsScriptLoaded         = false;
+        player.isPlayingMedia          = false;
 
         //Default options
         player.displayOptions = {
@@ -3917,6 +3933,76 @@ var fluidPlayerClass = {
 
         player.setVastList();
 
+        var _play_videoPlayer = videoPlayer.play;
+        videoPlayer.play = function () {
+            var videoPlayerTag = this;
+            var promise = null;
+            var player = fluidPlayerClass.getInstanceById(videoPlayerTag.id);
+
+            try {
+
+                promise = _play_videoPlayer.apply(this, arguments);
+
+                if (promise !== undefined && promise !== null) {
+
+                    promise.then(function() {
+
+                        player.isPlayingMedia = true;
+                        clearTimeout(player.promiseTimeout);
+
+                    }).catch(function (error) {
+
+                        var deviceInfo = fluidPlayerClass.getMobileOs();
+                        var iOsAbortError = (deviceInfo.userOs === 'iOS') && (typeof error.name != 'undefined' && error.name == 'AbortError');
+
+                        //On iOS the some cases throws an "AbortError" which does not happens other devices
+                        if(iOsAbortError) {
+                            // Ignore AbortError error reporting
+                        } else {
+                            player.announceLocalError(202, 'Failed to play video.');
+                        }
+                        clearTimeout(player.promiseTimeout);
+
+                    });
+
+                    player.promiseTimeout = setTimeout(function () {
+                        if (player.isPlayingMedia === false) {
+                            player.announceLocalError(204, 'Timeout error. Failed to play video.');
+                        }
+                    }, 5000);
+
+                }
+
+            } catch (error) {
+                player.announceLocalError(201, 'Failed to play video.');
+            }
+
+        };
+
+        var _pause_videoPlayer = videoPlayer.pause;
+        videoPlayer.pause = function () {
+            var videoPlayer = this;
+            var player = fluidPlayerClass.getInstanceById(videoPlayer.id);
+
+            if (player.isPlayingMedia === true) {
+
+                return _pause_videoPlayer.apply(this, arguments);
+
+            } else {
+
+                // just in case
+                if (player.isCurrentlyPlayingVideo(videoPlayer)) {
+                    try {
+                        return _pause_videoPlayer.apply(this, arguments);
+                    } catch (e) {
+                        player.announceLocalError(203, 'Failed to play video.');
+                    }
+                }
+
+            }
+
+        };
+
         if (player.displayOptions.layoutControls.autoPlay && !player.dashScriptLoaded && !player.hlsScriptLoaded) {
             videoPlayer.play();
         }
@@ -3961,6 +4047,10 @@ var fluidPlayerClass = {
     setVolume: function(passedVolume) {
         var videoPlayer = document.getElementById(this.videoPlayerId);
         videoPlayer.volume = passedVolume;
+    },
+
+    isCurrentlyPlayingVideo: function(instance) {
+        return instance && instance.currentTime > 0 && !instance.paused && !instance.ended && instance.readyState > 2;
     },
 
     setHtmlOnPauseBlock: function(passedHtml) {
