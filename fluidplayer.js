@@ -3820,6 +3820,7 @@ var fluidPlayerClass = {
         player.hlsPlayer               = false;
         player.dashScriptLoaded        = false;
         player.hlsScriptLoaded         = false;
+        player.isPlayingMedia          = false;
 
         //Default options
         player.displayOptions = {
@@ -3932,36 +3933,48 @@ var fluidPlayerClass = {
 
         player.setVastList();
 
-        videoPlayer.promiseIcan = null;
-        player.promiseTimeout = null;
-        videoPlayer.successfullyPlaying = false;
         var _play_videoPlayer = videoPlayer.play;
         videoPlayer.play = function () {
             var videoPlayerTag = this;
+            var promise = null;
             var player = fluidPlayerClass.getInstanceById(videoPlayerTag.id);
 
             try {
-                var timeoutMessenger = function (videoPlayer) {
 
-                    if (videoPlayer.successfullyPlaying === false) {
-                        player.announceLocalError(202, "Waiting for this file to play has timed out!!!" + error);
-                    } else {
-                        //seems okay
+                promise = _play_videoPlayer.apply(this, arguments);
+
+                if (promise !== undefined && promise !== null) {
+
+                    promise.then(function() {
+
+                        player.isPlayingMedia = true;
                         clearTimeout(player.promiseTimeout);
-                    }
-                };
 
-                var realWork = function (resolve, reject, paramThis, paramArgument) {
-                    videoPlayer.promiseIcan = _play_videoPlayer.apply(paramThis, paramArgument);
-                    videoPlayer.successfullyPlaying = true;
-                    resolve(videoPlayer.promiseIcan);
-                    clearTimeout(player.promiseTimeout);
-                };
+                    }).catch(function (error) {
 
-                player.promiseFallback(5000, timeoutMessenger, realWork, this, arguments);
+                        var deviceInfo = fluidPlayerClass.getMobileOs();
+                        var iOsAbortError = (deviceInfo.userOs === 'iOS') && (typeof error.name != 'undefined' && error.name == 'AbortError');
+
+                        //On iOS the some cases throws an "AbortError" which does not happens other devices
+                        if(iOsAbortError) {
+                            // Ignore AbortError error reporting
+                        } else {
+                            player.announceLocalError(202, 'Failed to play video.');
+                        }
+                        clearTimeout(player.promiseTimeout);
+
+                    });
+
+                    player.promiseTimeout = setTimeout(function () {
+                        if (player.isPlayingMedia === false) {
+                            player.announceLocalError(204, 'Timeout error. Failed to play video.');
+                        }
+                    }, 5000);
+
+                }
 
             } catch (error) {
-                player.announceLocalError(201, 'Failed to play video: ' + error);
+                player.announceLocalError(201, 'Failed to play video.');
             }
 
         };
@@ -3970,23 +3983,15 @@ var fluidPlayerClass = {
         videoPlayer.pause = function () {
             var videoPlayer = this;
             var player = fluidPlayerClass.getInstanceById(videoPlayer.id);
-            if (videoPlayer.promiseIcan !== undefined && videoPlayer.promiseIcan !== null) {
 
-                videoPlayer.promiseIcan.then(_ => {
-                     _pause_videoPlayer.apply(this, arguments)
-                }).catch(function (error) {
-                    player.announceLocalError(201, 'Failed to play video: ' + error);
-                });
+            if (player.isPlayingMedia === true) {
 
-                isPlaying = player.isCurrentlyPlayingVideo(videoPlayer);
-                if (isPlaying) {
-                    return _pause_videoPlayer.apply(this, arguments);
-                }
+                return _pause_videoPlayer.apply(this, arguments);
+
             } else {
-                //just in case
-                var player = fluidPlayerClass.getInstanceById(videoPlayer.id);
-                var isPlaying = player.isCurrentlyPlayingVideo(videoPlayer);
-                if (isPlaying) {
+
+                // just in case
+                if (player.isCurrentlyPlayingVideo(videoPlayer)) {
                     try {
                         return _pause_videoPlayer.apply(this, arguments);
                     } catch (e) {
@@ -4019,24 +4024,6 @@ var fluidPlayerClass = {
             this.playPauseToggle(videoPlayer);
         }
         return true;
-    },
-
-    promiseFallback: function(timeout, timeoutMessenger, callback, videoPlayerInstance, argumentParams) {
-        var player = this;
-
-        return new Promise(function(resolve, reject) {
-
-                callback(resolve, reject, videoPlayerInstance, argumentParams);
-                player.promiseTimeout = setTimeout(timeoutMessenger(videoPlayerInstance), timeout);
-
-            }).catch(
-
-                (error) => {
-                player.announceLocalError(204, 'Failed to play video: ' + error);
-
-            }
-        );
-
     },
 
     pause: function() {
