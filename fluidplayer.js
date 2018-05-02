@@ -353,9 +353,7 @@ var fluidPlayerClass = {
                 fallbackMediaFile = this.extractNodeData(mediaFiles[i]);
             }
 
-            if (mediaFiles[i].getAttribute('type') === this.displayOptions.layoutControls.mediaType) {
-                return this.extractNodeData(mediaFiles[i]);
-            }
+            return mediaFiles[i].childNodes[0].nodeValue;
         }
 
         return fallbackMediaFile;
@@ -862,7 +860,9 @@ var fluidPlayerClass = {
             //Store the current time of the main video
             player.mainVideoCurrentTime = videoPlayerTag.currentTime;
 
-            //Load the PreRoll ad
+            // Remove the streaming objects to prevent errors on the VAST content
+            player.detachStreamers();
+
             videoPlayerTag.src = player.vastOptions.mediaFile;
             player.isCurrentlyPlayingAd = true;
             if (player.displayOptions.vastOptions.showProgressbarMarkers) {
@@ -1394,6 +1394,8 @@ var fluidPlayerClass = {
 
         videoPlayerTag.src = player.originalSrc;
 
+        player.initialiseStreamers();
+
         videoPlayerTag.load();
 
 
@@ -1403,10 +1405,8 @@ var fluidPlayerClass = {
             videoPlayerTag.currentTime = 0;
         }
 
-        videoPlayerTag.play();
-
-        if (player.autoplayAfterAd == false) {
-            videoPlayerTag.pause();
+        if (player.autoplayAfterAd) {
+            player.play();
         }
 
         player.isCurrentlyPlayingAd = false;
@@ -1736,6 +1736,23 @@ var fluidPlayerClass = {
 
         if (sources.length) {
             return sources[0].getAttribute('src');
+        }
+
+        return null;
+    },
+
+    /**
+     * Src types required for streaming elements
+     */
+    getCurrentSrcType: function() {
+        var sources = document.getElementById(this.videoPlayerId).getElementsByTagName('source');
+
+        if (sources.length) {
+            for (var i = 0; i < sources.length; i++) {
+                if (sources[i].getAttribute('src') == this.originalSrc) {
+                    return sources[i].getAttribute('type');
+                }
+            }
         }
 
         return null;
@@ -2199,7 +2216,7 @@ var fluidPlayerClass = {
                 shiftTime(videoPlayerId, clickedX);
             }
             if (!initiallyPaused) {
-                videoPlayerTag.play();
+                player.play();
             }
             // Wait till video played then reenable the animations
             if (player.initialAnimationSet) {
@@ -2558,7 +2575,11 @@ var fluidPlayerClass = {
 
             if (player.displayOptions.layoutControls.layout !== 'browser') { //The original player play/pause toggling is managed by the browser
                 if (videoPlayerTag.paused) {
-                    videoPlayerTag.play();
+                    if (player.dashPlayer) {
+                        player.dashPlayer.play();
+                    } else {
+                        videoPlayerTag.play();
+                    }
                 } else if (!isFirstStart) {
                     videoPlayerTag.pause();
                 }
@@ -2683,7 +2704,7 @@ var fluidPlayerClass = {
     // Create the time position preview only if the vtt previews aren't enabled
     createTimePositionPreview: function() {
         var player = this;
-        videoPlayer = document.getElementById(player.videoPlayerId);
+        var videoPlayer = document.getElementById(player.videoPlayerId);
 
         if (!player.showTimeOnHover) {
             return;
@@ -2703,7 +2724,7 @@ var fluidPlayerClass = {
         document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container').addEventListener('mousemove', function(event) {
             var progressContainer = document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container');
             var totalWidth = progressContainer.clientWidth;
-            hoverTimeItem = document.getElementById(player.videoPlayerId + '_fluid_timeline_preview');
+            var hoverTimeItem = document.getElementById(player.videoPlayerId + '_fluid_timeline_preview');
             var hoverQ = fluidPlayerClass.getEventOffsetX(event, progressContainer);
 
             hoverSecondQ = player.currentVideoDuration * hoverQ / totalWidth;
@@ -2717,7 +2738,7 @@ var fluidPlayerClass = {
 
         // Hide timeline preview on mouseout
         document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container').addEventListener('mouseout', function() {
-            hoverTimeItem = document.getElementById(player.videoPlayerId + '_fluid_timeline_preview');
+            var hoverTimeItem = document.getElementById(player.videoPlayerId + '_fluid_timeline_preview');
             hoverTimeItem.style.display = 'none';
         }, false);
     },
@@ -3223,7 +3244,7 @@ var fluidPlayerClass = {
         } else {
             var play = false;
             if (!videoPlayerTag.paused) {
-                videoPlayerTag.pause();
+                player.pause();
                 var play = true;
             }
 
@@ -3233,12 +3254,14 @@ var fluidPlayerClass = {
                 videoPlayerTag.removeEventListener('loadedmetadata', videoSwitchedEvent);
                 videoPlayerTag.currentTime = currentTime;
                 if (play) {
-                    videoPlayerTag.play();
+                    player.play();
                 }
             };
             videoPlayerTag.addEventListener('loadedmetadata', videoSwitchedEvent);
             videoPlayerTag.src = url;
             player.originalSrc = url;
+            player.displayOptions.layoutControls.mediaType = player.getCurrentSrcType();
+            player.initialiseStreamers();
         }
     },
 
@@ -3674,6 +3697,82 @@ var fluidPlayerClass = {
         }
     },
 
+    initialiseStreamers: function() {
+        this.detachStreamers();
+        switch (this.displayOptions.layoutControls.mediaType) {
+            case 'application/dash+xml': // MPEG-DASH
+                if (!this.dashScriptLoaded) { // First time trying adding in DASH streamer, get the script
+                    this.dashScriptLoaded = true;
+                    fluidPlayerClass.requestScript('https://cdn.dashjs.org/latest/dash.mediaplayer.min.js', this.initialiseDash.bind(this));
+                } else {
+                    this.initialiseDash();
+                }
+                break;
+            case 'application/x-mpegURL': // HLS
+                if (!this.hlsScriptLoaded) { // First time trying adding in DASH streamer, get the script
+                    this.hlsScriptLoaded = true;
+                    fluidPlayerClass.requestScript('https://cdn.jsdelivr.net/npm/hls.js@latest', this.initialiseHls.bind(this));
+                } else {
+                    this.initialiseHls();
+                }
+                break;
+        }
+    },
+
+    initialiseDash: function() {
+        if ( typeof ( window.MediaSource || window.WebKitMediaSource ) === "function") {
+            var playVideo = (!this.autoplayAfterAd) ? this.autoplayAfterAd : this.displayOptions.layoutControls.autoPlay; // If false we want to override the autoPlay, as it comes from postRoll
+            var dashPlayer = dashjs.MediaPlayer().create();
+            dashPlayer.getDebug().setLogToBrowserConsole(false); // Remove default logging that clogs up the console
+            dashPlayer.initialize(document.getElementById(this.videoPlayerId), this.originalSrc, playVideo);
+            this.dashPlayer = dashPlayer;
+        } else {
+            this.nextSource();
+            console.log('[FP_ERROR] Media type not supported by this browser. (application/dash+xml)');
+        }
+    },
+
+    initialiseHls: function() {
+        if (Hls.isSupported()) {
+            var hls = new Hls();
+            hls.attachMedia(document.getElementById(this.videoPlayerId));
+            hls.loadSource(this.originalSrc);
+            this.hlsPlayer = hls;
+            if (!this.firstPlayLaunched && this.displayOptions.layoutControls.autoPlay) {
+                document.getElementById(this.videoPlayerId).play();
+            }
+        } else {
+            this.nextSource();
+            console.log('[FP_ERROR] Media type not supported by this browser. (application/x-mpegURL)');
+        }
+    },
+
+    detachStreamers: function() {
+        if (this.dashPlayer) {
+            this.dashPlayer.reset();
+            this.dashPlayer = false;
+        } else if (this.hlsPlayer) {
+            this.hlsPlayer.detachMedia();
+            this.hlsPlayer = false;
+        }
+    },
+
+    // This is called when a media type is unsupported. we'll find the current source and try set the next source if it exists
+    nextSource: function() {
+        var sources = document.getElementById(this.videoPlayerId).getElementsByTagName('source');
+
+        if (sources.length) {
+            for (var i = 0; i < sources.length; i++) {
+                if (sources[i].getAttribute('src') == this.originalSrc && sources[i + 1].getAttribute('src')) {
+                    this.setVideoSource(sources[i + 1].getAttribute('src'));
+                    return;
+                }
+            }
+        }
+
+        return null;
+    },
+
     init: function(idVideoPlayer, options) {
         var player = this;
         var videoPlayer = document.getElementById(idVideoPlayer);
@@ -3717,11 +3816,15 @@ var fluidPlayerClass = {
         player.fullscreenMode          = false;
         player.originalWidth           = videoPlayer.offsetWidth;
         player.originalHeight          = videoPlayer.offsetHeight;
+        player.dashPlayer              = false;
+        player.hlsPlayer               = false;
+        player.dashScriptLoaded        = false;
+        player.hlsScriptLoaded         = false;
 
         //Default options
         player.displayOptions = {
             layoutControls: {
-                mediaType:                    'video/mp4',//TODO: should be taken from the VAST Tag; consider removing it completely, since the supported format is browser-dependent
+                mediaType:                    player.getCurrentSrcType(),
                 primaryColor:                 false,
                 posterImage:                  false,
                 adProgressColor:              '#f9d300',
@@ -3787,6 +3890,8 @@ var fluidPlayerClass = {
                 player.displayOptions[key] = options[key];
             }
         }
+
+        player.initialiseStreamers();
 
         player.setupPlayerWrapper();
 
@@ -3893,7 +3998,7 @@ var fluidPlayerClass = {
 
         };
 
-        if (player.displayOptions.layoutControls.autoPlay) {
+        if (player.displayOptions.layoutControls.autoPlay && !player.dashScriptLoaded && !player.hlsScriptLoaded) {
             videoPlayer.play();
         }
 
@@ -3910,7 +4015,9 @@ var fluidPlayerClass = {
     // "API" Functions
     play: function() {
         var videoPlayer = document.getElementById(this.videoPlayerId);
-        videoPlayer.play();
+        if (videoPlayer.paused) {
+            this.playPauseToggle(videoPlayer);
+        }
         return true;
     },
 
@@ -3934,7 +4041,9 @@ var fluidPlayerClass = {
 
     pause: function() {
         var videoPlayer = document.getElementById(this.videoPlayerId);
-        videoPlayer.pause();
+        if (!videoPlayer.paused) {
+            this.playPauseToggle(videoPlayer);
+        }
         return true;
     },
 
@@ -3962,7 +4071,6 @@ var fluidPlayerClass = {
             return false;
         }
 
-        var videoPlayer = document.getElementById(this.videoPlayerId);
         var htmlBlock = document.getElementById(this.videoPlayerId + "_fluid_html_on_pause");
 
         // We create the HTML block from scratch if it doesn't already exist
@@ -4000,7 +4108,6 @@ var fluidPlayerClass = {
     },
 
     toggleControlBar: function(show) {
-        var videoPlayer = document.getElementById(this.videoPlayerId);
         var controlBar = document.getElementById(this.videoPlayerId + "_fluid_controls_container");
 
         if (show) {

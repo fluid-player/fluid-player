@@ -975,3 +975,13 @@ _:-ms-lang(x),
         display: block;
     }
 }
+
+.fp_logo {
+    visibility: hidden;
+    opacity: 0;
+    -webkit-transition: visibility 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    -moz-transition: visibility 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    -ms-transition: visibility 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    -o-transition: visibility 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    transition: visibility 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
