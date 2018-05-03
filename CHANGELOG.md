@@ -1,7 +1,16 @@
 # CHANGELOG
 
-## Master
+## 2.2.0
+* [Pull #121](https://github.com/fluid-player/fluid-player/pull/121) 'Browser layout' VAST fixes
+* [Pull #122](https://github.com/fluid-player/fluid-player/pull/122) iOS fullscreen improvements, use native player
+* [Pull #125](https://github.com/fluid-player/fluid-player/pull/125) Fix for VAST tag: additional checks for CDATA node irregularity
 * [Pull #126](https://github.com/fluid-player/fluid-player/pull/126) Pause player when linear ad opens (ad video is clicked)
+* [Pull #127](https://github.com/fluid-player/fluid-player/pull/127) OnPause ad showing on source switch fix
+* [Pull #128](https://github.com/fluid-player/fluid-player/pull/128) [Pull #139](https://github.com/fluid-player/fluid-player/pull/139) Poster Image as a param
+* [Pull #130](https://github.com/fluid-player/fluid-player/pull/130) Create progressbar markers for nonLinear ads
+* [Pull #131](https://github.com/fluid-player/fluid-player/pull/131) [Pull #136](https://github.com/fluid-player/fluid-player/pull/136/) Additional logo parameters
+* [Pull #138](https://github.com/fluid-player/fluid-player/pull/138) Support for DASH and HLS streaming
+* [Pull #143](https://github.com/fluid-player/fluid-player/pull/143) Positioning of ad and cta text elements
 
 ## 2.1.2
 * [Pull #108](https://github.com/fluid-player/fluid-player/pull/108) Fullscreen API call fix
