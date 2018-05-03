@@ -109,7 +109,7 @@ var fluidPlayerClass = {
         'toggleElementText', 'getMobileOs', 'findClosestParent', 'activeVideoPlayerId',
         'getInstanceIdByWrapperId', 'timer', 'timerPool', 'adList', 'adPool',
         'isUserActive', 'isCurrentlyPlayingAd', 'initialAnimationSet'],
-    version: '2.1.2',
+    version: '2.2.0',
     homepage: 'https://www.fluidplayer.com/',
     activeVideoPlayerId: null,
 
