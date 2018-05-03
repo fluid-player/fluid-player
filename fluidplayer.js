@@ -1592,9 +1592,6 @@ var fluidPlayerClass = {
         var skipButtonHeightWithSpacing = 0;
         var positionsCTA = [];
 
-        if (skipButton !== null) {
-            skipButtonHeightWithSpacing = skipButton.offsetHeight + pixelSpacing;
-        }
 
         var defaultPositions = {
             "top": {
@@ -1606,6 +1603,17 @@ var fluidPlayerClass = {
                 "right": {"h": 0, "v": 50 }
             }
         };
+
+        if (skipButton !== null) {
+            skipButtonHeightWithSpacing = skipButton.offsetHeight + pixelSpacing;
+
+            var wrapperElement = document.getElementById('fluid_video_wrapper_' + player.videoPlayerId);
+
+            if (wrapperElement.classList.contains('mobile')) {
+                defaultPositions.bottom.left.v = 75;
+                defaultPositions.bottom.right.v = 75;
+            }
+        }
 
         if (ctaButton !== null) {
 
@@ -1649,9 +1657,9 @@ var fluidPlayerClass = {
         if (ctaButtonHeightWithSpacing > 0 && adPlayingDivHeightWithSpacing > 0 && CTATextPosition == adPlayingDivPosition) {
             if (isBottom) {
                 if (positionsCTA[1] == 'right') {
-                    adPlayingDiv.style.bottom = 50 + skipButtonHeightWithSpacing + ctaButtonHeightWithSpacing;
+                    adPlayingDiv.style.bottom = defaultPositions[positionsAdText[0]][positionsAdText[1]].v + skipButtonHeightWithSpacing + ctaButtonHeightWithSpacing;
                 } else {
-                    adPlayingDiv.style.bottom = 50 + ctaButtonHeightWithSpacing;
+                    adPlayingDiv.style.bottom = defaultPositions[positionsAdText[0]][positionsAdText[1]].v + ctaButtonHeightWithSpacing;
                 }
             } else {
                 ctaButton.style.top = defaultPositions[positionsCTA[0]][positionsCTA[1]].v + adPlayingDivHeightWithSpacing;

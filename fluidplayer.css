@@ -275,9 +275,9 @@
 }
 
 .fluid_ad_playing {
+    position:absolute;
     background-color: black;
     opacity: 0.8;
-    position: absolute;
     border-radius: 1px;
     color:#ffffff;
     font-size: 13px;
@@ -337,11 +337,11 @@
 .fluid_video_wrapper.mobile .skip_button {
         bottom: 75px;
 }
-
+/*
 .fluid_video_wrapper.mobile .fluid_ad_cta {
         bottom: 125px;
 }
-
+*/
 .fluid_initial_play {
     width:60px;
     height:60px;
