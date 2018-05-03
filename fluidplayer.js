@@ -1563,71 +1563,77 @@ var fluidPlayerClass = {
     positionTextElements: function() {
         var player = this;
 
+        var allowedPosition = ['top left', 'top right', 'bottom left', 'bottom right'];
+
         var skipButton = document.getElementById('skip_button_' + player.videoPlayerId);
         var adPlayingDiv = document.getElementById(player.videoPlayerId + '_fluid_ad_playing');
         var ctaButton = document.getElementById(player.videoPlayerId + '_fluid_cta');
 
-        var ctaButtonHeight = 0;
-        var skipButtonHeight = 0;
-        var adPlayingDivHeight = 0;
-        var ctaIsBottom = false;
-        var ctaIsRight = false;
+        var ctaButtonHeightWithSpacing = 0;
+        var adPlayingDivHeightWithSpacing = 0;
         var pixelSpacing = 8;
-
-        var ctaVertical = false;
-        var ctaHorizontal = false;
+        var isBottom = false;
+        var skipButtonHeightWithSpacing = 0;
+        var positionsCTA = [];
 
         if (skipButton !== null) {
-            skipButtonHeight = skipButton.offsetHeight + pixelSpacing;
+            skipButtonHeightWithSpacing = skipButton.offsetHeight + pixelSpacing;
         }
+
+        var defaultPositions = {
+            "top": {
+                "left": {"h": 34, "v": 34},
+                "right": {"h": 0, "v": 34}
+            },
+            "bottom": {
+                "left": {"h": 34, "v": 50},
+                "right": {"h": 0, "v": 50 + skipButtonHeightWithSpacing}
+            }
+        };
 
         if (ctaButton !== null) {
 
-            ctaButtonHeight = ctaButton.offsetHeight + pixelSpacing;
-
             var CTATextPosition = player.displayOptions.vastOptions.adCTATextPosition.toLowerCase();
 
-            if (CTATextPosition.indexOf('bottom') !== -1) {
-                ctaVertical = 'bottom';
-                ctaButton.style.bottom = 50 + skipButtonHeight + 'px';
-            } else {
-                ctaVertical = 'top';
-                ctaButton.style.top = 34;
+            if (allowedPosition.indexOf(CTATextPosition) == -1) {
+                console.log('[FP Error] Invalid position for CTAText. Reverting to "bottom right"');
+                CTATextPosition = 'bottom right';
             }
 
-            if (CTATextPosition.indexOf('right') !== -1) {
-                ctaButton.style.right = '0px';
-            } else {
-                ctaButton.style.left = '34px';
-            }
+            positionsCTA = CTATextPosition.split(' ');
+            ctaButton.style[positionsCTA[0]] = defaultPositions[positionsCTA[0]][positionsCTA[1]].v;
+            ctaButton.style[positionsCTA[1]] = defaultPositions[positionsCTA[0]][positionsCTA[1]].h;
+            ctaButtonHeightWithSpacing = ctaButton.offsetHeight + pixelSpacing;
+
+            isBottom = positionsCTA[0] == 'bottom';
         }
 
         if (adPlayingDiv !== null) {
 
             var adPlayingDivPosition = this.displayOptions.vastOptions.adTextPosition.toLowerCase();
 
-            adPlayingDivHeight = adPlayingDiv.offsetHeight;
+            if (allowedPosition.indexOf(adPlayingDivPosition) == -1) {
+                console.log('[FP Error] Invalid position for adText. Reverting to "top left"');
+                adPlayingDivPosition = 'top left';
+            }
 
-            if (adPlayingDivPosition.indexOf('bottom') !== -1) {
-                if (ctaVertical == 'bottom') {
-                    adPlayingDiv.style.bottom = 50 + skipButtonHeight + ctaButtonHeight + 'px';
+            var positionsAdText = adPlayingDivPosition.split(' ');
+            adPlayingDiv.style[positionsAdText[0]] = defaultPositions[positionsAdText[0]][positionsAdText[1]].v;
+            adPlayingDiv.style[positionsAdText[1]] = defaultPositions[positionsAdText[0]][positionsAdText[1]].h;
+            adPlayingDivHeightWithSpacing = adPlayingDiv.offsetHeight + pixelSpacing;
+        }
+
+        if (ctaButtonHeightWithSpacing > 0 && adPlayingDivHeightWithSpacing > 0 && CTATextPosition == adPlayingDivPosition) {
+            if (isBottom) {
+                if (positionsCTA[1] == 'right') {
+                    adPlayingDiv.style.bottom = 50 + skipButtonHeightWithSpacing + ctaButtonHeightWithSpacing;
                 } else {
-                    adPlayingDiv.style.bottom = 50 + skipButtonHeight;
+                    adPlayingDiv.style.bottom = 50 + ctaButtonHeightWithSpacing;
                 }
             } else {
-                adPlayingDiv.style.top = '34px';
-            }
-
-            if (adPlayingDivPosition.indexOf('right') !== -1) {
-                adPlayingDiv.style.right = '0px';
-            } else {
-                adPlayingDiv.style.left = '34px';
+                ctaButton.style.top = defaultPositions[positionsCTA[0]][positionsCTA[1]].v + adPlayingDivHeightWithSpacing;
             }
         }
-        
-        console.log(skipButtonHeight);
-        console.log(ctaButtonHeight);
-        console.log(adPlayingDivHeight);
     },
 
     removeAdPlayingText: function() {
@@ -3927,7 +3933,7 @@ var fluidPlayerClass = {
                 adText:                       null,
                 adTextPosition:               'top left',
                 adCTAText:                    'Visit now!',
-                adCTAPosition:                'bottom right',
+                adCTATextPosition:            'bottom right',
                 vastTimeout:                  5000,
                 showProgressbarMarkers:       false,
 
