@@ -1598,12 +1598,12 @@ var fluidPlayerClass = {
 
         var defaultPositions = {
             "top": {
-                "left": {"h": 34, "v": 34},
-                "right": {"h": 0, "v": 34}
+                "left": {"h": 34, "v": 34 },
+                "right": {"h": 0, "v": 34 }
             },
             "bottom": {
-                "left": {"h": 34, "v": 50},
-                "right": {"h": 0, "v": 50 + skipButtonHeightWithSpacing}
+                "left": {"h": 34, "v": 50 },
+                "right": {"h": 0, "v": 50 }
             }
         };
 
@@ -1617,11 +1617,18 @@ var fluidPlayerClass = {
             }
 
             positionsCTA = CTATextPosition.split(' ');
-            ctaButton.style[positionsCTA[0]] = defaultPositions[positionsCTA[0]][positionsCTA[1]].v;
-            ctaButton.style[positionsCTA[1]] = defaultPositions[positionsCTA[0]][positionsCTA[1]].h;
-            ctaButtonHeightWithSpacing = ctaButton.offsetHeight + pixelSpacing;
 
             isBottom = positionsCTA[0] == 'bottom';
+
+            ctaButton.style[positionsCTA[0]] = defaultPositions[positionsCTA[0]][positionsCTA[1]].v;
+            ctaButton.style[positionsCTA[1]] = defaultPositions[positionsCTA[0]][positionsCTA[1]].h;
+
+            if (isBottom && positionsCTA[1] == 'right') {
+                ctaButton.style[positionsCTA[0]] = defaultPositions[positionsCTA[0]][positionsCTA[1]].v + skipButtonHeightWithSpacing;
+            }
+
+            ctaButtonHeightWithSpacing = ctaButton.offsetHeight + pixelSpacing;
+
         }
 
         if (adPlayingDiv !== null) {
