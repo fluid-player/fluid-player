@@ -1398,14 +1398,19 @@ var fluidPlayerClass = {
 
         player.initialiseStreamers();
 
+        var newCurrentTime = (typeof videoPlayerTag.mainVideoCurrentTime !== 'undefined')
+            ? videoPlayerTag.mainVideoCurrentTime : 0;
+
+        if(videoPlayerTag.hasOwnProperty('currentTime')) {
+            videoPlayerTag.currentTime = newCurrentTime;
+        }
+
+        videoPlayerTag.addEventListener("loadedmetadata", function() {
+            videoPlayerTag.currentTime = newCurrentTime;
+        }, false);
+
         videoPlayerTag.load();
 
-
-        if (typeof videoPlayerTag.mainVideoCurrentTime !== 'undefined') {
-            videoPlayerTag.currentTime = videoPlayerTag.mainVideoCurrentTime;
-        } else {
-            videoPlayerTag.currentTime = 0;
-        }
 
         if (player.autoplayAfterAd) {
             player.play();
