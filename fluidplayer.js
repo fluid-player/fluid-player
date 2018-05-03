@@ -842,6 +842,8 @@ var fluidPlayerClass = {
                     player.addAdPlayingText(player.displayOptions.vastOptions.adText);
                 }
 
+                player.positionTextElements();
+
                 player.toggleLoader(false);
                 player.adList[adListId].played = true;
                 player.adFinished = false;
@@ -1567,10 +1569,102 @@ var fluidPlayerClass = {
             adPlayingDiv.style.backgroundColor = player.displayOptions.layoutControls.primaryColor;
             adPlayingDiv.style.opacity = 1;
         }
+
         adPlayingDiv.className = 'fluid_ad_playing';
         adPlayingDiv.innerText = text;
 
         document.getElementById('fluid_video_wrapper_' + this.videoPlayerId).appendChild(adPlayingDiv);
+    },
+
+    positionTextElements: function() {
+        var player = this;
+
+        var allowedPosition = ['top left', 'top right', 'bottom left', 'bottom right'];
+
+        var skipButton = document.getElementById('skip_button_' + player.videoPlayerId);
+        var adPlayingDiv = document.getElementById(player.videoPlayerId + '_fluid_ad_playing');
+        var ctaButton = document.getElementById(player.videoPlayerId + '_fluid_cta');
+
+        var ctaButtonHeightWithSpacing = 0;
+        var adPlayingDivHeightWithSpacing = 0;
+        var pixelSpacing = 8;
+        var isBottom = false;
+        var skipButtonHeightWithSpacing = 0;
+        var positionsCTA = [];
+
+
+        var defaultPositions = {
+            "top": {
+                "left": {"h": 34, "v": 34 },
+                "right": {"h": 0, "v": 34 }
+            },
+            "bottom": {
+                "left": {"h": 34, "v": 50 },
+                "right": {"h": 0, "v": 50 }
+            }
+        };
+
+        if (skipButton !== null) {
+            skipButtonHeightWithSpacing = skipButton.offsetHeight + pixelSpacing;
+
+            var wrapperElement = document.getElementById('fluid_video_wrapper_' + player.videoPlayerId);
+
+            if (wrapperElement.classList.contains('mobile')) {
+                defaultPositions.bottom.left.v = 75;
+                defaultPositions.bottom.right.v = 75;
+            }
+        }
+
+        if (ctaButton !== null) {
+
+            var CTATextPosition = player.displayOptions.vastOptions.adCTATextPosition.toLowerCase();
+
+            if (allowedPosition.indexOf(CTATextPosition) == -1) {
+                console.log('[FP Error] Invalid position for CTAText. Reverting to "bottom right"');
+                CTATextPosition = 'bottom right';
+            }
+
+            positionsCTA = CTATextPosition.split(' ');
+
+            isBottom = positionsCTA[0] == 'bottom';
+
+            ctaButton.style[positionsCTA[0]] = defaultPositions[positionsCTA[0]][positionsCTA[1]].v;
+            ctaButton.style[positionsCTA[1]] = defaultPositions[positionsCTA[0]][positionsCTA[1]].h;
+
+            if (isBottom && positionsCTA[1] == 'right') {
+                ctaButton.style[positionsCTA[0]] = defaultPositions[positionsCTA[0]][positionsCTA[1]].v + skipButtonHeightWithSpacing;
+            }
+
+            ctaButtonHeightWithSpacing = ctaButton.offsetHeight + pixelSpacing;
+
+        }
+
+        if (adPlayingDiv !== null) {
+
+            var adPlayingDivPosition = this.displayOptions.vastOptions.adTextPosition.toLowerCase();
+
+            if (allowedPosition.indexOf(adPlayingDivPosition) == -1) {
+                console.log('[FP Error] Invalid position for adText. Reverting to "top left"');
+                adPlayingDivPosition = 'top left';
+            }
+
+            var positionsAdText = adPlayingDivPosition.split(' ');
+            adPlayingDiv.style[positionsAdText[0]] = defaultPositions[positionsAdText[0]][positionsAdText[1]].v;
+            adPlayingDiv.style[positionsAdText[1]] = defaultPositions[positionsAdText[0]][positionsAdText[1]].h;
+            adPlayingDivHeightWithSpacing = adPlayingDiv.offsetHeight + pixelSpacing;
+        }
+
+        if (ctaButtonHeightWithSpacing > 0 && adPlayingDivHeightWithSpacing > 0 && CTATextPosition == adPlayingDivPosition) {
+            if (isBottom) {
+                if (positionsCTA[1] == 'right') {
+                    adPlayingDiv.style.bottom = defaultPositions[positionsAdText[0]][positionsAdText[1]].v + skipButtonHeightWithSpacing + ctaButtonHeightWithSpacing;
+                } else {
+                    adPlayingDiv.style.bottom = defaultPositions[positionsAdText[0]][positionsAdText[1]].v + ctaButtonHeightWithSpacing;
+                }
+            } else {
+                ctaButton.style.top = defaultPositions[positionsCTA[0]][positionsCTA[1]].v + adPlayingDivHeightWithSpacing;
+            }
+        }
     },
 
     removeAdPlayingText: function() {
@@ -3868,7 +3962,9 @@ var fluidPlayerClass = {
                 skipButtonCaption:            'Skip ad in [seconds]',
                 skipButtonClickCaption:       'Skip Ad <span class="skip_button_icon"></span>',
                 adText:                       null,
+                adTextPosition:               'top left',
                 adCTAText:                    'Visit now!',
+                adCTATextPosition:            'bottom right',
                 vastTimeout:                  5000,
                 showProgressbarMarkers:       false,
 
