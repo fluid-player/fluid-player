@@ -2866,10 +2866,29 @@ var fluidPlayerClass = {
         //Disable the default context menu
         videoPlayerTag.addEventListener('contextmenu', function(event) {
             event.preventDefault();
-
-            divContextMenu.style.left = fluidPlayerClass.getEventOffsetX(event, videoPlayerTag) + 'px';
-            divContextMenu.style.top = fluidPlayerClass.getEventOffsetY(event, videoPlayerTag) + 'px';
+            //Show in invisible area for get div width
+            divContextMenu.style.left = "-9999px";
+            divContextMenu.style.top = "-9999px";
             divContextMenu.style.display = 'block';
+            var x,y,
+                clickX = fluidPlayerClass.getEventOffsetX(event, videoPlayerTag),
+                clickY = fluidPlayerClass.getEventOffsetY(event, videoPlayerTag);
+
+            if(videoPlayerTag.offsetWidth-divContextMenu.offsetWidth < clickX) {
+                x = videoPlayerTag.offsetWidth-divContextMenu.offsetWidth;
+            } else {
+                x = clickX;
+            }
+
+            if(videoPlayerTag.offsetHeight-divContextMenu.offsetHeight < clickY) {
+                y = videoPlayerTag.offsetHeight-divContextMenu.offsetHeight;
+            } else {
+                y = clickY;
+            }
+
+
+            divContextMenu.style.left = x + 'px';
+            divContextMenu.style.top = y + 'px';
         }, false);
 
         //Hide the context menu on clicking elsewhere
