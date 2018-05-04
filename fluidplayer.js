@@ -2764,10 +2764,13 @@ var fluidPlayerClass = {
         } else {
             //Workaround for Safari or Mobile Chrome - otherwise it blocks the subsequent
             //play() command, because it considers it not being triggered by the user.
-            var ua = window.navigator.userAgent;
             var isMobileChecks = fluidPlayerClass.getMobileOs();
+            var browserVersion = fluidPlayerClass.getBrowserVersion();
 
-            if (/^((?!chrome|android).)*safari/i.test(ua) || ((isMobileChecks.userOs !== false || isMobileChecks.device !== false) && (!!window.chrome || -1 !== ua.indexOf("crios") || 0 === window.navigator.vendor.indexOf("Google") && -1 !== ua.indexOf("chrome")))) {
+            if (
+                browserVersion.browserName == 'Safari'
+                || (isMobileChecks.userOs !== false && isMobileChecks.userOs == 'Android' && browserVersion.browserName == 'Google Chrome')
+            ) {
                 videoPlayerTag.src = fluidPlayerScriptLocation + 'blank.mp4';
                 videoPlayerTag.play();
             }
