@@ -1405,9 +1405,12 @@ var fluidPlayerClass = {
             videoPlayerTag.currentTime = newCurrentTime;
         }
 
-        videoPlayerTag.addEventListener("loadedmetadata", function() {
+        var loadedMetadata = function() {
             videoPlayerTag.currentTime = newCurrentTime;
-        }, false);
+            videoPlayerTag.removeEventListener('loadedmetadata', loadedMetadata);
+        };
+
+        videoPlayerTag.addEventListener("loadedmetadata", loadedMetadata, false);
 
         videoPlayerTag.load();
 
