@@ -345,18 +345,14 @@ var fluidPlayerClass = {
     },
 
     getMediaFileFromLinear: function(linear) {
-        var fallbackMediaFile;
+        var mediaFile;
         var mediaFiles = this.getMediaFilesFromLinear(linear);
 
-        for (var i = 0; i < mediaFiles.length; i++) {
-            if (!mediaFiles[i].getAttribute('type')) {
-                fallbackMediaFile = this.extractNodeData(mediaFiles[i]);
-            }
-
-            return mediaFiles[i].childNodes[0].nodeValue;
+        if (mediaFiles.length) {
+            mediaFile = this.extractNodeData(mediaFiles[0]);
         }
 
-        return fallbackMediaFile;
+        return mediaFile;
     },
 
     getIconClickThroughFromLinear: function (linear) {
