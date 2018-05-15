@@ -2074,6 +2074,7 @@ var fluidPlayerClass = {
 
     checkFullscreenSupport: function(videoPlayerId) {
         var videoPlayerTag = document.getElementById(videoPlayerId);
+        var videoPlayerDom = document.getElementById(this.videoPlayerId);
 
         if (videoPlayerTag.mozRequestFullScreen) {
             return {goFullscreen: 'mozRequestFullScreen', exitFullscreen: 'mozCancelFullScreen', isFullscreen: 'mozFullScreenElement'};
@@ -2087,7 +2088,7 @@ var fluidPlayerClass = {
         } else if (videoPlayerTag.requestFullscreen) {
             return {goFullscreen: 'requestFullscreen', exitFullscreen: 'exitFullscreen', isFullscreen: 'fullscreenElement'};
 
-        } else if (videoPlayerTag.webkitSupportsFullscreen) {
+        } else if (videoPlayerDom.webkitSupportsFullscreen) {
             return {goFullscreen: 'webkitEnterFullscreen', exitFullscreen: 'webkitExitFullscreen', isFullscreen: 'webkitDisplayingFullscreen'};
 
         }
