@@ -2786,7 +2786,7 @@ var fluidPlayerClass = {
         });
 
         // Theatre mode
-        if (player.displayOptions.layoutControls.allowTheatre) {
+        if (player.displayOptions.layoutControls.allowTheatre && !player.isInIframe) {
             document.getElementById(player.videoPlayerId + '_fluid_control_theatre').addEventListener('click', function () {
                 player.theatreToggle(player.videoPlayerId);
             });
@@ -3756,6 +3756,10 @@ var fluidPlayerClass = {
     },
 
     theatreToggle: function() {
+        if (this.isInIframe) {
+            return;
+        }
+
         var downloadItem = document.getElementById('fluid_video_wrapper_' + this.videoPlayerId);
         if (!this.theatreMode) {
             // Theatre and fullscreen, it's only one or the other
@@ -3867,6 +3871,14 @@ var fluidPlayerClass = {
         return null;
     },
 
+    inIframe: function() {
+        try {
+            return window.self !== window.top;
+        } catch (e) {
+            return true;
+        }
+    },
+
     init: function(idVideoPlayer, options) {
         var player = this;
         var videoPlayer = document.getElementById(idVideoPlayer);
@@ -3915,6 +3927,7 @@ var fluidPlayerClass = {
         player.dashScriptLoaded        = false;
         player.hlsScriptLoaded         = false;
         player.isPlayingMedia          = false;
+        player.isInIframe              = player.inIframe();
 
         //Default options
         player.displayOptions = {
