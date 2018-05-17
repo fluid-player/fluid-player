@@ -3346,13 +3346,22 @@ var fluidPlayerClass = {
             var videoSwitchedEvent = function() {
                 //after new video is loaded setting time from what it should start play
                 videoPlayerTag.removeEventListener('loadedmetadata', videoSwitchedEvent);
+                // Safari ios fix to set currentTime
+                if(fluidPlayerClass.getMobileOs().userOs == 'iOS') {
+                    videoPlayerTag.addEventListener('playing', videoPlayStart);
+                }
                 videoPlayerTag.currentTime = currentTime;
                 if (play) {
                     player.play();
                 }
             };
+            var videoPlayStart = function() {
+                this.currentTime = currentTime;
+                videoPlayerTag.removeEventListener('playing', videoPlayStart);
+            }
             videoPlayerTag.addEventListener('loadedmetadata', videoSwitchedEvent);
             videoPlayerTag.src = url;
+            videoPlayerTag.load();
             player.originalSrc = url;
             player.displayOptions.layoutControls.mediaType = player.getCurrentSrcType();
             player.initialiseStreamers();
