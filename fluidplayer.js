@@ -1477,19 +1477,7 @@ var fluidPlayerClass = {
             videoPlayerTag.currentTime = newCurrentTime;
         }
 
-        var loadedMetadata = function() {
-            videoPlayerTag.currentTime = newCurrentTime;
-            videoPlayerTag.removeEventListener('loadedmetadata', loadedMetadata);
-        };
-
-        videoPlayerTag.addEventListener("loadedmetadata", loadedMetadata, false);
-
-        videoPlayerTag.load();
-
-
-        if (player.autoplayAfterAd) {
-            player.play();
-        }
+        player.setCurrentTimeAndPlay(newCurrentTime, player.autoplayAfterAd);
 
         player.isCurrentlyPlayingAd = false;
 
@@ -3426,20 +3414,37 @@ var fluidPlayerClass = {
             }
 
             var currentTime = videoPlayerTag.currentTime;
-            var videoSwitchedEvent = function() {
-                //after new video is loaded setting time from what it should start play
-                videoPlayerTag.removeEventListener('loadedmetadata', videoSwitchedEvent);
-                videoPlayerTag.currentTime = currentTime;
-                if (play) {
-                    player.play();
-                }
-            };
-            videoPlayerTag.addEventListener('loadedmetadata', videoSwitchedEvent);
+            player.setCurrentTimeAndPlay(currentTime, play);
+
             videoPlayerTag.src = url;
             player.originalSrc = url;
             player.displayOptions.layoutControls.mediaType = player.getCurrentSrcType();
             player.initialiseStreamers();
         }
+    },
+
+    setCurrentTimeAndPlay: function(newCurrentTime, shouldPlay) {
+        var videoPlayerTag = document.getElementById(this.videoPlayerId);
+        var loadedMetadata = function() {
+            videoPlayerTag.currentTime = newCurrentTime;
+            videoPlayerTag.removeEventListener('loadedmetadata', loadedMetadata);
+            // Safari ios fix to set currentTime
+            if (fluidPlayerClass.getMobileOs().userOs == 'iOS') {
+                videoPlayerTag.addEventListener('playing', videoPlayStart);
+            }
+
+            if (shouldPlay) {
+                this.play();
+            }
+        };
+        var videoPlayStart = function() {
+            this.currentTime = newCurrentTime;
+            videoPlayerTag.removeEventListener('playing', videoPlayStart);
+        };
+
+        videoPlayerTag.addEventListener("loadedmetadata", loadedMetadata, false);
+
+        videoPlayerTag.load();
     },
 
     initLogo: function() {
