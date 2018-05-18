@@ -2688,6 +2688,7 @@ var fluidPlayerClass = {
             //play() command, because it considers it not being triggered by the user.
             var ua = window.navigator.userAgent;
             var isMobileChecks = fluidPlayerClass.getMobileOs();
+            player.isCurrentlyPlayingAd = true;
 
             if (/^((?!chrome|android).)*safari/i.test(ua) || ((isMobileChecks.userOs !== false || isMobileChecks.device !== false) && (!!window.chrome || -1 !== ua.indexOf("crios") || 0 === window.navigator.vendor.indexOf("Google") && -1 !== ua.indexOf("chrome")))) {
                 videoPlayerTag.src = fluidPlayerScriptLocation + 'blank.mp4';
