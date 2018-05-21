@@ -955,9 +955,11 @@ var fluidPlayerClass = {
             }
 
             var currentTime = Math.floor(videoPlayerTag.currentTime);
-            player.scheduleTrackingEvent(currentTime, player.vastOptions.duration);
+            if (player.vastOptions.duration != 0) {
+                player.scheduleTrackingEvent(currentTime, player.vastOptions.duration);
+            }
 
-            if (currentTime >= (player.vastOptions.duration - 1 )) {
+            if (currentTime >= (player.vastOptions.duration - 1 ) && player.vastOptions.duration != 0) {
                 videoPlayerTag.removeEventListener('timeupdate', videoPlayerTimeUpdate);
                 player.adFinished = true;
             }
