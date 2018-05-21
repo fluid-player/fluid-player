@@ -434,7 +434,8 @@
     transition: visibility 0.5s, opacity 0.5s;
 }
 
-.fluid_video_wrapper.fluid_player_layout_default:hover .fluid_controls_container {
+.fluid_video_wrapper.fluid_player_layout_default:hover .fluid_controls_container,
+.fluid_video_wrapper.fluid_player_layout_default:hover .fp_logo {
     visibility: visible;
     opacity: 1;
 }
@@ -532,7 +533,7 @@ _:-ms-lang(x),
     position: absolute;
     left: 13px;
     right: 13px;
-    z-index: 2;
+    z-index: 1;
     top: 8px;
 }
 
@@ -550,7 +551,7 @@ _:-ms-lang(x),
     width: 0;
     height: 3px;
     background-color: rgba(255, 255, 255, 0.5);
-    z-index: 1;
+    z-index: -1;
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_progress_container .fluid_controls_progress,
@@ -560,13 +561,13 @@ _:-ms-lang(x),
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_progress_container:hover .fluid_controls_progress,
-.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_progress_container:hover .fluid_controls_buffered {
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_progress_container:hover .fluid_controls_buffered,
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_progress_container:hover .fluid_controls_ad_markers_holder {
     margin-top: -1px;
     height: 5px;
 }
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_progress_container:hover .fluid_controls_progress .fluid_controls_currentprogress {
     height: 5px;
-    z-index: 4;
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_progress_container .fluid_timeline_preview_container {
@@ -597,7 +598,7 @@ _:-ms-lang(x),
     top: 5px;
     width: 100%;
     height: 3px;
-    z-index: 3;
+    z-index: 2;
 }
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_ad_marker {
     position: absolute;
@@ -646,7 +647,7 @@ _:-ms-lang(x),
 
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_progress_container .fluid_controls_progress .fluid_controls_currentpos {
     right: -4px;
-    z-index: 5;
+    z-index: 3;
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_control_volume_container .fluid_control_volume .fluid_control_currentvolume .fluid_control_volume_currentpos,
