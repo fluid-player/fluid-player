@@ -1502,7 +1502,6 @@ var fluidPlayerClass = {
         }
 
         videoPlayerTag.removeEventListener('ended', player.onVastAdEnded);
-        videoPlayerTag.addEventListener('ended', player.onMainVideoEnded);
 
         if (player.displayOptions.layoutControls.layout=== 'browser') {
             videoPlayerTag.setAttribute('controls', 'controls');
@@ -1537,6 +1536,9 @@ var fluidPlayerClass = {
 
     onMainVideoEnded: function () {
         var player = fluidPlayerClass.getInstanceById(this.id);
+        if (player.isCurrentlyPlayingAd && player.autoplayAfterAd) {  // It may be in-stream ending, and if it's not postroll then we don't execute anything
+            return;
+        }
 
         //we can remove timer as no more ad will be shown
         if (Math.floor(player.getCurrentTime()) >= Math.floor(player.mainVideoDuration)) {
@@ -2754,6 +2756,7 @@ var fluidPlayerClass = {
             //play() command, because it considers it not being triggered by the user.
             var isMobileChecks = fluidPlayerClass.getMobileOs();
             var browserVersion = fluidPlayerClass.getBrowserVersion();
+            player.isCurrentlyPlayingAd = true;
 
             if (
                 browserVersion.browserName == 'Safari'
@@ -4087,6 +4090,7 @@ var fluidPlayerClass = {
         videoPlayer.addEventListener('loadedmetadata', player.mainVideoReady, false);
         videoPlayer.addEventListener('durationchange', function() {player.currentVideoDuration = player.getCurrentVideoDuration();}, false);
         videoPlayer.addEventListener('error', player.onErrorDetection, false);
+        videoPlayer.addEventListener('ended', player.onMainVideoEnded, false);
 
         //Manually load the video duration if the video was loaded before adding the event listener
         player.currentVideoDuration = player.getCurrentVideoDuration();
