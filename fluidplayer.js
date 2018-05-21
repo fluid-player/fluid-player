@@ -2015,10 +2015,6 @@ var fluidPlayerClass = {
         }
 
         if (isPlaying) {
-            if (!player.isCurrentlyPlayingAd && player.displayOptions.layoutControls.playPauseAnimation) {
-                player.playPauseAnimationToggle(true, videoPlayerId);
-            }
-
             playPauseButton.className = playPauseButton.className.replace(/\bfluid_button_play\b/g, 'fluid_button_pause');
             controlsDisplay.classList.remove('initial_controls_show');
             if (fpLogo) {
@@ -2030,10 +2026,6 @@ var fluidPlayerClass = {
             }
 
         } else {
-            if (!player.isCurrentlyPlayingAd && player.displayOptions.layoutControls.playPauseAnimation) {
-                player.playPauseAnimationToggle(false, videoPlayerId);
-            }
-
             playPauseButton.className = playPauseButton.className.replace(/\bfluid_button_pause\b/g, 'fluid_button_play');
             controlsDisplay.classList.add('initial_controls_show');
             if (fpLogo) {
@@ -2046,7 +2038,12 @@ var fluidPlayerClass = {
         }
     },
 
-    playPauseAnimationToggle: function(play, videoPlayerId) {
+    playPauseAnimationToggle: function(play) {
+        if (this.isCurrentlyPlayingAd || !this.displayOptions.layoutControls.playPauseAnimation || this.isSwitchingSource) {
+            return;
+        }
+
+        videoPlayerId = this.videoPlayerId;
         if (play) {
             document.getElementById(videoPlayerId + '_fluid_state_button').classList.remove('fluid_initial_pause_button');
             document.getElementById(videoPlayerId + '_fluid_state_button').classList.add('fluid_initial_play_button');
@@ -2744,8 +2741,10 @@ var fluidPlayerClass = {
                     } else {
                         videoPlayerTag.play();
                     }
+                    this.playPauseAnimationToggle(true);
                 } else if (!isFirstStart) {
                     videoPlayerTag.pause();
+                    this.playPauseAnimationToggle(false);
                 }
             }
 
@@ -2764,6 +2763,7 @@ var fluidPlayerClass = {
             ) {
                 videoPlayerTag.src = fluidPlayerScriptLocation + 'blank.mp4';
                 videoPlayerTag.play();
+                this.playPauseAnimationToggle(true);
             }
 
             player.firstPlayLaunched = true;
@@ -3410,6 +3410,7 @@ var fluidPlayerClass = {
         if (player.isCurrentlyPlayingAd) {
             player.originalSrc = url;
         } else {
+            player.isSwitchingSource = true;
             var play = false;
             if (!videoPlayerTag.paused) {
                 videoPlayerTag.pause();
@@ -3428,6 +3429,8 @@ var fluidPlayerClass = {
 
     setCurrentTimeAndPlay: function(newCurrentTime, shouldPlay) {
         var videoPlayerTag = document.getElementById(this.videoPlayerId);
+        var player = this;
+      
         var loadedMetadata = function() {
             videoPlayerTag.currentTime = newCurrentTime;
             videoPlayerTag.removeEventListener('loadedmetadata', loadedMetadata);
@@ -3439,6 +3442,7 @@ var fluidPlayerClass = {
             if (shouldPlay) {
                 videoPlayerTag.play();
             }
+            player.isSwitchingSource = false;
         };
         var videoPlayStart = function() {
             this.currentTime = newCurrentTime;
@@ -4018,6 +4022,7 @@ var fluidPlayerClass = {
         player.dashScriptLoaded        = false;
         player.hlsScriptLoaded         = false;
         player.isPlayingMedia          = false;
+        player.isSwitchingSource       = false;
         player.isInIframe              = player.inIframe();
 
         //Default options
