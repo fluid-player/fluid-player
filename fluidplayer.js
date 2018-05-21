@@ -3409,7 +3409,7 @@ var fluidPlayerClass = {
         } else {
             var play = false;
             if (!videoPlayerTag.paused) {
-                player.pause();
+                videoPlayerTag.pause();
                 var play = true;
             }
 
@@ -3434,7 +3434,7 @@ var fluidPlayerClass = {
             }
 
             if (shouldPlay) {
-                this.play();
+                videoPlayerTag.play();
             }
         };
         var videoPlayStart = function() {
