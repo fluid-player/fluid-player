@@ -2135,22 +2135,23 @@ var fluidPlayerClass = {
         }
     },
 
-    checkFullscreenSupport: function(videoPlayerId) {
-        var videoPlayerTag = document.getElementById(videoPlayerId);
+    checkFullscreenSupport: function(videoPlayerWrapperId) {
+        var videoPlayerWrapper = document.getElementById(videoPlayerWrapperId);
+        var videoPlayer = document.getElementById(this.videoPlayerId);
 
-        if (videoPlayerTag.mozRequestFullScreen) {
+        if (videoPlayerWrapper.mozRequestFullScreen) {
             return {goFullscreen: 'mozRequestFullScreen', exitFullscreen: 'mozCancelFullScreen', isFullscreen: 'mozFullScreenElement'};
 
-        } else if (videoPlayerTag.webkitRequestFullscreen) {
+        } else if (videoPlayerWrapper.webkitRequestFullscreen) {
             return {goFullscreen: 'webkitRequestFullscreen', exitFullscreen: 'webkitExitFullscreen', isFullscreen: 'webkitFullscreenElement'};
 
-        } else if (videoPlayerTag.msRequestFullscreen) {
+        } else if (videoPlayerWrapper.msRequestFullscreen) {
             return {goFullscreen: 'msRequestFullscreen', exitFullscreen: 'msExitFullscreen', isFullscreen: 'msFullscreenElement'};
 
-        } else if (videoPlayerTag.requestFullscreen) {
+        } else if (videoPlayerWrapper.requestFullscreen) {
             return {goFullscreen: 'requestFullscreen', exitFullscreen: 'exitFullscreen', isFullscreen: 'fullscreenElement'};
 
-        } else if (videoPlayerTag.webkitSupportsFullscreen) {
+        } else if (videoPlayer.webkitSupportsFullscreen) {
             return {goFullscreen: 'webkitEnterFullscreen', exitFullscreen: 'webkitExitFullscreen', isFullscreen: 'webkitDisplayingFullscreen'};
 
         }
@@ -2181,7 +2182,7 @@ var fluidPlayerClass = {
         var requestFullscreenFunctionNames = this.checkFullscreenSupport('fluid_video_wrapper_' + this.videoPlayerId);
         var fullscreenButton = document.getElementById(this.videoPlayerId + '_fluid_control_fullscreen');
         var menuOptionFullscreen = document.getElementById(this.videoPlayerId + 'context_option_fullscreen');
-        videoPlayerTag = document.getElementById(this.videoPlayerId);
+        var videoPlayerTag = document.getElementById(this.videoPlayerId);
 
         // Disable Theatre mode if it's on while we toggle fullscreen
         if (this.theatreMode) {
