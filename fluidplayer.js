@@ -3338,7 +3338,7 @@ var fluidPlayerClass = {
         } else {
             var play = false;
             if (!videoPlayerTag.paused) {
-                player.pause();
+                videoPlayerTag.pause();
                 var play = true;
             }
 
@@ -3348,7 +3348,7 @@ var fluidPlayerClass = {
                 videoPlayerTag.removeEventListener('loadedmetadata', videoSwitchedEvent);
                 videoPlayerTag.currentTime = currentTime;
                 if (play) {
-                    player.play();
+                    videoPlayerTag.play();
                 }
             };
             videoPlayerTag.addEventListener('loadedmetadata', videoSwitchedEvent);
