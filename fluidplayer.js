@@ -4160,10 +4160,9 @@ var fluidPlayerClass = {
 
                     }).catch(function (error) {
 
-                        var deviceInfo = fluidPlayerClass.getMobileOs();
-                        var isAbortError = (deviceInfo.userOs === 'iOS' || deviceInfo.userOs === 'Android') && (typeof error.name != 'undefined' && error.name == 'AbortError');
-
-                        //On iOS and Android devices in some cases throws an "AbortError" which does not happens otherwise
+                        var isAbortError = (typeof error.name !== 'undefined' && error.name === 'AbortError');
+                        // Ignore abort errors which caused for example Safari or autoplay functions
+                        // (example: interrupted by a new load request)
                         if(isAbortError) {
                             // Ignore AbortError error reporting
                         } else {
@@ -4193,7 +4192,7 @@ var fluidPlayerClass = {
             var player = fluidPlayerClass.getInstanceById(videoPlayer.id);
 
             if (player.isPlayingMedia === true) {
-
+                player.isPlayingMedia = false;
                 return _pause_videoPlayer.apply(this, arguments);
 
             } else {
@@ -4201,6 +4200,7 @@ var fluidPlayerClass = {
                 // just in case
                 if (player.isCurrentlyPlayingVideo(videoPlayer)) {
                     try {
+                        player.isPlayingMedia = false;
                         return _pause_videoPlayer.apply(this, arguments);
                     } catch (e) {
                         player.announceLocalError(203, 'Failed to play video.');
