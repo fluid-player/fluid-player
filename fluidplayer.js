@@ -213,6 +213,78 @@ var fluidPlayerClass = {
         return result;
     },
 
+    /**
+     * Browser detection
+     *
+     * @returns object
+     */
+    getBrowserVersion: function() {
+
+        var ua = navigator.userAgent;
+        var result = {browserName: false, fullVersion: false, majorVersion: false, userOsMajor: false};
+        var idx, uaindex;
+
+        try {
+
+            result.browserName = navigator.appName;
+
+            if ((idx = ua.indexOf("OPR/")) != -1) {
+                result.browserName = "Opera";
+                result.fullVersion = ua.substring(idx + 4);
+            }
+            else if ((idx = ua.indexOf("Opera")) != -1) {
+                result.browserName = "Opera";
+                result.fullVersion = ua.substring(idx + 6);
+                if ((idx = ua.indexOf("Version")) != -1)
+                    result.fullVersion = ua.substring(idx + 8);
+            }
+            else if ((idx = ua.indexOf("MSIE")) != -1) {
+                result.browserName = "Microsoft Internet Explorer";
+                result.fullVersion = ua.substring(idx + 5);
+            }
+            else if ((idx = ua.indexOf("Chrome")) != -1) {
+                result.browserName = "Google Chrome";
+                result.fullVersion = ua.substring(idx + 7);
+            }
+            else if ((idx = ua.indexOf("Safari")) != -1) {
+                result.browserName = "Safari";
+                result.fullVersion = ua.substring(idx + 7);
+                if ((idx = ua.indexOf("Version")) != -1)
+                    result.fullVersion = ua.substring(idx + 8);
+            }
+            else if ((idx = ua.indexOf("Firefox")) != -1) {
+                result.browserName = "Mozilla Firefox";
+                result.fullVersion = ua.substring(idx + 8);
+            }
+            // Others "name/version" is at the end of userAgent
+            else if ((uaindex = ua.lastIndexOf(' ') + 1) < (idx = ua.lastIndexOf('/'))) {
+                result.browserName = ua.substring(uaindex, idx);
+                result.fullVersion = ua.substring(idx + 1);
+                if (result.browserName.toLowerCase() == result.browserName.toUpperCase()) {
+                    result.browserName = navigator.appName;
+                }
+            }
+
+            // trim the fullVersion string at semicolon/space if present
+            if ((uaindex = result.fullVersion.indexOf(';')) != -1) {
+                result.fullVersion = result.fullVersion.substring(0, uaindex);
+            }
+            if ((uaindex = result.fullVersion.indexOf(' ')) != -1) {
+                result.fullVersion = result.fullVersion.substring(0, uaindex);
+            }
+
+            result.majorVersion = parseInt('' + result.fullVersion, 10);
+            if (isNaN(result.majorVersion)) {
+                result.fullVersion = '' + parseFloat(navigator.appVersion);
+                result.majorVersion = parseInt(navigator.appVersion, 10);
+            }
+        } catch (e) {
+            //Return default obj.
+        }
+
+        return result;
+    },
+
     getCurrentVideoDuration: function() {
         var videoPlayerTag = document.getElementById(this.videoPlayerId);
 
@@ -1398,18 +1470,14 @@ var fluidPlayerClass = {
 
         player.initialiseStreamers();
 
-        videoPlayerTag.load();
+        var newCurrentTime = (typeof videoPlayerTag.mainVideoCurrentTime !== 'undefined')
+            ? videoPlayerTag.mainVideoCurrentTime : 0;
 
-
-        if (typeof videoPlayerTag.mainVideoCurrentTime !== 'undefined') {
-            videoPlayerTag.currentTime = videoPlayerTag.mainVideoCurrentTime;
-        } else {
-            videoPlayerTag.currentTime = 0;
+        if(videoPlayerTag.hasOwnProperty('currentTime')) {
+            videoPlayerTag.currentTime = newCurrentTime;
         }
 
-        if (player.autoplayAfterAd) {
-            player.play();
-        }
+        player.setCurrentTimeAndPlay(newCurrentTime, player.autoplayAfterAd);
 
         player.isCurrentlyPlayingAd = false;
 
@@ -1434,7 +1502,6 @@ var fluidPlayerClass = {
         }
 
         videoPlayerTag.removeEventListener('ended', player.onVastAdEnded);
-        videoPlayerTag.addEventListener('ended', player.onMainVideoEnded);
 
         if (player.displayOptions.layoutControls.layout=== 'browser') {
             videoPlayerTag.setAttribute('controls', 'controls');
@@ -1469,6 +1536,9 @@ var fluidPlayerClass = {
 
     onMainVideoEnded: function () {
         var player = fluidPlayerClass.getInstanceById(this.id);
+        if (player.isCurrentlyPlayingAd && player.autoplayAfterAd) {  // It may be in-stream ending, and if it's not postroll then we don't execute anything
+            return;
+        }
 
         //we can remove timer as no more ad will be shown
         if (Math.floor(player.getCurrentTime()) >= Math.floor(player.mainVideoDuration)) {
@@ -2683,10 +2753,14 @@ var fluidPlayerClass = {
         } else {
             //Workaround for Safari or Mobile Chrome - otherwise it blocks the subsequent
             //play() command, because it considers it not being triggered by the user.
-            var ua = window.navigator.userAgent;
             var isMobileChecks = fluidPlayerClass.getMobileOs();
+            var browserVersion = fluidPlayerClass.getBrowserVersion();
+            player.isCurrentlyPlayingAd = true;
 
-            if (/^((?!chrome|android).)*safari/i.test(ua) || ((isMobileChecks.userOs !== false || isMobileChecks.device !== false) && (!!window.chrome || -1 !== ua.indexOf("crios") || 0 === window.navigator.vendor.indexOf("Google") && -1 !== ua.indexOf("chrome")))) {
+            if (
+                browserVersion.browserName == 'Safari'
+                || (isMobileChecks.userOs !== false && isMobileChecks.userOs == 'Android' && browserVersion.browserName == 'Google Chrome')
+            ) {
                 videoPlayerTag.src = fluidPlayerScriptLocation + 'blank.mp4';
                 videoPlayerTag.play();
                 this.playPauseAnimationToggle(true);
@@ -2786,7 +2860,7 @@ var fluidPlayerClass = {
         });
 
         // Theatre mode
-        if (player.displayOptions.layoutControls.allowTheatre) {
+        if (player.displayOptions.layoutControls.allowTheatre && !player.isInIframe) {
             document.getElementById(player.videoPlayerId + '_fluid_control_theatre').addEventListener('click', function () {
                 player.theatreToggle(player.videoPlayerId);
             });
@@ -3339,26 +3413,45 @@ var fluidPlayerClass = {
             player.isSwitchingSource = true;
             var play = false;
             if (!videoPlayerTag.paused) {
-                player.pause();
+                videoPlayerTag.pause();
                 var play = true;
             }
 
             var currentTime = videoPlayerTag.currentTime;
-            var videoSwitchedEvent = function() {
-                //after new video is loaded setting time from what it should start play
-                videoPlayerTag.removeEventListener('loadedmetadata', videoSwitchedEvent);
-                videoPlayerTag.currentTime = currentTime;
-                if (play) {
-                    player.play();
-                }
-                player.isSwitchingSource = false;
-            };
-            videoPlayerTag.addEventListener('loadedmetadata', videoSwitchedEvent);
+            player.setCurrentTimeAndPlay(currentTime, play);
+
             videoPlayerTag.src = url;
             player.originalSrc = url;
             player.displayOptions.layoutControls.mediaType = player.getCurrentSrcType();
             player.initialiseStreamers();
         }
+    },
+
+    setCurrentTimeAndPlay: function(newCurrentTime, shouldPlay) {
+        var videoPlayerTag = document.getElementById(this.videoPlayerId);
+        var player = this;
+      
+        var loadedMetadata = function() {
+            videoPlayerTag.currentTime = newCurrentTime;
+            videoPlayerTag.removeEventListener('loadedmetadata', loadedMetadata);
+            // Safari ios fix to set currentTime
+            if (fluidPlayerClass.getMobileOs().userOs == 'iOS') {
+                videoPlayerTag.addEventListener('playing', videoPlayStart);
+            }
+
+            if (shouldPlay) {
+                videoPlayerTag.play();
+            }
+            player.isSwitchingSource = false;
+        };
+        var videoPlayStart = function() {
+            this.currentTime = newCurrentTime;
+            videoPlayerTag.removeEventListener('playing', videoPlayStart);
+        };
+
+        videoPlayerTag.addEventListener("loadedmetadata", loadedMetadata, false);
+
+        videoPlayerTag.load();
     },
 
     initLogo: function() {
@@ -3758,6 +3851,10 @@ var fluidPlayerClass = {
     },
 
     theatreToggle: function() {
+        if (this.isInIframe) {
+            return;
+        }
+
         var downloadItem = document.getElementById('fluid_video_wrapper_' + this.videoPlayerId);
         if (!this.theatreMode) {
             // Theatre and fullscreen, it's only one or the other
@@ -3869,6 +3966,14 @@ var fluidPlayerClass = {
         return null;
     },
 
+    inIframe: function() {
+        try {
+            return window.self !== window.top;
+        } catch (e) {
+            return true;
+        }
+    },
+
     init: function(idVideoPlayer, options) {
         var player = this;
         var videoPlayer = document.getElementById(idVideoPlayer);
@@ -3918,6 +4023,7 @@ var fluidPlayerClass = {
         player.hlsScriptLoaded         = false;
         player.isPlayingMedia          = false;
         player.isSwitchingSource       = false;
+        player.isInIframe              = player.inIframe();
 
         //Default options
         player.displayOptions = {
@@ -4002,6 +4108,7 @@ var fluidPlayerClass = {
         videoPlayer.addEventListener('loadedmetadata', player.mainVideoReady, false);
         videoPlayer.addEventListener('durationchange', function() {player.currentVideoDuration = player.getCurrentVideoDuration();}, false);
         videoPlayer.addEventListener('error', player.onErrorDetection, false);
+        videoPlayer.addEventListener('ended', player.onMainVideoEnded, false);
 
         //Manually load the video duration if the video was loaded before adding the event listener
         player.currentVideoDuration = player.getCurrentVideoDuration();
@@ -4103,6 +4210,13 @@ var fluidPlayerClass = {
         };
 
         if (player.displayOptions.layoutControls.autoPlay && !player.dashScriptLoaded && !player.hlsScriptLoaded) {
+
+            //There is known issue with Safari 11+, will prevent autoPlay, so we wont try
+            var browserVersion = fluidPlayerClass.getBrowserVersion();
+            if (browserVersion.browserName == 'Safari' && browserVersion.majorVersion >= 11){
+                return;
+            }
+
             videoPlayer.play();
         }
 
