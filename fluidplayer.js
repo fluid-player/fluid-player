@@ -3139,6 +3139,7 @@ var fluidPlayerClass = {
                             (tempThumbnailData.length === 2) &&
                             (tempThumbnailData[1].indexOf('xywh=') === 0)
                         ) {
+                            player.displayOptions.layoutControls.timelinePreview.spriteImage = true;
                             tempThumbnailCoordinates = tempThumbnailData[1].substring(5);
                             tempThumbnailCoordinates = tempThumbnailCoordinates.split(',');
 
@@ -3243,7 +3244,9 @@ var fluidPlayerClass = {
                     'url(' + thumbnailCoordinates.image + ') no-repeat scroll -' + thumbnailCoordinates.x + 'px -' + thumbnailCoordinates.y + 'px';
                 timelinePreviewTag.style.left = hoverX - (thumbnailCoordinates.w / 2) + 'px';
                 timelinePreviewTag.style.display = 'block';
-                timelinePreviewTag.style.backgroundSize = 'contain';
+                if (!player.displayOptions.layoutControls.timelinePreview.spriteImage) {
+                    timelinePreviewTag.style.backgroundSize = 'contain';
+                }
 
             } else {
                 timelinePreviewTag.style.display = 'none';
@@ -4067,7 +4070,9 @@ var fluidPlayerClass = {
                     autoHideTimeout:          3,
                     animated:                 true
                 },
-                timelinePreview:              {},
+                timelinePreview:              {
+                    spriteImage:              false
+                },
                 htmlOnPauseBlock: {
                     html:                     null,
                     height:                   null,
