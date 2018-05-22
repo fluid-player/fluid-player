@@ -3139,11 +3139,11 @@ var fluidPlayerClass = {
                             (tempThumbnailData.length === 2) &&
                             (tempThumbnailData[1].indexOf('xywh=') === 0)
                         ) {
-                            player.displayOptions.layoutControls.timelinePreview.spriteImage = true;
                             tempThumbnailCoordinates = tempThumbnailData[1].substring(5);
                             tempThumbnailCoordinates = tempThumbnailCoordinates.split(',');
 
                             if (tempThumbnailCoordinates.length === 4) {
+                                player.displayOptions.layoutControls.timelinePreview.spriteImage = true;
                                 xCoords = parseInt(tempThumbnailCoordinates[0]);
                                 yCoords = parseInt(tempThumbnailCoordinates[1]);
                                 wCoords = parseInt(tempThumbnailCoordinates[2]);
