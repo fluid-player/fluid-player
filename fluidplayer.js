@@ -3132,7 +3132,9 @@ var fluidPlayerClass = {
 
                     for (var i = 0; i < vttRawData.cues.length; i++) {
                         tempThumbnailData = vttRawData.cues[i].text.split('#');
+                        var xCoords = 0, yCoords = 0, wCoords = 122.5, hCoords = 69;
 
+                        // .vtt file contains sprite corrdinates
                         if (
                             (tempThumbnailData.length === 2) &&
                             (tempThumbnailData[1].indexOf('xywh=') === 0)
@@ -3141,27 +3143,22 @@ var fluidPlayerClass = {
                             tempThumbnailCoordinates = tempThumbnailCoordinates.split(',');
 
                             if (tempThumbnailCoordinates.length === 4) {
-                                result.push({
-                                    startTime: vttRawData.cues[i].startTime,
-                                    endTime: vttRawData.cues[i].endTime,
-                                    image: (player.displayOptions.layoutControls.timelinePreview.sprite ? player.displayOptions.layoutControls.timelinePreview.sprite : tempThumbnailData[0]),
-                                    x: parseInt(tempThumbnailCoordinates[0]),
-                                    y: parseInt(tempThumbnailCoordinates[1]),
-                                    w: parseInt(tempThumbnailCoordinates[2]),
-                                    h: parseInt(tempThumbnailCoordinates[3])
-                                });
+                                xCoords = parseInt(tempThumbnailCoordinates[0]);
+                                yCoords = parseInt(tempThumbnailCoordinates[1]);
+                                wCoords = parseInt(tempThumbnailCoordinates[2]);
+                                hCoords = parseInt(tempThumbnailCoordinates[3]);
                             }
-                        } else {
-                            result.push({
-                                startTime: vttRawData.cues[i].startTime,
-                                endTime: vttRawData.cues[i].endTime,
-                                image: tempThumbnailData[0],
-                                x: 0,
-                                y: 0,
-                                w: 122.5,
-                                h: 69
-                            });
                         }
+
+                        result.push({
+                            startTime: vttRawData.cues[i].startTime,
+                            endTime: vttRawData.cues[i].endTime,
+                            image: (player.displayOptions.layoutControls.timelinePreview.sprite ? player.displayOptions.layoutControls.timelinePreview.sprite : tempThumbnailData[0]),
+                            x: xCoords,
+                            y: yCoords,
+                            w: wCoords,
+                            h: hCoords
+                        });
                     }
 
                     return result;
