@@ -728,7 +728,8 @@ var fluidPlayerClass = {
             function() {
                 var xmlHttpReq = this;
 
-                if ((xmlHttpReq.readyState === 4) && (xmlHttpReq.status !== 200)) {
+                // Helper function to stop processing
+                var stopProcessAndReportError = function() {
 
                     //Set the error flag for the Ad
                     player.adList[adListId].error = true;
@@ -740,6 +741,11 @@ var fluidPlayerClass = {
                     } else {
                         player.announceLocalError(101);
                     }
+
+                };
+
+                if ((xmlHttpReq.readyState === 4) && (xmlHttpReq.status !== 200)) {
+                    stopProcessAndReportError();
                     return;
                 }
 
@@ -748,6 +754,11 @@ var fluidPlayerClass = {
                 }
 
                 var xmlResponse = xmlHttpReq.responseXML;
+
+                if(!xmlResponse) {
+                    stopProcessAndReportError();
+                    return;
+                }
 
                 //Get impression tag
                 var impression = xmlResponse.getElementsByTagName('Impression');
@@ -823,27 +834,11 @@ var fluidPlayerClass = {
                         document.getElementById(player.videoPlayerId).dispatchEvent(event);
                         return;
                     } else {
-                        player.adList[adListId].error = true;
-                        //announceError the main video
-                        //Try to switch main video only if it is a preRoll scenario
-                        if (typeof adListId !== 'undefined' && player.adList[adListId]['roll'] == 'preRoll') {
-                            player.playMainVideoWhenVastFails(101);
-                        } else {
-                            player.announceLocalError(101);
-                        }
-
+                        stopProcessAndReportError();
                         return;
                     }
                 } else {
-                    player.adList[adListId].error = true;
-                    //announceError the main video
-                    //Try to switch to main video only if it is a preRoll scenario otherwise just ignore
-                    if (typeof adListId !== 'undefined' && player.adList[adListId]['roll'] == 'preRoll') {
-                        player.playMainVideoWhenVastFails(101);
-                    } else {
-                        player.announceLocalError(101);
-                    }
-
+                    stopProcessAndReportError();
                     return;
                 }
                 player.displayOptions.vastOptions.vastAdvanced.vastLoadedCallback();
