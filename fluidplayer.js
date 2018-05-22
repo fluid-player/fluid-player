@@ -3151,6 +3151,16 @@ var fluidPlayerClass = {
                                     h: parseInt(tempThumbnailCoordinates[3])
                                 });
                             }
+                        } else {
+                            result.push({
+                                startTime: vttRawData.cues[i].startTime,
+                                endTime: vttRawData.cues[i].endTime,
+                                image: tempThumbnailData[0],
+                                x: 0,
+                                y: 0,
+                                w: 122.5,
+                                h: 69
+                            });
                         }
                     }
 
@@ -3236,6 +3246,7 @@ var fluidPlayerClass = {
                     'url(' + thumbnailCoordinates.image + ') no-repeat scroll -' + thumbnailCoordinates.x + 'px -' + thumbnailCoordinates.y + 'px';
                 timelinePreviewTag.style.left = hoverX - (thumbnailCoordinates.w / 2) + 'px';
                 timelinePreviewTag.style.display = 'block';
+                timelinePreviewTag.style.backgroundSize = 'contain';
 
             } else {
                 timelinePreviewTag.style.display = 'none';
