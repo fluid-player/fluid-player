@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## 2.2.1
+* [Pull #153](https://github.com/fluid-player/fluid-player/pull/153) CDATA media file ignores whitespace correctly
+* [Pull #154](https://github.com/fluid-player/fluid-player/pull/154) onPauseRoll not showing on source switch
+* [Pull #155](https://github.com/fluid-player/fluid-player/pull/155) iOS native fullscreen
+* [Pull #156](https://github.com/fluid-player/fluid-player/pull/156) CSS fixes for progress bar and logo
+* [Pull #157](https://github.com/fluid-player/fluid-player/pull/157) Fix for onMainVideoEnded firing correctly
+* [Pull #158](https://github.com/fluid-player/fluid-player/pull/158) Play / Pause animation to not show when changing source
+* [Pull #159](https://github.com/fluid-player/fluid-player/pull/159) Theatre mode to not show in iframe
+* [Pull #148](https://github.com/fluid-player/fluid-player/pull/148) Fix for currentTime being set for iOS and safari for ads and source switch
+* [Pull #165](https://github.com/fluid-player/fluid-player/pull/165) Fix for video duration if passed as 00:00:00 in the VAST file
+* [Pull #167](https://github.com/fluid-player/fluid-player/pull/167) Allow for individual images to be set in .vtt file
+* [Pull #169](https://github.com/fluid-player/fluid-player/pull/169) Preview Thumbnail image locations - Ability to set relative path
+* [Pull #168](https://github.com/fluid-player/fluid-player/pull/168) Show custom error if XML content-type is wrong
+* [Pull #166](https://github.com/fluid-player/fluid-player/pull/166) Bug fix for Error 202  showing up periodically in the console
+* [Pull #149](https://github.com/fluid-player/fluid-player/pull/149) Bug fix to remove mainVideoReady eventListener after success
+
 ## 2.2.0
 * [Pull #121](https://github.com/fluid-player/fluid-player/pull/121) 'Browser layout' VAST fixes
 * [Pull #122](https://github.com/fluid-player/fluid-player/pull/122) iOS fullscreen improvements, use native player

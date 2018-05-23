@@ -109,7 +109,7 @@ var fluidPlayerClass = {
         'toggleElementText', 'getMobileOs', 'findClosestParent', 'activeVideoPlayerId',
         'getInstanceIdByWrapperId', 'timer', 'timerPool', 'adList', 'adPool',
         'isUserActive', 'isCurrentlyPlayingAd', 'initialAnimationSet'],
-    version: '2.2.0',
+    version: '2.2.1',
     homepage: 'https://www.fluidplayer.com/',
     activeVideoPlayerId: null,
 
@@ -208,6 +208,78 @@ var fluidPlayerClass = {
 
         } else {
             result.userOsVer = false;
+        }
+
+        return result;
+    },
+
+    /**
+     * Browser detection
+     *
+     * @returns object
+     */
+    getBrowserVersion: function() {
+
+        var ua = navigator.userAgent;
+        var result = {browserName: false, fullVersion: false, majorVersion: false, userOsMajor: false};
+        var idx, uaindex;
+
+        try {
+
+            result.browserName = navigator.appName;
+
+            if ((idx = ua.indexOf("OPR/")) != -1) {
+                result.browserName = "Opera";
+                result.fullVersion = ua.substring(idx + 4);
+            }
+            else if ((idx = ua.indexOf("Opera")) != -1) {
+                result.browserName = "Opera";
+                result.fullVersion = ua.substring(idx + 6);
+                if ((idx = ua.indexOf("Version")) != -1)
+                    result.fullVersion = ua.substring(idx + 8);
+            }
+            else if ((idx = ua.indexOf("MSIE")) != -1) {
+                result.browserName = "Microsoft Internet Explorer";
+                result.fullVersion = ua.substring(idx + 5);
+            }
+            else if ((idx = ua.indexOf("Chrome")) != -1) {
+                result.browserName = "Google Chrome";
+                result.fullVersion = ua.substring(idx + 7);
+            }
+            else if ((idx = ua.indexOf("Safari")) != -1) {
+                result.browserName = "Safari";
+                result.fullVersion = ua.substring(idx + 7);
+                if ((idx = ua.indexOf("Version")) != -1)
+                    result.fullVersion = ua.substring(idx + 8);
+            }
+            else if ((idx = ua.indexOf("Firefox")) != -1) {
+                result.browserName = "Mozilla Firefox";
+                result.fullVersion = ua.substring(idx + 8);
+            }
+            // Others "name/version" is at the end of userAgent
+            else if ((uaindex = ua.lastIndexOf(' ') + 1) < (idx = ua.lastIndexOf('/'))) {
+                result.browserName = ua.substring(uaindex, idx);
+                result.fullVersion = ua.substring(idx + 1);
+                if (result.browserName.toLowerCase() == result.browserName.toUpperCase()) {
+                    result.browserName = navigator.appName;
+                }
+            }
+
+            // trim the fullVersion string at semicolon/space if present
+            if ((uaindex = result.fullVersion.indexOf(';')) != -1) {
+                result.fullVersion = result.fullVersion.substring(0, uaindex);
+            }
+            if ((uaindex = result.fullVersion.indexOf(' ')) != -1) {
+                result.fullVersion = result.fullVersion.substring(0, uaindex);
+            }
+
+            result.majorVersion = parseInt('' + result.fullVersion, 10);
+            if (isNaN(result.majorVersion)) {
+                result.fullVersion = '' + parseFloat(navigator.appVersion);
+                result.majorVersion = parseInt(navigator.appVersion, 10);
+            }
+        } catch (e) {
+            //Return default obj.
         }
 
         return result;
@@ -345,18 +417,14 @@ var fluidPlayerClass = {
     },
 
     getMediaFileFromLinear: function(linear) {
-        var fallbackMediaFile;
+        var mediaFile;
         var mediaFiles = this.getMediaFilesFromLinear(linear);
 
-        for (var i = 0; i < mediaFiles.length; i++) {
-            if (!mediaFiles[i].getAttribute('type')) {
-                fallbackMediaFile = this.extractNodeData(mediaFiles[i]);
-            }
-
-            return mediaFiles[i].childNodes[0].nodeValue;
+        if (mediaFiles.length) {
+            mediaFile = this.extractNodeData(mediaFiles[0]);
         }
 
-        return fallbackMediaFile;
+        return mediaFile;
     },
 
     getIconClickThroughFromLinear: function (linear) {
@@ -660,7 +728,8 @@ var fluidPlayerClass = {
             function() {
                 var xmlHttpReq = this;
 
-                if ((xmlHttpReq.readyState === 4) && (xmlHttpReq.status !== 200)) {
+                // Helper function to stop processing
+                var stopProcessAndReportError = function() {
 
                     //Set the error flag for the Ad
                     player.adList[adListId].error = true;
@@ -672,6 +741,11 @@ var fluidPlayerClass = {
                     } else {
                         player.announceLocalError(101);
                     }
+
+                };
+
+                if ((xmlHttpReq.readyState === 4) && (xmlHttpReq.status !== 200)) {
+                    stopProcessAndReportError();
                     return;
                 }
 
@@ -680,6 +754,11 @@ var fluidPlayerClass = {
                 }
 
                 var xmlResponse = xmlHttpReq.responseXML;
+
+                if(!xmlResponse) {
+                    stopProcessAndReportError();
+                    return;
+                }
 
                 //Get impression tag
                 var impression = xmlResponse.getElementsByTagName('Impression');
@@ -755,27 +834,11 @@ var fluidPlayerClass = {
                         document.getElementById(player.videoPlayerId).dispatchEvent(event);
                         return;
                     } else {
-                        player.adList[adListId].error = true;
-                        //announceError the main video
-                        //Try to switch main video only if it is a preRoll scenario
-                        if (typeof adListId !== 'undefined' && player.adList[adListId]['roll'] == 'preRoll') {
-                            player.playMainVideoWhenVastFails(101);
-                        } else {
-                            player.announceLocalError(101);
-                        }
-
+                        stopProcessAndReportError();
                         return;
                     }
                 } else {
-                    player.adList[adListId].error = true;
-                    //announceError the main video
-                    //Try to switch to main video only if it is a preRoll scenario otherwise just ignore
-                    if (typeof adListId !== 'undefined' && player.adList[adListId]['roll'] == 'preRoll') {
-                        player.playMainVideoWhenVastFails(101);
-                    } else {
-                        player.announceLocalError(101);
-                    }
-
+                    stopProcessAndReportError();
                     return;
                 }
                 player.displayOptions.vastOptions.vastAdvanced.vastLoadedCallback();
@@ -887,9 +950,11 @@ var fluidPlayerClass = {
             }
 
             var currentTime = Math.floor(videoPlayerTag.currentTime);
-            player.scheduleTrackingEvent(currentTime, player.vastOptions.duration);
+            if (player.vastOptions.duration != 0) {
+                player.scheduleTrackingEvent(currentTime, player.vastOptions.duration);
+            }
 
-            if (currentTime >= (player.vastOptions.duration - 1 )) {
+            if (currentTime >= (player.vastOptions.duration - 1 ) && player.vastOptions.duration != 0) {
                 videoPlayerTag.removeEventListener('timeupdate', videoPlayerTimeUpdate);
                 player.adFinished = true;
             }
@@ -1398,18 +1463,14 @@ var fluidPlayerClass = {
 
         player.initialiseStreamers();
 
-        videoPlayerTag.load();
+        var newCurrentTime = (typeof videoPlayerTag.mainVideoCurrentTime !== 'undefined')
+            ? videoPlayerTag.mainVideoCurrentTime : 0;
 
-
-        if (typeof videoPlayerTag.mainVideoCurrentTime !== 'undefined') {
-            videoPlayerTag.currentTime = videoPlayerTag.mainVideoCurrentTime;
-        } else {
-            videoPlayerTag.currentTime = 0;
+        if(videoPlayerTag.hasOwnProperty('currentTime')) {
+            videoPlayerTag.currentTime = newCurrentTime;
         }
 
-        if (player.autoplayAfterAd) {
-            player.play();
-        }
+        player.setCurrentTimeAndPlay(newCurrentTime, player.autoplayAfterAd);
 
         player.isCurrentlyPlayingAd = false;
 
@@ -1434,7 +1495,6 @@ var fluidPlayerClass = {
         }
 
         videoPlayerTag.removeEventListener('ended', player.onVastAdEnded);
-        videoPlayerTag.addEventListener('ended', player.onMainVideoEnded);
 
         if (player.displayOptions.layoutControls.layout=== 'browser') {
             videoPlayerTag.setAttribute('controls', 'controls');
@@ -1469,6 +1529,9 @@ var fluidPlayerClass = {
 
     onMainVideoEnded: function () {
         var player = fluidPlayerClass.getInstanceById(this.id);
+        if (player.isCurrentlyPlayingAd && player.autoplayAfterAd) {  // It may be in-stream ending, and if it's not postroll then we don't execute anything
+            return;
+        }
 
         //we can remove timer as no more ad will be shown
         if (Math.floor(player.getCurrentTime()) >= Math.floor(player.mainVideoDuration)) {
@@ -1945,10 +2008,6 @@ var fluidPlayerClass = {
         }
 
         if (isPlaying) {
-            if (!player.isCurrentlyPlayingAd && player.displayOptions.layoutControls.playPauseAnimation) {
-                player.playPauseAnimationToggle(true, videoPlayerId);
-            }
-
             playPauseButton.className = playPauseButton.className.replace(/\bfluid_button_play\b/g, 'fluid_button_pause');
             controlsDisplay.classList.remove('initial_controls_show');
             if (fpLogo) {
@@ -1960,10 +2019,6 @@ var fluidPlayerClass = {
             }
 
         } else {
-            if (!player.isCurrentlyPlayingAd && player.displayOptions.layoutControls.playPauseAnimation) {
-                player.playPauseAnimationToggle(false, videoPlayerId);
-            }
-
             playPauseButton.className = playPauseButton.className.replace(/\bfluid_button_pause\b/g, 'fluid_button_play');
             controlsDisplay.classList.add('initial_controls_show');
             if (fpLogo) {
@@ -1976,7 +2031,12 @@ var fluidPlayerClass = {
         }
     },
 
-    playPauseAnimationToggle: function(play, videoPlayerId) {
+    playPauseAnimationToggle: function(play) {
+        if (this.isCurrentlyPlayingAd || !this.displayOptions.layoutControls.playPauseAnimation || this.isSwitchingSource) {
+            return;
+        }
+
+        videoPlayerId = this.videoPlayerId;
         if (play) {
             document.getElementById(videoPlayerId + '_fluid_state_button').classList.remove('fluid_initial_pause_button');
             document.getElementById(videoPlayerId + '_fluid_state_button').classList.add('fluid_initial_play_button');
@@ -2072,22 +2132,23 @@ var fluidPlayerClass = {
         }
     },
 
-    checkFullscreenSupport: function(videoPlayerId) {
-        var videoPlayerTag = document.getElementById(videoPlayerId);
+    checkFullscreenSupport: function(videoPlayerWrapperId) {
+        var videoPlayerWrapper = document.getElementById(videoPlayerWrapperId);
+        var videoPlayer = document.getElementById(this.videoPlayerId);
 
-        if (videoPlayerTag.mozRequestFullScreen) {
+        if (videoPlayerWrapper.mozRequestFullScreen) {
             return {goFullscreen: 'mozRequestFullScreen', exitFullscreen: 'mozCancelFullScreen', isFullscreen: 'mozFullScreenElement'};
 
-        } else if (videoPlayerTag.webkitRequestFullscreen) {
+        } else if (videoPlayerWrapper.webkitRequestFullscreen) {
             return {goFullscreen: 'webkitRequestFullscreen', exitFullscreen: 'webkitExitFullscreen', isFullscreen: 'webkitFullscreenElement'};
 
-        } else if (videoPlayerTag.msRequestFullscreen) {
+        } else if (videoPlayerWrapper.msRequestFullscreen) {
             return {goFullscreen: 'msRequestFullscreen', exitFullscreen: 'msExitFullscreen', isFullscreen: 'msFullscreenElement'};
 
-        } else if (videoPlayerTag.requestFullscreen) {
+        } else if (videoPlayerWrapper.requestFullscreen) {
             return {goFullscreen: 'requestFullscreen', exitFullscreen: 'exitFullscreen', isFullscreen: 'fullscreenElement'};
 
-        } else if (videoPlayerTag.webkitSupportsFullscreen) {
+        } else if (videoPlayer.webkitSupportsFullscreen) {
             return {goFullscreen: 'webkitEnterFullscreen', exitFullscreen: 'webkitExitFullscreen', isFullscreen: 'webkitDisplayingFullscreen'};
 
         }
@@ -2118,7 +2179,7 @@ var fluidPlayerClass = {
         var requestFullscreenFunctionNames = this.checkFullscreenSupport('fluid_video_wrapper_' + this.videoPlayerId);
         var fullscreenButton = document.getElementById(this.videoPlayerId + '_fluid_control_fullscreen');
         var menuOptionFullscreen = document.getElementById(this.videoPlayerId + 'context_option_fullscreen');
-        videoPlayerTag = document.getElementById(this.videoPlayerId);
+        var videoPlayerTag = document.getElementById(this.videoPlayerId);
 
         // Disable Theatre mode if it's on while we toggle fullscreen
         if (this.theatreMode) {
@@ -2674,8 +2735,10 @@ var fluidPlayerClass = {
                     } else {
                         videoPlayerTag.play();
                     }
+                    this.playPauseAnimationToggle(true);
                 } else if (!isFirstStart) {
                     videoPlayerTag.pause();
+                    this.playPauseAnimationToggle(false);
                 }
             }
 
@@ -2684,12 +2747,17 @@ var fluidPlayerClass = {
         } else {
             //Workaround for Safari or Mobile Chrome - otherwise it blocks the subsequent
             //play() command, because it considers it not being triggered by the user.
-            var ua = window.navigator.userAgent;
             var isMobileChecks = fluidPlayerClass.getMobileOs();
+            var browserVersion = fluidPlayerClass.getBrowserVersion();
+            player.isCurrentlyPlayingAd = true;
 
-            if (/^((?!chrome|android).)*safari/i.test(ua) || ((isMobileChecks.userOs !== false || isMobileChecks.device !== false) && (!!window.chrome || -1 !== ua.indexOf("crios") || 0 === window.navigator.vendor.indexOf("Google") && -1 !== ua.indexOf("chrome")))) {
+            if (
+                browserVersion.browserName == 'Safari'
+                || (isMobileChecks.userOs !== false && isMobileChecks.userOs == 'Android' && browserVersion.browserName == 'Google Chrome')
+            ) {
                 videoPlayerTag.src = fluidPlayerScriptLocation + 'blank.mp4';
                 videoPlayerTag.play();
+                this.playPauseAnimationToggle(true);
             }
 
             player.firstPlayLaunched = true;
@@ -2786,7 +2854,7 @@ var fluidPlayerClass = {
         });
 
         // Theatre mode
-        if (player.displayOptions.layoutControls.allowTheatre) {
+        if (player.displayOptions.layoutControls.allowTheatre && !player.isInIframe) {
             document.getElementById(player.videoPlayerId + '_fluid_control_theatre').addEventListener('click', function () {
                 player.theatreToggle(player.videoPlayerId);
             });
@@ -3058,7 +3126,9 @@ var fluidPlayerClass = {
 
                     for (var i = 0; i < vttRawData.cues.length; i++) {
                         tempThumbnailData = vttRawData.cues[i].text.split('#');
+                        var xCoords = 0, yCoords = 0, wCoords = 122.5, hCoords = 69;
 
+                        // .vtt file contains sprite corrdinates
                         if (
                             (tempThumbnailData.length === 2) &&
                             (tempThumbnailData[1].indexOf('xywh=') === 0)
@@ -3067,17 +3137,33 @@ var fluidPlayerClass = {
                             tempThumbnailCoordinates = tempThumbnailCoordinates.split(',');
 
                             if (tempThumbnailCoordinates.length === 4) {
-                                result.push({
-                                    startTime: vttRawData.cues[i].startTime,
-                                    endTime: vttRawData.cues[i].endTime,
-                                    image: (player.displayOptions.layoutControls.timelinePreview.sprite ? player.displayOptions.layoutControls.timelinePreview.sprite : tempThumbnailData[0]),
-                                    x: parseInt(tempThumbnailCoordinates[0]),
-                                    y: parseInt(tempThumbnailCoordinates[1]),
-                                    w: parseInt(tempThumbnailCoordinates[2]),
-                                    h: parseInt(tempThumbnailCoordinates[3])
-                                });
+                                player.displayOptions.layoutControls.timelinePreview.spriteImage = true;
+                                xCoords = parseInt(tempThumbnailCoordinates[0]);
+                                yCoords = parseInt(tempThumbnailCoordinates[1]);
+                                wCoords = parseInt(tempThumbnailCoordinates[2]);
+                                hCoords = parseInt(tempThumbnailCoordinates[3]);
                             }
                         }
+
+                        if (player.displayOptions.layoutControls.timelinePreview.spriteRelativePath
+                            && player.displayOptions.layoutControls.timelinePreview.file.indexOf('/') !== -1
+                            && (typeof player.displayOptions.layoutControls.timelinePreview.sprite === 'undefined' || player.displayOptions.layoutControls.timelinePreview.sprite == '')
+                            ) {
+                            imageUrl = player.displayOptions.layoutControls.timelinePreview.file.substring(0, player.displayOptions.layoutControls.timelinePreview.file.lastIndexOf('/'));
+                            imageUrl += '/' + tempThumbnailData[0];
+                        } else {
+                            imageUrl = (player.displayOptions.layoutControls.timelinePreview.sprite ? player.displayOptions.layoutControls.timelinePreview.sprite : tempThumbnailData[0]);
+                        }
+
+                        result.push({
+                            startTime: vttRawData.cues[i].startTime,
+                            endTime: vttRawData.cues[i].endTime,
+                            image: imageUrl,
+                            x: xCoords,
+                            y: yCoords,
+                            w: wCoords,
+                            h: hCoords
+                        });
                     }
 
                     return result;
@@ -3162,6 +3248,9 @@ var fluidPlayerClass = {
                     'url(' + thumbnailCoordinates.image + ') no-repeat scroll -' + thumbnailCoordinates.x + 'px -' + thumbnailCoordinates.y + 'px';
                 timelinePreviewTag.style.left = hoverX - (thumbnailCoordinates.w / 2) + 'px';
                 timelinePreviewTag.style.display = 'block';
+                if (!player.displayOptions.layoutControls.timelinePreview.spriteImage) {
+                    timelinePreviewTag.style.backgroundSize = 'contain';
+                }
 
             } else {
                 timelinePreviewTag.style.display = 'none';
@@ -3336,27 +3425,48 @@ var fluidPlayerClass = {
         if (player.isCurrentlyPlayingAd) {
             player.originalSrc = url;
         } else {
+            player.isSwitchingSource = true;
             var play = false;
             if (!videoPlayerTag.paused) {
-                player.pause();
+                videoPlayerTag.pause();
                 var play = true;
             }
 
             var currentTime = videoPlayerTag.currentTime;
-            var videoSwitchedEvent = function() {
-                //after new video is loaded setting time from what it should start play
-                videoPlayerTag.removeEventListener('loadedmetadata', videoSwitchedEvent);
-                videoPlayerTag.currentTime = currentTime;
-                if (play) {
-                    player.play();
-                }
-            };
-            videoPlayerTag.addEventListener('loadedmetadata', videoSwitchedEvent);
+            player.setCurrentTimeAndPlay(currentTime, play);
+
             videoPlayerTag.src = url;
             player.originalSrc = url;
             player.displayOptions.layoutControls.mediaType = player.getCurrentSrcType();
             player.initialiseStreamers();
         }
+    },
+
+    setCurrentTimeAndPlay: function(newCurrentTime, shouldPlay) {
+        var videoPlayerTag = document.getElementById(this.videoPlayerId);
+        var player = this;
+
+        var loadedMetadata = function() {
+            videoPlayerTag.currentTime = newCurrentTime;
+            videoPlayerTag.removeEventListener('loadedmetadata', loadedMetadata);
+            // Safari ios fix to set currentTime
+            if (fluidPlayerClass.getMobileOs().userOs == 'iOS') {
+                videoPlayerTag.addEventListener('playing', videoPlayStart);
+            }
+
+            if (shouldPlay) {
+                videoPlayerTag.play();
+            }
+            player.isSwitchingSource = false;
+        };
+        var videoPlayStart = function() {
+            this.currentTime = newCurrentTime;
+            videoPlayerTag.removeEventListener('playing', videoPlayStart);
+        };
+
+        videoPlayerTag.addEventListener("loadedmetadata", loadedMetadata, false);
+
+        videoPlayerTag.load();
     },
 
     initLogo: function() {
@@ -3485,13 +3595,14 @@ var fluidPlayerClass = {
         var videoPlayerTag = this;
         var player = fluidPlayerClass.getInstanceById(this.id);
 
-        if (player.mainVideoDuration == 0 && !player.isCurrentlyPlayingAd) {
+        if (player.mainVideoDuration == 0 && !player.isCurrentlyPlayingAd && player.mainVideoReadyState === false) {
             player.mainVideoDuration = videoPlayerTag.duration;
+            player.mainVideoReadyState = true;
             var event = new CustomEvent("mainVideoDurationSet");
             videoPlayerTag.dispatchEvent(event);
+            videoPlayerTag.removeEventListener('loadedmetadata', player.mainVideoReady);
         }
 
-        videoPlayerTag.removeEventListener('loadedmetadata', player.mainVideoReady);
     },
 
     userActivityChecker: function () {
@@ -3756,6 +3867,10 @@ var fluidPlayerClass = {
     },
 
     theatreToggle: function() {
+        if (this.isInIframe) {
+            return;
+        }
+
         var downloadItem = document.getElementById('fluid_video_wrapper_' + this.videoPlayerId);
         if (!this.theatreMode) {
             // Theatre and fullscreen, it's only one or the other
@@ -3867,6 +3982,14 @@ var fluidPlayerClass = {
         return null;
     },
 
+    inIframe: function() {
+        try {
+            return window.self !== window.top;
+        } catch (e) {
+            return true;
+        }
+    },
+
     init: function(idVideoPlayer, options) {
         var player = this;
         var videoPlayer = document.getElementById(idVideoPlayer);
@@ -3915,6 +4038,9 @@ var fluidPlayerClass = {
         player.dashScriptLoaded        = false;
         player.hlsScriptLoaded         = false;
         player.isPlayingMedia          = false;
+        player.isSwitchingSource       = false;
+        player.isInIframe              = player.inIframe();
+        player.mainVideoReadyState     = false;
 
         //Default options
         player.displayOptions = {
@@ -3948,7 +4074,10 @@ var fluidPlayerClass = {
                     autoHideTimeout:          3,
                     animated:                 true
                 },
-                timelinePreview:              {},
+                timelinePreview:              {
+                    spriteImage:              false,
+                    spriteRelativePath:       false
+                },
                 htmlOnPauseBlock: {
                     html:                     null,
                     height:                   null,
@@ -3999,6 +4128,7 @@ var fluidPlayerClass = {
         videoPlayer.addEventListener('loadedmetadata', player.mainVideoReady, false);
         videoPlayer.addEventListener('durationchange', function() {player.currentVideoDuration = player.getCurrentVideoDuration();}, false);
         videoPlayer.addEventListener('error', player.onErrorDetection, false);
+        videoPlayer.addEventListener('ended', player.onMainVideoEnded, false);
 
         //Manually load the video duration if the video was loaded before adding the event listener
         player.currentVideoDuration = player.getCurrentVideoDuration();
@@ -4048,10 +4178,9 @@ var fluidPlayerClass = {
 
                     }).catch(function (error) {
 
-                        var deviceInfo = fluidPlayerClass.getMobileOs();
-                        var isAbortError = (deviceInfo.userOs === 'iOS' || deviceInfo.userOs === 'Android') && (typeof error.name != 'undefined' && error.name == 'AbortError');
-
-                        //On iOS and Android devices in some cases throws an "AbortError" which does not happens otherwise
+                        var isAbortError = (typeof error.name !== 'undefined' && error.name === 'AbortError');
+                        // Ignore abort errors which caused for example Safari or autoplay functions
+                        // (example: interrupted by a new load request)
                         if(isAbortError) {
                             // Ignore AbortError error reporting
                         } else {
@@ -4081,7 +4210,7 @@ var fluidPlayerClass = {
             var player = fluidPlayerClass.getInstanceById(videoPlayer.id);
 
             if (player.isPlayingMedia === true) {
-
+                player.isPlayingMedia = false;
                 return _pause_videoPlayer.apply(this, arguments);
 
             } else {
@@ -4089,6 +4218,7 @@ var fluidPlayerClass = {
                 // just in case
                 if (player.isCurrentlyPlayingVideo(videoPlayer)) {
                     try {
+                        player.isPlayingMedia = false;
                         return _pause_videoPlayer.apply(this, arguments);
                     } catch (e) {
                         player.announceLocalError(203, 'Failed to play video.');
@@ -4100,6 +4230,13 @@ var fluidPlayerClass = {
         };
 
         if (player.displayOptions.layoutControls.autoPlay && !player.dashScriptLoaded && !player.hlsScriptLoaded) {
+
+            //There is known issue with Safari 11+, will prevent autoPlay, so we wont try
+            var browserVersion = fluidPlayerClass.getBrowserVersion();
+            if (browserVersion.browserName == 'Safari' && browserVersion.majorVersion >= 11){
+                return;
+            }
+
             videoPlayer.play();
         }
 
