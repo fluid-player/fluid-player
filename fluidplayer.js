@@ -3145,10 +3145,20 @@ var fluidPlayerClass = {
                             }
                         }
 
+                        if (player.displayOptions.layoutControls.timelinePreview.spriteRelativePath
+                            && player.displayOptions.layoutControls.timelinePreview.file.indexOf('/') !== -1
+                            && (typeof player.displayOptions.layoutControls.timelinePreview.sprite === 'undefined' || player.displayOptions.layoutControls.timelinePreview.sprite == '')
+                            ) {
+                            imageUrl = player.displayOptions.layoutControls.timelinePreview.file.substring(0, player.displayOptions.layoutControls.timelinePreview.file.lastIndexOf('/'));
+                            imageUrl += '/' + tempThumbnailData[0];
+                        } else {
+                            imageUrl = (player.displayOptions.layoutControls.timelinePreview.sprite ? player.displayOptions.layoutControls.timelinePreview.sprite : tempThumbnailData[0]);
+                        }
+
                         result.push({
                             startTime: vttRawData.cues[i].startTime,
                             endTime: vttRawData.cues[i].endTime,
-                            image: (player.displayOptions.layoutControls.timelinePreview.sprite ? player.displayOptions.layoutControls.timelinePreview.sprite : tempThumbnailData[0]),
+                            image: imageUrl,
                             x: xCoords,
                             y: yCoords,
                             w: wCoords,
@@ -4065,7 +4075,8 @@ var fluidPlayerClass = {
                     animated:                 true
                 },
                 timelinePreview:              {
-                    spriteImage:              false
+                    spriteImage:              false,
+                    spriteRelativePath:       false
                 },
                 htmlOnPauseBlock: {
                     html:                     null,
