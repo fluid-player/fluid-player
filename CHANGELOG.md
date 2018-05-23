@@ -11,6 +11,10 @@
 * [Pull #148](https://github.com/fluid-player/fluid-player/pull/148) Fix for currentTime being set for iOS and safari for ads and source switch
 * [Pull #165](https://github.com/fluid-player/fluid-player/pull/165) Fix for video duration if passed as 00:00:00 in the VAST file
 * [Pull #167](https://github.com/fluid-player/fluid-player/pull/167) Allow for individual images to be set in .vtt file
+* [Pull #169](https://github.com/fluid-player/fluid-player/pull/169) Preview Thumbnail image locations - Ability to set relative path
+* [Pull #168](https://github.com/fluid-player/fluid-player/pull/168) Show custom error if XML content-type is wrong
+* [Pull #166](https://github.com/fluid-player/fluid-player/pull/166) Bug fix for Error 202  showing up periodically in the console
+* [Pull #149](https://github.com/fluid-player/fluid-player/pull/149) Bug fix to remove mainVideoReady eventListener after success
 
 ## 2.2.0
 * [Pull #121](https://github.com/fluid-player/fluid-player/pull/121) 'Browser layout' VAST fixes
