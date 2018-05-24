@@ -745,15 +745,12 @@ var fluidPlayerClass = {
             tracking:     [],
             stopTracking: [],
             vastLoaded: false
-
         };
 
-        if(xmlResponse) {
-
-                if(!xmlResponse) {
-                    stopProcessAndReportError();
-                    return;
-                }
+        if(!xmlResponse) {
+            player.stopProcessAndReportError(adListId);
+            return;
+        }
 
                 //Get impression tag
                 var impression = xmlResponse.getElementsByTagName('Impression');
@@ -831,16 +828,20 @@ var fluidPlayerClass = {
                         player.displayOptions.vastLoadedCallback();
                         return;
                     } else {
-                        stopProcessAndReportError();
+                        player.stopProcessAndReportError(adListId);
                         return;
                     }
                 } else {
-                    stopProcessAndReportError();
+                    player.stopProcessAndReportError(adListId);
                     return;
                 }
+            //??
+            player.displayOptions.vastOptions.vastAdvanced.vastLoadedCallback();
 
-            }
     },
+
+
+
 
     /**
      * Parse the VAST Tag
@@ -860,7 +861,7 @@ var fluidPlayerClass = {
                 var xmlHttpReq = this;
 
                 if ((xmlHttpReq.readyState === 4) && (xmlHttpReq.status !== 200)) {
-                    player.playMainVideoWhenVastFails(900);
+                    player.stopProcessAndReportError(adListId);
                     return;
                 }
 
@@ -890,7 +891,8 @@ var fluidPlayerClass = {
                 }
 
                 if (numberOfJumps >= player.displayOptions.vastOptions.maxVastTagJumps && !player.InLineFound) {
-                    player.playMainVideoWhenVastFails(101);
+                    player.stopProcessAndReportError(adListId);
+                    return;
                 }
 
                 if (player.InLineFound) {
@@ -921,6 +923,26 @@ var fluidPlayerClass = {
 
     },
 
+    /**
+     * Helper function to stop processing
+     *
+     * @param adListId
+     */
+    stopProcessAndReportError: function(adListId) {
+        var player = this;
+
+        //Set the error flag for the Ad
+        player.adList[adListId].error = true;
+
+        //The response returned an error. Proceeding with the main video.
+        //Try to switch main video only if it is a preRoll scenario
+        if (typeof adListId !== 'undefined' && player.adList[adListId]['roll'] == 'preRoll') {
+            player.playMainVideoWhenVastFails(900);
+        } else {
+            player.announceLocalError(101);
+        }
+
+    },
 
     playRoll: function(adListId) {
         var player = this;
