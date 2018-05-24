@@ -3337,12 +3337,14 @@ var fluidPlayerClass = {
         if (player.displayOptions.layoutControls.layout === 'browser') {
             return;
         }
-
+        var hasDefaultSource = false;
         var sources = [];
         var sourcesList = videoPlayer.querySelectorAll('source');
         [].forEach.call(sourcesList, function (source) {
             if (source.title && source.src) {
-                sources.push({'title': source.title, 'url': source.src});
+                var isDefault = source.getAttribute('data-default') ? true : false;
+                if(isDefault) hasDefaultSource = true;
+                sources.push({'title': source.title, 'url': source.src, 'isHD': source.getAttribute('data-is-hd') ? true : false, 'default': isDefault});
             }
         });
 
@@ -3357,10 +3359,23 @@ var fluidPlayerClass = {
 
             var firstSource = true;
             player.videoSources.forEach(function(source) {
-                var sourceSelected = (firstSource) ? "source_selected" :  "";
+                var sourceSelected = "";
+                if(hasDefaultSource) {
+                    if(source.default) {
+                        player.originalSrc = source.url;
+                        sourceSelected = "source_selected";
+                        // Only one item can be selected
+                        hasDefaultSource = false;
+                    }
+                } else if(firstSource) {
+                    sourceSelected = "source_selected";
+                }
                 firstSource = false;
                 var sourceChangeDiv = document.createElement('div');
                 sourceChangeDiv.className = 'fluid_video_source_list_item';
+                if( source.isHD ){
+                    sourceChangeDiv.classList.add('fluid_video_source_item_hd');
+                }
                 sourceChangeDiv.innerHTML = '<span class="source_button_icon ' + sourceSelected + '"></span>' + source.title;
 
                 sourceChangeDiv.addEventListener('click', function(event) {
