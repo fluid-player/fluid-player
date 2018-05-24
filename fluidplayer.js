@@ -324,6 +324,17 @@ var fluidPlayerClass = {
     },
 
 
+    hasInLine: function (xmlResponse) {
+        var inLine = xmlResponse.getElementsByTagName('InLine');
+        return ((typeof inLine !== 'undefined') && inLine.length);
+    },
+
+
+    hasVastAdTagUri: function (xmlResponse) {
+        var vastAdTagURI = xmlResponse.getElementsByTagName('VASTAdTagURI');
+        return ((typeof vastAdTagURI !== 'undefined') && vastAdTagURI.length);
+    },
+
     hasVastAdTagUriFromWrapper: function(creative) {
         var player = this;
 
@@ -535,7 +546,6 @@ var fluidPlayerClass = {
 
     registerImpressionEvents: function(impressionTags, tmpOptions) {
         if (impressionTags.length) {
-            tmpOptions.impression = [];
 
             for (var i = 0; i < impressionTags.length; i++) {
                 var impressionEvent = this.extractNodeData(impressionTags[i]);
@@ -732,115 +742,117 @@ var fluidPlayerClass = {
     switchPlayerToVastMode: function() {},
 
 
-        /**
-         * Process the XML response
-         *
-         * @param xmlResponse
-         * @param adListId
-         */
-    processVastXml: function(xmlResponse, adListId) {
+    /**
+     * Process the XML response
+     *
+     * @param xmlResponse
+     * @param adListId
+     * @param tmpOptions
+     */
+    processVastXml: function (xmlResponse, adListId, tmpOptions) {
         var player = this;
 
-        var tmpOptions = {
-            tracking:     [],
-            stopTracking: [],
-            vastLoaded: false
-        };
-
-        if(!xmlResponse) {
+        if (!xmlResponse) {
             player.stopProcessAndReportError(adListId);
             return;
         }
 
-                //Get impression tag
-                var impression = xmlResponse.getElementsByTagName('Impression');
-                if(impression !== null) {
-                    player.registerImpressionEvents(impression, tmpOptions);
+        //Get impression tag
+        var impression = xmlResponse.getElementsByTagName('Impression');
+        if (impression !== null) {
+            player.registerImpressionEvents(impression, tmpOptions);
+        }
+
+        //Get the error tag, if any
+        var errorTags = xmlResponse.getElementsByTagName('Error');
+        if (errorTags !== null) {
+            player.registerErrorEvents(errorTags, tmpOptions);
+        }
+
+
+        //Get Creative
+        var creative = xmlResponse.getElementsByTagName('Creative');
+
+        //Currently only 1 creative and 1 linear is supported
+        if ((typeof creative !== 'undefined') && creative.length) {
+            var arrayCreativeLinears = creative[0].getElementsByTagName('Linear');
+
+            if ((typeof arrayCreativeLinears !== 'undefined') && (arrayCreativeLinears !== null) && arrayCreativeLinears.length) {
+
+                var creativeLinear = arrayCreativeLinears[0];
+                player.registerTrackingEvents(creativeLinear, tmpOptions);
+
+                //Extract the Ad data if it is actually the Ad (!wrapper)
+                if (!player.hasVastAdTagUri(xmlResponse) && player.hasInLine(xmlResponse)) {
+
+                    //Set initial values
+                    tmpOptions.skipoffset = false;
+                    tmpOptions.adFinished = false;
+                    tmpOptions.adType = 'linear';
+
+                    //Extract the necessary data from the Linear node
+                    tmpOptions.skipoffset = player.convertTimeStringToSeconds(creativeLinear.getAttribute('skipoffset'));
+                    tmpOptions.clickthroughUrl = player.getClickThroughUrlFromLinear(creativeLinear);
+                    tmpOptions.clicktracking = player.getClickTrackingEvents(creativeLinear);
+                    tmpOptions.duration = player.getDurationFromLinear(creativeLinear);
+                    tmpOptions.mediaFile = player.getMediaFileFromLinear(creativeLinear);
+                    tmpOptions.iconClick = player.getIconClickThroughFromLinear(creativeLinear);
+
                 }
+            }
 
-                //Get the error tag, if any
-                var errorTags = xmlResponse.getElementsByTagName('Error');
-                if (errorTags !== null) {
-                    player.registerErrorEvents(errorTags, tmpOptions);
+            if ((typeof tmpOptions.iconClick !== 'undefined') && (tmpOptions.iconClick !== null) && tmpOptions.iconClick.length) {
+                player.adList[adListId].landingPage = tmpOptions.iconClick;
+            }
+
+            var arrayCreativeNonLinears = creative[0].getElementsByTagName('NonLinearAds');
+
+            if ((typeof arrayCreativeNonLinears !== 'undefined') && (arrayCreativeNonLinears !== null) && arrayCreativeNonLinears.length) {
+
+                var creativeNonLinear = arrayCreativeNonLinears[0];
+                player.registerTrackingEvents(creativeNonLinear, tmpOptions);
+
+                //Extract the Ad data if it is actually the Ad (!wrapper)
+                if (!player.hasVastAdTagUri(xmlResponse) && player.hasInLine(xmlResponse)) {
+
+                    //Set initial values
+                    tmpOptions.adType = 'nonLinear';
+
+                    //Extract the necessary data from the NonLinear node
+                    tmpOptions.clickthroughUrl = player.getClickThroughUrlFromNonLinear(creativeNonLinear);
+                    tmpOptions.clicktracking = player.getNonLinearClickTrackingEvents(creativeNonLinear);
+                    tmpOptions.duration = player.getDurationFromNonLinear(creativeNonLinear);
+                    tmpOptions.dimension = player.getDimensionFromNonLinear(creativeNonLinear);
+                    tmpOptions.staticResource = player.getStaticResourceFromNonLinear(creativeNonLinear);
+                    tmpOptions.creativeType = player.getCreativeTypeFromStaticResources(creativeNonLinear);
                 }
+            }
 
+            //Extract the Ad data if it is actually the Ad (!wrapper)
+            if (!player.hasVastAdTagUri(xmlResponse) && player.hasInLine(xmlResponse)) {
 
-                //Get Creative
-                var creative = xmlResponse.getElementsByTagName('Creative');
+                player.adList[adListId].adType = tmpOptions.adType ? tmpOptions.adType : 'unknown';
 
-                //Currently only 1 creative and 1 linear is supported
-                if ((typeof creative !== 'undefined') && creative.length) {
-                    var arrayCreativeLinears = creative[0].getElementsByTagName('Linear');
+                if (typeof tmpOptions.mediaFile !== 'undefined' || typeof tmpOptions.staticResource !== 'undefined') {
 
-                    if ((typeof arrayCreativeLinears !== 'undefined') && (arrayCreativeLinears !== null) && arrayCreativeLinears.length) {
+                    player.adList[adListId].vastLoaded = true;
+                    player.adPool[adListId] = Object.assign({}, tmpOptions);
+                    var event = document.createEvent('Event');
+                    event.initEvent('adId_' + adListId, false, true);
+                    document.getElementById(player.videoPlayerId).dispatchEvent(event);
 
-                        //Set initial values
-                        tmpOptions.skipoffset = false;
-                        tmpOptions.adFinished = false;
-
-                        var creativeLinear = arrayCreativeLinears[0];
-
-                        tmpOptions.adType = 'linear';
-
-                        //Extract the necessary data from the Linear node
-                        tmpOptions.skipoffset      = player.convertTimeStringToSeconds(creativeLinear.getAttribute('skipoffset'));
-                        tmpOptions.clickthroughUrl = player.getClickThroughUrlFromLinear(creativeLinear);
-                        tmpOptions.clicktracking   = player.getClickTrackingEvents(creativeLinear);
-                        tmpOptions.duration        = player.getDurationFromLinear(creativeLinear);
-                        tmpOptions.mediaFile       = player.getMediaFileFromLinear(creativeLinear);
-                        tmpOptions.iconClick       = player.getIconClickThroughFromLinear(creativeLinear);
-
-                        player.registerTrackingEvents(creativeLinear, tmpOptions);
-                    }
-
-                    if ((typeof tmpOptions.iconClick !== 'undefined') && (tmpOptions.iconClick !== null) && tmpOptions.iconClick.length) {
-                        player.adList[adListId].landingPage = tmpOptions.iconClick;
-                    }
-
-                    var arrayCreativeNonLinears = creative[0].getElementsByTagName('NonLinearAds');
-
-                    if ((typeof arrayCreativeNonLinears !== 'undefined') && (arrayCreativeNonLinears !== null) && arrayCreativeNonLinears.length) {
-                        var creativeNonLinear = arrayCreativeNonLinears[0];
-
-                        tmpOptions.adType = 'nonLinear';
-
-                        //Extract the necessary data from the Linear node
-                        tmpOptions.clickthroughUrl = player.getClickThroughUrlFromNonLinear(creativeNonLinear);
-                        tmpOptions.clicktracking   = player.getNonLinearClickTrackingEvents(creativeNonLinear);
-                        tmpOptions.duration        = player.getDurationFromNonLinear(creativeNonLinear);
-                        tmpOptions.dimension       = player.getDimensionFromNonLinear(creativeNonLinear);
-                        tmpOptions.staticResource  = player.getStaticResourceFromNonLinear(creativeNonLinear);
-                        tmpOptions.creativeType    = player.getCreativeTypeFromStaticResources(creativeNonLinear);
-
-                        player.registerTrackingEvents(creativeNonLinear, tmpOptions);
-                    }
-
-                    player.adList[adListId].adType = tmpOptions.adType? tmpOptions.adType : 'unknown';
-
-                    if (typeof tmpOptions.mediaFile !== 'undefined' || typeof tmpOptions.staticResource !== 'undefined') {
-
-                        player.adList[adListId].vastLoaded = true;
-                        player.displayOptions.vastOptions.vastAdvanced.vastLoadedCallback();
-                        player.adPool[adListId] = Object.assign({}, tmpOptions);
-                        var event = document.createEvent('Event');
-                        event.initEvent('adId_' + adListId, false, true);
-                        document.getElementById(player.videoPlayerId).dispatchEvent(event);
-                        player.displayOptions.vastLoadedCallback();
-                        return;
-                    } else {
-                        player.stopProcessAndReportError(adListId);
-                        return;
-                    }
                 } else {
+
                     player.stopProcessAndReportError(adListId);
-                    return;
+
                 }
-            //??
-            player.displayOptions.vastOptions.vastAdvanced.vastLoadedCallback();
+
+            }
+        } else {
+            player.stopProcessAndReportError(adListId);
+        }
 
     },
-
-
 
 
     /**
@@ -849,11 +861,16 @@ var fluidPlayerClass = {
      * @param vastTag
      * @param adListId
      */
-    processUrl: function(vastTag, adListId) {
+    processUrl: function (vastTag, adListId) {
         var player = this;
         var numberOfJumps = 0;
 
-        player.toggleLoader(true);
+        var tmpOptions = {
+            tracking: [],
+            stopTracking: [],
+            impression: [],
+            vastLoaded: false
+        };
 
         var resolveVastTag = function (vastTag, callback, numberOfJumps) {
 
@@ -869,13 +886,21 @@ var fluidPlayerClass = {
                     return;
                 }
 
-                numberOfJumps++;
+                try {
+                    var xmlResponse = xmlHttpReq.responseXML;
+                } catch (e) {
+                    player.stopProcessAndReportError(adListId);
+                    return;
+                }
 
-                var xmlResponse = xmlHttpReq.responseXML;
+                if (!xmlResponse) {
+                    player.stopProcessAndReportError(adListId);
+                    return;
+                }
 
-                player.InLineFound = player.hasVastAdTagUriFromWrapper(xmlResponse.getElementsByTagName('Creative'));
+                player.inLineFound = player.hasInLine(xmlResponse);
 
-                if (!player.InLineFound) {
+                if (!player.inLineFound) {
                     var wrapper = xmlResponse.getElementsByTagName('Wrapper');
 
                     if ((typeof wrapper !== 'undefined') && wrapper.length) {
@@ -890,20 +915,18 @@ var fluidPlayerClass = {
 
                 }
 
-                if (numberOfJumps >= player.displayOptions.vastOptions.maxVastTagJumps && !player.InLineFound) {
+                if (numberOfJumps >= player.displayOptions.vastOptions.maxVastTagJumps && !player.inLineFound) {
                     player.stopProcessAndReportError(adListId);
                     return;
                 }
 
-                if (player.InLineFound) {
+                if (player.inLineFound) {
                     callback(numberOfJumps);
-                    //We have got XML so Let's process it.
-                    player.processVastXml(xmlResponse, adListId);
                 }
-
+                player.processVastXml(xmlResponse, adListId, tmpOptions);
             };
 
-            if (numberOfJumps < player.displayOptions.vastOptions.maxVastTagJumps) {
+            if (numberOfJumps <= player.displayOptions.vastOptions.maxVastTagJumps) {
 
                 player.sendRequest(
                     vastTag,
@@ -914,11 +937,13 @@ var fluidPlayerClass = {
 
             }
 
+            numberOfJumps++;
         };
 
 
         resolveVastTag(vastTag, function (numberOfJumps) {
-            console.log('eventually', numberOfJumps);
+            //console.log('numberOfJumps:', numberOfJumps);
+            player.displayOptions.vastOptions.vastAdvanced.vastLoadedCallback();
         }, numberOfJumps);
 
     },
@@ -4142,8 +4167,8 @@ var fluidPlayerClass = {
         player.isInIframe              = player.inIframe();
         player.mainVideoReadyState     = false;
         player.xmlCollection           = [];
-        player.InLineFound             = null;
         player.maxVastTagJumps         = 3;
+        player.inLineFound             = null;
 
         //Default options
         player.displayOptions = {
