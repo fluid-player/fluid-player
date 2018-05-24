@@ -2861,6 +2861,12 @@ var fluidPlayerClass = {
         } else {
             document.getElementById(player.videoPlayerId + '_fluid_control_theatre').style.display = 'none';
         }
+
+        videoPlayerTag.addEventListener('ratechange', function() {
+            if (player.isCurrentlyPlayingAd) {
+                this.playbackRate = 1;
+            }
+        });
     },
 
     // Create the time position preview only if the vtt previews aren't enabled
@@ -4276,8 +4282,10 @@ var fluidPlayerClass = {
     },
 
     setPlaybackSpeed: function(speed) {
-        var videoPlayer = document.getElementById(this.videoPlayerId);
-        videoPlayer.playbackRate = speed;
+        if (!this.isCurrentlyPlayingAd) {
+            var videoPlayer = document.getElementById(this.videoPlayerId);
+            videoPlayer.playbackRate = speed;
+        }
     },
 
     setVolume: function(passedVolume) {
