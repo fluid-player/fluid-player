@@ -3433,7 +3433,8 @@ var fluidPlayerClass = {
             }
 
             var currentTime = videoPlayerTag.currentTime;
-            player.setCurrentTimeAndPlay(currentTime, play);
+            var currentPlaybackRate = videoPlayerTag.playbackRate;
+            player.setCurrentTimeAndPlay(currentTime, play, currentPlaybackRate);
 
             videoPlayerTag.src = url;
             player.originalSrc = url;
@@ -3442,12 +3443,13 @@ var fluidPlayerClass = {
         }
     },
 
-    setCurrentTimeAndPlay: function(newCurrentTime, shouldPlay) {
+    setCurrentTimeAndPlay: function(newCurrentTime, shouldPlay, currentPlaybackRate) {
         var videoPlayerTag = document.getElementById(this.videoPlayerId);
         var player = this;
 
         var loadedMetadata = function() {
             videoPlayerTag.currentTime = newCurrentTime;
+            videoPlayerTag.playbackRate = currentPlaybackRate;
             videoPlayerTag.removeEventListener('loadedmetadata', loadedMetadata);
             // Safari ios fix to set currentTime
             if (fluidPlayerClass.getMobileOs().userOs == 'iOS') {
