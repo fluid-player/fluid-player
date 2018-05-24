@@ -4167,7 +4167,6 @@ var fluidPlayerClass = {
         player.isInIframe              = player.inIframe();
         player.mainVideoReadyState     = false;
         player.xmlCollection           = [];
-        player.maxVastTagJumps         = 3;
         player.inLineFound             = null;
 
         //Default options
