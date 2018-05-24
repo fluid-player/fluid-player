@@ -3724,22 +3724,25 @@ var fluidPlayerClass = {
         var opacity = 1;
         var timer = setInterval(function () {
             if (opacity <= 0.1) {
+                opacity = 0;
                 clearInterval(timer);
+            } else {
+                opacity -= 0.1;
             }
             element.style.opacity = opacity;
-            opacity -= 0.1;
         }, 50);
     },
 
     fadeIn: function (element) {
-        var opacity = 0.1;
+        var opacity = 0.2;
         var timer = setInterval(function () {
             if (opacity >= 1) {
+                opacity = 1;
                 clearInterval(timer);
             } else {
-                element.style.opacity = opacity;
-                opacity += 0.1;
+                opacity += 0.2;
             }
+            element.style.opacity = opacity;
         }, 10);
     },
 
