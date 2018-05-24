@@ -2160,16 +2160,16 @@ var fluidPlayerClass = {
         fullscreenButton.className = fullscreenButton.className.replace(/\bfluid_button_fullscreen_exit\b/g, 'fluid_button_fullscreen');
         if (menuOptionFullscreen !== null) {
             menuOptionFullscreen.innerHTML = 'Fullscreen';
-            this.fullscreenMode = false;
         }
+        this.fullscreenMode = false;
     },
 
     fullscreenOn: function (fullscreenButton, menuOptionFullscreen) {
         fullscreenButton.className = fullscreenButton.className.replace(/\bfluid_button_fullscreen\b/g, 'fluid_button_fullscreen_exit');
         if (menuOptionFullscreen !== null) {
             menuOptionFullscreen.innerHTML = 'Exit Fullscreen';
-            this.fullscreenMode = true;
         }
+        this.fullscreenMode = true;
     },
 
     fullscreenToggle: function() {
