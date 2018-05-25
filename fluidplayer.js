@@ -880,7 +880,7 @@ var fluidPlayerClass = {
      */
     processUrl: function (vastTag, adListId) {
         var player = this;
-        var numberOfJumps = 0;
+        var numberOfRedirects = 0;
 
         var tmpOptions = {
             tracking: [],
@@ -890,7 +890,7 @@ var fluidPlayerClass = {
             vastLoaded: false
         };
 
-        var resolveVastTag = function (vastTag, callback, numberOfJumps) {
+        var resolveVastTag = function (vastTag, callback, numberOfRedirects) {
 
             var handleXmlHttpReq = function () {
                 var xmlHttpReq = this;
@@ -926,25 +926,25 @@ var fluidPlayerClass = {
                         var vastAdTagURI = xmlResponse.getElementsByTagName('VASTAdTagURI');
 
                         if ((typeof vastAdTagURI !== 'undefined') && vastAdTagURI.length) {
-                            resolveVastTag(player.getVastAdTagUriFromWrapper(wrapper), callback, numberOfJumps);
+                            resolveVastTag(player.getVastAdTagUriFromWrapper(wrapper), callback, numberOfRedirects);
                         }
 
                     }
 
                 }
 
-                if (numberOfJumps >= player.displayOptions.vastOptions.maxVastTagJumps && !player.inLineFound) {
+                if (numberOfRedirects >= player.displayOptions.vastOptions.maxAllowedVastTagRedirects && !player.inLineFound) {
                     player.stopProcessAndReportError(adListId);
                     return;
                 }
 
                 if (player.inLineFound) {
-                    callback(numberOfJumps);
+                    callback(numberOfRedirects);
                 }
                 player.processVastXml(xmlResponse, adListId, tmpOptions);
             };
 
-            if (numberOfJumps <= player.displayOptions.vastOptions.maxVastTagJumps) {
+            if (numberOfRedirects <= player.displayOptions.vastOptions.maxAllowedVastTagRedirects) {
 
                 player.sendRequest(
                     vastTag,
@@ -955,14 +955,14 @@ var fluidPlayerClass = {
 
             }
 
-            numberOfJumps++;
+            numberOfRedirects++;
         };
 
 
-        resolveVastTag(vastTag, function (numberOfJumps) {
-            //console.log('numberOfJumps:', numberOfJumps);
+        resolveVastTag(vastTag, function (numberOfRedirects) {
+            //console.log('numberOfRedirects:', numberOfRedirects);
             player.displayOptions.vastOptions.vastAdvanced.vastLoadedCallback();
-        }, numberOfJumps);
+        }, numberOfRedirects);
 
     },
 
@@ -4241,7 +4241,7 @@ var fluidPlayerClass = {
                 adCTATextPosition:            'bottom right',
                 vastTimeout:                  5000,
                 showProgressbarMarkers:       false,
-                maxVastTagJumps:              3,
+                maxAllowedVastTagRedirects:   3,
 
                 vastAdvanced: {
                     vastLoadedCallback:       (function() {}),
