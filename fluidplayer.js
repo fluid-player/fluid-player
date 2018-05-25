@@ -544,6 +544,18 @@ var fluidPlayerClass = {
         }
     },
 
+    registerClickTracking: function(clickTrackingTag, tmpOptions) {
+
+        if(clickTrackingTag.length) {
+            for (var i = 0; i < clickTrackingTag.length; i++) {
+                if(clickTrackingTag[i] != ''){
+                    tmpOptions.clicktracking.push(clickTrackingTag[i]);
+                }
+            }
+        }
+
+    },
+
     registerImpressionEvents: function(impressionTags, tmpOptions) {
         if (impressionTags.length) {
 
@@ -620,13 +632,16 @@ var fluidPlayerClass = {
 
 
     getNonLinearClickTrackingEvents: function (nonLinear) {
-        var result = '';
+        var result = [];
         var nonLinears = nonLinear.getElementsByTagName('NonLinear');
 
         if (nonLinears.length) {//There should be exactly 1 node
             var clickTracking = nonLinear.getElementsByTagName('NonLinearClickTracking');
             if (clickTracking.length) {
-                result = this.extractNodeData(clickTracking[0]);
+                for (var i = 0; i < clickTracking.length; i++) {
+                    var NonLinearClickTracking = this.extractNodeData(clickTracking[i]);
+                    result.push(NonLinearClickTracking);
+                }
             }
         }
 
@@ -782,22 +797,22 @@ var fluidPlayerClass = {
                 var creativeLinear = arrayCreativeLinears[0];
                 player.registerTrackingEvents(creativeLinear, tmpOptions);
 
+                var clickTracks = player.getClickTrackingEvents(creativeLinear);
+                player.registerClickTracking(clickTracks, tmpOptions);
+
                 //Extract the Ad data if it is actually the Ad (!wrapper)
                 if (!player.hasVastAdTagUri(xmlResponse) && player.hasInLine(xmlResponse)) {
 
                     //Set initial values
-                    tmpOptions.skipoffset = false;
                     tmpOptions.adFinished = false;
                     tmpOptions.adType = 'linear';
 
                     //Extract the necessary data from the Linear node
                     tmpOptions.skipoffset = player.convertTimeStringToSeconds(creativeLinear.getAttribute('skipoffset'));
                     tmpOptions.clickthroughUrl = player.getClickThroughUrlFromLinear(creativeLinear);
-                    tmpOptions.clicktracking = player.getClickTrackingEvents(creativeLinear);
                     tmpOptions.duration = player.getDurationFromLinear(creativeLinear);
                     tmpOptions.mediaFile = player.getMediaFileFromLinear(creativeLinear);
                     tmpOptions.iconClick = player.getIconClickThroughFromLinear(creativeLinear);
-
                 }
             }
 
@@ -812,6 +827,9 @@ var fluidPlayerClass = {
                 var creativeNonLinear = arrayCreativeNonLinears[0];
                 player.registerTrackingEvents(creativeNonLinear, tmpOptions);
 
+                var clickTracks = player.getNonLinearClickTrackingEvents(creativeNonLinear);
+                player.registerClickTracking(clickTracks, tmpOptions);
+
                 //Extract the Ad data if it is actually the Ad (!wrapper)
                 if (!player.hasVastAdTagUri(xmlResponse) && player.hasInLine(xmlResponse)) {
 
@@ -820,9 +838,8 @@ var fluidPlayerClass = {
 
                     //Extract the necessary data from the NonLinear node
                     tmpOptions.clickthroughUrl = player.getClickThroughUrlFromNonLinear(creativeNonLinear);
-                    tmpOptions.clicktracking = player.getNonLinearClickTrackingEvents(creativeNonLinear);
-                    tmpOptions.duration = player.getDurationFromNonLinear(creativeNonLinear);
-                    tmpOptions.dimension = player.getDimensionFromNonLinear(creativeNonLinear);
+                    tmpOptions.duration = player.getDurationFromNonLinear(creativeNonLinear); // VAST version < 4.0
+                    tmpOptions.dimension = player.getDimensionFromNonLinear(creativeNonLinear); // VAST version < 4.0
                     tmpOptions.staticResource = player.getStaticResourceFromNonLinear(creativeNonLinear);
                     tmpOptions.creativeType = player.getCreativeTypeFromStaticResources(creativeNonLinear);
                 }
@@ -869,6 +886,7 @@ var fluidPlayerClass = {
             tracking: [],
             stopTracking: [],
             impression: [],
+            clicktracking: [],
             vastLoaded: false
         };
 
