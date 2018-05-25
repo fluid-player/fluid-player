@@ -3449,7 +3449,7 @@ var fluidPlayerClass = {
 
         var loadedMetadata = function() {
             videoPlayerTag.currentTime = newCurrentTime;
-            videoPlayerTag.playbackRate = currentPlaybackRate;
+            if(currentPlaybackRate) videoPlayerTag.playbackRate = currentPlaybackRate;
             videoPlayerTag.removeEventListener('loadedmetadata', loadedMetadata);
             // Safari ios fix to set currentTime
             if (fluidPlayerClass.getMobileOs().userOs == 'iOS') {
