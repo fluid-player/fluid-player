@@ -316,7 +316,7 @@ var fluidPlayerClass = {
 
             var vastAdTagURI = wrapper[0].getElementsByTagName('VASTAdTagURI');
             if (vastAdTagURI.length) {
-                return vastAdTagURI[0].childNodes[0].nodeValue;
+                return this.extractNodeData(vastAdTagURI[0]);
             }
         }
 
@@ -635,7 +635,7 @@ var fluidPlayerClass = {
         var result = [];
         var nonLinears = nonLinear.getElementsByTagName('NonLinear');
 
-        if (nonLinears.length) {//There should be exactly 1 node
+        if (nonLinears.length) {
             var clickTracking = nonLinear.getElementsByTagName('NonLinearClickTracking');
             if (clickTracking.length) {
                 for (var i = 0; i < clickTracking.length; i++) {
@@ -922,18 +922,12 @@ var fluidPlayerClass = {
                     var wrapper = xmlResponse.getElementsByTagName('Wrapper');
 
                     if ((typeof wrapper !== 'undefined') && wrapper.length) {
-
-                        var vastAdTagURI = xmlResponse.getElementsByTagName('VASTAdTagURI');
-
-                        if ((typeof vastAdTagURI !== 'undefined') && vastAdTagURI.length) {
-                            resolveVastTag(player.getVastAdTagUriFromWrapper(wrapper), callback, numberOfRedirects);
-                        }
-
+                        resolveVastTag(player.getVastAdTagUriFromWrapper(wrapper), callback, numberOfRedirects);
                     }
 
                 }
 
-                if (numberOfRedirects >= player.displayOptions.vastOptions.maxAllowedVastTagRedirects && !player.inLineFound) {
+                if (numberOfRedirects > player.displayOptions.vastOptions.maxAllowedVastTagRedirects && !player.inLineFound) {
                     player.stopProcessAndReportError(adListId);
                     return;
                 }
