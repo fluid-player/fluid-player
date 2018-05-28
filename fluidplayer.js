@@ -3273,11 +3273,18 @@ var fluidPlayerClass = {
                         player.setupThumbnailPreviewVtt.bind(this)
                     );
 
-                    document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container')
-                        .addEventListener('mousemove', player.drawTimelinePreview.bind(player), false);
+                    var isMobileChecks = fluidPlayerClass.getMobileOs();
+                    var eventOn = 'mousemove';
+                    var eventOff = 'mouseout';
+                    if (isMobileChecks.userOs) {
+                        eventOn = 'touchmove';
+                        eventOff = 'touchend';
+                    }
 
                     document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container')
-                        .addEventListener('mouseout', function() {
+                        .addEventListener(eventOn, player.drawTimelinePreview.bind(player), false);
+                    document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container')
+                        .addEventListener(eventOff, function() {
                             document.getElementById(player.videoPlayerId + '_fluid_timeline_preview_container').style.display = 'none';
                         }, false);
 
