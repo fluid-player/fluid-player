@@ -310,7 +310,8 @@ var fluidPlayerClass = {
     },
 
 
-    getVastAdTagUriFromWrapper: function(wrapper) {
+    getVastAdTagUriFromWrapper: function(xmlResponse) {
+        var wrapper = xmlResponse.getElementsByTagName('Wrapper');
 
         if (typeof wrapper !== 'undefined' && wrapper.length) {
 
@@ -858,6 +859,8 @@ var fluidPlayerClass = {
                     event.initEvent('adId_' + adListId, false, true);
                     document.getElementById(player.videoPlayerId).dispatchEvent(event);
 
+                    player.displayOptions.vastOptions.vastAdvanced.vastLoadedCallback();
+
                 } else {
 
                     player.stopProcessAndReportError(adListId);
@@ -881,7 +884,6 @@ var fluidPlayerClass = {
     processUrl: function (vastTag, adListId) {
         var player = this;
         var numberOfRedirects = 0;
-
         var tmpOptions = {
             tracking: [],
             stopTracking: [],
@@ -890,74 +892,80 @@ var fluidPlayerClass = {
             vastLoaded: false
         };
 
-        var resolveVastTag = function (vastTag, callback, numberOfRedirects) {
+        player.resolveVastTag(
+            vastTag,
+            numberOfRedirects,
+            adListId,
+            tmpOptions
+        );
 
-            var handleXmlHttpReq = function () {
-                var xmlHttpReq = this;
+    },
 
-                if ((xmlHttpReq.readyState === 4) && (xmlHttpReq.status !== 200)) {
-                    player.stopProcessAndReportError(adListId);
-                    return;
-                }
+    resolveVastTag: function (vastTag, numberOfRedirects, adListId, tmpOptions) {
+        var player = this;
 
-                if (!((xmlHttpReq.readyState === 4) && (xmlHttpReq.status === 200))) {
-                    return;
-                }
+        if(!vastTag || vastTag == '') {
+            player.stopProcessAndReportError(adListId);
+            return;
+        }
 
-                try {
-                    var xmlResponse = xmlHttpReq.responseXML;
-                } catch (e) {
-                    player.stopProcessAndReportError(adListId);
-                    return;
-                }
+        var handleXmlHttpReq = function () {
+            var xmlHttpReq = this;
 
-                if (!xmlResponse) {
-                    player.stopProcessAndReportError(adListId);
-                    return;
-                }
-
-                player.inLineFound = player.hasInLine(xmlResponse);
-
-                if (!player.inLineFound) {
-                    var wrapper = xmlResponse.getElementsByTagName('Wrapper');
-
-                    if ((typeof wrapper !== 'undefined') && wrapper.length) {
-                        resolveVastTag(player.getVastAdTagUriFromWrapper(wrapper), callback, numberOfRedirects);
-                    }
-
-                }
-
-                if (numberOfRedirects > player.displayOptions.vastOptions.maxAllowedVastTagRedirects && !player.inLineFound) {
-                    player.stopProcessAndReportError(adListId);
-                    return;
-                }
-
-                if (player.inLineFound) {
-                    callback(numberOfRedirects);
-                }
-                player.processVastXml(xmlResponse, adListId, tmpOptions);
-            };
-
-            if (numberOfRedirects <= player.displayOptions.vastOptions.maxAllowedVastTagRedirects) {
-
-                player.sendRequest(
-                    vastTag,
-                    true,
-                    player.displayOptions.vastOptions.vastTimeout,
-                    handleXmlHttpReq
-                );
-
+            if (!((xmlHttpReq.readyState === 4) && (xmlHttpReq.status === 200))) {
+                return;
             }
 
-            numberOfRedirects++;
+            if ((xmlHttpReq.readyState === 4) && (xmlHttpReq.status !== 200)) {
+                player.stopProcessAndReportError(adListId);
+                return;
+            }
+
+            try {
+                var xmlResponse = xmlHttpReq.responseXML;
+            } catch (e) {
+                player.stopProcessAndReportError(adListId);
+                return;
+            }
+
+            if (!xmlResponse) {
+                player.stopProcessAndReportError(adListId);
+                return;
+            }
+
+            player.inLineFound = player.hasInLine(xmlResponse);
+
+            if (!player.inLineFound && player.hasVastAdTagUri(xmlResponse)) {
+
+                var vastAdTagUri = player.getVastAdTagUriFromWrapper(xmlResponse);
+                if (vastAdTagUri) {
+                    player.resolveVastTag(vastAdTagUri, numberOfRedirects, adListId, tmpOptions);
+                } else {
+                    player.stopProcessAndReportError(adListId);
+                    return;
+                }
+            }
+
+            if (numberOfRedirects > player.displayOptions.vastOptions.maxAllowedVastTagRedirects && !player.inLineFound) {
+                player.stopProcessAndReportError(adListId);
+                return;
+            }
+
+            player.processVastXml(xmlResponse, adListId, tmpOptions);
         };
 
+        if (numberOfRedirects <= player.displayOptions.vastOptions.maxAllowedVastTagRedirects) {
 
-        resolveVastTag(vastTag, function (numberOfRedirects) {
-            //console.log('numberOfRedirects:', numberOfRedirects);
-            player.displayOptions.vastOptions.vastAdvanced.vastLoadedCallback();
-        }, numberOfRedirects);
+            player.sendRequest(
+                vastTag,
+                true,
+                player.displayOptions.vastOptions.vastTimeout,
+                handleXmlHttpReq
+            );
 
+        }
+
+        numberOfRedirects++;
     },
 
     /**
