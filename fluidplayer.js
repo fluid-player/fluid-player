@@ -2489,6 +2489,7 @@ var fluidPlayerClass = {
             return;
         }
 
+        player.fluidSeeking = true;
         var videoPlayerTag = document.getElementById(videoPlayerId);
 
         var initiallyPaused = videoPlayerTag.paused;
@@ -2526,6 +2527,7 @@ var fluidPlayerClass = {
             if (player.initialAnimationSet) {
                 setTimeout(function() { player.displayOptions.layoutControls.playPauseAnimation = player.initialAnimationSet; }, 200);
             }
+            player.fluidSeeking = false;
         }
 
         document.addEventListener('mouseup', onProgressbarMouseUp);
@@ -4194,6 +4196,7 @@ var fluidPlayerClass = {
         player.mainVideoReadyState     = false;
         player.xmlCollection           = [];
         player.inLineFound             = null;
+        player.fluidSeeking            = false;
 
         //Default options
         player.displayOptions = {
