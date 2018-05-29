@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Next release
+## 2.2.2
 * [Pull #175](https://github.com/fluid-player/fluid-player/pull/175) Fullscreen mode variable correct place
 * [Pull #177](https://github.com/fluid-player/fluid-player/pull/177) Fix fadeOut/fadeIn opacity to correct values in the end of animation
 * [Pull #180](https://github.com/fluid-player/fluid-player/pull/180) Adding VASTAdTagURI support
