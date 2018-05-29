@@ -912,6 +912,12 @@ var fluidPlayerClass = {
         var handleXmlHttpReq = function () {
             var xmlHttpReq = this;
 
+
+            if (xmlHttpReq.readyState === 4 && xmlHttpReq.status === 404) {
+                player.stopProcessAndReportError(adListId);
+                return;
+            }
+
             if (!((xmlHttpReq.readyState === 4) && (xmlHttpReq.status === 200))) {
                 return;
             }
