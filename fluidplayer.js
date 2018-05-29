@@ -310,6 +310,45 @@ var fluidPlayerClass = {
     },
 
 
+    getVastAdTagUriFromWrapper: function(xmlResponse) {
+        var wrapper = xmlResponse.getElementsByTagName('Wrapper');
+
+        if (typeof wrapper !== 'undefined' && wrapper.length) {
+
+            var vastAdTagURI = wrapper[0].getElementsByTagName('VASTAdTagURI');
+            if (vastAdTagURI.length) {
+                return this.extractNodeData(vastAdTagURI[0]);
+            }
+        }
+
+        return false;
+    },
+
+
+    hasInLine: function (xmlResponse) {
+        var inLine = xmlResponse.getElementsByTagName('InLine');
+        return ((typeof inLine !== 'undefined') && inLine.length);
+    },
+
+
+    hasVastAdTagUri: function (xmlResponse) {
+        var vastAdTagURI = xmlResponse.getElementsByTagName('VASTAdTagURI');
+        return ((typeof vastAdTagURI !== 'undefined') && vastAdTagURI.length);
+    },
+
+    hasVastAdTagUriFromWrapper: function(creative) {
+        var player = this;
+
+        if ((typeof creative !== 'undefined') && creative.length) {
+            var arrayCreativeLinears = creative[0].getElementsByTagName('Linear');
+            if ((typeof arrayCreativeLinears !== 'undefined') && (arrayCreativeLinears !== null) && arrayCreativeLinears.length) {
+                return player.getMediaFileFromLinear(arrayCreativeLinears[0]);
+            }
+        }
+
+        return false;
+    },
+
     getClickThroughUrlFromNonLinear: function (nonLinear) {
         var result = '';
         var nonLinears = nonLinear.getElementsByTagName('NonLinear');
@@ -506,9 +545,20 @@ var fluidPlayerClass = {
         }
     },
 
+    registerClickTracking: function(clickTrackingTag, tmpOptions) {
+
+        if(clickTrackingTag.length) {
+            for (var i = 0; i < clickTrackingTag.length; i++) {
+                if(clickTrackingTag[i] != ''){
+                    tmpOptions.clicktracking.push(clickTrackingTag[i]);
+                }
+            }
+        }
+
+    },
+
     registerImpressionEvents: function(impressionTags, tmpOptions) {
         if (impressionTags.length) {
-            tmpOptions.impression = [];
 
             for (var i = 0; i < impressionTags.length; i++) {
                 var impressionEvent = this.extractNodeData(impressionTags[i]);
@@ -583,13 +633,16 @@ var fluidPlayerClass = {
 
 
     getNonLinearClickTrackingEvents: function (nonLinear) {
-        var result = '';
+        var result = [];
         var nonLinears = nonLinear.getElementsByTagName('NonLinear');
 
-        if (nonLinears.length) {//There should be exactly 1 node
+        if (nonLinears.length) {
             var clickTracking = nonLinear.getElementsByTagName('NonLinearClickTracking');
             if (clickTracking.length) {
-                result = this.extractNodeData(clickTracking[0]);
+                for (var i = 0; i < clickTracking.length; i++) {
+                    var NonLinearClickTracking = this.extractNodeData(clickTracking[i]);
+                    result.push(NonLinearClickTracking);
+                }
             }
         }
 
@@ -652,7 +705,7 @@ var fluidPlayerClass = {
             var adListId = list[i];
 
             if (player.adList[adListId].vastLoaded !== true && player.adList[adListId].error !== true) {
-                player.parseVastTag(player.adList[adListId].vastTag, adListId);
+                player.processUrl(player.adList[adListId].vastTag, adListId);
                 videoPlayerTag.addEventListener('adId_' + adListId, player[roll]);
             }
         }
@@ -704,146 +757,242 @@ var fluidPlayerClass = {
 
     switchPlayerToVastMode: function() {},
 
+
+    /**
+     * Process the XML response
+     *
+     * @param xmlResponse
+     * @param adListId
+     * @param tmpOptions
+     */
+    processVastXml: function (xmlResponse, adListId, tmpOptions) {
+        var player = this;
+
+        if (!xmlResponse) {
+            player.stopProcessAndReportError(adListId);
+            return;
+        }
+
+        //Get impression tag
+        var impression = xmlResponse.getElementsByTagName('Impression');
+        if (impression !== null) {
+            player.registerImpressionEvents(impression, tmpOptions);
+        }
+
+        //Get the error tag, if any
+        var errorTags = xmlResponse.getElementsByTagName('Error');
+        if (errorTags !== null) {
+            player.registerErrorEvents(errorTags, tmpOptions);
+        }
+
+
+        //Get Creative
+        var creative = xmlResponse.getElementsByTagName('Creative');
+
+        //Currently only 1 creative and 1 linear is supported
+        if ((typeof creative !== 'undefined') && creative.length) {
+            var arrayCreativeLinears = creative[0].getElementsByTagName('Linear');
+
+            if ((typeof arrayCreativeLinears !== 'undefined') && (arrayCreativeLinears !== null) && arrayCreativeLinears.length) {
+
+                var creativeLinear = arrayCreativeLinears[0];
+                player.registerTrackingEvents(creativeLinear, tmpOptions);
+
+                var clickTracks = player.getClickTrackingEvents(creativeLinear);
+                player.registerClickTracking(clickTracks, tmpOptions);
+
+                //Extract the Ad data if it is actually the Ad (!wrapper)
+                if (!player.hasVastAdTagUri(xmlResponse) && player.hasInLine(xmlResponse)) {
+
+                    //Set initial values
+                    tmpOptions.adFinished = false;
+                    tmpOptions.adType = 'linear';
+
+                    //Extract the necessary data from the Linear node
+                    tmpOptions.skipoffset = player.convertTimeStringToSeconds(creativeLinear.getAttribute('skipoffset'));
+                    tmpOptions.clickthroughUrl = player.getClickThroughUrlFromLinear(creativeLinear);
+                    tmpOptions.duration = player.getDurationFromLinear(creativeLinear);
+                    tmpOptions.mediaFile = player.getMediaFileFromLinear(creativeLinear);
+                    tmpOptions.iconClick = player.getIconClickThroughFromLinear(creativeLinear);
+                }
+            }
+
+            if ((typeof tmpOptions.iconClick !== 'undefined') && (tmpOptions.iconClick !== null) && tmpOptions.iconClick.length) {
+                player.adList[adListId].landingPage = tmpOptions.iconClick;
+            }
+
+            var arrayCreativeNonLinears = creative[0].getElementsByTagName('NonLinearAds');
+
+            if ((typeof arrayCreativeNonLinears !== 'undefined') && (arrayCreativeNonLinears !== null) && arrayCreativeNonLinears.length) {
+
+                var creativeNonLinear = arrayCreativeNonLinears[0];
+                player.registerTrackingEvents(creativeNonLinear, tmpOptions);
+
+                var clickTracks = player.getNonLinearClickTrackingEvents(creativeNonLinear);
+                player.registerClickTracking(clickTracks, tmpOptions);
+
+                //Extract the Ad data if it is actually the Ad (!wrapper)
+                if (!player.hasVastAdTagUri(xmlResponse) && player.hasInLine(xmlResponse)) {
+
+                    //Set initial values
+                    tmpOptions.adType = 'nonLinear';
+
+                    //Extract the necessary data from the NonLinear node
+                    tmpOptions.clickthroughUrl = player.getClickThroughUrlFromNonLinear(creativeNonLinear);
+                    tmpOptions.duration = player.getDurationFromNonLinear(creativeNonLinear); // VAST version < 4.0
+                    tmpOptions.dimension = player.getDimensionFromNonLinear(creativeNonLinear); // VAST version < 4.0
+                    tmpOptions.staticResource = player.getStaticResourceFromNonLinear(creativeNonLinear);
+                    tmpOptions.creativeType = player.getCreativeTypeFromStaticResources(creativeNonLinear);
+                }
+            }
+
+            //Extract the Ad data if it is actually the Ad (!wrapper)
+            if (!player.hasVastAdTagUri(xmlResponse) && player.hasInLine(xmlResponse)) {
+
+                player.adList[adListId].adType = tmpOptions.adType ? tmpOptions.adType : 'unknown';
+
+                if (typeof tmpOptions.mediaFile !== 'undefined' || typeof tmpOptions.staticResource !== 'undefined') {
+
+                    player.adList[adListId].vastLoaded = true;
+                    player.adPool[adListId] = Object.assign({}, tmpOptions);
+                    var event = document.createEvent('Event');
+                    event.initEvent('adId_' + adListId, false, true);
+                    document.getElementById(player.videoPlayerId).dispatchEvent(event);
+
+                    player.displayOptions.vastOptions.vastAdvanced.vastLoadedCallback();
+
+                } else {
+
+                    player.stopProcessAndReportError(adListId);
+
+                }
+
+            }
+        } else {
+            player.stopProcessAndReportError(adListId);
+        }
+
+    },
+
+
     /**
      * Parse the VAST Tag
      *
      * @param vastTag
      * @param adListId
      */
-    parseVastTag: function(vastTag, adListId) {
+    processUrl: function (vastTag, adListId) {
         var player = this;
-
+        var numberOfRedirects = 0;
         var tmpOptions = {
-            vastTagUrl:   vastTag,
-            tracking:     [],
+            tracking: [],
             stopTracking: [],
+            impression: [],
+            clicktracking: [],
             vastLoaded: false
-
         };
 
-        player.sendRequest(
+        player.resolveVastTag(
             vastTag,
-            true,
-            player.displayOptions.vastOptions.vastTimeout,
-            function() {
-                var xmlHttpReq = this;
-
-                // Helper function to stop processing
-                var stopProcessAndReportError = function() {
-
-                    //Set the error flag for the Ad
-                    player.adList[adListId].error = true;
-
-                    //The response returned an error. Proceeding with the main video.
-                    //Try to switch main video only if it is a preRoll scenario
-                    if (typeof adListId !== 'undefined' && player.adList[adListId]['roll'] == 'preRoll') {
-                        player.playMainVideoWhenVastFails(900);
-                    } else {
-                        player.announceLocalError(101);
-                    }
-
-                };
-
-                if ((xmlHttpReq.readyState === 4) && (xmlHttpReq.status !== 200)) {
-                    stopProcessAndReportError();
-                    return;
-                }
-
-                if (!((xmlHttpReq.readyState === 4) && (xmlHttpReq.status === 200))) {
-                    return;
-                }
-
-                var xmlResponse = xmlHttpReq.responseXML;
-
-                if(!xmlResponse) {
-                    stopProcessAndReportError();
-                    return;
-                }
-
-                //Get impression tag
-                var impression = xmlResponse.getElementsByTagName('Impression');
-                if(impression !== null) {
-                    player.registerImpressionEvents(impression, tmpOptions);
-                }
-
-                //Get the error tag, if any
-                var errorTags = xmlResponse.getElementsByTagName('Error');
-                if (errorTags !== null) {
-                    player.registerErrorEvents(errorTags, tmpOptions);
-                }
-
-                //Set initial values
-                tmpOptions.skipoffset = false;
-                tmpOptions.adFinished = false;
-                tmpOptions.vastTagUrl = vastTag;
-
-                //Get Creative
-                var creative = xmlResponse.getElementsByTagName('Creative');
-
-                //Currently only 1 creative and 1 linear is supported
-                if ((typeof creative !== 'undefined') && creative.length) {
-                    var arrayCreativeLinears = creative[0].getElementsByTagName('Linear');
-
-                    if ((typeof arrayCreativeLinears !== 'undefined') && (arrayCreativeLinears !== null) && arrayCreativeLinears.length) {
-                        var creativeLinear = arrayCreativeLinears[0];
-
-                        tmpOptions.adType = 'linear';
-
-                        //Extract the necessary data from the Linear node
-                        tmpOptions.skipoffset      = player.convertTimeStringToSeconds(creativeLinear.getAttribute('skipoffset'));
-                        tmpOptions.clickthroughUrl = player.getClickThroughUrlFromLinear(creativeLinear);
-                        tmpOptions.clicktracking   = player.getClickTrackingEvents(creativeLinear);
-                        tmpOptions.duration        = player.getDurationFromLinear(creativeLinear);
-                        tmpOptions.mediaFile       = player.getMediaFileFromLinear(creativeLinear);
-                        tmpOptions.iconClick       = player.getIconClickThroughFromLinear(creativeLinear);
-
-                        player.registerTrackingEvents(creativeLinear, tmpOptions);
-                    }
-
-                    if ((typeof tmpOptions.iconClick !== 'undefined') && (tmpOptions.iconClick !== null) && tmpOptions.iconClick.length) {
-                        player.adList[adListId].landingPage = tmpOptions.iconClick;
-                    }
-
-                    var arrayCreativeNonLinears = creative[0].getElementsByTagName('NonLinearAds');
-
-                    if ((typeof arrayCreativeNonLinears !== 'undefined') && (arrayCreativeNonLinears !== null) && arrayCreativeNonLinears.length) {
-                        var creativeNonLinear = arrayCreativeNonLinears[0];
-
-                        tmpOptions.adType = 'nonLinear';
-
-                        //Extract the necessary data from the Linear node
-                        tmpOptions.clickthroughUrl = player.getClickThroughUrlFromNonLinear(creativeNonLinear);
-                        tmpOptions.clicktracking   = player.getNonLinearClickTrackingEvents(creativeNonLinear);
-                        tmpOptions.duration        = player.getDurationFromNonLinear(creativeNonLinear);
-                        tmpOptions.dimension       = player.getDimensionFromNonLinear(creativeNonLinear);
-                        tmpOptions.staticResource  = player.getStaticResourceFromNonLinear(creativeNonLinear);
-                        tmpOptions.creativeType    = player.getCreativeTypeFromStaticResources(creativeNonLinear);
-
-                        player.registerTrackingEvents(creativeNonLinear, tmpOptions);
-                    }
-
-                    player.adList[adListId].adType = tmpOptions.adType? tmpOptions.adType : 'unknown';
-
-                    if (typeof tmpOptions.mediaFile !== 'undefined' || typeof tmpOptions.staticResource !== 'undefined') {
-
-                        player.adList[adListId].vastLoaded = true;
-                        player.displayOptions.vastOptions.vastAdvanced.vastLoadedCallback();
-                        player.adPool[adListId] = Object.assign({}, tmpOptions);
-                        var event = document.createEvent('Event');
-                        event.initEvent('adId_' + adListId, false, true);
-                        document.getElementById(player.videoPlayerId).dispatchEvent(event);
-                        return;
-                    } else {
-                        stopProcessAndReportError();
-                        return;
-                    }
-                } else {
-                    stopProcessAndReportError();
-                    return;
-                }
-                player.displayOptions.vastOptions.vastAdvanced.vastLoadedCallback();
-            }
+            numberOfRedirects,
+            adListId,
+            tmpOptions
         );
+
+    },
+
+    resolveVastTag: function (vastTag, numberOfRedirects, adListId, tmpOptions) {
+        var player = this;
+
+        if(!vastTag || vastTag == '') {
+            player.stopProcessAndReportError(adListId);
+            return;
+        }
+
+        var handleXmlHttpReq = function () {
+            var xmlHttpReq = this;
+
+
+            if (xmlHttpReq.readyState === 4 && xmlHttpReq.status === 404) {
+                player.stopProcessAndReportError(adListId);
+                return;
+            }
+
+            if (!((xmlHttpReq.readyState === 4) && (xmlHttpReq.status === 200))) {
+                return;
+            }
+
+            if ((xmlHttpReq.readyState === 4) && (xmlHttpReq.status !== 200)) {
+                player.stopProcessAndReportError(adListId);
+                return;
+            }
+
+            try {
+                var xmlResponse = xmlHttpReq.responseXML;
+            } catch (e) {
+                player.stopProcessAndReportError(adListId);
+                return;
+            }
+
+            if (!xmlResponse) {
+                player.stopProcessAndReportError(adListId);
+                return;
+            }
+
+            player.inLineFound = player.hasInLine(xmlResponse);
+
+            if (!player.inLineFound && player.hasVastAdTagUri(xmlResponse)) {
+
+                var vastAdTagUri = player.getVastAdTagUriFromWrapper(xmlResponse);
+                if (vastAdTagUri) {
+                    player.resolveVastTag(vastAdTagUri, numberOfRedirects, adListId, tmpOptions);
+                } else {
+                    player.stopProcessAndReportError(adListId);
+                    return;
+                }
+            }
+
+            if (numberOfRedirects > player.displayOptions.vastOptions.maxAllowedVastTagRedirects && !player.inLineFound) {
+                player.stopProcessAndReportError(adListId);
+                return;
+            }
+
+            player.processVastXml(xmlResponse, adListId, tmpOptions);
+        };
+
+        if (numberOfRedirects <= player.displayOptions.vastOptions.maxAllowedVastTagRedirects) {
+
+            player.sendRequest(
+                vastTag,
+                true,
+                player.displayOptions.vastOptions.vastTimeout,
+                handleXmlHttpReq
+            );
+
+        }
+
+        numberOfRedirects++;
+    },
+
+    /**
+     * Helper function to stop processing
+     *
+     * @param adListId
+     */
+    stopProcessAndReportError: function(adListId) {
+        var player = this;
+
+        //Set the error flag for the Ad
+        player.adList[adListId].error = true;
+
+        //The response returned an error. Proceeding with the main video.
+        //Try to switch main video only if it is a preRoll scenario
+        if (typeof adListId !== 'undefined' && player.adList[adListId]['roll'] == 'preRoll') {
+            player.playMainVideoWhenVastFails(900);
+        } else {
+            player.announceLocalError(101);
+        }
+
     },
 
     playRoll: function(adListId) {
@@ -4001,7 +4150,6 @@ var fluidPlayerClass = {
         videoPlayer.setAttribute('webkit-playsinline', '');
 
         player.vastOptions = {
-            vastTagUrl:   '',
             tracking:     [],
             stopTracking: []
         };
@@ -4044,6 +4192,8 @@ var fluidPlayerClass = {
         player.isSwitchingSource       = false;
         player.isInIframe              = player.inIframe();
         player.mainVideoReadyState     = false;
+        player.xmlCollection           = [];
+        player.inLineFound             = null;
 
         //Default options
         player.displayOptions = {
@@ -4099,6 +4249,7 @@ var fluidPlayerClass = {
                 adCTATextPosition:            'bottom right',
                 vastTimeout:                  5000,
                 showProgressbarMarkers:       false,
+                maxAllowedVastTagRedirects:   3,
 
                 vastAdvanced: {
                     vastLoadedCallback:       (function() {}),
