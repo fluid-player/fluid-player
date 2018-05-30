@@ -1921,7 +1921,7 @@ var fluidPlayerClass = {
         }
     },
 
-    decreaseSkipOffset: function decreaseSkipOffset() {
+    decreaseSkipOffset: function() {
         //"this" is the HTML5 video tag, because it disptches the "ended" event
         var videoPlayerTag = this;
         var player = fluidPlayerClass.getInstanceById(videoPlayerTag.id);
