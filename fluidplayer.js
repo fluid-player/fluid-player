@@ -4516,7 +4516,7 @@ var fluidPlayerClass = {
             case 'pause':
                 videoPlayer.addEventListener('pause', function() {
                     if (!player.fluidPseudoPause) {
-                        eval(functionCall());
+                        functionCall();
                     }
                 });
                 break;
