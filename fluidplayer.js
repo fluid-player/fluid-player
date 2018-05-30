@@ -4023,28 +4023,45 @@ var fluidPlayerClass = {
             return;
         }
 
-        var downloadItem = document.getElementById('fluid_video_wrapper_' + this.videoPlayerId);
+        var videoWrapper = document.getElementById('fluid_video_wrapper_' + this.videoPlayerId);
         if (!this.theatreMode) {
             // Theatre and fullscreen, it's only one or the other
             if (this.fullscreenMode) {
                 this.fullscreenToggle();
             }
 
-            downloadItem.classList.add('fluid_theatre_mode');
-            lessFullHeight = (screen.height / 100) * 60;
-            downloadItem.style.width = '100%';
-            downloadItem.style.height = "60%";
-            downloadItem.style.maxHeight = lessFullHeight + "px";
+            videoWrapper.classList.add('fluid_theatre_mode');
+            lessFullHeight = (screen.height / 100) * this.displayOptions.layoutControls.theatreSettings.height;
+            videoWrapper.style.width = this.displayOptions.layoutControls.theatreSettings.width + '%';
+            videoWrapper.style.height = this.displayOptions.layoutControls.theatreSettings.height + "%";
+            videoWrapper.style.maxHeight = lessFullHeight + "px";
+            videoWrapper.style.marginTop = this.displayOptions.layoutControls.theatreSettings.marginTop + "px";
+
+            switch (this.displayOptions.layoutControls.theatreSettings.align) {
+                case 'left':
+                    videoWrapper.style.left = '0px';
+                    break;
+                case 'right':
+                    videoWrapper.style.right = '0px';
+                    break;
+                case 'center':
+                default:
+                    videoWrapper.style.left = ((100 - this.displayOptions.layoutControls.theatreSettings.width) / 2) + "%";
+                    break;
+            }
             this.theatreMode = true;
         } else {
-            downloadItem.classList.remove('fluid_theatre_mode');
-            downloadItem.style.maxHeight = "";
+            videoWrapper.classList.remove('fluid_theatre_mode');
+            videoWrapper.style.maxHeight = "";
+            videoWrapper.style.marginTop = "";
+            videoWrapper.style.left = "";
+            videoWrapper.style.right = "";
             if (!this.displayOptions.layoutControls.fillToContainer) {
-                downloadItem.style.width = this.originalWidth + 'px';
-                downloadItem.style.height = this.originalHeight + 'px';
+                videoWrapper.style.width = this.originalWidth + 'px';
+                videoWrapper.style.height = this.originalHeight + 'px';
             } else {
-                downloadItem.style.width = '100%';
-                downloadItem.style.height = '100%';
+                videoWrapper.style.width = '100%';
+                videoWrapper.style.height = '100%';
             }
             this.theatreMode = false;
         }
@@ -4212,6 +4229,12 @@ var fluidPlayerClass = {
                 allowDownload:                false,
                 playbackRateEnabled:          false,
                 allowTheatre:                 true,
+                theatreSettings: {
+                    width:                    100,
+                    height:                   60,
+                    marginTop:                0,
+                    align:                    'center'
+                },
                 logo: {
                     imageUrl:                 null,
                     position:                 'top left',
