@@ -2489,7 +2489,7 @@ var fluidPlayerClass = {
             return;
         }
 
-        player.fluidSeeking = true;
+        player.fluidPseudoPause = true;
         var videoPlayerTag = document.getElementById(videoPlayerId);
 
         var initiallyPaused = videoPlayerTag.paused;
@@ -2527,7 +2527,7 @@ var fluidPlayerClass = {
             if (player.initialAnimationSet) {
                 setTimeout(function() { player.displayOptions.layoutControls.playPauseAnimation = player.initialAnimationSet; }, 200);
             }
-            player.fluidSeeking = false;
+            player.fluidPseudoPause = false;
         }
 
         document.addEventListener('mouseup', onProgressbarMouseUp);
@@ -4196,7 +4196,7 @@ var fluidPlayerClass = {
         player.mainVideoReadyState     = false;
         player.xmlCollection           = [];
         player.inLineFound             = null;
-        player.fluidSeeking            = false;
+        player.fluidPseudoPause        = false;
 
         //Default options
         player.displayOptions = {
@@ -4508,12 +4508,17 @@ var fluidPlayerClass = {
 
     on: function(eventCall, functionCall) {
         var videoPlayer = document.getElementById(this.videoPlayerId);
+        var player = this;
         switch(eventCall) {
             case 'play':
                 videoPlayer.onplay = functionCall;
                 break;
             case 'pause':
-                videoPlayer.onpause = functionCall;
+                videoPlayer.addEventListener('pause', function() {
+                    if (!player.fluidPseudoPause) {
+                        eval(functionCall());
+                    }
+                });
                 break;
             default:
                 console.log('[FP_ERROR] Event not recognised');
