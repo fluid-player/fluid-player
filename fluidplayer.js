@@ -3221,6 +3221,10 @@ var fluidPlayerClass = {
             player.playPauseToggle(videoPlayerTag);
         }, false);
 
+        document.getElementById(this.videoPlayerId).addEventListener('touchstart', function() {
+            player.playPauseToggle(videoPlayerTag);
+        }, false);
+
         switch (this.displayOptions.layoutControls.layout) {
             case 'browser':
                 //Nothing special to do here at this point.
