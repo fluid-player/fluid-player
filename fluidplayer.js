@@ -4032,10 +4032,10 @@ var fluidPlayerClass = {
 
             videoWrapper.classList.add('fluid_theatre_mode');
             lessFullHeight = (screen.height / 100) * this.displayOptions.layoutControls.theatreSettings.height;
-            videoWrapper.style.width = this.displayOptions.layoutControls.theatreSettings.width + '%';
-            videoWrapper.style.height = this.displayOptions.layoutControls.theatreSettings.height + "%";
+            videoWrapper.style.width = this.displayOptions.layoutControls.theatreSettings.width;
+            videoWrapper.style.height = this.displayOptions.layoutControls.theatreSettings.height;
             videoWrapper.style.maxHeight = lessFullHeight + "px";
-            videoWrapper.style.marginTop = this.displayOptions.layoutControls.theatreSettings.marginTop + "px";
+            videoWrapper.style.marginTop = this.displayOptions.layoutControls.theatreSettings.marginTop + 'px';
 
             switch (this.displayOptions.layoutControls.theatreSettings.align) {
                 case 'left':
@@ -4046,7 +4046,21 @@ var fluidPlayerClass = {
                     break;
                 case 'center':
                 default:
-                    videoWrapper.style.left = ((100 - this.displayOptions.layoutControls.theatreSettings.width) / 2) + "%";
+                    var setMargin = '0px';
+                    var workingWidth = this.displayOptions.layoutControls.theatreSettings.width;
+
+                    // We must calculate the margin differently based on whether they passed % or px
+                    if (typeof(workingWidth) == 'string' && workingWidth.substr(workingWidth.length - 1) == "%") {
+                        // A margin of half the remaining space
+                        setMargin = ((100 - parseInt(workingWidth.substring(0, workingWidth.length - 1))) / 2) + "%";
+                    } else if (typeof(workingWidth) == 'string' && workingWidth.substr(workingWidth.length - 2) == "px") {
+                        // Half the (Remaining width / fullwidth) to get the centre of the page
+                        setMargin = (((screen.width - parseInt(workingWidth.substring(0, workingWidth.length - 2))) / screen.width) * 100 / 2) + "%";
+                    } else {
+                        console.log('[FP_ERROR] Theatre width specified invalid.');
+                    }
+
+                    videoWrapper.style.left = setMargin;
                     break;
             }
             this.theatreMode = true;
@@ -4230,8 +4244,8 @@ var fluidPlayerClass = {
                 playbackRateEnabled:          false,
                 allowTheatre:                 true,
                 theatreSettings: {
-                    width:                    100,
-                    height:                   60,
+                    width:                    '100%',
+                    height:                   '60%',
                     marginTop:                0,
                     align:                    'center'
                 },
