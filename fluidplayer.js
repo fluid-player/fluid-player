@@ -2851,6 +2851,14 @@ var fluidPlayerClass = {
         var videoPlayerTag = this;
         var player = fluidPlayerClass.getInstanceById(videoPlayerTag.id);
 
+        videoPlayerTag.addEventListener('playing', function() {
+            player.toggleLoader(false);
+        });
+
+        videoPlayerTag.addEventListener('waiting', function() {
+            player.toggleLoader(true);
+        });
+
         if (!player.displayOptions.layoutControls.playButtonShowing) {
             var initialControlsDisplay = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
             var fpPlayer = document.getElementById(player.videoPlayerId + '_logo');
