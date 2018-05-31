@@ -3757,6 +3757,7 @@ var fluidPlayerClass = {
     userActivityChecker: function () {
         var player = this;
         var videoPlayer = document.getElementById('fluid_video_wrapper_' + player.videoPlayerId);
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);
         player.newActivity = null;
 
         var activity = function () {
@@ -3768,9 +3769,7 @@ var fluidPlayerClass = {
             if (player.newActivity === true) {
                 player.newActivity = false;
 
-                var videoPlayerTag = document.getElementById(player.videoPlayerId);
-                if (player.isUserActive === false) {
-                    var videoPlayerTag = document.getElementById(player.videoPlayerId);
+                if (player.isUserActive === false || (player.isUserActive && !player.isControlBarVisible())) {
                     var event = new CustomEvent("userActive");
                     videoPlayerTag.dispatchEvent(event);
                     player.isUserActive = true;
