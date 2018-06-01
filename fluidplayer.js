@@ -2865,10 +2865,20 @@ var fluidPlayerClass = {
         });
 
         if (!player.displayOptions.layoutControls.playButtonShowing) {
+            // Controls always showing until the video is first played
             var initialControlsDisplay = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
-            var fpPlayer = document.getElementById(player.videoPlayerId + '_logo');
             initialControlsDisplay.classList.remove('initial_controls_show');
-            fpPlayer.classList.remove('initial_controls_show');
+            // The logo shows before playing but may need to be removed
+            var fpPlayer = document.getElementById(player.videoPlayerId + '_logo');
+            if (fpPlayer) {
+                fpPlayer.classList.remove('initial_controls_show');
+            }
+        }
+
+        // Remove the div that was placed as a fix for poster image and DASH streaming, if it exists
+        var pseudoPoster= document.getElementById(player.videoPlayerId + '_fluid_pseudo_poster');
+        if (pseudoPoster) {
+            pseudoPoster.parentNode.removeChild(pseudoPoster);
         }
 
         if (!player.firstPlayLaunched) {
@@ -4091,6 +4101,15 @@ var fluidPlayerClass = {
                 if (!this.dashScriptLoaded) { // First time trying adding in DASH streamer, get the script
                     this.dashScriptLoaded = true;
                     fluidPlayerClass.requestScript('https://cdn.dashjs.org/latest/dash.mediaplayer.min.js', this.initialiseDash.bind(this));
+
+                    // Fix for a fake poster image, as the DASH streamer removes it
+                    if (this.displayOptions.layoutControls.posterImage) {
+                        var containerDiv = document.createElement('div');
+                        containerDiv.id = this.videoPlayerId + '_fluid_pseudo_poster';
+                        containerDiv.className = 'fluid_pseudo_poster';
+                        containerDiv.style.background = "url('" + this.displayOptions.layoutControls.posterImage + "') no-repeat";
+                        document.getElementById(this.videoPlayerId).parentNode.insertBefore(containerDiv, null);
+                    }
                 } else {
                     this.initialiseDash();
                 }
@@ -4332,9 +4351,8 @@ var fluidPlayerClass = {
             }
         }
 
-        player.initialiseStreamers();
-
         player.setupPlayerWrapper();
+        player.initialiseStreamers();
 
         videoPlayer.addEventListener('webkitfullscreenchange', player.recalculateAdDimensions, false);
         videoPlayer.addEventListener('fullscreenchange', player.recalculateAdDimensions, false);

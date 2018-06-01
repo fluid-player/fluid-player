@@ -315,7 +315,8 @@
     background-color: rgba(0, 0, 0, 1);
 }
 
-.fluid_html_on_pause {
+.fluid_html_on_pause,
+.fluid_pseudo_poster {
     position: absolute;
     top: 0;
     right: 0;
