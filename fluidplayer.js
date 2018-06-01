@@ -4031,36 +4031,40 @@ var fluidPlayerClass = {
             }
 
             videoWrapper.classList.add('fluid_theatre_mode');
-            lessFullHeight = (screen.height / 100) * this.displayOptions.layoutControls.theatreSettings.height;
-            videoWrapper.style.width = this.displayOptions.layoutControls.theatreSettings.width;
+            var desiredWidth = this.displayOptions.layoutControls.theatreSettings.width;
+            if (!this.displayOptions.layoutControls.theatreSettings.keepRelativity) {
+                videoWrapper.style.position = 'fixed';
+            } else if (desiredWidth.substr(desiredWidth.length - 1) == "%") {
+                // If it's relative and they gave a % we need the pixel value relative to the screen. As % will still be to it's container.
+                desiredWidth = ((screen.width / 100) * parseInt(desiredWidth.substring(0, desiredWidth.length - 1))) + "px";
+            }
+            videoWrapper.style.width = desiredWidth;
             videoWrapper.style.height = this.displayOptions.layoutControls.theatreSettings.height;
-            videoWrapper.style.maxHeight = lessFullHeight + "px";
+            videoWrapper.style.maxHeight = screen.height + "px";
+            videoWrapper.style.transform = 'translateX(' + this.displayOptions.layoutControls.theatreSettings.xAxisSlide + ')';
             videoWrapper.style.marginTop = this.displayOptions.layoutControls.theatreSettings.marginTop + 'px';
-
             switch (this.displayOptions.layoutControls.theatreSettings.align) {
-                case 'left':
-                    videoWrapper.style.left = '0px';
-                    break;
-                case 'right':
-                    videoWrapper.style.right = '0px';
-                    break;
                 case 'center':
-                default:
                     var setMargin = '0px';
                     var workingWidth = this.displayOptions.layoutControls.theatreSettings.width;
 
                     // We must calculate the margin differently based on whether they passed % or px
                     if (typeof(workingWidth) == 'string' && workingWidth.substr(workingWidth.length - 1) == "%") {
-                        // A margin of half the remaining space
-                        setMargin = ((100 - parseInt(workingWidth.substring(0, workingWidth.length - 1))) / 2) + "%";
+                        setMargin = ((100 - parseInt(workingWidth.substring(0, workingWidth.length - 1))) / 2) + "%"; // A margin of half the remaining space
                     } else if (typeof(workingWidth) == 'string' && workingWidth.substr(workingWidth.length - 2) == "px") {
-                        // Half the (Remaining width / fullwidth) to get the centre of the page
-                        setMargin = (((screen.width - parseInt(workingWidth.substring(0, workingWidth.length - 2))) / screen.width) * 100 / 2) + "%";
+                        setMargin = (((screen.width - parseInt(workingWidth.substring(0, workingWidth.length - 2))) / screen.width) * 100 / 2) + "%"; // Half the (Remaining width / fullwidth)
                     } else {
                         console.log('[FP_ERROR] Theatre width specified invalid.');
                     }
 
                     videoWrapper.style.left = setMargin;
+                    break;
+                case 'right':
+                    videoWrapper.style.right = '0px';
+                    break;
+                case 'left':
+                default:
+                    videoWrapper.style.left = '0px';
                     break;
             }
             this.theatreMode = true;
@@ -4070,6 +4074,8 @@ var fluidPlayerClass = {
             videoWrapper.style.marginTop = "";
             videoWrapper.style.left = "";
             videoWrapper.style.right = "";
+            videoWrapper.style.position = "";
+            videoWrapper.style.transform = "";
             if (!this.displayOptions.layoutControls.fillToContainer) {
                 videoWrapper.style.width = this.originalWidth + 'px';
                 videoWrapper.style.height = this.originalHeight + 'px';
@@ -4247,7 +4253,9 @@ var fluidPlayerClass = {
                     width:                    '100%',
                     height:                   '60%',
                     marginTop:                0,
-                    align:                    'center'
+                    align:                    'center',
+                    keepRelativity:           false,
+                    xAxisSlide:               '0px'
                 },
                 logo: {
                     imageUrl:                 null,
