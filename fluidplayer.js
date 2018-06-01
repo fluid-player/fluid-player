@@ -4032,7 +4032,7 @@ var fluidPlayerClass = {
 
             videoWrapper.classList.add('fluid_theatre_mode');
             var desiredWidth = this.displayOptions.layoutControls.theatreSettings.width;
-            if (!this.displayOptions.layoutControls.theatreSettings.keepRelativity) {
+            if (!this.displayOptions.layoutControls.theatreSettings.keepPosition) {
                 videoWrapper.style.position = 'fixed';
             } else if (desiredWidth.substr(desiredWidth.length - 1) == "%") {
                 // If it's relative and they gave a % we need the pixel value relative to the screen. As % will still be to it's container.
@@ -4041,9 +4041,8 @@ var fluidPlayerClass = {
             videoWrapper.style.width = desiredWidth;
             videoWrapper.style.height = this.displayOptions.layoutControls.theatreSettings.height;
             videoWrapper.style.maxHeight = screen.height + "px";
-            videoWrapper.style.transform = 'translateX(' + this.displayOptions.layoutControls.theatreSettings.xAxisSlide + ')';
             videoWrapper.style.marginTop = this.displayOptions.layoutControls.theatreSettings.marginTop + 'px';
-            switch (this.displayOptions.layoutControls.theatreSettings.align) {
+            switch (this.displayOptions.layoutControls.theatreSettings.horizontalAlign) {
                 case 'center':
                     var setMargin = '0px';
                     var workingWidth = this.displayOptions.layoutControls.theatreSettings.width;
@@ -4075,7 +4074,6 @@ var fluidPlayerClass = {
             videoWrapper.style.left = "";
             videoWrapper.style.right = "";
             videoWrapper.style.position = "";
-            videoWrapper.style.transform = "";
             if (!this.displayOptions.layoutControls.fillToContainer) {
                 videoWrapper.style.width = this.originalWidth + 'px';
                 videoWrapper.style.height = this.originalHeight + 'px';
@@ -4253,9 +4251,8 @@ var fluidPlayerClass = {
                     width:                    '100%',
                     height:                   '60%',
                     marginTop:                0,
-                    align:                    'center',
-                    keepRelativity:           false,
-                    xAxisSlide:               '0px'
+                    horizontalAlign:          'center',
+                    keepPosition:             false
                 },
                 logo: {
                     imageUrl:                 null,
