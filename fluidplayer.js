@@ -2279,6 +2279,7 @@ var fluidPlayerClass = {
             videoPlayerTag.volume = player.latestVolume;
             videoPlayerTag.muted = false;
         }
+        this.fluidStorage.fluidVolume = videoPlayerTag.volume;
     },
 
     checkFullscreenSupport: function(videoPlayerWrapperId) {
@@ -2541,6 +2542,8 @@ var fluidPlayerClass = {
         function shiftVolume(videoPlayerId, volumeBarX) {
             var videoPlayerTag = document.getElementById(videoPlayerId);
             var totalWidth = document.getElementById(videoPlayerId + '_fluid_control_volume_container').clientWidth;
+            var player = fluidPlayerClass.getInstanceById(videoPlayerId);
+
             if (totalWidth) {
                 var newVolume = volumeBarX / totalWidth;
 
@@ -2554,7 +2557,7 @@ var fluidPlayerClass = {
                 if (videoPlayerTag.muted && newVolume > 0) {
                     videoPlayerTag.muted = false;
                 }
-                videoPlayerTag.volume = newVolume;
+                player.setVolume(newVolume);
             }
         }
 
@@ -2691,7 +2694,7 @@ var fluidPlayerClass = {
             newVolume = 1;
         }
 
-        videoPlayerTag.volume = newVolume;
+        this.setVolume(newVolume);
     },
 
     currentTimeChange: function (videoPlayerId, keyCode) {
@@ -3530,6 +3533,7 @@ var fluidPlayerClass = {
                 var sourceSelected = (firstSource) ? "source_selected" :  "";
                 firstSource = false;
                 var sourceChangeDiv = document.createElement('div');
+                sourceChangeDiv.id        = 'source_' + player.videoPlayerId + '_' + source.title;
                 sourceChangeDiv.className = 'fluid_video_source_list_item';
                 sourceChangeDiv.innerHTML = '<span class="source_button_icon ' + sourceSelected + '"></span>' + source.title;
 
@@ -3546,6 +3550,7 @@ var fluidPlayerClass = {
                         if (source.title == videoChangedTo.innerText) {
                             player.setBuffering();
                             player.setVideoSource(source.url);
+                            player.fluidStorage.fluidQuality = source.title;
                         }
                     });
 
@@ -4068,6 +4073,7 @@ var fluidPlayerClass = {
             }
             this.theatreMode = false;
         }
+        this.fluidStorage.fluidTheatre = this.theatreMode;
     },
 
     // Set the poster for the video, taken from custom params
@@ -4162,6 +4168,33 @@ var fluidPlayerClass = {
         }
     },
 
+    setPersistentSettings: function() {
+        if (typeof(Storage) !== "undefined" && typeof(localStorage) !== "undefined") {
+            this.fluidStorage = localStorage;
+
+            if (typeof(this.fluidStorage.fluidVolume) !== "undefined" && this.displayOptions.layoutControls.persistentSettings.volume) {
+                this.setVolume(this.fluidStorage.fluidVolume);
+            }
+
+            if (typeof(this.fluidStorage.fluidQuality) !== "undefined" && this.displayOptions.layoutControls.persistentSettings.quality) {
+                var sourceOption = document.getElementById('source_' + this.videoPlayerId + '_' + this.fluidStorage.fluidQuality);
+                var sourceChangeButton = document.getElementById(this.videoPlayerId + '_fluid_control_video_source');
+                if (sourceOption) {
+                    sourceOption.click();
+                    sourceChangeButton.click();
+                }
+            }
+
+            if (typeof(this.fluidStorage.fluidSpeed) !== "undefined" && this.displayOptions.layoutControls.persistentSettings.speed) {
+                this.setPlaybackSpeed(this.fluidStorage.fluidSpeed);
+            }
+
+            if (typeof(this.fluidStorage.fluidTheatre) !== "undefined" && this.fluidStorage.fluidTheatre == "true" && this.displayOptions.layoutControls.persistentSettings.theatre) {
+                this.theatreToggle();
+            }
+        }
+    },
+
     init: function(idVideoPlayer, options) {
         var player = this;
         var videoPlayer = document.getElementById(idVideoPlayer);
@@ -4214,6 +4247,7 @@ var fluidPlayerClass = {
         player.mainVideoReadyState     = false;
         player.xmlCollection           = [];
         player.inLineFound             = null;
+        player.fluidStorage            = {};
         player.fluidPseudoPause        = false;
 
         //Default options
@@ -4258,7 +4292,13 @@ var fluidPlayerClass = {
                     width:                    null
                 },
                 layout:                       'default', //options: 'default', 'browser', '<custom>'
-                playerInitCallback:           (function() {})
+                playerInitCallback:           (function() {}),
+                persistentSettings:           {
+                    volume:                   true,
+                    quality:                  true,
+                    speed:                    true,
+                    theatre:                  true
+                }
             },
             vastOptions: {
                 adList:                       {},
@@ -4333,6 +4373,8 @@ var fluidPlayerClass = {
         player.userActivityChecker();
 
         player.setVastList();
+
+        player.setPersistentSettings();
 
         var _play_videoPlayer = videoPlayer.play;
         videoPlayer.play = function () {
@@ -4450,11 +4492,13 @@ var fluidPlayerClass = {
     setPlaybackSpeed: function(speed) {
         var videoPlayer = document.getElementById(this.videoPlayerId);
         videoPlayer.playbackRate = speed;
+        this.fluidStorage.fluidSpeed = speed;
     },
 
     setVolume: function(passedVolume) {
         var videoPlayer = document.getElementById(this.videoPlayerId);
         videoPlayer.volume = passedVolume;
+        this.fluidStorage.fluidVolume = passedVolume;
     },
 
     isCurrentlyPlayingVideo: function(instance) {
