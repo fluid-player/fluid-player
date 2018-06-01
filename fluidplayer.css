@@ -187,7 +187,7 @@
 }
 
 .fluid_video_wrapper .vast_video_loading:before {
-    background-image: url("/images/fluid_spinner.svg");
+    background-image: url("images/fluid_spinner.svg");
     background-position: center, center;
     background-repeat: no-repeat, repeat;
     background-color: rgba(0, 0, 0, 0.2);
@@ -941,6 +941,7 @@ _:-ms-lang(x),
 }
 
 .fluid_theatre_mode {
+    position: fixed;
     float: left;
     top: 0;
     left: 0;
