@@ -941,7 +941,6 @@ _:-ms-lang(x),
 }
 
 .fluid_theatre_mode {
-    position: fixed;
     float: left;
     top: 0;
     z-index: 10;
