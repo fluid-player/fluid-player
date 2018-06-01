@@ -3769,7 +3769,7 @@ var fluidPlayerClass = {
             if (player.newActivity === true) {
                 player.newActivity = false;
 
-                if (player.isUserActive === false || (player.isUserActive && !player.isControlBarVisible())) {
+                if (player.isUserActive === false || !player.isControlBarVisible()) {
                     var event = new CustomEvent("userActive");
                     videoPlayerTag.dispatchEvent(event);
                     player.isUserActive = true;
