@@ -943,6 +943,7 @@ _:-ms-lang(x),
 .fluid_theatre_mode {
     float: left;
     top: 0;
+    left: 0;
     z-index: 10;
     box-shadow: 0px 15px 25px rgba(0,0,0,0.8);
 }
