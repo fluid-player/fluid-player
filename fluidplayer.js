@@ -1050,11 +1050,12 @@ var fluidPlayerClass = {
                     }
                 }
 
-                if (player.displayOptions.vastOptions.adText) {
-                    player.addAdPlayingText(player.displayOptions.vastOptions.adText);
+                if (player.displayOptions.vastOptions.adText || player.adList[adListId].adText) {
+                    var adTextToShow = (player.adList[adListId].adText !== null) ? player.adList[adListId].adText : player.displayOptions.vastOptions.adText;
+                    player.addAdPlayingText(adTextToShow);
                 }
 
-                player.positionTextElements();
+                player.positionTextElements(player.adList[adListId]);
 
                 player.toggleLoader(false);
                 player.adList[adListId].played = true;
@@ -1770,9 +1771,8 @@ var fluidPlayerClass = {
         }
     },
 
-    addAdPlayingText: function() {
+    addAdPlayingText: function(textToShow) {
         var player = this;
-        var text = this.displayOptions.vastOptions.adText;
 
         var adPlayingDiv = document.createElement('div');
         adPlayingDiv.id = this.videoPlayerId + '_fluid_ad_playing';
@@ -1783,12 +1783,12 @@ var fluidPlayerClass = {
         }
 
         adPlayingDiv.className = 'fluid_ad_playing';
-        adPlayingDiv.innerText = text;
+        adPlayingDiv.innerText = textToShow;
 
         document.getElementById('fluid_video_wrapper_' + this.videoPlayerId).appendChild(adPlayingDiv);
     },
 
-    positionTextElements: function() {
+    positionTextElements: function(adListData) {
         var player = this;
 
         var allowedPosition = ['top left', 'top right', 'bottom left', 'bottom right'];
@@ -1853,7 +1853,7 @@ var fluidPlayerClass = {
 
         if (adPlayingDiv !== null) {
 
-            var adPlayingDivPosition = this.displayOptions.vastOptions.adTextPosition.toLowerCase();
+            var adPlayingDivPosition = (adListData.adTextPosition !== null) ? adListData.adTextPosition.toLowerCase() : this.displayOptions.vastOptions.adTextPosition.toLowerCase();
 
             if (allowedPosition.indexOf(adPlayingDivPosition) == -1) {
                 console.log('[FP Error] Invalid position for adText. Reverting to "top left"');
@@ -2490,6 +2490,7 @@ var fluidPlayerClass = {
             return;
         }
 
+        player.fluidPseudoPause = true;
         var videoPlayerTag = document.getElementById(videoPlayerId);
 
         var initiallyPaused = videoPlayerTag.paused;
@@ -2527,6 +2528,7 @@ var fluidPlayerClass = {
             if (player.initialAnimationSet) {
                 setTimeout(function() { player.displayOptions.layoutControls.playPauseAnimation = player.initialAnimationSet; }, 200);
             }
+            player.fluidPseudoPause = false;
         }
 
         document.addEventListener('mouseup', onProgressbarMouseUp);
@@ -2584,7 +2586,7 @@ var fluidPlayerClass = {
     setVastList: function () {
         var player = this;
         var ads = {};
-        var def = {id: null, roll: null, played: false, vastLoaded: false, error: false};
+        var def = {id: null, roll: null, played: false, vastLoaded: false, error: false, adText: null, adTextPosition: null};
         var idPart = 0;
 
         var validateVastList = function (item) {
@@ -2853,6 +2855,14 @@ var fluidPlayerClass = {
     initialPlay: function() {
         var videoPlayerTag = this;
         var player = fluidPlayerClass.getInstanceById(videoPlayerTag.id);
+
+        videoPlayerTag.addEventListener('playing', function() {
+            player.toggleLoader(false);
+        });
+
+        videoPlayerTag.addEventListener('waiting', function() {
+            player.toggleLoader(true);
+        });
 
         if (!player.displayOptions.layoutControls.playButtonShowing) {
             var initialControlsDisplay = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
@@ -3224,6 +3234,10 @@ var fluidPlayerClass = {
             player.playPauseToggle(videoPlayerTag);
         }, false);
 
+        document.getElementById(this.videoPlayerId).addEventListener('touchstart', function() {
+            player.playPauseToggle(videoPlayerTag);
+        }, false);
+
         switch (this.displayOptions.layoutControls.layout) {
             case 'browser':
                 //Nothing special to do here at this point.
@@ -3425,11 +3439,18 @@ var fluidPlayerClass = {
                         player.setupThumbnailPreviewVtt.bind(this)
                     );
 
-                    document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container')
-                        .addEventListener('mousemove', player.drawTimelinePreview.bind(player), false);
+                    var isMobileChecks = fluidPlayerClass.getMobileOs();
+                    var eventOn = 'mousemove';
+                    var eventOff = 'mouseout';
+                    if (isMobileChecks.userOs) {
+                        eventOn = 'touchmove';
+                        eventOff = 'touchend';
+                    }
 
                     document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container')
-                        .addEventListener('mouseout', function() {
+                        .addEventListener(eventOn, player.drawTimelinePreview.bind(player), false);
+                    document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container')
+                        .addEventListener(eventOff, function() {
                             document.getElementById(player.videoPlayerId + '_fluid_timeline_preview_container').style.display = 'none';
                         }, false);
 
@@ -3762,6 +3783,7 @@ var fluidPlayerClass = {
     userActivityChecker: function () {
         var player = this;
         var videoPlayer = document.getElementById('fluid_video_wrapper_' + player.videoPlayerId);
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);
         player.newActivity = null;
 
         var activity = function () {
@@ -3773,9 +3795,7 @@ var fluidPlayerClass = {
             if (player.newActivity === true) {
                 player.newActivity = false;
 
-                var videoPlayerTag = document.getElementById(player.videoPlayerId);
-                if (player.isUserActive === false) {
-                    var videoPlayerTag = document.getElementById(player.videoPlayerId);
+                if (player.isUserActive === false || !player.isControlBarVisible()) {
                     var event = new CustomEvent("userActive");
                     videoPlayerTag.dispatchEvent(event);
                     player.isUserActive = true;
@@ -4228,6 +4248,7 @@ var fluidPlayerClass = {
         player.xmlCollection           = [];
         player.inLineFound             = null;
         player.fluidStorage            = {};
+        player.fluidPseudoPause        = false;
 
         //Default options
         player.displayOptions = {
@@ -4549,12 +4570,17 @@ var fluidPlayerClass = {
 
     on: function(eventCall, functionCall) {
         var videoPlayer = document.getElementById(this.videoPlayerId);
+        var player = this;
         switch(eventCall) {
             case 'play':
                 videoPlayer.onplay = functionCall;
                 break;
             case 'pause':
-                videoPlayer.onpause = functionCall;
+                videoPlayer.addEventListener('pause', function() {
+                    if (!player.fluidPseudoPause) {
+                        functionCall();
+                    }
+                });
                 break;
             default:
                 console.log('[FP_ERROR] Event not recognised');
