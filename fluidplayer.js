@@ -2716,7 +2716,7 @@ var fluidPlayerClass = {
         // Remove the div that was placed as a fix for poster image and DASH streaming, if it exists
         var pseudoPoster= document.getElementById(player.videoPlayerId + '_fluid_pseudo_poster');
         if (pseudoPoster) {
-            pseudoPoster.style.display = 'none';
+            pseudoPoster.remove();
         }
 
         if (!player.firstPlayLaunched) {
@@ -3927,7 +3927,7 @@ var fluidPlayerClass = {
                     this.dashScriptLoaded = true;
                     fluidPlayerClass.requestScript('https://cdn.dashjs.org/latest/dash.mediaplayer.min.js', this.initialiseDash.bind(this));
 
-                    // Dirty fix for a fake poster image, as the DASH streamer removes it
+                    // Fix for a fake poster image, as the DASH streamer removes it
                     if (this.displayOptions.layoutControls.posterImage) {
                         var containerDiv = document.createElement('div');
                         containerDiv.id = this.videoPlayerId + '_fluid_pseudo_poster';
