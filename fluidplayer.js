@@ -1853,7 +1853,7 @@ var fluidPlayerClass = {
 
         if (adPlayingDiv !== null) {
 
-            var adPlayingDivPosition = this.displayOptions.vastOptions.adTextPosition.toLowerCase();
+            var adPlayingDivPosition = (adListData.adTextPosition !== null) ? adListData.adTextPosition.toLowerCase() : this.displayOptions.vastOptions.adTextPosition.toLowerCase();
 
             if (allowedPosition.indexOf(adPlayingDivPosition) == -1) {
                 console.log('[FP Error] Invalid position for adText. Reverting to "top left"');
