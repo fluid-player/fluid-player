@@ -2716,7 +2716,7 @@ var fluidPlayerClass = {
         // Remove the div that was placed as a fix for poster image and DASH streaming, if it exists
         var pseudoPoster= document.getElementById(player.videoPlayerId + '_fluid_pseudo_poster');
         if (pseudoPoster) {
-            pseudoPoster.remove();
+            pseudoPoster.parentNode.removeChild(pseudoPoster);
         }
 
         if (!player.firstPlayLaunched) {
