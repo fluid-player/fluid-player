@@ -1050,11 +1050,12 @@ var fluidPlayerClass = {
                     }
                 }
 
-                if (player.displayOptions.vastOptions.adText) {
-                    player.addAdPlayingText(player.displayOptions.vastOptions.adText);
+                if (player.displayOptions.vastOptions.adText || player.adList[adListId].adText) {
+                    var adTextToShow = (player.adList[adListId].adText !== null) ? player.adList[adListId].adText : player.displayOptions.vastOptions.adText;
+                    player.addAdPlayingText(adTextToShow);
                 }
 
-                player.positionTextElements();
+                player.positionTextElements(player.adList[adListId]);
 
                 player.toggleLoader(false);
                 player.adList[adListId].played = true;
@@ -1770,9 +1771,8 @@ var fluidPlayerClass = {
         }
     },
 
-    addAdPlayingText: function() {
+    addAdPlayingText: function(textToShow) {
         var player = this;
-        var text = this.displayOptions.vastOptions.adText;
 
         var adPlayingDiv = document.createElement('div');
         adPlayingDiv.id = this.videoPlayerId + '_fluid_ad_playing';
@@ -1783,12 +1783,12 @@ var fluidPlayerClass = {
         }
 
         adPlayingDiv.className = 'fluid_ad_playing';
-        adPlayingDiv.innerText = text;
+        adPlayingDiv.innerText = textToShow;
 
         document.getElementById('fluid_video_wrapper_' + this.videoPlayerId).appendChild(adPlayingDiv);
     },
 
-    positionTextElements: function() {
+    positionTextElements: function(adListData) {
         var player = this;
 
         var allowedPosition = ['top left', 'top right', 'bottom left', 'bottom right'];
@@ -1853,7 +1853,7 @@ var fluidPlayerClass = {
 
         if (adPlayingDiv !== null) {
 
-            var adPlayingDivPosition = this.displayOptions.vastOptions.adTextPosition.toLowerCase();
+            var adPlayingDivPosition = (adListData.adTextPosition !== null) ? adListData.adTextPosition.toLowerCase() : this.displayOptions.vastOptions.adTextPosition.toLowerCase();
 
             if (allowedPosition.indexOf(adPlayingDivPosition) == -1) {
                 console.log('[FP Error] Invalid position for adText. Reverting to "top left"');
@@ -2581,7 +2581,7 @@ var fluidPlayerClass = {
     setVastList: function () {
         var player = this;
         var ads = {};
-        var def = {id: null, roll: null, played: false, vastLoaded: false, error: false};
+        var def = {id: null, roll: null, played: false, vastLoaded: false, error: false, adText: null, adTextPosition: null};
         var idPart = 0;
 
         var validateVastList = function (item) {
