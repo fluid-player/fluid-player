@@ -3525,7 +3525,7 @@ var fluidPlayerClass = {
         var sourcesList = videoPlayer.querySelectorAll('source');
         [].forEach.call(sourcesList, function (source) {
             if (source.title && source.src) {
-                sources.push({'title': source.title, 'url': source.src});
+                sources.push({'title': source.title, 'url': source.src, 'isHD': (source.getAttribute('data-fluid-hd') != null) });
             }
         });
 
@@ -3541,11 +3541,12 @@ var fluidPlayerClass = {
             var firstSource = true;
             player.videoSources.forEach(function(source) {
                 var sourceSelected = (firstSource) ? "source_selected" :  "";
+                var hdElement = (source.isHD) ? '<sup style="color:' + player.displayOptions.layoutControls.primaryColor + '" class="fp_hd_source"></sup>' : '';
                 firstSource = false;
                 var sourceChangeDiv = document.createElement('div');
                 sourceChangeDiv.id        = 'source_' + player.videoPlayerId + '_' + source.title;
                 sourceChangeDiv.className = 'fluid_video_source_list_item';
-                sourceChangeDiv.innerHTML = '<span class="source_button_icon ' + sourceSelected + '"></span>' + source.title;
+                sourceChangeDiv.innerHTML = '<span class="source_button_icon ' + sourceSelected + '"></span>' + source.title + hdElement;
 
                 sourceChangeDiv.addEventListener('click', function(event) {
                     event.stopPropagation();
