@@ -1305,6 +1305,7 @@ var fluidPlayerClass = {
             img.width = newBannerWidth;
             img.height = newBannerHeight;
 
+            player.trackSingleEvent('impression');
         };
 
         board.id = 'fluid_nonLinear_' + adListId;
