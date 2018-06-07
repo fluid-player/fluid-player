@@ -101,7 +101,7 @@ fluidPlayer = function(idVideoPlayer, options) {
 };
 
 var fluidPlayerClass = {
-    vttParserScript: '/scripts/webvtt.js',
+    vttParserScript: '/scripts/webvtt.min.js',
     instances: [],
     notCloned: ['notCloned', 'vttParserScript', 'instances', 'getInstanceById',
         'requestStylesheet', 'reqiestScript', 'isTouchDevice', 'vastOptions',
