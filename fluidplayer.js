@@ -2837,7 +2837,7 @@ var fluidPlayerClass = {
                 document.removeEventListener('keydown', videoPlayerInstance.captureKey, true);
                 delete videoPlayerInstance["captureKey"];
 
-                if (videoPlayerInstance.theatreMode) {
+                if (videoPlayerInstance.theatreMode && !videoPlayerInstance.theatreModeAdvanced) {
                     videoPlayerInstance.theatreToggle();
                 }
             }
@@ -3290,9 +3290,9 @@ var fluidPlayerClass = {
             function() {
                 var convertVttRawData = function(vttRawData) {
                     if (!(
-                            (typeof vttRawData.cues !== 'undefined') &&
-                            (vttRawData.cues.length)
-                        )) {
+                        (typeof vttRawData.cues !== 'undefined') &&
+                        (vttRawData.cues.length)
+                    )) {
                         return [];
                     }
 
@@ -3324,7 +3324,7 @@ var fluidPlayerClass = {
                         if (player.displayOptions.layoutControls.timelinePreview.spriteRelativePath
                             && player.displayOptions.layoutControls.timelinePreview.file.indexOf('/') !== -1
                             && (typeof player.displayOptions.layoutControls.timelinePreview.sprite === 'undefined' || player.displayOptions.layoutControls.timelinePreview.sprite == '')
-                            ) {
+                        ) {
                             imageUrl = player.displayOptions.layoutControls.timelinePreview.file.substring(0, player.displayOptions.layoutControls.timelinePreview.file.lastIndexOf('/'));
                             imageUrl += '/' + tempThumbnailData[0];
                         } else {
@@ -4058,13 +4058,50 @@ var fluidPlayerClass = {
             return;
         }
 
-        var videoWrapper = document.getElementById('fluid_video_wrapper_' + this.videoPlayerId);
-        if (!this.theatreMode) {
-            // Theatre and fullscreen, it's only one or the other
-            if (this.fullscreenMode) {
-                this.fullscreenToggle();
-            }
+        // Theatre and fullscreen, it's only one or the other
+        if (this.fullscreenMode) {
+            this.fullscreenToggle();
+        }
 
+        // Advanced Theatre mode if specified
+        if (this.displayOptions.layoutControls.theatreAdvanced) {
+            var elementForTheatre = document.getElementById(this.displayOptions.layoutControls.theatreAdvanced.theatreElement);
+            var theatreClassToApply = this.displayOptions.layoutControls.theatreAdvanced.classToApply;
+            if (elementForTheatre != null && theatreClassToApply != null) {
+                if (!this.theatreMode) {
+                    elementForTheatre.classList.add(theatreClassToApply);
+                } else {
+                    elementForTheatre.classList.remove(theatreClassToApply);
+                }
+                this.theatreModeAdvanced = !this.theatreModeAdvanced;
+            } else {
+                console.log('[FP_ERROR] Theatre mode elements could not be found, defaulting behaviour.');
+                // Default overlay behaviour
+                this.defaultTheatre();
+            }
+        } else {
+            // Default overlay behaviour
+            this.defaultTheatre();
+        }
+
+        // Set correct variables
+        this.theatreMode = !this.theatreMode;
+        this.fluidStorage.fluidTheatre = this.theatreMode;
+
+        // Trigger theatre event
+        var videoPlayer = document.getElementById(this.videoPlayerId);
+        var theatreEvent = (this.theatreMode) ? 'theatreModeOn' : 'theatreModeOff';
+        var event = document.createEvent('CustomEvent');
+        event.initEvent(theatreEvent, false, true);
+        videoPlayer.dispatchEvent(event);
+
+        return;
+    },
+
+    defaultTheatre: function() {
+        var videoWrapper = document.getElementById('fluid_video_wrapper_' + this.videoPlayerId);
+
+        if (!this.theatreMode) {
             videoWrapper.classList.add('fluid_theatre_mode');
             var workingWidth = this.displayOptions.layoutControls.theatreSettings.width;
             var defaultHorizontalMargin = '10px';
@@ -4093,7 +4130,6 @@ var fluidPlayerClass = {
                     videoWrapper.style.left = defaultHorizontalMargin;
                     break;
             }
-            this.theatreMode = true;
         } else {
             videoWrapper.classList.remove('fluid_theatre_mode');
             videoWrapper.style.maxHeight = "";
@@ -4108,7 +4144,6 @@ var fluidPlayerClass = {
                 videoWrapper.style.width = '100%';
                 videoWrapper.style.height = '100%';
             }
-            this.theatreMode = false;
         }
     },
 
@@ -4279,6 +4314,7 @@ var fluidPlayerClass = {
         player.showTimeOnHover         = true;
         player.initialAnimationSet     = true;
         player.theatreMode             = false;
+        player.theatreModeAdvanced     = false;
         player.fullscreenMode          = false;
         player.originalWidth           = videoPlayer.offsetWidth;
         player.originalHeight          = videoPlayer.offsetHeight;
@@ -4319,6 +4355,7 @@ var fluidPlayerClass = {
                     horizontalAlign:          'center',
                     keepPosition:             false
                 },
+                theatreAdvanced:              false,
                 logo: {
                     imageUrl:                 null,
                     position:                 'top left',
@@ -4631,6 +4668,16 @@ var fluidPlayerClass = {
                     if (!player.fluidPseudoPause) {
                         functionCall();
                     }
+                });
+                break;
+            case 'theatreModeOn':
+                videoPlayer.addEventListener('theatreModeOn', function() {
+                    functionCall();
+                });
+                break;
+            case 'theatreModeOff':
+                videoPlayer.addEventListener('theatreModeOff', function() {
+                    functionCall();
                 });
                 break;
             default:
