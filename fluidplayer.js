@@ -2875,12 +2875,6 @@ var fluidPlayerClass = {
             }
         }
 
-        // Remove the div that was placed as a fix for poster image and DASH streaming, if it exists
-        var pseudoPoster= document.getElementById(player.videoPlayerId + '_fluid_pseudo_poster');
-        if (pseudoPoster) {
-            pseudoPoster.parentNode.removeChild(pseudoPoster);
-        }
-
         if (!player.firstPlayLaunched) {
             player.playPauseToggle(videoPlayerTag);
 
@@ -2945,6 +2939,12 @@ var fluidPlayerClass = {
         };
 
         if (isFirstStart) {
+            // Remove the div that was placed as a fix for poster image and DASH streaming, if it exists
+            var pseudoPoster= document.getElementById(player.videoPlayerId + '_fluid_pseudo_poster');
+            if (pseudoPoster) {
+                pseudoPoster.parentNode.removeChild(pseudoPoster);
+            }
+
             if (player.mainVideoDuration > 0) {
                 prepareVastAdsThatKnowDuration();
             } else {
@@ -3207,13 +3207,13 @@ var fluidPlayerClass = {
 
         player.createTimePositionPreview();
 
+        player.posterImage();
+
         player.initPlayButton();
 
         player.createPlaybackList();
 
         player.createDownload();
-
-        player.posterImage();
     },
 
     /**
@@ -4087,10 +4087,14 @@ var fluidPlayerClass = {
     },
 
     // Set the poster for the video, taken from custom params
+    // Cannot use the standard video tag poster image as it can be removed by the persistent settings
     posterImage: function() {
         if (this.displayOptions.layoutControls.posterImage) {
-            var videoPlayer = document.getElementById(this.videoPlayerId);
-            videoPlayer.poster = this.displayOptions.layoutControls.posterImage;
+            var containerDiv = document.createElement('div');
+            containerDiv.id = this.videoPlayerId + '_fluid_pseudo_poster';
+            containerDiv.className = 'fluid_pseudo_poster';
+            containerDiv.style.background = "url('" + this.displayOptions.layoutControls.posterImage + "') center center / contain no-repeat black";
+            document.getElementById(this.videoPlayerId).parentNode.insertBefore(containerDiv, null);
         }
     },
 
@@ -4101,15 +4105,6 @@ var fluidPlayerClass = {
                 if (!this.dashScriptLoaded) { // First time trying adding in DASH streamer, get the script
                     this.dashScriptLoaded = true;
                     fluidPlayerClass.requestScript('https://cdn.dashjs.org/latest/dash.mediaplayer.min.js', this.initialiseDash.bind(this));
-
-                    // Fix for a fake poster image, as the DASH streamer removes it
-                    if (this.displayOptions.layoutControls.posterImage) {
-                        var containerDiv = document.createElement('div');
-                        containerDiv.id = this.videoPlayerId + '_fluid_pseudo_poster';
-                        containerDiv.className = 'fluid_pseudo_poster';
-                        containerDiv.style.background = "url('" + this.displayOptions.layoutControls.posterImage + "') no-repeat";
-                        document.getElementById(this.videoPlayerId).parentNode.insertBefore(containerDiv, null);
-                    }
                 } else {
                     this.initialiseDash();
                 }
