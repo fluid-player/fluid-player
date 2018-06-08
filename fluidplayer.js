@@ -1034,6 +1034,8 @@ var fluidPlayerClass = {
                     player.addSkipButton();
                 }
 
+                videoPlayerTag.loop = false;
+
                 player.addCTAButton(player.adList[adListId].landingPage);
 
                 player.addAdCountdown();
@@ -1620,6 +1622,10 @@ var fluidPlayerClass = {
             videoPlayerTag.currentTime = newCurrentTime;
         }
 
+        if(player.displayOptions.layoutControls.loop) {
+            videoPlayerTag.loop = true;
+        }
+
         player.setCurrentTimeAndPlay(newCurrentTime, player.autoplayAfterAd);
 
         player.isCurrentlyPlayingAd = false;
@@ -1678,6 +1684,7 @@ var fluidPlayerClass = {
     },
 
     onMainVideoEnded: function () {
+        var videoPlayerTag = this;
         var player = fluidPlayerClass.getInstanceById(this.id);
         if (player.isCurrentlyPlayingAd && player.autoplayAfterAd) {  // It may be in-stream ending, and if it's not postroll then we don't execute anything
             return;
@@ -1688,6 +1695,12 @@ var fluidPlayerClass = {
             clearInterval(player.timer);
         }
 
+        if (player.displayOptions.layoutControls.loop === true) {
+            var videoInstanceId = fluidPlayerClass.getInstanceIdByWrapperId(this.getAttribute('id'));
+            var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
+            player.switchToMainVideo();
+            player.playPauseToggle(videoPlayerTag);
+        }
     },
 
     getCurrentTime: function() {
@@ -3945,6 +3958,16 @@ var fluidPlayerClass = {
         }
     },
 
+    initLoop: function() {
+        var player = this;
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);
+        if (player.displayOptions.layoutControls.loop !== null) {
+            videoPlayerTag.loop = player.displayOptions.layoutControls.loop;
+        } else if(videoPlayerTag.loop) {
+            player.displayOptions.layoutControls.loop = true;
+        }
+    },
+
     setBuffering: function() {
         var player = this;
         var videoPlayer = document.getElementById(player.videoPlayerId);
@@ -4282,6 +4305,7 @@ var fluidPlayerClass = {
                 fillToContainer:              false,
                 autoPlay:                     false,
                 mute:                         false,
+                loop:                         null,
                 keyboardControl:              true,
                 allowDownload:                false,
                 playbackRateEnabled:          false,
@@ -4384,6 +4408,8 @@ var fluidPlayerClass = {
         player.initLogo();
 
         player.initMute();
+
+        player.initLoop();
 
         player.displayOptions.layoutControls.playerInitCallback();
 
