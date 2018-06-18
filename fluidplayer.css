@@ -983,3 +983,10 @@ _:-ms-lang(x),
     -o-transition: visibility 0.3s ease-in-out, opacity 0.3s ease-in-out;
     transition: visibility 0.3s ease-in-out, opacity 0.3s ease-in-out;
 }
+
+.fp_hd_source::before {
+    font-weight: bolder;
+    font-size: 6pt;
+    content: 'HD';
+    padding-left: 3px;
+}
