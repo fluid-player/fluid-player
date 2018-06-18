@@ -919,6 +919,7 @@ var fluidPlayerClass = {
             }
 
             if (!((xmlHttpReq.readyState === 4) && (xmlHttpReq.status === 200))) {
+                player.stopProcessAndReportError(adListId);
                 return;
             }
 
@@ -3240,11 +3241,8 @@ var fluidPlayerClass = {
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
         //All other browsers
-        document.getElementById(this.videoPlayerId).addEventListener('click', function() {
-            player.playPauseToggle(videoPlayerTag);
-        }, false);
-
-        document.getElementById(this.videoPlayerId).addEventListener('touchstart', function() {
+        var listenTo = (fluidPlayerClass.isTouchDevice()) ? 'touchend' : 'click';
+        document.getElementById(this.videoPlayerId).addEventListener(listenTo, function() {
             player.playPauseToggle(videoPlayerTag);
         }, false);
 
