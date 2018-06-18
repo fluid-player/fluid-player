@@ -3558,7 +3558,7 @@ var fluidPlayerClass = {
                     videoChangedTo.firstChild.className += ' source_selected';
 
                     player.videoSources.forEach(function(source) {
-                        if (source.title == videoChangedTo.innerText) {
+                        if (source.title == videoChangedTo.innerText.replace(/(\r\n\t|\n|\r\t)/gm,"")) {
                             player.setBuffering();
                             player.setVideoSource(source.url);
                             player.fluidStorage.fluidQuality = source.title;
