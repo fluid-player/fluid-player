@@ -2144,12 +2144,13 @@ var fluidPlayerClass = {
             '</div>';
     },
 
-    controlPlayPauseToggle: function(videoPlayerId, isPlaying) {
+    controlPlayPauseToggle: function(videoPlayerId) {
         var playPauseButton = document.getElementById(videoPlayerId + '_fluid_control_playpause');
         var menuOptionPlay = document.getElementById(videoPlayerId + 'context_option_play');
         var player = fluidPlayerClass.getInstanceById(videoPlayerId);
         var controlsDisplay = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
         var fpLogo = document.getElementById(player.videoPlayerId + '_logo');
+        var videoPlayer = document.getElementById(player.videoPlayerId);
 
         var initialPlay = document.getElementById(videoPlayerId + '_fluid_initial_play');
         if (initialPlay) {
@@ -2157,7 +2158,7 @@ var fluidPlayerClass = {
             document.getElementById(videoPlayerId + '_fluid_initial_play_button').style.opacity = "1";
         }
 
-        if (isPlaying) {
+        if (!videoPlayer.paused) {
             playPauseButton.className = playPauseButton.className.replace(/\bfluid_button_play\b/g, 'fluid_button_pause');
             controlsDisplay.classList.remove('initial_controls_show');
             if (fpLogo) {
@@ -2980,12 +2981,12 @@ var fluidPlayerClass = {
         }, false);
 
         document.getElementById(player.videoPlayerId).addEventListener('play', function() {
-            player.controlPlayPauseToggle(player.videoPlayerId, true);
+            player.controlPlayPauseToggle(player.videoPlayerId);
             player.contolVolumebarUpdate(player.videoPlayerId);
         }, false);
 
         document.getElementById(player.videoPlayerId).addEventListener('fluidplayerpause', function() {
-            player.controlPlayPauseToggle(player.videoPlayerId, false);
+            player.controlPlayPauseToggle(player.videoPlayerId);
         }, false);
 
         //Set the progressbar
