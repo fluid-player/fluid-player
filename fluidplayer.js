@@ -3568,6 +3568,10 @@ var fluidPlayerClass = {
                 sourceChangeDiv.innerHTML = '<span class="source_button_icon ' + sourceSelected + '"></span>' + source.title + hdElement;
 
                 sourceChangeDiv.addEventListener('click', function(event) {
+                    // While changing source the player size can flash, we want to set the pixel dimensions then back to 100% afterwards
+                    videoPlayer.style.width = videoPlayer.clientWidth + "px";
+                    videoPlayer.style.height = videoPlayer.clientHeight + "px";
+
                     event.stopPropagation();
                     var videoChangedTo = this;
                     var sourceIcons = document.getElementsByClassName('source_button_icon');
@@ -3663,6 +3667,8 @@ var fluidPlayerClass = {
                 videoPlayerTag.play();
             }
             player.isSwitchingSource = false;
+            videoPlayerTag.style.width = "100%";
+            videoPlayerTag.style.height = "100%";
         };
         var videoPlayStart = function() {
             this.currentTime = newCurrentTime;
