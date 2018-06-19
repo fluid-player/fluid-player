@@ -918,8 +918,12 @@ var fluidPlayerClass = {
                 return;
             }
 
+            if (xmlHttpReq.readyState === 4 && xmlHttpReq.status === 0) {
+                player.stopProcessAndReportError(adListId); //Most likely that Ad Blocker exists
+                return;
+            }
+
             if (!((xmlHttpReq.readyState === 4) && (xmlHttpReq.status === 200))) {
-                player.stopProcessAndReportError(adListId);
                 return;
             }
 
@@ -1151,6 +1155,11 @@ var fluidPlayerClass = {
 
     trackSingleEvent : function(eventType, eventSubType) {
         var player = this;
+
+        if (typeof player.vastOptions === 'undefined' || player.vastOptions === null) {
+            return;
+        }
+
         var trackingUris = [];
         trackingUris.length = 0;
 
@@ -1377,7 +1386,7 @@ var fluidPlayerClass = {
         }
 
         if (player.adList[adListId].adType == 'nonLinear') {
-            videoPlayerTag.play();
+            player.switchToMainVideo();
             player.createNonLinearStatic(adListId);
         }
 
