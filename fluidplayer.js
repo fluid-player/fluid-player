@@ -1447,7 +1447,7 @@ var fluidPlayerClass = {
             return;
         }
 
-        var time = parseInt(player.adList[adListId].timer);
+        var time = player.adList[adListId].timer;
 
         if(typeof time == 'string' && time.indexOf("%") !== -1) {
             time = time.replace('%', '');
