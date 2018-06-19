@@ -3549,8 +3549,8 @@ var fluidPlayerClass = {
 
                 sourceChangeDiv.addEventListener('click', function(event) {
                     // While changing source the player size can flash, we want to set the pixel dimensions then back to 100% afterwards
-                    videoPlayer.style.width = videoPlayerTag.offsetWidth + "px";
-                    videoPlayer.style.height = videoPlayerTag.offsetHeight + "px";
+                    videoPlayer.style.width = videoPlayer.clientWidth + "px";
+                    videoPlayer.style.height = videoPlayer.clientHeight + "px";
 
                     event.stopPropagation();
                     var videoChangedTo = this;
@@ -3574,7 +3574,7 @@ var fluidPlayerClass = {
                     setTimeout(function () {
                         videoPlayer.style.width = "100%";
                         videoPlayer.style.height = "100%";
-                    }, 500);
+                    }, 1000);
                 });
                 sourceChangeList.appendChild(sourceChangeDiv);
             });
