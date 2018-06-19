@@ -1,7 +1,7 @@
 # CHANGELOG
 
 
-## Next release
+## 2.3.1
 * [Pull #214](https://github.com/fluid-player/fluid-player/pull/241) Avoid looping VAST Ad
 * [Pull #206](https://github.com/fluid-player/fluid-player/pull/206) Fix tracking impression events for nonLinear ads 
 * [Pull #221](https://github.com/fluid-player/fluid-player/pull/221) Fix VAST loading issue by AdBlock
