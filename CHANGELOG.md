@@ -5,6 +5,15 @@
 * [Pull #214](https://github.com/fluid-player/fluid-player/pull/241) Avoid looping VAST Ad
 * [Pull #206](https://github.com/fluid-player/fluid-player/pull/206) Fix tracking impression events for nonLinear ads 
 * [Pull #221](https://github.com/fluid-player/fluid-player/pull/221) Fix VAST loading issue by AdBlock
+* [Pull #207](https://github.com/fluid-player/fluid-player/pull/207) Add support for HD icon on quality select
+* [Pull #209](https://github.com/fluid-player/fluid-player/pull/209) Advanced theatre mode
+* [Pull #208](https://github.com/fluid-player/fluid-player/pull/208) Compress files
+* [Pull #179](https://github.com/fluid-player/fluid-player/pull/179) Fix to prevent changing speed during ads
+* [Pull #217](https://github.com/fluid-player/fluid-player/pull/217) Prevent video size change on quality switch
+* [Pull #213](https://github.com/fluid-player/fluid-player/pull/213) Controls to stay working with adblock and fix for double event on mobile touch
+* [Pull #212](https://github.com/fluid-player/fluid-player/pull/212) Poster image to fit player size
+* [Pull #186](https://github.com/fluid-player/fluid-player/pull/186) Fix for source switch on Edge
+* [Pull #219](https://github.com/fluid-player/fluid-player/pull/219) Play / pause icon fix and progress bar to disappear correctly
 
 ## 2.3.0
 * [Pull #192](https://github.com/fluid-player/fluid-player/pull/191) Persist user settings across pages for volume, speed, quality and theatre mode
