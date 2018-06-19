@@ -1,7 +1,20 @@
 # CHANGELOG
 
-## Next release
+## 2.3.0
+* [Pull #192](https://github.com/fluid-player/fluid-player/pull/191) Persist user settings across pages for volume, speed, quality and theatre mode
+* [Pull #194](https://github.com/fluid-player/fluid-player/pull/194) Fix for play event on video click for certain devices
+* [Pull #193](https://github.com/fluid-player/fluid-player/pull/193) Option to set adText and adTextPosition on a per ad basis
+* [Pull #184](https://github.com/fluid-player/fluid-player/pull/184) Fix for thumbnails appearing incorrectly on mobile
+* [Pull #181](https://github.com/fluid-player/fluid-player/pull/181) Fix for poster image for dash file
+* [Pull #195](https://github.com/fluid-player/fluid-player/pull/195) Loading icon while player is waiting
+* [Pull #200](https://github.com/fluid-player/fluid-player/pull/200) Ad text positioning fix
+* [Pull #196](https://github.com/fluid-player/fluid-player/pull/196) Fix for issue causing controls to hide incorrectly
+* [Pull #191](https://github.com/fluid-player/fluid-player/pull/191) Scrubbing to no longer trigger Fluid on.pause event
+
+## 2.2.2
+* [Pull #175](https://github.com/fluid-player/fluid-player/pull/175) Fullscreen mode variable correct place
 * [Pull #177](https://github.com/fluid-player/fluid-player/pull/177) Fix fadeOut/fadeIn opacity to correct values in the end of animation
+* [Pull #180](https://github.com/fluid-player/fluid-player/pull/180) Adding VASTAdTagURI support
 
 ## 2.2.1
 * [Pull #153](https://github.com/fluid-player/fluid-player/pull/153) CDATA media file ignores whitespace correctly

@@ -109,7 +109,7 @@ var fluidPlayerClass = {
         'toggleElementText', 'getMobileOs', 'findClosestParent', 'activeVideoPlayerId',
         'getInstanceIdByWrapperId', 'timer', 'timerPool', 'adList', 'adPool',
         'isUserActive', 'isCurrentlyPlayingAd', 'initialAnimationSet'],
-    version: '2.2.1',
+    version: '2.3.0',
     homepage: 'https://www.fluidplayer.com/',
     activeVideoPlayerId: null,
 
@@ -310,6 +310,45 @@ var fluidPlayerClass = {
     },
 
 
+    getVastAdTagUriFromWrapper: function(xmlResponse) {
+        var wrapper = xmlResponse.getElementsByTagName('Wrapper');
+
+        if (typeof wrapper !== 'undefined' && wrapper.length) {
+
+            var vastAdTagURI = wrapper[0].getElementsByTagName('VASTAdTagURI');
+            if (vastAdTagURI.length) {
+                return this.extractNodeData(vastAdTagURI[0]);
+            }
+        }
+
+        return false;
+    },
+
+
+    hasInLine: function (xmlResponse) {
+        var inLine = xmlResponse.getElementsByTagName('InLine');
+        return ((typeof inLine !== 'undefined') && inLine.length);
+    },
+
+
+    hasVastAdTagUri: function (xmlResponse) {
+        var vastAdTagURI = xmlResponse.getElementsByTagName('VASTAdTagURI');
+        return ((typeof vastAdTagURI !== 'undefined') && vastAdTagURI.length);
+    },
+
+    hasVastAdTagUriFromWrapper: function(creative) {
+        var player = this;
+
+        if ((typeof creative !== 'undefined') && creative.length) {
+            var arrayCreativeLinears = creative[0].getElementsByTagName('Linear');
+            if ((typeof arrayCreativeLinears !== 'undefined') && (arrayCreativeLinears !== null) && arrayCreativeLinears.length) {
+                return player.getMediaFileFromLinear(arrayCreativeLinears[0]);
+            }
+        }
+
+        return false;
+    },
+
     getClickThroughUrlFromNonLinear: function (nonLinear) {
         var result = '';
         var nonLinears = nonLinear.getElementsByTagName('NonLinear');
@@ -506,9 +545,20 @@ var fluidPlayerClass = {
         }
     },
 
+    registerClickTracking: function(clickTrackingTag, tmpOptions) {
+
+        if(clickTrackingTag.length) {
+            for (var i = 0; i < clickTrackingTag.length; i++) {
+                if(clickTrackingTag[i] != ''){
+                    tmpOptions.clicktracking.push(clickTrackingTag[i]);
+                }
+            }
+        }
+
+    },
+
     registerImpressionEvents: function(impressionTags, tmpOptions) {
         if (impressionTags.length) {
-            tmpOptions.impression = [];
 
             for (var i = 0; i < impressionTags.length; i++) {
                 var impressionEvent = this.extractNodeData(impressionTags[i]);
@@ -583,13 +633,16 @@ var fluidPlayerClass = {
 
 
     getNonLinearClickTrackingEvents: function (nonLinear) {
-        var result = '';
+        var result = [];
         var nonLinears = nonLinear.getElementsByTagName('NonLinear');
 
-        if (nonLinears.length) {//There should be exactly 1 node
+        if (nonLinears.length) {
             var clickTracking = nonLinear.getElementsByTagName('NonLinearClickTracking');
             if (clickTracking.length) {
-                result = this.extractNodeData(clickTracking[0]);
+                for (var i = 0; i < clickTracking.length; i++) {
+                    var NonLinearClickTracking = this.extractNodeData(clickTracking[i]);
+                    result.push(NonLinearClickTracking);
+                }
             }
         }
 
@@ -652,7 +705,7 @@ var fluidPlayerClass = {
             var adListId = list[i];
 
             if (player.adList[adListId].vastLoaded !== true && player.adList[adListId].error !== true) {
-                player.parseVastTag(player.adList[adListId].vastTag, adListId);
+                player.processUrl(player.adList[adListId].vastTag, adListId);
                 videoPlayerTag.addEventListener('adId_' + adListId, player[roll]);
             }
         }
@@ -704,146 +757,242 @@ var fluidPlayerClass = {
 
     switchPlayerToVastMode: function() {},
 
+
+    /**
+     * Process the XML response
+     *
+     * @param xmlResponse
+     * @param adListId
+     * @param tmpOptions
+     */
+    processVastXml: function (xmlResponse, adListId, tmpOptions) {
+        var player = this;
+
+        if (!xmlResponse) {
+            player.stopProcessAndReportError(adListId);
+            return;
+        }
+
+        //Get impression tag
+        var impression = xmlResponse.getElementsByTagName('Impression');
+        if (impression !== null) {
+            player.registerImpressionEvents(impression, tmpOptions);
+        }
+
+        //Get the error tag, if any
+        var errorTags = xmlResponse.getElementsByTagName('Error');
+        if (errorTags !== null) {
+            player.registerErrorEvents(errorTags, tmpOptions);
+        }
+
+
+        //Get Creative
+        var creative = xmlResponse.getElementsByTagName('Creative');
+
+        //Currently only 1 creative and 1 linear is supported
+        if ((typeof creative !== 'undefined') && creative.length) {
+            var arrayCreativeLinears = creative[0].getElementsByTagName('Linear');
+
+            if ((typeof arrayCreativeLinears !== 'undefined') && (arrayCreativeLinears !== null) && arrayCreativeLinears.length) {
+
+                var creativeLinear = arrayCreativeLinears[0];
+                player.registerTrackingEvents(creativeLinear, tmpOptions);
+
+                var clickTracks = player.getClickTrackingEvents(creativeLinear);
+                player.registerClickTracking(clickTracks, tmpOptions);
+
+                //Extract the Ad data if it is actually the Ad (!wrapper)
+                if (!player.hasVastAdTagUri(xmlResponse) && player.hasInLine(xmlResponse)) {
+
+                    //Set initial values
+                    tmpOptions.adFinished = false;
+                    tmpOptions.adType = 'linear';
+
+                    //Extract the necessary data from the Linear node
+                    tmpOptions.skipoffset = player.convertTimeStringToSeconds(creativeLinear.getAttribute('skipoffset'));
+                    tmpOptions.clickthroughUrl = player.getClickThroughUrlFromLinear(creativeLinear);
+                    tmpOptions.duration = player.getDurationFromLinear(creativeLinear);
+                    tmpOptions.mediaFile = player.getMediaFileFromLinear(creativeLinear);
+                    tmpOptions.iconClick = player.getIconClickThroughFromLinear(creativeLinear);
+                }
+            }
+
+            if ((typeof tmpOptions.iconClick !== 'undefined') && (tmpOptions.iconClick !== null) && tmpOptions.iconClick.length) {
+                player.adList[adListId].landingPage = tmpOptions.iconClick;
+            }
+
+            var arrayCreativeNonLinears = creative[0].getElementsByTagName('NonLinearAds');
+
+            if ((typeof arrayCreativeNonLinears !== 'undefined') && (arrayCreativeNonLinears !== null) && arrayCreativeNonLinears.length) {
+
+                var creativeNonLinear = arrayCreativeNonLinears[0];
+                player.registerTrackingEvents(creativeNonLinear, tmpOptions);
+
+                var clickTracks = player.getNonLinearClickTrackingEvents(creativeNonLinear);
+                player.registerClickTracking(clickTracks, tmpOptions);
+
+                //Extract the Ad data if it is actually the Ad (!wrapper)
+                if (!player.hasVastAdTagUri(xmlResponse) && player.hasInLine(xmlResponse)) {
+
+                    //Set initial values
+                    tmpOptions.adType = 'nonLinear';
+
+                    //Extract the necessary data from the NonLinear node
+                    tmpOptions.clickthroughUrl = player.getClickThroughUrlFromNonLinear(creativeNonLinear);
+                    tmpOptions.duration = player.getDurationFromNonLinear(creativeNonLinear); // VAST version < 4.0
+                    tmpOptions.dimension = player.getDimensionFromNonLinear(creativeNonLinear); // VAST version < 4.0
+                    tmpOptions.staticResource = player.getStaticResourceFromNonLinear(creativeNonLinear);
+                    tmpOptions.creativeType = player.getCreativeTypeFromStaticResources(creativeNonLinear);
+                }
+            }
+
+            //Extract the Ad data if it is actually the Ad (!wrapper)
+            if (!player.hasVastAdTagUri(xmlResponse) && player.hasInLine(xmlResponse)) {
+
+                player.adList[adListId].adType = tmpOptions.adType ? tmpOptions.adType : 'unknown';
+
+                if (typeof tmpOptions.mediaFile !== 'undefined' || typeof tmpOptions.staticResource !== 'undefined') {
+
+                    player.adList[adListId].vastLoaded = true;
+                    player.adPool[adListId] = Object.assign({}, tmpOptions);
+                    var event = document.createEvent('Event');
+                    event.initEvent('adId_' + adListId, false, true);
+                    document.getElementById(player.videoPlayerId).dispatchEvent(event);
+
+                    player.displayOptions.vastOptions.vastAdvanced.vastLoadedCallback();
+
+                } else {
+
+                    player.stopProcessAndReportError(adListId);
+
+                }
+
+            }
+        } else {
+            player.stopProcessAndReportError(adListId);
+        }
+
+    },
+
+
     /**
      * Parse the VAST Tag
      *
      * @param vastTag
      * @param adListId
      */
-    parseVastTag: function(vastTag, adListId) {
+    processUrl: function (vastTag, adListId) {
         var player = this;
-
+        var numberOfRedirects = 0;
         var tmpOptions = {
-            vastTagUrl:   vastTag,
-            tracking:     [],
+            tracking: [],
             stopTracking: [],
+            impression: [],
+            clicktracking: [],
             vastLoaded: false
-
         };
 
-        player.sendRequest(
+        player.resolveVastTag(
             vastTag,
-            true,
-            player.displayOptions.vastOptions.vastTimeout,
-            function() {
-                var xmlHttpReq = this;
-
-                // Helper function to stop processing
-                var stopProcessAndReportError = function() {
-
-                    //Set the error flag for the Ad
-                    player.adList[adListId].error = true;
-
-                    //The response returned an error. Proceeding with the main video.
-                    //Try to switch main video only if it is a preRoll scenario
-                    if (typeof adListId !== 'undefined' && player.adList[adListId]['roll'] == 'preRoll') {
-                        player.playMainVideoWhenVastFails(900);
-                    } else {
-                        player.announceLocalError(101);
-                    }
-
-                };
-
-                if ((xmlHttpReq.readyState === 4) && (xmlHttpReq.status !== 200)) {
-                    stopProcessAndReportError();
-                    return;
-                }
-
-                if (!((xmlHttpReq.readyState === 4) && (xmlHttpReq.status === 200))) {
-                    return;
-                }
-
-                var xmlResponse = xmlHttpReq.responseXML;
-
-                if(!xmlResponse) {
-                    stopProcessAndReportError();
-                    return;
-                }
-
-                //Get impression tag
-                var impression = xmlResponse.getElementsByTagName('Impression');
-                if(impression !== null) {
-                    player.registerImpressionEvents(impression, tmpOptions);
-                }
-
-                //Get the error tag, if any
-                var errorTags = xmlResponse.getElementsByTagName('Error');
-                if (errorTags !== null) {
-                    player.registerErrorEvents(errorTags, tmpOptions);
-                }
-
-                //Set initial values
-                tmpOptions.skipoffset = false;
-                tmpOptions.adFinished = false;
-                tmpOptions.vastTagUrl = vastTag;
-
-                //Get Creative
-                var creative = xmlResponse.getElementsByTagName('Creative');
-
-                //Currently only 1 creative and 1 linear is supported
-                if ((typeof creative !== 'undefined') && creative.length) {
-                    var arrayCreativeLinears = creative[0].getElementsByTagName('Linear');
-
-                    if ((typeof arrayCreativeLinears !== 'undefined') && (arrayCreativeLinears !== null) && arrayCreativeLinears.length) {
-                        var creativeLinear = arrayCreativeLinears[0];
-
-                        tmpOptions.adType = 'linear';
-
-                        //Extract the necessary data from the Linear node
-                        tmpOptions.skipoffset      = player.convertTimeStringToSeconds(creativeLinear.getAttribute('skipoffset'));
-                        tmpOptions.clickthroughUrl = player.getClickThroughUrlFromLinear(creativeLinear);
-                        tmpOptions.clicktracking   = player.getClickTrackingEvents(creativeLinear);
-                        tmpOptions.duration        = player.getDurationFromLinear(creativeLinear);
-                        tmpOptions.mediaFile       = player.getMediaFileFromLinear(creativeLinear);
-                        tmpOptions.iconClick       = player.getIconClickThroughFromLinear(creativeLinear);
-
-                        player.registerTrackingEvents(creativeLinear, tmpOptions);
-                    }
-
-                    if ((typeof tmpOptions.iconClick !== 'undefined') && (tmpOptions.iconClick !== null) && tmpOptions.iconClick.length) {
-                        player.adList[adListId].landingPage = tmpOptions.iconClick;
-                    }
-
-                    var arrayCreativeNonLinears = creative[0].getElementsByTagName('NonLinearAds');
-
-                    if ((typeof arrayCreativeNonLinears !== 'undefined') && (arrayCreativeNonLinears !== null) && arrayCreativeNonLinears.length) {
-                        var creativeNonLinear = arrayCreativeNonLinears[0];
-
-                        tmpOptions.adType = 'nonLinear';
-
-                        //Extract the necessary data from the Linear node
-                        tmpOptions.clickthroughUrl = player.getClickThroughUrlFromNonLinear(creativeNonLinear);
-                        tmpOptions.clicktracking   = player.getNonLinearClickTrackingEvents(creativeNonLinear);
-                        tmpOptions.duration        = player.getDurationFromNonLinear(creativeNonLinear);
-                        tmpOptions.dimension       = player.getDimensionFromNonLinear(creativeNonLinear);
-                        tmpOptions.staticResource  = player.getStaticResourceFromNonLinear(creativeNonLinear);
-                        tmpOptions.creativeType    = player.getCreativeTypeFromStaticResources(creativeNonLinear);
-
-                        player.registerTrackingEvents(creativeNonLinear, tmpOptions);
-                    }
-
-                    player.adList[adListId].adType = tmpOptions.adType? tmpOptions.adType : 'unknown';
-
-                    if (typeof tmpOptions.mediaFile !== 'undefined' || typeof tmpOptions.staticResource !== 'undefined') {
-
-                        player.adList[adListId].vastLoaded = true;
-                        player.displayOptions.vastOptions.vastAdvanced.vastLoadedCallback();
-                        player.adPool[adListId] = Object.assign({}, tmpOptions);
-                        var event = document.createEvent('Event');
-                        event.initEvent('adId_' + adListId, false, true);
-                        document.getElementById(player.videoPlayerId).dispatchEvent(event);
-                        return;
-                    } else {
-                        stopProcessAndReportError();
-                        return;
-                    }
-                } else {
-                    stopProcessAndReportError();
-                    return;
-                }
-                player.displayOptions.vastOptions.vastAdvanced.vastLoadedCallback();
-            }
+            numberOfRedirects,
+            adListId,
+            tmpOptions
         );
+
+    },
+
+    resolveVastTag: function (vastTag, numberOfRedirects, adListId, tmpOptions) {
+        var player = this;
+
+        if(!vastTag || vastTag == '') {
+            player.stopProcessAndReportError(adListId);
+            return;
+        }
+
+        var handleXmlHttpReq = function () {
+            var xmlHttpReq = this;
+
+
+            if (xmlHttpReq.readyState === 4 && xmlHttpReq.status === 404) {
+                player.stopProcessAndReportError(adListId);
+                return;
+            }
+
+            if (!((xmlHttpReq.readyState === 4) && (xmlHttpReq.status === 200))) {
+                return;
+            }
+
+            if ((xmlHttpReq.readyState === 4) && (xmlHttpReq.status !== 200)) {
+                player.stopProcessAndReportError(adListId);
+                return;
+            }
+
+            try {
+                var xmlResponse = xmlHttpReq.responseXML;
+            } catch (e) {
+                player.stopProcessAndReportError(adListId);
+                return;
+            }
+
+            if (!xmlResponse) {
+                player.stopProcessAndReportError(adListId);
+                return;
+            }
+
+            player.inLineFound = player.hasInLine(xmlResponse);
+
+            if (!player.inLineFound && player.hasVastAdTagUri(xmlResponse)) {
+
+                var vastAdTagUri = player.getVastAdTagUriFromWrapper(xmlResponse);
+                if (vastAdTagUri) {
+                    player.resolveVastTag(vastAdTagUri, numberOfRedirects, adListId, tmpOptions);
+                } else {
+                    player.stopProcessAndReportError(adListId);
+                    return;
+                }
+            }
+
+            if (numberOfRedirects > player.displayOptions.vastOptions.maxAllowedVastTagRedirects && !player.inLineFound) {
+                player.stopProcessAndReportError(adListId);
+                return;
+            }
+
+            player.processVastXml(xmlResponse, adListId, tmpOptions);
+        };
+
+        if (numberOfRedirects <= player.displayOptions.vastOptions.maxAllowedVastTagRedirects) {
+
+            player.sendRequest(
+                vastTag,
+                true,
+                player.displayOptions.vastOptions.vastTimeout,
+                handleXmlHttpReq
+            );
+
+        }
+
+        numberOfRedirects++;
+    },
+
+    /**
+     * Helper function to stop processing
+     *
+     * @param adListId
+     */
+    stopProcessAndReportError: function(adListId) {
+        var player = this;
+
+        //Set the error flag for the Ad
+        player.adList[adListId].error = true;
+
+        //The response returned an error. Proceeding with the main video.
+        //Try to switch main video only if it is a preRoll scenario
+        if (typeof adListId !== 'undefined' && player.adList[adListId]['roll'] == 'preRoll') {
+            player.playMainVideoWhenVastFails(900);
+        } else {
+            player.announceLocalError(101);
+        }
+
     },
 
     playRoll: function(adListId) {
@@ -901,11 +1050,12 @@ var fluidPlayerClass = {
                     }
                 }
 
-                if (player.displayOptions.vastOptions.adText) {
-                    player.addAdPlayingText(player.displayOptions.vastOptions.adText);
+                if (player.displayOptions.vastOptions.adText || player.adList[adListId].adText) {
+                    var adTextToShow = (player.adList[adListId].adText !== null) ? player.adList[adListId].adText : player.displayOptions.vastOptions.adText;
+                    player.addAdPlayingText(adTextToShow);
                 }
 
-                player.positionTextElements();
+                player.positionTextElements(player.adList[adListId]);
 
                 player.toggleLoader(false);
                 player.adList[adListId].played = true;
@@ -1621,9 +1771,8 @@ var fluidPlayerClass = {
         }
     },
 
-    addAdPlayingText: function() {
+    addAdPlayingText: function(textToShow) {
         var player = this;
-        var text = this.displayOptions.vastOptions.adText;
 
         var adPlayingDiv = document.createElement('div');
         adPlayingDiv.id = this.videoPlayerId + '_fluid_ad_playing';
@@ -1634,12 +1783,12 @@ var fluidPlayerClass = {
         }
 
         adPlayingDiv.className = 'fluid_ad_playing';
-        adPlayingDiv.innerText = text;
+        adPlayingDiv.innerText = textToShow;
 
         document.getElementById('fluid_video_wrapper_' + this.videoPlayerId).appendChild(adPlayingDiv);
     },
 
-    positionTextElements: function() {
+    positionTextElements: function(adListData) {
         var player = this;
 
         var allowedPosition = ['top left', 'top right', 'bottom left', 'bottom right'];
@@ -1691,20 +1840,20 @@ var fluidPlayerClass = {
 
             isBottom = positionsCTA[0] == 'bottom';
 
-            ctaButton.style[positionsCTA[0]] = defaultPositions[positionsCTA[0]][positionsCTA[1]].v;
-            ctaButton.style[positionsCTA[1]] = defaultPositions[positionsCTA[0]][positionsCTA[1]].h;
+            ctaButton.style[positionsCTA[0]] = defaultPositions[positionsCTA[0]][positionsCTA[1]].v + 'px';
+            ctaButton.style[positionsCTA[1]] = defaultPositions[positionsCTA[0]][positionsCTA[1]].h + 'px';
 
             if (isBottom && positionsCTA[1] == 'right') {
-                ctaButton.style[positionsCTA[0]] = defaultPositions[positionsCTA[0]][positionsCTA[1]].v + skipButtonHeightWithSpacing;
+                ctaButton.style[positionsCTA[0]] = defaultPositions[positionsCTA[0]][positionsCTA[1]].v + skipButtonHeightWithSpacing + 'px';
             }
 
-            ctaButtonHeightWithSpacing = ctaButton.offsetHeight + pixelSpacing;
+            ctaButtonHeightWithSpacing = ctaButton.offsetHeight + pixelSpacing + 'px';
 
         }
 
         if (adPlayingDiv !== null) {
 
-            var adPlayingDivPosition = this.displayOptions.vastOptions.adTextPosition.toLowerCase();
+            var adPlayingDivPosition = (adListData.adTextPosition !== null) ? adListData.adTextPosition.toLowerCase() : this.displayOptions.vastOptions.adTextPosition.toLowerCase();
 
             if (allowedPosition.indexOf(adPlayingDivPosition) == -1) {
                 console.log('[FP Error] Invalid position for adText. Reverting to "top left"');
@@ -1712,20 +1861,20 @@ var fluidPlayerClass = {
             }
 
             var positionsAdText = adPlayingDivPosition.split(' ');
-            adPlayingDiv.style[positionsAdText[0]] = defaultPositions[positionsAdText[0]][positionsAdText[1]].v;
-            adPlayingDiv.style[positionsAdText[1]] = defaultPositions[positionsAdText[0]][positionsAdText[1]].h;
-            adPlayingDivHeightWithSpacing = adPlayingDiv.offsetHeight + pixelSpacing;
+            adPlayingDiv.style[positionsAdText[0]] = defaultPositions[positionsAdText[0]][positionsAdText[1]].v + 'px';
+            adPlayingDiv.style[positionsAdText[1]] = defaultPositions[positionsAdText[0]][positionsAdText[1]].h + 'px';
+            adPlayingDivHeightWithSpacing = adPlayingDiv.offsetHeight + pixelSpacing + 'px';
         }
 
         if (ctaButtonHeightWithSpacing > 0 && adPlayingDivHeightWithSpacing > 0 && CTATextPosition == adPlayingDivPosition) {
             if (isBottom) {
                 if (positionsCTA[1] == 'right') {
-                    adPlayingDiv.style.bottom = defaultPositions[positionsAdText[0]][positionsAdText[1]].v + skipButtonHeightWithSpacing + ctaButtonHeightWithSpacing;
+                    adPlayingDiv.style.bottom = defaultPositions[positionsAdText[0]][positionsAdText[1]].v + skipButtonHeightWithSpacing + ctaButtonHeightWithSpacing + 'px';
                 } else {
-                    adPlayingDiv.style.bottom = defaultPositions[positionsAdText[0]][positionsAdText[1]].v + ctaButtonHeightWithSpacing;
+                    adPlayingDiv.style.bottom = defaultPositions[positionsAdText[0]][positionsAdText[1]].v + ctaButtonHeightWithSpacing + 'px';
                 }
             } else {
-                ctaButton.style.top = defaultPositions[positionsCTA[0]][positionsCTA[1]].v + adPlayingDivHeightWithSpacing;
+                ctaButton.style.top = defaultPositions[positionsCTA[0]][positionsCTA[1]].v + adPlayingDivHeightWithSpacing + 'px';
             }
         }
     },
@@ -2130,6 +2279,7 @@ var fluidPlayerClass = {
             videoPlayerTag.volume = player.latestVolume;
             videoPlayerTag.muted = false;
         }
+        this.fluidStorage.fluidVolume = videoPlayerTag.volume;
     },
 
     checkFullscreenSupport: function(videoPlayerWrapperId) {
@@ -2160,16 +2310,16 @@ var fluidPlayerClass = {
         fullscreenButton.className = fullscreenButton.className.replace(/\bfluid_button_fullscreen_exit\b/g, 'fluid_button_fullscreen');
         if (menuOptionFullscreen !== null) {
             menuOptionFullscreen.innerHTML = 'Fullscreen';
-            this.fullscreenMode = false;
         }
+        this.fullscreenMode = false;
     },
 
     fullscreenOn: function (fullscreenButton, menuOptionFullscreen) {
         fullscreenButton.className = fullscreenButton.className.replace(/\bfluid_button_fullscreen\b/g, 'fluid_button_fullscreen_exit');
         if (menuOptionFullscreen !== null) {
             menuOptionFullscreen.innerHTML = 'Exit Fullscreen';
-            this.fullscreenMode = true;
         }
+        this.fullscreenMode = true;
     },
 
     fullscreenToggle: function() {
@@ -2340,6 +2490,7 @@ var fluidPlayerClass = {
             return;
         }
 
+        player.fluidPseudoPause = true;
         var videoPlayerTag = document.getElementById(videoPlayerId);
 
         var initiallyPaused = videoPlayerTag.paused;
@@ -2377,6 +2528,7 @@ var fluidPlayerClass = {
             if (player.initialAnimationSet) {
                 setTimeout(function() { player.displayOptions.layoutControls.playPauseAnimation = player.initialAnimationSet; }, 200);
             }
+            player.fluidPseudoPause = false;
         }
 
         document.addEventListener('mouseup', onProgressbarMouseUp);
@@ -2390,6 +2542,8 @@ var fluidPlayerClass = {
         function shiftVolume(videoPlayerId, volumeBarX) {
             var videoPlayerTag = document.getElementById(videoPlayerId);
             var totalWidth = document.getElementById(videoPlayerId + '_fluid_control_volume_container').clientWidth;
+            var player = fluidPlayerClass.getInstanceById(videoPlayerId);
+
             if (totalWidth) {
                 var newVolume = volumeBarX / totalWidth;
 
@@ -2403,7 +2557,7 @@ var fluidPlayerClass = {
                 if (videoPlayerTag.muted && newVolume > 0) {
                     videoPlayerTag.muted = false;
                 }
-                videoPlayerTag.volume = newVolume;
+                player.setVolume(newVolume);
             }
         }
 
@@ -2432,7 +2586,7 @@ var fluidPlayerClass = {
     setVastList: function () {
         var player = this;
         var ads = {};
-        var def = {id: null, roll: null, played: false, vastLoaded: false, error: false};
+        var def = {id: null, roll: null, played: false, vastLoaded: false, error: false, adText: null, adTextPosition: null};
         var idPart = 0;
 
         var validateVastList = function (item) {
@@ -2540,7 +2694,7 @@ var fluidPlayerClass = {
             newVolume = 1;
         }
 
-        videoPlayerTag.volume = newVolume;
+        this.setVolume(newVolume);
     },
 
     currentTimeChange: function (videoPlayerId, keyCode) {
@@ -2702,11 +2856,29 @@ var fluidPlayerClass = {
         var videoPlayerTag = this;
         var player = fluidPlayerClass.getInstanceById(videoPlayerTag.id);
 
+        videoPlayerTag.addEventListener('playing', function() {
+            player.toggleLoader(false);
+        });
+
+        videoPlayerTag.addEventListener('waiting', function() {
+            player.toggleLoader(true);
+        });
+
         if (!player.displayOptions.layoutControls.playButtonShowing) {
+            // Controls always showing until the video is first played
             var initialControlsDisplay = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
-            var fpPlayer = document.getElementById(player.videoPlayerId + '_logo');
             initialControlsDisplay.classList.remove('initial_controls_show');
-            fpPlayer.classList.remove('initial_controls_show');
+            // The logo shows before playing but may need to be removed
+            var fpPlayer = document.getElementById(player.videoPlayerId + '_logo');
+            if (fpPlayer) {
+                fpPlayer.classList.remove('initial_controls_show');
+            }
+        }
+
+        // Remove the div that was placed as a fix for poster image and DASH streaming, if it exists
+        var pseudoPoster= document.getElementById(player.videoPlayerId + '_fluid_pseudo_poster');
+        if (pseudoPoster) {
+            pseudoPoster.parentNode.removeChild(pseudoPoster);
         }
 
         if (!player.firstPlayLaunched) {
@@ -3078,6 +3250,10 @@ var fluidPlayerClass = {
             player.playPauseToggle(videoPlayerTag);
         }, false);
 
+        document.getElementById(this.videoPlayerId).addEventListener('touchstart', function() {
+            player.playPauseToggle(videoPlayerTag);
+        }, false);
+
         switch (this.displayOptions.layoutControls.layout) {
             case 'browser':
                 //Nothing special to do here at this point.
@@ -3279,11 +3455,18 @@ var fluidPlayerClass = {
                         player.setupThumbnailPreviewVtt.bind(this)
                     );
 
-                    document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container')
-                        .addEventListener('mousemove', player.drawTimelinePreview.bind(player), false);
+                    var isMobileChecks = fluidPlayerClass.getMobileOs();
+                    var eventOn = 'mousemove';
+                    var eventOff = 'mouseout';
+                    if (isMobileChecks.userOs) {
+                        eventOn = 'touchmove';
+                        eventOff = 'touchend';
+                    }
 
                     document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container')
-                        .addEventListener('mouseout', function() {
+                        .addEventListener(eventOn, player.drawTimelinePreview.bind(player), false);
+                    document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container')
+                        .addEventListener(eventOff, function() {
                             document.getElementById(player.videoPlayerId + '_fluid_timeline_preview_container').style.display = 'none';
                         }, false);
 
@@ -3366,6 +3549,7 @@ var fluidPlayerClass = {
                 var sourceSelected = (firstSource) ? "source_selected" :  "";
                 firstSource = false;
                 var sourceChangeDiv = document.createElement('div');
+                sourceChangeDiv.id        = 'source_' + player.videoPlayerId + '_' + source.title;
                 sourceChangeDiv.className = 'fluid_video_source_list_item';
                 sourceChangeDiv.innerHTML = '<span class="source_button_icon ' + sourceSelected + '"></span>' + source.title;
 
@@ -3382,6 +3566,7 @@ var fluidPlayerClass = {
                         if (source.title == videoChangedTo.innerText) {
                             player.setBuffering();
                             player.setVideoSource(source.url);
+                            player.fluidStorage.fluidQuality = source.title;
                         }
                     });
 
@@ -3614,6 +3799,7 @@ var fluidPlayerClass = {
     userActivityChecker: function () {
         var player = this;
         var videoPlayer = document.getElementById('fluid_video_wrapper_' + player.videoPlayerId);
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);
         player.newActivity = null;
 
         var activity = function () {
@@ -3625,9 +3811,7 @@ var fluidPlayerClass = {
             if (player.newActivity === true) {
                 player.newActivity = false;
 
-                var videoPlayerTag = document.getElementById(player.videoPlayerId);
-                if (player.isUserActive === false) {
-                    var videoPlayerTag = document.getElementById(player.videoPlayerId);
+                if (player.isUserActive === false || !player.isControlBarVisible()) {
                     var event = new CustomEvent("userActive");
                     videoPlayerTag.dispatchEvent(event);
                     player.isUserActive = true;
@@ -3905,6 +4089,7 @@ var fluidPlayerClass = {
             }
             this.theatreMode = false;
         }
+        this.fluidStorage.fluidTheatre = this.theatreMode;
     },
 
     // Set the poster for the video, taken from custom params
@@ -3922,6 +4107,15 @@ var fluidPlayerClass = {
                 if (!this.dashScriptLoaded) { // First time trying adding in DASH streamer, get the script
                     this.dashScriptLoaded = true;
                     fluidPlayerClass.requestScript('https://cdn.dashjs.org/latest/dash.mediaplayer.min.js', this.initialiseDash.bind(this));
+
+                    // Fix for a fake poster image, as the DASH streamer removes it
+                    if (this.displayOptions.layoutControls.posterImage) {
+                        var containerDiv = document.createElement('div');
+                        containerDiv.id = this.videoPlayerId + '_fluid_pseudo_poster';
+                        containerDiv.className = 'fluid_pseudo_poster';
+                        containerDiv.style.background = "url('" + this.displayOptions.layoutControls.posterImage + "') no-repeat";
+                        document.getElementById(this.videoPlayerId).parentNode.insertBefore(containerDiv, null);
+                    }
                 } else {
                     this.initialiseDash();
                 }
@@ -3999,6 +4193,33 @@ var fluidPlayerClass = {
         }
     },
 
+    setPersistentSettings: function() {
+        if (typeof(Storage) !== "undefined" && typeof(localStorage) !== "undefined") {
+            this.fluidStorage = localStorage;
+
+            if (typeof(this.fluidStorage.fluidVolume) !== "undefined" && this.displayOptions.layoutControls.persistentSettings.volume) {
+                this.setVolume(this.fluidStorage.fluidVolume);
+            }
+
+            if (typeof(this.fluidStorage.fluidQuality) !== "undefined" && this.displayOptions.layoutControls.persistentSettings.quality) {
+                var sourceOption = document.getElementById('source_' + this.videoPlayerId + '_' + this.fluidStorage.fluidQuality);
+                var sourceChangeButton = document.getElementById(this.videoPlayerId + '_fluid_control_video_source');
+                if (sourceOption) {
+                    sourceOption.click();
+                    sourceChangeButton.click();
+                }
+            }
+
+            if (typeof(this.fluidStorage.fluidSpeed) !== "undefined" && this.displayOptions.layoutControls.persistentSettings.speed) {
+                this.setPlaybackSpeed(this.fluidStorage.fluidSpeed);
+            }
+
+            if (typeof(this.fluidStorage.fluidTheatre) !== "undefined" && this.fluidStorage.fluidTheatre == "true" && this.displayOptions.layoutControls.persistentSettings.theatre) {
+                this.theatreToggle();
+            }
+        }
+    },
+
     init: function(idVideoPlayer, options) {
         var player = this;
         var videoPlayer = document.getElementById(idVideoPlayer);
@@ -4007,7 +4228,6 @@ var fluidPlayerClass = {
         videoPlayer.setAttribute('webkit-playsinline', '');
 
         player.vastOptions = {
-            vastTagUrl:   '',
             tracking:     [],
             stopTracking: []
         };
@@ -4050,6 +4270,10 @@ var fluidPlayerClass = {
         player.isSwitchingSource       = false;
         player.isInIframe              = player.inIframe();
         player.mainVideoReadyState     = false;
+        player.xmlCollection           = [];
+        player.inLineFound             = null;
+        player.fluidStorage            = {};
+        player.fluidPseudoPause        = false;
 
         //Default options
         player.displayOptions = {
@@ -4093,7 +4317,13 @@ var fluidPlayerClass = {
                     width:                    null
                 },
                 layout:                       'default', //options: 'default', 'browser', '<custom>'
-                playerInitCallback:           (function() {})
+                playerInitCallback:           (function() {}),
+                persistentSettings:           {
+                    volume:                   true,
+                    quality:                  true,
+                    speed:                    true,
+                    theatre:                  true
+                }
             },
             vastOptions: {
                 adList:                       {},
@@ -4105,6 +4335,7 @@ var fluidPlayerClass = {
                 adCTATextPosition:            'bottom right',
                 vastTimeout:                  5000,
                 showProgressbarMarkers:       false,
+                maxAllowedVastTagRedirects:   3,
 
                 vastAdvanced: {
                     vastLoadedCallback:       (function() {}),
@@ -4126,9 +4357,8 @@ var fluidPlayerClass = {
             }
         }
 
-        player.initialiseStreamers();
-
         player.setupPlayerWrapper();
+        player.initialiseStreamers();
 
         videoPlayer.addEventListener('webkitfullscreenchange', player.recalculateAdDimensions, false);
         videoPlayer.addEventListener('fullscreenchange', player.recalculateAdDimensions, false);
@@ -4167,6 +4397,8 @@ var fluidPlayerClass = {
         player.userActivityChecker();
 
         player.setVastList();
+
+        player.setPersistentSettings();
 
         var _play_videoPlayer = videoPlayer.play;
         videoPlayer.play = function () {
@@ -4285,12 +4517,14 @@ var fluidPlayerClass = {
         if (!this.isCurrentlyPlayingAd) {
             var videoPlayer = document.getElementById(this.videoPlayerId);
             videoPlayer.playbackRate = speed;
+            this.fluidStorage.fluidSpeed = speed;
         }
     },
 
     setVolume: function(passedVolume) {
         var videoPlayer = document.getElementById(this.videoPlayerId);
         videoPlayer.volume = passedVolume;
+        this.fluidStorage.fluidVolume = passedVolume;
     },
 
     isCurrentlyPlayingVideo: function(instance) {
@@ -4362,12 +4596,17 @@ var fluidPlayerClass = {
 
     on: function(eventCall, functionCall) {
         var videoPlayer = document.getElementById(this.videoPlayerId);
+        var player = this;
         switch(eventCall) {
             case 'play':
                 videoPlayer.onplay = functionCall;
                 break;
             case 'pause':
-                videoPlayer.onpause = functionCall;
+                videoPlayer.addEventListener('pause', function() {
+                    if (!player.fluidPseudoPause) {
+                        functionCall();
+                    }
+                });
                 break;
             default:
                 console.log('[FP_ERROR] Event not recognised');

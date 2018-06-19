@@ -176,7 +176,6 @@
 }
 
 .fluid_video_wrapper .vast_video_loading {
-    position: absolute;
     display: table;
     text-align: center;
     width: 100%;
@@ -184,12 +183,14 @@
     top: 0;
     left: 0;
     pointer-events: auto;
-    z-index: 10;
+    z-index: 1;
 }
 
 .fluid_video_wrapper .vast_video_loading:before {
-    background: #000000 url("images/loader.gif") no-repeat scroll center center;
-    opacity: 0.6;
+    background-image: url("images/fluid_spinner.svg");
+    background-position: center, center;
+    background-repeat: no-repeat, repeat;
+    background-color: rgba(0, 0, 0, 0.2);
     content: '';
     position: absolute;
     height: 100%;
@@ -314,7 +315,8 @@
     background-color: rgba(0, 0, 0, 1);
 }
 
-.fluid_html_on_pause {
+.fluid_html_on_pause,
+.fluid_pseudo_poster {
     position: absolute;
     top: 0;
     right: 0;
