@@ -1,5 +1,11 @@
 # CHANGELOG
 
+
+## Next release
+* [Pull #214](https://github.com/fluid-player/fluid-player/pull/241) Avoid looping VAST Ad
+* [Pull #206](https://github.com/fluid-player/fluid-player/pull/206) Fix tracking impression events for nonLinear ads 
+* [Pull #221](https://github.com/fluid-player/fluid-player/pull/221) Fix VAST loading issue by AdBlock
+
 ## 2.3.0
 * [Pull #192](https://github.com/fluid-player/fluid-player/pull/191) Persist user settings across pages for volume, speed, quality and theatre mode
 * [Pull #194](https://github.com/fluid-player/fluid-player/pull/194) Fix for play event on video click for certain devices
