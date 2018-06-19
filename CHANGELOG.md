@@ -14,7 +14,7 @@
 * [Pull #212](https://github.com/fluid-player/fluid-player/pull/212) Poster image to fit player size
 * [Pull #186](https://github.com/fluid-player/fluid-player/pull/186) Fix for source switch on Edge
 * [Pull #219](https://github.com/fluid-player/fluid-player/pull/219) Play / pause icon fix and progress bar to disappear correctly
-* [Pull #218](https://github.com/fluid-player/fluid-player/pull/218) Additional optional default theatre settings
+* [Pull #218](https://github.com/fluid-player/fluid-player/pull/218) Optional theatre settings
 
 ## 2.3.0
 * [Pull #192](https://github.com/fluid-player/fluid-player/pull/191) Persist user settings across pages for volume, speed, quality and theatre mode
