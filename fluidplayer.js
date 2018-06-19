@@ -3570,11 +3570,6 @@ var fluidPlayerClass = {
 
                     player.openCloseVideoSourceSwitch();
 
-                    // Wait till the source is set then reset the size
-                    setTimeout(function () {
-                        videoPlayer.style.width = "100%";
-                        videoPlayer.style.height = "100%";
-                    }, 1000);
                 });
                 sourceChangeList.appendChild(sourceChangeDiv);
             });
@@ -3652,6 +3647,8 @@ var fluidPlayerClass = {
                 videoPlayerTag.play();
             }
             player.isSwitchingSource = false;
+            videoPlayerTag.style.width = "100%";
+            videoPlayerTag.style.height = "100%";
         };
         var videoPlayStart = function() {
             this.currentTime = newCurrentTime;
