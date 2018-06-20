@@ -3122,14 +3122,7 @@ var fluidPlayerClass = {
             '    <li id="' + player.videoPlayerId + 'context_option_play">Play</li>' +
             '    <li id="' + player.videoPlayerId + 'context_option_mute">Mute</li>' +
             '    <li id="' + player.videoPlayerId + 'context_option_fullscreen">Fullscreen</li>' +
-            '    <li id="' + player.videoPlayerId + 'context_option_homepage">' +
-            '       <a ' +
-            '           id="' + player.videoPlayerId + 'context_option_homepage_link" ' +
-            '           href="' + player.homepage + '" ' +
-            '           target="_blank">' +
-            '           Fluid Player ' + player.version + '' +
-            '       </a>' +
-            '     </li>' +
+            '    <li id="' + player.videoPlayerId + 'context_option_homepage">Fluid Player ' + player.version + '</li>' +
             '</ul>';
 
         videoPlayerTag.parentNode.insertBefore(divContextMenu, videoPlayerTag.nextSibling);
@@ -3155,7 +3148,7 @@ var fluidPlayerClass = {
         var menuOptionPlay       = document.getElementById(player.videoPlayerId + 'context_option_play');
         var menuOptionMute       = document.getElementById(player.videoPlayerId + 'context_option_mute');
         var menuOptionFullscreen = document.getElementById(player.videoPlayerId + 'context_option_fullscreen');
-        var menuOptionHomepageLink   = document.getElementById(player.videoPlayerId + 'context_option_homepage_link');
+        var menuOptionHomepage   = document.getElementById(player.videoPlayerId + 'context_option_homepage');
 
         menuOptionPlay.addEventListener('click', function() {
             player.playPauseToggle(videoPlayerTag);
@@ -3169,8 +3162,10 @@ var fluidPlayerClass = {
             player.fullscreenToggle();
         }, false);
 
-        menuOptionHomepageLink.style.color = 'inherit';
-        menuOptionHomepageLink.style.textDecoration = 'inherit';
+        menuOptionHomepage.addEventListener('click', function() {
+            var win = window.open(player.homepage, '_blank');
+            win.focus();
+        }, false);
     },
 
     setDefaultLayout: function() {
