@@ -1034,7 +1034,10 @@ var fluidPlayerClass = {
                     player.vastOptions.duration = videoPlayerTag.duration;
                 }
 
-                player.addClickthroughLayer(player.videoPlayerId);
+                if ((typeof player.displayOptions.adClickable == 'undefined' || player.displayOptions.adClickable) && player.displayOptions.vastOptions.adClickable) {
+                    player.addClickthroughLayer(player.videoPlayerId);
+                }
+
                 if (player.vastOptions.skipoffset !== false) {
                     player.addSkipButton();
                 }
@@ -1748,7 +1751,6 @@ var fluidPlayerClass = {
     addAdCountdown: function() {
         var videoPlayerTag = document.getElementById(this.videoPlayerId);
         var videoWrapper = document.getElementById('fluid_video_wrapper_' + this.videoPlayerId);
-        var clickthrough = document.getElementById('vast_clickthrough_layer_' + this.videoPlayerId);
         var divAdCountdown = document.createElement('div');
 
         // Create element
@@ -1761,7 +1763,7 @@ var fluidPlayerClass = {
         videoWrapper.appendChild(divAdCountdown);
 
         videoPlayerTag.addEventListener('timeupdate', this.decreaseAdCountdown, false);
-        clickthrough.addEventListener('mouseover', function() { divAdCountdown.style.display = 'none'; }, false);
+        videoWrapper.addEventListener('mouseover', function() { divAdCountdown.style.display = 'none'; }, false);
     },
 
     decreaseAdCountdown: function decreaseAdCountdown() {
@@ -1921,9 +1923,7 @@ var fluidPlayerClass = {
         ctaButton.id = this.videoPlayerId + '_fluid_cta';
         ctaButton.className = 'fluid_ad_cta';
 
-        var link = document.createElement('a');
-        link.href = player.vastOptions.clickthroughUrl;
-        link.target = '_blank';
+        var link = document.createElement('span');
         link.innerHTML = this.displayOptions.vastOptions.adCTAText + "<br/><span class=\"add_icon_clickthrough\">" + landingPage + "</span>";
         link.onclick = function() {
             if (!videoPlayerTag.paused) {
@@ -1932,6 +1932,11 @@ var fluidPlayerClass = {
 
             return true;
         };
+
+        ctaButton.addEventListener('click', function() {
+            var win = window.open(player.vastOptions.clickthroughUrl, '_blank');
+            win.focus();
+        }, false);
 
         ctaButton.appendChild(link);
 
@@ -2611,7 +2616,7 @@ var fluidPlayerClass = {
     setVastList: function () {
         var player = this;
         var ads = {};
-        var def = {id: null, roll: null, played: false, vastLoaded: false, error: false, adText: null, adTextPosition: null};
+        var def = {id: null, roll: null, played: false, vastLoaded: false, error: false, adText: null, adTextPosition: null, adClickable: true};
         var idPart = 0;
 
         var validateVastList = function (item) {
@@ -4438,6 +4443,7 @@ var fluidPlayerClass = {
                 adTextPosition:               'top left',
                 adCTAText:                    'Visit now!',
                 adCTATextPosition:            'bottom right',
+                adClickable:                  true,
                 vastTimeout:                  5000,
                 showProgressbarMarkers:       false,
                 maxAllowedVastTagRedirects:   3,
