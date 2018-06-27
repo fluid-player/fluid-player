@@ -2273,6 +2273,7 @@ var fluidPlayerClass = {
 
         if (videoPlayerTag.volume) {
             player.latestVolume = videoPlayerTag.volume;
+            player.fluidStorage.fluidMute = false;
         }
 
         if (videoPlayerTag.volume && !videoPlayerTag.muted) {
@@ -2304,7 +2305,10 @@ var fluidPlayerClass = {
             videoPlayerTag.volume = player.latestVolume;
             videoPlayerTag.muted = false;
         }
-        this.fluidStorage.fluidVolume = videoPlayerTag.volume;
+
+        // Persistent settings
+        this.fluidStorage.fluidVolume = player.latestVolume;
+        this.fluidStorage.fluidMute   = videoPlayerTag.muted;
     },
 
     checkFullscreenSupport: function(videoPlayerWrapperId) {
@@ -4294,6 +4298,9 @@ var fluidPlayerClass = {
 
             if (typeof(this.fluidStorage.fluidVolume) !== "undefined" && this.displayOptions.layoutControls.persistentSettings.volume) {
                 this.setVolume(this.fluidStorage.fluidVolume);
+                if (typeof(this.fluidStorage.fluidMute) !== "undefined" && this.fluidStorage.fluidMute == "true") {
+                    this.muteToggle(this.videoPlayerId);
+                }
             }
 
             if (typeof(this.fluidStorage.fluidQuality) !== "undefined" && this.displayOptions.layoutControls.persistentSettings.quality) {
@@ -4631,6 +4638,7 @@ var fluidPlayerClass = {
     setVolume: function(passedVolume) {
         var videoPlayer = document.getElementById(this.videoPlayerId);
         videoPlayer.volume = passedVolume;
+        this.latestVolume = passedVolume;
         this.fluidStorage.fluidVolume = passedVolume;
     },
 
