@@ -1034,7 +1034,7 @@ var fluidPlayerClass = {
                     player.vastOptions.duration = videoPlayerTag.duration;
                 }
 
-                if ((typeof player.displayOptions.adClickable == 'undefined' || player.displayOptions.adClickable) && player.displayOptions.vastOptions.adClickable) {
+                if ((typeof player.displayOptions.vastOptions.adClickable == 'undefined' || player.displayOptions.vastOptions.adClickable) && player.adList[adListId].adClickable) {
                     player.addClickthroughLayer(player.videoPlayerId);
                 }
 
@@ -1925,17 +1925,15 @@ var fluidPlayerClass = {
 
         var link = document.createElement('span');
         link.innerHTML = this.displayOptions.vastOptions.adCTAText + "<br/><span class=\"add_icon_clickthrough\">" + landingPage + "</span>";
-        link.onclick = function() {
+
+        ctaButton.addEventListener('click', function() {
             if (!videoPlayerTag.paused) {
                 videoPlayerTag.pause();
             }
 
-            return true;
-        };
-
-        ctaButton.addEventListener('click', function() {
             var win = window.open(player.vastOptions.clickthroughUrl, '_blank');
             win.focus();
+            return true;
         }, false);
 
         ctaButton.appendChild(link);
