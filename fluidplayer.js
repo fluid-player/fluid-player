@@ -1034,7 +1034,8 @@ var fluidPlayerClass = {
                     player.vastOptions.duration = videoPlayerTag.duration;
                 }
 
-                if ((typeof player.displayOptions.vastOptions.adClickable == 'undefined' || player.displayOptions.vastOptions.adClickable) && player.adList[adListId].adClickable) {
+                var addClickthroughLayer = (typeof player.adList[adListId].adClickable != "undefined") ? player.adList[adListId].adClickable: player.displayOptions.vastOptions.adClickable;
+                if (addClickthroughLayer) {
                     player.addClickthroughLayer(player.videoPlayerId);
                 }
 
@@ -2614,7 +2615,7 @@ var fluidPlayerClass = {
     setVastList: function () {
         var player = this;
         var ads = {};
-        var def = {id: null, roll: null, played: false, vastLoaded: false, error: false, adText: null, adTextPosition: null, adClickable: true};
+        var def = {id: null, roll: null, played: false, vastLoaded: false, error: false, adText: null, adTextPosition: null};
         var idPart = 0;
 
         var validateVastList = function (item) {
