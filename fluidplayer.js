@@ -3501,9 +3501,14 @@ var fluidPlayerClass = {
                     document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container')
                         .addEventListener(eventOn, player.drawTimelinePreview.bind(player), false);
                     document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container')
-                        .addEventListener(eventOff, function() {
+                        .addEventListener(eventOff, function(event) {
+                            var shadow = document.getElementById(player.videoPlayerId + '_fluid_timeline_preview_container_shadow');
+                            if (shadow === document.elementFromPoint(event.clientX, event.clientY)) {
+                                //False positive (Chrome bug when fast click causes leave event)
+                                return;
+                            }
                             document.getElementById(player.videoPlayerId + '_fluid_timeline_preview_container').style.display = 'none';
-                            document.getElementById(player.videoPlayerId + '_fluid_timeline_preview_container_shadow').style.display = 'none';
+                            shadow.style.display = 'none';
                         }, false);
 
                     player.generateTimelinePreviewTags();
