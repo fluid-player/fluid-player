@@ -3471,7 +3471,6 @@ var fluidPlayerClass = {
 
             } else {
                 timelinePreviewTag.style.display = 'none';
-                timelinePreviewShadow.style.display = 'none';
             }
         }
     },
@@ -3493,7 +3492,7 @@ var fluidPlayerClass = {
 
                     var isMobileChecks = fluidPlayerClass.getMobileOs();
                     var eventOn = 'mousemove';
-                    var eventOff = 'mouseout';
+                    var eventOff = 'mouseleave';
                     if (isMobileChecks.userOs) {
                         eventOn = 'touchmove';
                         eventOff = 'touchend';
