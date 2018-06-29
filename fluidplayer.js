@@ -3406,7 +3406,7 @@ var fluidPlayerClass = {
 
         progressContainer.appendChild(previewContainer);
 
-        //Shadow is needed to not trigger mouseout event and stop showing thumbnails if one scrubs a bit too fast and leaves thumb before new one drawn.
+        //Shadow is needed to not trigger mouseleave event, that stops showing thumbnails, in case one scrubs a bit too fast and leaves current thumb before new one drawn.
         var previewContainerShadow = document.createElement('div');
         previewContainerShadow.id = player.videoPlayerId + '_fluid_timeline_preview_container_shadow';
         previewContainerShadow.className = 'fluid_timeline_preview_container_shadow';
