@@ -1034,7 +1034,11 @@ var fluidPlayerClass = {
                     player.vastOptions.duration = videoPlayerTag.duration;
                 }
 
-                player.addClickthroughLayer(player.videoPlayerId);
+                var addClickthroughLayer = (typeof player.adList[adListId].adClickable != "undefined") ? player.adList[adListId].adClickable: player.displayOptions.vastOptions.adClickable;
+                if (addClickthroughLayer) {
+                    player.addClickthroughLayer(player.videoPlayerId);
+                }
+
                 if (player.vastOptions.skipoffset !== false) {
                     player.addSkipButton();
                 }
@@ -1748,7 +1752,6 @@ var fluidPlayerClass = {
     addAdCountdown: function() {
         var videoPlayerTag = document.getElementById(this.videoPlayerId);
         var videoWrapper = document.getElementById('fluid_video_wrapper_' + this.videoPlayerId);
-        var clickthrough = document.getElementById('vast_clickthrough_layer_' + this.videoPlayerId);
         var divAdCountdown = document.createElement('div');
 
         // Create element
@@ -1761,7 +1764,7 @@ var fluidPlayerClass = {
         videoWrapper.appendChild(divAdCountdown);
 
         videoPlayerTag.addEventListener('timeupdate', this.decreaseAdCountdown, false);
-        clickthrough.addEventListener('mouseover', function() { divAdCountdown.style.display = 'none'; }, false);
+        videoWrapper.addEventListener('mouseover', function() { divAdCountdown.style.display = 'none'; }, false);
     },
 
     decreaseAdCountdown: function decreaseAdCountdown() {
@@ -1921,17 +1924,18 @@ var fluidPlayerClass = {
         ctaButton.id = this.videoPlayerId + '_fluid_cta';
         ctaButton.className = 'fluid_ad_cta';
 
-        var link = document.createElement('a');
-        link.href = player.vastOptions.clickthroughUrl;
-        link.target = '_blank';
+        var link = document.createElement('span');
         link.innerHTML = this.displayOptions.vastOptions.adCTAText + "<br/><span class=\"add_icon_clickthrough\">" + landingPage + "</span>";
-        link.onclick = function() {
+
+        ctaButton.addEventListener('click', function() {
             if (!videoPlayerTag.paused) {
                 videoPlayerTag.pause();
             }
 
+            var win = window.open(player.vastOptions.clickthroughUrl, '_blank');
+            win.focus();
             return true;
-        };
+        }, false);
 
         ctaButton.appendChild(link);
 
@@ -4438,6 +4442,7 @@ var fluidPlayerClass = {
                 adTextPosition:               'top left',
                 adCTAText:                    'Visit now!',
                 adCTATextPosition:            'bottom right',
+                adClickable:                  true,
                 vastTimeout:                  5000,
                 showProgressbarMarkers:       false,
                 maxAllowedVastTagRedirects:   3,
