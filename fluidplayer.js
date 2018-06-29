@@ -3409,6 +3409,15 @@ var fluidPlayerClass = {
         previewContainer.style.position = 'absolute';
 
         progressContainer.appendChild(previewContainer);
+
+        //Shadow is needed to not trigger mouseleave event, that stops showing thumbnails, in case one scrubs a bit too fast and leaves current thumb before new one drawn.
+        var previewContainerShadow = document.createElement('div');
+        previewContainerShadow.id = player.videoPlayerId + '_fluid_timeline_preview_container_shadow';
+        previewContainerShadow.className = 'fluid_timeline_preview_container_shadow';
+        previewContainerShadow.style.position = 'absolute';
+        previewContainerShadow.style.display = 'none';
+        previewContainerShadow.style.opacity = 1;
+        progressContainer.appendChild(previewContainerShadow);
     },
 
     getThumbnailCoordinates: function(second) {
@@ -3428,6 +3437,7 @@ var fluidPlayerClass = {
     drawTimelinePreview: function(event) {
         var player = this;
         var timelinePreviewTag = document.getElementById(player.videoPlayerId + '_fluid_timeline_preview_container');
+        var timelinePreviewShadow = document.getElementById(player.videoPlayerId + '_fluid_timeline_preview_container_shadow');
         var progressContainer = document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container');
         var totalWidth = progressContainer.clientWidth;
 
@@ -3448,10 +3458,13 @@ var fluidPlayerClass = {
 
             //get the corresponding thumbnail coordinates
             var thumbnailCoordinates = player.getThumbnailCoordinates(hoverSecond);
+            timelinePreviewShadow.style.width = totalWidth + 'px';
+            timelinePreviewShadow.style.display = 'block';
 
             if (thumbnailCoordinates !== false) {
                 timelinePreviewTag.style.width = thumbnailCoordinates.w + 'px';
                 timelinePreviewTag.style.height = thumbnailCoordinates.h + 'px';
+                timelinePreviewShadow.style.height = thumbnailCoordinates.h + 'px';
                 timelinePreviewTag.style.background =
                     'url(' + thumbnailCoordinates.image + ') no-repeat scroll -' + thumbnailCoordinates.x + 'px -' + thumbnailCoordinates.y + 'px';
                 timelinePreviewTag.style.left = hoverX - (thumbnailCoordinates.w / 2) + 'px';
@@ -3483,7 +3496,7 @@ var fluidPlayerClass = {
 
                     var isMobileChecks = fluidPlayerClass.getMobileOs();
                     var eventOn = 'mousemove';
-                    var eventOff = 'mouseout';
+                    var eventOff = 'mouseleave';
                     if (isMobileChecks.userOs) {
                         eventOn = 'touchmove';
                         eventOff = 'touchend';
@@ -3492,8 +3505,14 @@ var fluidPlayerClass = {
                     document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container')
                         .addEventListener(eventOn, player.drawTimelinePreview.bind(player), false);
                     document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container')
-                        .addEventListener(eventOff, function() {
+                        .addEventListener(eventOff, function(event) {
+                            var shadow = document.getElementById(player.videoPlayerId + '_fluid_timeline_preview_container_shadow');
+                            if (shadow === document.elementFromPoint(event.clientX, event.clientY)) {
+                                //False positive (Chrome bug when fast click causes leave event)
+                                return;
+                            }
                             document.getElementById(player.videoPlayerId + '_fluid_timeline_preview_container').style.display = 'none';
+                            shadow.style.display = 'none';
                         }, false);
 
                     player.generateTimelinePreviewTags();
@@ -3835,14 +3854,24 @@ var fluidPlayerClass = {
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
         player.newActivity = null;
 
-        var activity = function () {
+        var isMouseStillDown = false;
+
+        var activity = function (event) {
+            if (event.type === 'touchstart' || event.type === 'mousedown') {
+                isMouseStillDown = true;
+            }
+            if (event.type === 'touchend' || event.type === 'mouseup') {
+                isMouseStillDown = false;
+            }
             player.newActivity = true;
         };
 
         activityCheck = setInterval(function () {
 
             if (player.newActivity === true) {
-                player.newActivity = false;
+                if (!isMouseStillDown) {
+                    player.newActivity = false;
+                }
 
                 if (player.isUserActive === false || !player.isControlBarVisible()) {
                     var event = new CustomEvent("userActive");
@@ -3868,8 +3897,10 @@ var fluidPlayerClass = {
             }
         }, 300);
 
-        var listenTo = (fluidPlayerClass.isTouchDevice()) ? 'touchstart' : 'mousemove';
-        videoPlayer.addEventListener(listenTo, activity);
+        var listenTo = (fluidPlayerClass.isTouchDevice()) ? ['touchstart', 'touchmove', 'touchend'] : ['mousemove', 'mousedown', 'mouseup'];
+        for (var i = 0; i < listenTo.length; i++) {
+            videoPlayer.addEventListener(listenTo[i], activity);
+        }
     },
 
     hasControlBar: function () {
