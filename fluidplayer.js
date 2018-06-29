@@ -109,7 +109,7 @@ var fluidPlayerClass = {
         'toggleElementText', 'getMobileOs', 'findClosestParent', 'activeVideoPlayerId',
         'getInstanceIdByWrapperId', 'timer', 'timerPool', 'adList', 'adPool',
         'isUserActive', 'isCurrentlyPlayingAd', 'initialAnimationSet'],
-    version: '2.4.0',
+    version: '2.4.1',
     homepage: 'https://www.fluidplayer.com/',
     activeVideoPlayerId: null,
 
@@ -1034,7 +1034,11 @@ var fluidPlayerClass = {
                     player.vastOptions.duration = videoPlayerTag.duration;
                 }
 
-                player.addClickthroughLayer(player.videoPlayerId);
+                var addClickthroughLayer = (typeof player.adList[adListId].adClickable != "undefined") ? player.adList[adListId].adClickable: player.displayOptions.vastOptions.adClickable;
+                if (addClickthroughLayer) {
+                    player.addClickthroughLayer(player.videoPlayerId);
+                }
+
                 if (player.vastOptions.skipoffset !== false) {
                     player.addSkipButton();
                 }
@@ -1748,7 +1752,6 @@ var fluidPlayerClass = {
     addAdCountdown: function() {
         var videoPlayerTag = document.getElementById(this.videoPlayerId);
         var videoWrapper = document.getElementById('fluid_video_wrapper_' + this.videoPlayerId);
-        var clickthrough = document.getElementById('vast_clickthrough_layer_' + this.videoPlayerId);
         var divAdCountdown = document.createElement('div');
 
         // Create element
@@ -1761,7 +1764,7 @@ var fluidPlayerClass = {
         videoWrapper.appendChild(divAdCountdown);
 
         videoPlayerTag.addEventListener('timeupdate', this.decreaseAdCountdown, false);
-        clickthrough.addEventListener('mouseover', function() { divAdCountdown.style.display = 'none'; }, false);
+        videoWrapper.addEventListener('mouseover', function() { divAdCountdown.style.display = 'none'; }, false);
     },
 
     decreaseAdCountdown: function decreaseAdCountdown() {
@@ -1921,17 +1924,18 @@ var fluidPlayerClass = {
         ctaButton.id = this.videoPlayerId + '_fluid_cta';
         ctaButton.className = 'fluid_ad_cta';
 
-        var link = document.createElement('a');
-        link.href = player.vastOptions.clickthroughUrl;
-        link.target = '_blank';
+        var link = document.createElement('span');
         link.innerHTML = this.displayOptions.vastOptions.adCTAText + "<br/><span class=\"add_icon_clickthrough\">" + landingPage + "</span>";
-        link.onclick = function() {
+
+        ctaButton.addEventListener('click', function() {
             if (!videoPlayerTag.paused) {
                 videoPlayerTag.pause();
             }
 
+            var win = window.open(player.vastOptions.clickthroughUrl, '_blank');
+            win.focus();
             return true;
-        };
+        }, false);
 
         ctaButton.appendChild(link);
 
@@ -2273,6 +2277,7 @@ var fluidPlayerClass = {
 
         if (videoPlayerTag.volume) {
             player.latestVolume = videoPlayerTag.volume;
+            player.fluidStorage.fluidMute = false;
         }
 
         if (videoPlayerTag.volume && !videoPlayerTag.muted) {
@@ -2304,7 +2309,10 @@ var fluidPlayerClass = {
             videoPlayerTag.volume = player.latestVolume;
             videoPlayerTag.muted = false;
         }
-        this.fluidStorage.fluidVolume = videoPlayerTag.volume;
+
+        // Persistent settings
+        this.fluidStorage.fluidVolume = player.latestVolume;
+        this.fluidStorage.fluidMute   = videoPlayerTag.muted;
     },
 
     checkFullscreenSupport: function(videoPlayerWrapperId) {
@@ -3111,6 +3119,7 @@ var fluidPlayerClass = {
     setCustomContextMenu: function() {
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
+        var playerWrapper = document.getElementById('fluid_video_wrapper_' + player.videoPlayerId);
 
         //Create own context menu
         var divContextMenu = document.createElement('div');
@@ -3122,20 +3131,13 @@ var fluidPlayerClass = {
             '    <li id="' + player.videoPlayerId + 'context_option_play">Play</li>' +
             '    <li id="' + player.videoPlayerId + 'context_option_mute">Mute</li>' +
             '    <li id="' + player.videoPlayerId + 'context_option_fullscreen">Fullscreen</li>' +
-            '    <li id="' + player.videoPlayerId + 'context_option_homepage">' +
-            '       <a ' +
-            '           id="' + player.videoPlayerId + 'context_option_homepage_link" ' +
-            '           href="' + player.homepage + '" ' +
-            '           target="_blank">' +
-            '           Fluid Player ' + player.version + '' +
-            '       </a>' +
-            '     </li>' +
+            '    <li id="' + player.videoPlayerId + 'context_option_homepage">Fluid Player ' + player.version + '</li>' +
             '</ul>';
 
         videoPlayerTag.parentNode.insertBefore(divContextMenu, videoPlayerTag.nextSibling);
 
         //Disable the default context menu
-        videoPlayerTag.addEventListener('contextmenu', function(event) {
+        playerWrapper.addEventListener('contextmenu', function(event) {
             event.preventDefault();
 
             divContextMenu.style.left = fluidPlayerClass.getEventOffsetX(event, videoPlayerTag) + 'px';
@@ -3155,7 +3157,7 @@ var fluidPlayerClass = {
         var menuOptionPlay       = document.getElementById(player.videoPlayerId + 'context_option_play');
         var menuOptionMute       = document.getElementById(player.videoPlayerId + 'context_option_mute');
         var menuOptionFullscreen = document.getElementById(player.videoPlayerId + 'context_option_fullscreen');
-        var menuOptionHomepageLink   = document.getElementById(player.videoPlayerId + 'context_option_homepage_link');
+        var menuOptionHomepage   = document.getElementById(player.videoPlayerId + 'context_option_homepage');
 
         menuOptionPlay.addEventListener('click', function() {
             player.playPauseToggle(videoPlayerTag);
@@ -3169,8 +3171,10 @@ var fluidPlayerClass = {
             player.fullscreenToggle();
         }, false);
 
-        menuOptionHomepageLink.style.color = 'inherit';
-        menuOptionHomepageLink.style.textDecoration = 'inherit';
+        menuOptionHomepage.addEventListener('click', function() {
+            var win = window.open(player.homepage, '_blank');
+            win.focus();
+        }, false);
     },
 
     setDefaultLayout: function() {
@@ -3405,6 +3409,15 @@ var fluidPlayerClass = {
         previewContainer.style.position = 'absolute';
 
         progressContainer.appendChild(previewContainer);
+
+        //Shadow is needed to not trigger mouseleave event, that stops showing thumbnails, in case one scrubs a bit too fast and leaves current thumb before new one drawn.
+        var previewContainerShadow = document.createElement('div');
+        previewContainerShadow.id = player.videoPlayerId + '_fluid_timeline_preview_container_shadow';
+        previewContainerShadow.className = 'fluid_timeline_preview_container_shadow';
+        previewContainerShadow.style.position = 'absolute';
+        previewContainerShadow.style.display = 'none';
+        previewContainerShadow.style.opacity = 1;
+        progressContainer.appendChild(previewContainerShadow);
     },
 
     getThumbnailCoordinates: function(second) {
@@ -3424,6 +3437,7 @@ var fluidPlayerClass = {
     drawTimelinePreview: function(event) {
         var player = this;
         var timelinePreviewTag = document.getElementById(player.videoPlayerId + '_fluid_timeline_preview_container');
+        var timelinePreviewShadow = document.getElementById(player.videoPlayerId + '_fluid_timeline_preview_container_shadow');
         var progressContainer = document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container');
         var totalWidth = progressContainer.clientWidth;
 
@@ -3444,10 +3458,13 @@ var fluidPlayerClass = {
 
             //get the corresponding thumbnail coordinates
             var thumbnailCoordinates = player.getThumbnailCoordinates(hoverSecond);
+            timelinePreviewShadow.style.width = totalWidth + 'px';
+            timelinePreviewShadow.style.display = 'block';
 
             if (thumbnailCoordinates !== false) {
                 timelinePreviewTag.style.width = thumbnailCoordinates.w + 'px';
                 timelinePreviewTag.style.height = thumbnailCoordinates.h + 'px';
+                timelinePreviewShadow.style.height = thumbnailCoordinates.h + 'px';
                 timelinePreviewTag.style.background =
                     'url(' + thumbnailCoordinates.image + ') no-repeat scroll -' + thumbnailCoordinates.x + 'px -' + thumbnailCoordinates.y + 'px';
                 timelinePreviewTag.style.left = hoverX - (thumbnailCoordinates.w / 2) + 'px';
@@ -3479,7 +3496,7 @@ var fluidPlayerClass = {
 
                     var isMobileChecks = fluidPlayerClass.getMobileOs();
                     var eventOn = 'mousemove';
-                    var eventOff = 'mouseout';
+                    var eventOff = 'mouseleave';
                     if (isMobileChecks.userOs) {
                         eventOn = 'touchmove';
                         eventOff = 'touchend';
@@ -3488,8 +3505,14 @@ var fluidPlayerClass = {
                     document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container')
                         .addEventListener(eventOn, player.drawTimelinePreview.bind(player), false);
                     document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container')
-                        .addEventListener(eventOff, function() {
+                        .addEventListener(eventOff, function(event) {
+                            var shadow = document.getElementById(player.videoPlayerId + '_fluid_timeline_preview_container_shadow');
+                            if (shadow === document.elementFromPoint(event.clientX, event.clientY)) {
+                                //False positive (Chrome bug when fast click causes leave event)
+                                return;
+                            }
                             document.getElementById(player.videoPlayerId + '_fluid_timeline_preview_container').style.display = 'none';
+                            shadow.style.display = 'none';
                         }, false);
 
                     player.generateTimelinePreviewTags();
@@ -3831,14 +3854,24 @@ var fluidPlayerClass = {
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
         player.newActivity = null;
 
-        var activity = function () {
+        var isMouseStillDown = false;
+
+        var activity = function (event) {
+            if (event.type === 'touchstart' || event.type === 'mousedown') {
+                isMouseStillDown = true;
+            }
+            if (event.type === 'touchend' || event.type === 'mouseup') {
+                isMouseStillDown = false;
+            }
             player.newActivity = true;
         };
 
         activityCheck = setInterval(function () {
 
             if (player.newActivity === true) {
-                player.newActivity = false;
+                if (!isMouseStillDown) {
+                    player.newActivity = false;
+                }
 
                 if (player.isUserActive === false || !player.isControlBarVisible()) {
                     var event = new CustomEvent("userActive");
@@ -3864,8 +3897,10 @@ var fluidPlayerClass = {
             }
         }, 300);
 
-        var listenTo = (fluidPlayerClass.isTouchDevice()) ? 'touchstart' : 'mousemove';
-        videoPlayer.addEventListener(listenTo, activity);
+        var listenTo = (fluidPlayerClass.isTouchDevice()) ? ['touchstart', 'touchmove', 'touchend'] : ['mousemove', 'mousedown', 'mouseup'];
+        for (var i = 0; i < listenTo.length; i++) {
+            videoPlayer.addEventListener(listenTo[i], activity);
+        }
     },
 
     hasControlBar: function () {
@@ -4294,6 +4329,9 @@ var fluidPlayerClass = {
 
             if (typeof(this.fluidStorage.fluidVolume) !== "undefined" && this.displayOptions.layoutControls.persistentSettings.volume) {
                 this.setVolume(this.fluidStorage.fluidVolume);
+                if (typeof(this.fluidStorage.fluidMute) !== "undefined" && this.fluidStorage.fluidMute == "true") {
+                    this.muteToggle(this.videoPlayerId);
+                }
             }
 
             if (typeof(this.fluidStorage.fluidQuality) !== "undefined" && this.displayOptions.layoutControls.persistentSettings.quality) {
@@ -4438,6 +4476,7 @@ var fluidPlayerClass = {
                 adTextPosition:               'top left',
                 adCTAText:                    'Visit now!',
                 adCTATextPosition:            'bottom right',
+                adClickable:                  true,
                 vastTimeout:                  5000,
                 showProgressbarMarkers:       false,
                 maxAllowedVastTagRedirects:   3,
@@ -4631,6 +4670,7 @@ var fluidPlayerClass = {
     setVolume: function(passedVolume) {
         var videoPlayer = document.getElementById(this.videoPlayerId);
         videoPlayer.volume = passedVolume;
+        this.latestVolume = passedVolume;
         this.fluidStorage.fluidVolume = passedVolume;
     },
 
