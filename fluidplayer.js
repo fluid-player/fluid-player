@@ -3115,6 +3115,7 @@ var fluidPlayerClass = {
     setCustomContextMenu: function() {
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
+        var playerWrapper = document.getElementById('fluid_video_wrapper_' + player.videoPlayerId);
 
         //Create own context menu
         var divContextMenu = document.createElement('div');
@@ -3139,7 +3140,7 @@ var fluidPlayerClass = {
         videoPlayerTag.parentNode.insertBefore(divContextMenu, videoPlayerTag.nextSibling);
 
         //Disable the default context menu
-        videoPlayerTag.addEventListener('contextmenu', function(event) {
+        playerWrapper.addEventListener('contextmenu', function(event) {
             event.preventDefault();
 
             divContextMenu.style.left = fluidPlayerClass.getEventOffsetX(event, videoPlayerTag) + 'px';
