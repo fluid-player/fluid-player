@@ -2794,7 +2794,7 @@ var fluidPlayerClass = {
         var videoInstanceId = fluidPlayerClass.getInstanceIdByWrapperId(playerElement.getAttribute('id'));
         var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
 
-        if (document.getElementById('fluid_video_wrapper_' + videoInstanceId).contains(document.elementFromPoint(event.clientX, event.clientY))) {
+        if (typeof event.clientX !== 'undefined' && document.getElementById('fluid_video_wrapper_' + videoInstanceId).contains(document.elementFromPoint(event.clientX, event.clientY))) {
             //false positive; we didn't actually leave the player
             return;
         }
@@ -3515,7 +3515,7 @@ var fluidPlayerClass = {
                     document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container')
                         .addEventListener(eventOff, function(event) {
                             var progress = document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container');
-                            if (progress.contains(document.elementFromPoint(event.clientX, event.clientY))) {
+                            if (typeof event.clientX !== 'undefined' && progress.contains(document.elementFromPoint(event.clientX, event.clientY))) {
                                 //False positive (Chrome bug when fast click causes leave event)
                                 return;
                             }
