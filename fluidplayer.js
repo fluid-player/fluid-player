@@ -712,6 +712,13 @@ var fluidPlayerClass = {
     },
 
     toggleLoader: function(showLoader) {
+        var player = this;
+        if (showLoader) {
+            player.isLoading = true;
+        } else {
+            player.isLoading = false;
+        }
+
         if (this.displayOptions.layoutControls.layout=== 'browser') {
             //The browser handles all the layout of the video tag
             return;
@@ -2782,8 +2789,20 @@ var fluidPlayerClass = {
         return newCurrentTime;
     },
 
+    handleMouseleave: function (event) {
+        var playerElement = this;
+        var videoInstanceId = fluidPlayerClass.getInstanceIdByWrapperId(playerElement.getAttribute('id'));
+        var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
 
-    handleMouseenter: function () {
+        if (document.getElementById('fluid_video_wrapper_' + videoInstanceId).contains(document.elementFromPoint(event.clientX, event.clientY))) {
+            //false positive; we didn't actually leave the player
+            return;
+        }
+
+        videoPlayerInstance.hideControlBar.call(playerElement);
+    },
+
+    handleMouseenterForKeyboard: function () {
         var videoInstanceId = fluidPlayerClass.getInstanceIdByWrapperId(this.getAttribute('id'));
         var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
         var videoPlayerTag = document.getElementById(videoInstanceId);
@@ -2845,19 +2864,8 @@ var fluidPlayerClass = {
 
     },
 
-    handleMouseleave: function () {
+    handleMouseleaveForKeyboard: function () {
         var player = this;
-        var videoInstanceId = fluidPlayerClass.getInstanceIdByWrapperId(player.getAttribute('id'));
-        var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
-        var videoPlayerTag = document.getElementById(videoInstanceId);
-
-        if (videoPlayerInstance.isCurrentlyPlayingAd && !videoPlayerTag.paused && videoPlayerInstance.displayOptions.layoutControls.layout !== 'browser') {
-            setTimeout(function() {
-                if (!videoPlayerInstance.isControlBarVisible()) {
-                    videoPlayerInstance.toggleAdCountdown(true);
-                }
-            }, 600);
-        }
 
         window.addEventListener('click', function (e) {
             var videoInstanceId = fluidPlayerClass.getInstanceIdByWrapperId(player.getAttribute('id'));
@@ -2881,8 +2889,8 @@ var fluidPlayerClass = {
         var player = this;
         var videoPlayer = document.getElementById('fluid_video_wrapper_' + player.videoPlayerId);
 
-        videoPlayer.addEventListener('click', player.handleMouseenter, false);
-        videoPlayer.addEventListener('mouseleave', player.handleMouseleave, false);
+        videoPlayer.addEventListener('click', player.handleMouseenterForKeyboard, false);
+        videoPlayer.addEventListener('mouseleave', player.handleMouseleaveForKeyboard, false);
     },
 
     initialPlay: function() {
@@ -3506,13 +3514,13 @@ var fluidPlayerClass = {
                         .addEventListener(eventOn, player.drawTimelinePreview.bind(player), false);
                     document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container')
                         .addEventListener(eventOff, function(event) {
-                            var shadow = document.getElementById(player.videoPlayerId + '_fluid_timeline_preview_container_shadow');
-                            if (shadow === document.elementFromPoint(event.clientX, event.clientY)) {
+                            var progress = document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container');
+                            if (progress.contains(document.elementFromPoint(event.clientX, event.clientY))) {
                                 //False positive (Chrome bug when fast click causes leave event)
                                 return;
                             }
                             document.getElementById(player.videoPlayerId + '_fluid_timeline_preview_container').style.display = 'none';
-                            shadow.style.display = 'none';
+                            document.getElementById(player.videoPlayerId + '_fluid_timeline_preview_container_shadow').style.display = 'none';
                         }, false);
 
                     player.generateTimelinePreviewTags();
@@ -3869,7 +3877,7 @@ var fluidPlayerClass = {
         activityCheck = setInterval(function () {
 
             if (player.newActivity === true) {
-                if (!isMouseStillDown) {
+                if (!isMouseStillDown && !player.isLoading) {
                     player.newActivity = false;
                 }
 
@@ -3882,7 +3890,6 @@ var fluidPlayerClass = {
                 clearTimeout(player.inactivityTimeout);
 
                 player.inactivityTimeout = setTimeout(function () {
-
                     if (player.newActivity !== true) {
                         player.isUserActive = false;
                         event = new CustomEvent("userInactive");
@@ -3927,9 +3934,11 @@ var fluidPlayerClass = {
             var fpLogo = document.getElementById(videoPlayerInstance.videoPlayerId + '_logo');
 
             if (videoPlayerInstance.displayOptions.layoutControls.controlBar.animated) {
-                videoPlayerInstance.fadeOut(divVastControls);
+                divVastControls.classList.remove('fade_in');
+                divVastControls.classList.add('fade_out');
                 if (fpLogo) {
-                    videoPlayerInstance.fadeOut(fpLogo);
+                    fpLogo.classList.remove('fade_in');
+                    fpLogo.classList.add('fade_out');
                 }
             } else {
                 divVastControls.style.display = 'none';
@@ -3957,9 +3966,11 @@ var fluidPlayerClass = {
             var fpLogo = document.getElementById(videoPlayerInstance.videoPlayerId + '_logo');
 
             if (videoPlayerInstance.displayOptions.layoutControls.controlBar.animated) {
-                videoPlayerInstance.fadeIn(divVastControls);
+                divVastControls.classList.remove('fade_out');
+                divVastControls.classList.add('fade_in');
                 if (fpLogo) {
-                    videoPlayerInstance.fadeIn(fpLogo);
+                    fpLogo.classList.remove('fade_out');
+                    fpLogo.classList.add('fade_in');
                 }
             } else {
                 divVastControls.style.display = 'block';
@@ -3972,32 +3983,6 @@ var fluidPlayerClass = {
         if (!fluidPlayerClass.isTouchDevice()) {
             videoPlayerTag.style.cursor = 'default';
         }
-    },
-
-    fadeOut: function (element) {
-        var opacity = 1;
-        var timer = setInterval(function () {
-            if (opacity <= 0.1) {
-                opacity = 0;
-                clearInterval(timer);
-            } else {
-                opacity -= 0.1;
-            }
-            element.style.opacity = opacity;
-        }, 50);
-    },
-
-    fadeIn: function (element) {
-        var opacity = 0.2;
-        var timer = setInterval(function () {
-            if (opacity >= 1) {
-                opacity = 1;
-                clearInterval(timer);
-            } else {
-                opacity += 0.2;
-            }
-            element.style.opacity = opacity;
-        }, 10);
     },
 
     linkControlBarUserActivity: function () {
@@ -4402,6 +4387,7 @@ var fluidPlayerClass = {
         player.hlsScriptLoaded         = false;
         player.isPlayingMedia          = false;
         player.isSwitchingSource       = false;
+        player.isLoading               = false;
         player.isInIframe              = player.inIframe();
         player.mainVideoReadyState     = false;
         player.xmlCollection           = [];
@@ -4626,6 +4612,18 @@ var fluidPlayerClass = {
 
             videoPlayer.play();
         }
+
+        var isMobileChecks = fluidPlayerClass.getMobileOs();
+        var eventEnter = 'mouseenter';
+        var eventLeave = 'mouseleave';
+        if (isMobileChecks.userOs) {
+            eventEnter = 'touchstart';
+            eventLeave = 'touchend';
+        }
+
+        var videoWrapper = document.getElementById('fluid_video_wrapper_' + videoPlayer.id);
+        videoWrapper.addEventListener(eventLeave, player.handleMouseleave, false);
+        videoWrapper.addEventListener(eventEnter, player.showControlBar, false);
 
         //Keyboard Controls
         if (player.displayOptions.layoutControls.keyboardControl) {
