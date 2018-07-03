@@ -430,16 +430,20 @@
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#ad000000',GradientType=0 ); /* IE6-9 */
     height: 53px;
     z-index: 1;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fade_out {
     visibility: hidden;
     opacity: 0;
     -webkit-transition: visibility 0.5s, opacity 0.5s; /* Safari */
     transition: visibility 0.5s, opacity 0.5s;
 }
 
-.fluid_video_wrapper.fluid_player_layout_default:hover .fluid_controls_container,
-.fluid_video_wrapper.fluid_player_layout_default:hover .fp_logo {
+.fluid_video_wrapper.fluid_player_layout_default .fade_in {
     visibility: visible;
     opacity: 1;
+    -webkit-transition: visibility 0.5s, opacity 0.5s; /* Safari */
+    transition: visibility 0.5s, opacity 0.5s;
 }
 
 .fluid_video_wrapper.fluid_player_layout_default.pseudo_fullscreen {
