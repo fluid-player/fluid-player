@@ -2864,11 +2864,15 @@ var fluidPlayerClass = {
 
     },
 
-    handleMouseleaveForKeyboard: function () {
+    keyboardControl: function () {
         var player = this;
+        var videoPlayer = document.getElementById('fluid_video_wrapper_' + player.videoPlayerId);
 
+        videoPlayer.addEventListener('click', player.handleMouseenterForKeyboard, false);
+
+        // When we click outside player, we stop registering keyboard events
         window.addEventListener('click', function (e) {
-            var videoInstanceId = fluidPlayerClass.getInstanceIdByWrapperId(player.getAttribute('id'));
+            var videoInstanceId = player.videoPlayerId;
             var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
 
             if (document.getElementById('fluid_video_wrapper_' + videoInstanceId).contains(e.target)
@@ -2883,14 +2887,6 @@ var fluidPlayerClass = {
                 }
             }
         });
-    },
-
-    keyboardControl: function () {
-        var player = this;
-        var videoPlayer = document.getElementById('fluid_video_wrapper_' + player.videoPlayerId);
-
-        videoPlayer.addEventListener('click', player.handleMouseenterForKeyboard, false);
-        videoPlayer.addEventListener('mouseleave', player.handleMouseleaveForKeyboard, false);
     },
 
     initialPlay: function() {
