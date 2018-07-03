@@ -4610,16 +4610,16 @@ var fluidPlayerClass = {
         }
 
         var isMobileChecks = fluidPlayerClass.getMobileOs();
-        var eventEnter = 'mouseenter';
-        var eventLeave = 'mouseleave';
-        if (isMobileChecks.userOs) {
-            eventEnter = 'touchstart';
-            eventLeave = 'touchend';
-        }
-
         var videoWrapper = document.getElementById('fluid_video_wrapper_' + videoPlayer.id);
-        videoWrapper.addEventListener(eventLeave, player.handleMouseleave, false);
-        videoWrapper.addEventListener(eventEnter, player.showControlBar, false);
+        if (!isMobileChecks.userOs) {
+            videoWrapper.addEventListener('mouseleave', player.handleMouseleave, false);
+            videoWrapper.addEventListener('mouseenter', player.showControlBar, false);
+        } else {
+            //On mobile mouseleave behavior does not make sense, so it's better to keep controls, once the playback starts
+            //Autohide behavior on timer is a separate functionality
+            player.hideControlBar.call(videoWrapper);
+            videoWrapper.addEventListener('touchstart', player.showControlBar, false);
+        }
 
         //Keyboard Controls
         if (player.displayOptions.layoutControls.keyboardControl) {
