@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 2.4.2
+* [Pull #235](https://github.com/fluid-player/fluid-player/pull/235) [Pull #236](https://github.com/fluid-player/fluid-player/pull/236) Fix the controls randomly disappearing on scrubbing clicks
+
 ## 2.4.1
 * [Pull #228](https://github.com/fluid-player/fluid-player/pull/228) Persistent volume settings from before mute on page navigation 
 * [Pull #229](https://github.com/fluid-player/fluid-player/pull/229) Link to FP on menu button working correctly
