@@ -1,0 +1,23 @@
+{
+  "name": "insma/fluid-player",
+  "description": "Fluid Player is a new free HTML5 video player. It is lightweight, easy to integrate and has advanced VAST capabilities.",
+  "keywords": [
+    "video player",
+    "Fluid Player",
+    "lightweight",
+    "advanced"
+  ],
+  "type": "yii2-extension",
+  "license": "MIT",
+  "support": {
+    "issues": "https://github.com/fluid-player/fluid-player/issues?state=open",
+    "wiki": "https://docs.fluidplayer.com/",
+    "source": "https://github.com/fluid-player/fluid-player"
+  },
+  "authors": [
+    {
+      "name": "fluid-player",
+      "email": "privacy@fluidplayer.com"
+    }
+  ],
+}
