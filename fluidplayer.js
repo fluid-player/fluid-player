@@ -3284,6 +3284,10 @@ var fluidPlayerClass = {
             player.playPauseToggle(videoPlayerTag);
         }, false);
 
+        document.getElementById(this.videoPlayerId).addEventListener('dblclick', function() {
+            player.fullscreenToggle();
+        }, false);
+
         switch (this.displayOptions.layoutControls.layout) {
             case 'browser':
                 //Nothing special to do here at this point.
