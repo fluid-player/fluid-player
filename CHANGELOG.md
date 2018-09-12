@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## Master
+* [Pull #266](https://github.com/fluid-player/fluid-player/pull/266) Fix play pause issue on mobile
+
 ## 2.4.2
 * [Pull #235](https://github.com/fluid-player/fluid-player/pull/235) [Pull #236](https://github.com/fluid-player/fluid-player/pull/236) Fix the controls randomly disappearing on scrubbing clicks
 
