@@ -3820,9 +3820,11 @@ var fluidPlayerClass = {
         containerDiv.className = 'fluid_html_on_pause';
         backgroundColor = (player.displayOptions.layoutControls.primaryColor) ? player.displayOptions.layoutControls.primaryColor : "#333333";
         containerDiv.innerHTML = '<div id="' + player.videoPlayerId + '_fluid_initial_play" class="fluid_initial_play" style="background-color:' + backgroundColor + '"><div id="' + player.videoPlayerId + '_fluid_state_button" class="fluid_initial_play_button"></div></div>';
-        containerDiv.onclick = function(event) {
+        var initPlayFunction = function() {
             player.playPauseToggle(videoPlayer);
+            containerDiv.removeEventListener('click', initPlayFunction);
         };
+        containerDiv.addEventListener('click', initPlayFunction);
 
         // If the user has chosen to not show the play button we'll make it invisible
         // We don't hide altogether because animations might still be used
