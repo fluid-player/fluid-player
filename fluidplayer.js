@@ -2522,9 +2522,11 @@ var fluidPlayerClass = {
         return evt.clientY - y;
     },
 
-    onProgressbarMouseDown: function(videoPlayerId) {
+    onProgressbarMouseDown: function(videoPlayerId, event) {
         var player = fluidPlayerClass.getInstanceById(videoPlayerId);
         player.displayOptions.layoutControls.playPauseAnimation = false;
+        // we need an initial position for touchstart events, as mouse up has no offset x for iOS
+        var initialPosition = fluidPlayerClass.getEventOffsetX(event, document.getElementById(videoPlayerId + '_fluid_controls_progress_container'));
 
         if (player.isCurrentlyPlayingAd) {
             return;
@@ -2547,6 +2549,7 @@ var fluidPlayerClass = {
 
         function onProgressbarMouseMove (event) {
             var currentX = fluidPlayerClass.getEventOffsetX(event, document.getElementById(videoPlayerId + '_fluid_controls_progress_container'));
+            initialPosition = NaN; // mouse up will fire after the move, we don't want to trigger the initial position in the event of iOS
             shiftTime(videoPlayerId, currentX);
             player.contolProgressbarUpdate(player.videoPlayerId);
             player.contolDurationUpdate(player.videoPlayerId);
@@ -2558,6 +2561,10 @@ var fluidPlayerClass = {
             document.removeEventListener('mouseup', onProgressbarMouseUp);
             document.removeEventListener('touchend', onProgressbarMouseUp);
             var clickedX = fluidPlayerClass.getEventOffsetX(event, document.getElementById(videoPlayerId + '_fluid_controls_progress_container'));
+            if (isNaN(clickedX) && !isNaN(initialPosition)) {
+                clickedX = initialPosition;
+            }
+
             if (!isNaN(clickedX)) {
                 shiftTime(videoPlayerId, clickedX);
             }
@@ -3030,20 +3037,15 @@ var fluidPlayerClass = {
             player.contolDurationUpdate(player.videoPlayerId);
         });
 
-        document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container').addEventListener('mousedown', function(event) {
-            player.onProgressbarMouseDown(player.videoPlayerId);
+        var isMobileChecks = fluidPlayerClass.getMobileOs();
+        var eventOn = (isMobileChecks.userOs) ? 'touchstart' : 'mousedown';
+
+        document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container').addEventListener(eventOn, function(event) {
+            player.onProgressbarMouseDown(player.videoPlayerId, event);
         }, false);
 
-        document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container').addEventListener('touchstart', function(event) {
-            player.onProgressbarMouseDown(player.videoPlayerId);
-        }, false);
-
-        //Set the volume contols
-        document.getElementById(player.videoPlayerId + '_fluid_control_volume_container').addEventListener('mousedown', function(event) {
-            player.onVolumebarMouseDown(player.videoPlayerId);
-        }, false);
-
-        document.getElementById(player.videoPlayerId + '_fluid_control_volume_container').addEventListener('touchstart', function(event) {
+        //Set the volume controls
+        document.getElementById(player.videoPlayerId + '_fluid_control_volume_container').addEventListener(eventOn, function(event) {
             player.onVolumebarMouseDown(player.videoPlayerId);
         }, false);
 
