@@ -164,7 +164,7 @@ var fluidPlayerClass = {
     },
 
     /**
-     * Distinguises iOS from Android devices and the OS version.
+     * Distinguishes iOS from Android devices and the OS version.
      *
      * @returns object
      */
@@ -2035,8 +2035,7 @@ var fluidPlayerClass = {
         };
 
         var clickthroughLayer = document.getElementById('vast_clickthrough_layer_' + player.videoPlayerId);
-        var deviceInfo = fluidPlayerClass.getMobileOs();
-        var isIos9orLower = (deviceInfo.device === 'iPhone') && (deviceInfo.userOsMajor !== false) && (deviceInfo.userOsMajor <= 9);
+        var isIos9orLower = (player.mobileInfo.device === 'iPhone') && (player.mobileInfo.userOsMajor !== false) && (player.mobileInfo.userOsMajor <= 9);
 
         clickthroughLayer.onclick = function() {
             if (videoPlayerTag.paused) {
@@ -2957,13 +2956,12 @@ var fluidPlayerClass = {
         } else {
             //Workaround for Safari or Mobile Chrome - otherwise it blocks the subsequent
             //play() command, because it considers it not being triggered by the user.
-            var isMobileChecks = fluidPlayerClass.getMobileOs();
             var browserVersion = fluidPlayerClass.getBrowserVersion();
             player.isCurrentlyPlayingAd = true;
 
             if (
                 browserVersion.browserName == 'Safari'
-                || (isMobileChecks.userOs !== false && isMobileChecks.userOs == 'Android' && browserVersion.browserName == 'Google Chrome')
+                || (player.mobileInfo.userOs !== false && player.mobileInfo.userOs == 'Android' && browserVersion.browserName == 'Google Chrome')
             ) {
                 videoPlayerTag.src = fluidPlayerScriptLocation + 'blank.mp4';
                 videoPlayerTag.play();
@@ -3500,10 +3498,9 @@ var fluidPlayerClass = {
                         player.setupThumbnailPreviewVtt.bind(this)
                     );
 
-                    var isMobileChecks = fluidPlayerClass.getMobileOs();
                     var eventOn = 'mousemove';
                     var eventOff = 'mouseleave';
-                    if (isMobileChecks.userOs) {
+                    if (player.mobileInfo.userOs) {
                         eventOn = 'touchmove';
                         eventOff = 'touchend';
                     }
@@ -3589,6 +3586,7 @@ var fluidPlayerClass = {
         player.videoSources = sources;
         if (player.videoSources.length > 1) {
             var sourceChangeButton = document.getElementById(player.videoPlayerId + '_fluid_control_video_source');
+            var appendSourceChange = false;
 
             var sourceChangeList = document.createElement('div');
             sourceChangeList.id = player.videoPlayerId + '_fluid_control_video_source_list';
@@ -3597,6 +3595,12 @@ var fluidPlayerClass = {
 
             var firstSource = true;
             player.videoSources.forEach(function(source) {
+                // Fix for issues occurring on iOS with mkv files
+                var getTheType = source.url.split(".").pop();
+                if (player.mobileInfo.userOs == "iOS" && getTheType == 'mkv') {
+                    return;
+                }
+
                 var sourceSelected = (firstSource) ? "source_selected" :  "";
                 var hdElement = (source.isHD) ? '<sup style="color:' + player.displayOptions.layoutControls.primaryColor + '" class="fp_hd_source"></sup>' : '';
                 firstSource = false;
@@ -3630,12 +3634,18 @@ var fluidPlayerClass = {
 
                 });
                 sourceChangeList.appendChild(sourceChangeDiv);
+                appendSourceChange = true;
             });
 
-            sourceChangeButton.appendChild(sourceChangeList);
-            sourceChangeButton.addEventListener('click', function() {
-                player.openCloseVideoSourceSwitch();
-            });
+            if (appendSourceChange) {
+                sourceChangeButton.appendChild(sourceChangeList);
+                sourceChangeButton.addEventListener('click', function() {
+                    player.openCloseVideoSourceSwitch();
+                });
+            } else {
+                // Didn't give any source options
+                document.getElementById(player.videoPlayerId + '_fluid_control_video_source').style.display = 'none';
+            }
 
         } else {
             // No other video sources
@@ -3669,6 +3679,11 @@ var fluidPlayerClass = {
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
+        if (player.mobileInfo.userOs == "iOS" && url.indexOf('.mkv') > 0) {
+            console.log('[FP_ERROR] .mkv files not supported by iOS devices.');
+            return false;
+        }
+
         if (player.isCurrentlyPlayingAd) {
             player.originalSrc = url;
         } else {
@@ -3676,7 +3691,7 @@ var fluidPlayerClass = {
             var play = false;
             if (!videoPlayerTag.paused) {
                 videoPlayerTag.pause();
-                var play = true;
+                play = true;
             }
 
             var currentTime = videoPlayerTag.currentTime;
@@ -3697,7 +3712,7 @@ var fluidPlayerClass = {
             videoPlayerTag.currentTime = newCurrentTime;
             videoPlayerTag.removeEventListener('loadedmetadata', loadedMetadata);
             // Safari ios fix to set currentTime
-            if (fluidPlayerClass.getMobileOs().userOs == 'iOS') {
+            if (player.mobileInfo.userOs == 'iOS') {
                 videoPlayerTag.addEventListener('playing', videoPlayStart);
             }
 
@@ -4394,6 +4409,7 @@ var fluidPlayerClass = {
         player.inLineFound             = null;
         player.fluidStorage            = {};
         player.fluidPseudoPause        = false;
+        player.mobileInfo              = fluidPlayerClass.getMobileOs();
 
         //Default options
         player.displayOptions = {
@@ -4613,9 +4629,8 @@ var fluidPlayerClass = {
             videoPlayer.play();
         }
 
-        var isMobileChecks = fluidPlayerClass.getMobileOs();
         var videoWrapper = document.getElementById('fluid_video_wrapper_' + videoPlayer.id);
-        if (!isMobileChecks.userOs) {
+        if (!player.mobileInfo.userOs) {
             videoWrapper.addEventListener('mouseleave', player.handleMouseleave, false);
             videoWrapper.addEventListener('mouseenter', player.showControlBar, false);
         } else {
