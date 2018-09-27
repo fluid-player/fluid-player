@@ -919,22 +919,16 @@ var fluidPlayerClass = {
         var handleXmlHttpReq = function () {
             var xmlHttpReq = this;
 
-
-            if (xmlHttpReq.readyState === 4 && xmlHttpReq.status === 404) {
-                player.stopProcessAndReportError(adListId);
+            if (xmlHttpReq.readyState !== 4) {
                 return;
             }
 
-            if (xmlHttpReq.readyState === 4 && xmlHttpReq.status === 0) {
-                player.stopProcessAndReportError(adListId); //Most likely that Ad Blocker exists
+            if (xmlHttpReq.status === 204) {
+                player.switchToMainVideo();
                 return;
             }
 
-            if (!((xmlHttpReq.readyState === 4) && (xmlHttpReq.status === 200))) {
-                return;
-            }
-
-            if ((xmlHttpReq.readyState === 4) && (xmlHttpReq.status !== 200)) {
+            if (xmlHttpReq.status !== 200) {
                 player.stopProcessAndReportError(adListId);
                 return;
             }
