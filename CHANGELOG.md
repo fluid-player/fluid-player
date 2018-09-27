@@ -2,6 +2,8 @@
 
 ## Master
 * [Pull #266](https://github.com/fluid-player/fluid-player/pull/266) Fix play pause issue on mobile
+* [Pull #268](https://github.com/fluid-player/fluid-player/pull/268) Fix iOS scrubbing bugs
+* [Pull #270](https://github.com/fluid-player/fluid-player/pull/270) Fix for iOS switching to unsupported file types
 
 ## 2.4.2
 * [Pull #235](https://github.com/fluid-player/fluid-player/pull/235) [Pull #236](https://github.com/fluid-player/fluid-player/pull/236) Fix the controls randomly disappearing on scrubbing clicks
