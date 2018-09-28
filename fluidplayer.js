@@ -924,7 +924,7 @@ var fluidPlayerClass = {
             }
 
             if (xmlHttpReq.status === 204) {
-                player.switchToMainVideo();
+                player.stopProcessAndReportError(adListId, 303);
                 return;
             }
 
@@ -985,7 +985,7 @@ var fluidPlayerClass = {
      *
      * @param adListId
      */
-    stopProcessAndReportError: function(adListId) {
+    stopProcessAndReportError: function(adListId, errorCode) {
         var player = this;
 
         //Set the error flag for the Ad
@@ -994,7 +994,7 @@ var fluidPlayerClass = {
         //The response returned an error. Proceeding with the main video.
         //Try to switch main video only if it is a preRoll scenario
         if (typeof adListId !== 'undefined' && player.adList[adListId]['roll'] == 'preRoll') {
-            player.playMainVideoWhenVastFails(900);
+            player.playMainVideoWhenVastFails(errorCode || 900);
         } else {
             player.announceLocalError(101);
         }
