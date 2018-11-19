@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## Master
+* [Pull #289](https://github.com/fluid-player/fluid-player/pull/289) Fix window.getComputedStyle call on null
+
 ## 2.4.3
 * [Pull #266](https://github.com/fluid-player/fluid-player/pull/266) Fix play pause issue on mobile
 * [Pull #268](https://github.com/fluid-player/fluid-player/pull/268) Fix iOS scrubbing bugs
