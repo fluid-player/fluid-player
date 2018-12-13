@@ -4270,7 +4270,7 @@ var fluidPlayerClass = {
                 }
                 break;
             case 'application/x-mpegURL': // HLS
-                if (!this.hlsScriptLoaded) { // First time trying adding in DASH streamer, get the script
+                if (!this.hlsScriptLoaded && !window.Hls) { // First time trying adding in DASH streamer, get the script
                     this.hlsScriptLoaded = true;
                     fluidPlayerClass.requestScript('https://cdn.jsdelivr.net/npm/hls.js@latest', this.initialiseHls.bind(this));
                 } else {
@@ -4295,7 +4295,7 @@ var fluidPlayerClass = {
 
     initialiseHls: function() {
         if (Hls.isSupported()) {
-            var hls = new Hls();
+            var hls = new Hls(this.displayOptions.hlsjsConfig);
             hls.attachMedia(document.getElementById(this.videoPlayerId));
             hls.loadSource(this.originalSrc);
             this.hlsPlayer = hls;
@@ -4507,6 +4507,11 @@ var fluidPlayerClass = {
                     noVastVideoCallback:      (function() {}),
                     vastVideoSkippedCallback: (function() {}),
                     vastVideoEndedCallback:   (function() {})
+                }
+            },
+            hlsjsConfig: {
+                p2pConfig: {
+                    logLevel: false,
                 }
             }
         };
