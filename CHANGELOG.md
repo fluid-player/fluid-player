@@ -1,9 +1,9 @@
 # CHANGELOG
 
-## Master
+## 2.4.4
 * [Pull #289](https://github.com/fluid-player/fluid-player/pull/289) Fix window.getComputedStyle call on null
 * [Pull #290](https://github.com/fluid-player/fluid-player/pull/290) Prevent multi click event on download btn
-* [Pull #293](https://github.com/fluid-player/fluid-player/pull/293) check if Hls already exposed in window
+* [Pull #293](https://github.com/fluid-player/fluid-player/pull/293) Check if Hls already exposed in window
 
 ## 2.4.3
 * [Pull #266](https://github.com/fluid-player/fluid-player/pull/266) Fix play pause issue on mobile
