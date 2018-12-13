@@ -4126,6 +4126,19 @@ var fluidPlayerClass = {
         if (player.displayOptions.layoutControls.allowDownload) {
             downloadClick = document.createElement('a');
             downloadClick.id = this.videoPlayerId + '_download';
+            downloadClick.onclick = function(e) {
+                var linkItem = this;
+
+                if (typeof e.stopImmediatePropagation !== 'undefined') {
+                    e.stopImmediatePropagation();
+                }
+
+                setInterval(function() {
+                    linkItem.download = '';
+                    linkItem.href = '';
+                }, 100);
+            };
+
             downloadOption.appendChild(downloadClick);
 
             downloadOption.addEventListener('click', function() {
