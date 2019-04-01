@@ -4253,7 +4253,14 @@ var fluidPlayerClass = {
             var containerDiv = document.createElement('div');
             containerDiv.id = this.videoPlayerId + '_fluid_pseudo_poster';
             containerDiv.className = 'fluid_pseudo_poster';
-            containerDiv.style.background = "url('" + this.displayOptions.layoutControls.posterImage + "') center center / contain no-repeat black";
+
+            if (['auto', 'contain', 'cover'].indexOf(this.displayOptions.layoutControls.posterImageSize) === -1) {
+                console.log('[FP_ERROR] Not allowed value in posterImageSize');
+                return;
+            }
+
+            containerDiv.style.background = "url('" + this.displayOptions.layoutControls.posterImage + "') center center / "
+                + this.displayOptions.layoutControls.posterImageSize + " no-repeat black";
             document.getElementById(this.videoPlayerId).parentNode.insertBefore(containerDiv, null);
         }
     },
@@ -4436,6 +4443,7 @@ var fluidPlayerClass = {
                 mediaType:                    player.getCurrentSrcType(),
                 primaryColor:                 false,
                 posterImage:                  false,
+                posterImageSize:              'contain',
                 adProgressColor:              '#f9d300',
                 playButtonShowing:            true,
                 playPauseAnimation:           true,
