@@ -3280,8 +3280,13 @@ var fluidPlayerClass = {
 
         //All other browsers
         var listenTo = (fluidPlayerClass.isTouchDevice()) ? 'touchend' : 'click';
+
         document.getElementById(this.videoPlayerId).addEventListener(listenTo, function() {
-            player.playPauseToggle(videoPlayerTag);
+            if (!player.displayOptions.layoutControls.playOnlyOnPlay && videoPlayerTag.paused) {
+                player.playPauseToggle(videoPlayerTag);
+            } else if (!player.displayOptions.layoutControls.pauseOnlyOnPause && !videoPlayerTag.paused) {
+                player.playPauseToggle(videoPlayerTag);
+            }
         }, false);
 
         switch (this.displayOptions.layoutControls.layout) {
@@ -4442,6 +4447,8 @@ var fluidPlayerClass = {
                 closeButtonCaption:           'Close', // Remove?
                 fillToContainer:              false,
                 autoPlay:                     false,
+                playOnlyOnPlay:               false,
+                pauseOnlyOnPause:             false,
                 mute:                         false,
                 loop:                         null,
                 keyboardControl:              true,
