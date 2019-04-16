@@ -2205,6 +2205,12 @@ var fluidPlayerClass = {
         } else {
             playPauseButton.className = playPauseButton.className.replace(/\bfluid_button_pause\b/g, 'fluid_button_play');
             controlsDisplay.classList.add('initial_controls_show');
+
+            if (this.isCurrentlyPlayingAd && player.displayOptions.vastOptions.showPlayButton) {
+                document.getElementById(videoPlayerId + '_fluid_initial_play').style.display = "block";
+                document.getElementById(videoPlayerId + '_fluid_initial_play_button').style.opacity = "0";
+            }
+
             if (fpLogo) {
                 fpLogo.classList.add('initial_controls_show');
             }
@@ -4500,6 +4506,7 @@ var fluidPlayerClass = {
                 adClickable:                  true,
                 vastTimeout:                  5000,
                 showProgressbarMarkers:       false,
+                showPlayButton:               false,
                 maxAllowedVastTagRedirects:   3,
 
                 vastAdvanced: {
