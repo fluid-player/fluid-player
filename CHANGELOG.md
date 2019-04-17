@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## Master
+* [Pull #325](https://github.com/fluid-player/fluid-player/pull/325) Add poster image size option (posterImageSize)
+
 ## 2.4.4
 * [Pull #289](https://github.com/fluid-player/fluid-player/pull/289) Fix window.getComputedStyle call on null
 * [Pull #290](https://github.com/fluid-player/fluid-player/pull/290) Prevent multi click event on download btn
