@@ -3297,6 +3297,105 @@ var fluidPlayerClass = {
         }
     },
 
+    setCustomStyles: function() {
+        var style = document.createElement('style');
+
+        var iconsStyles = '';
+        var controls_icons = [
+            {
+                name: 'fluid_button_play',
+                position: 'background-position: -15px -19px;',
+            },
+            {
+                name: 'fluid_button_pause',
+                position: 'background-position: -15px -57px;',
+            },
+            {
+                name: 'fluid_button_volume',
+                position: 'background-position: -52px -19px;',
+            },
+            {
+                name: 'fluid_button_mute',
+                position: 'background-position: -15px -19px;',
+            },
+            {
+                name: 'fluid_button_video_source',
+                position: 'background-position: -122px -19px;',
+            },
+            {
+                name: 'fluid_button_fullscreen',
+                position: 'background-position: -88px -19px;',
+            },
+            {
+                name: 'fluid_button_fullscreen_exit',
+                position: 'background-position: -88px -57px;',
+            },
+            {
+                name: 'fluid_button_playback_rate',
+                position: 'background-position: -232px -19px;',
+            },
+            {
+                name: 'fluid_button_download',
+                position: 'background-position: -194px -18px;',
+            },
+            {
+                name: 'fluid_button_theatre',
+                position: 'background-position: -195px -56px;',
+            },
+        ]
+
+        if (this.displayOptions.icons.icons) {
+            controls_icons.map((control, index) => {
+                iconsStyles += ".fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button." + control.name + ":before";
+
+                iconsStyles += controls_icons.length -1 !== index ?  "," : " {";
+            })
+
+            iconsStyles += "background: url('" + this.displayOptions.icons.icons + "') no-repeat; }";
+
+            controls_icons.map((control) => {
+                iconsStyles += " .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button." + control.name + ":before {" +
+                control.position + "} ";
+            })
+                
+            iconsStyles += 
+                ".add_icon_clickthrough:before {" +
+                    "background: url('" + this.displayOptions.icons.icons + "') no-repeat;" +
+                    "background-position: -162px -57px;" +
+                "}";
+                ".source_button_icon {" +
+                    "background: url('" + this.displayOptions.icons.icons + "') no-repeat;" +
+                    "background-position: -164px -21px;" +
+                "}";
+        }
+
+        if (this.displayOptions.icons.close_icon) {
+            iconsStyles +=
+                ".close_button {" +
+                    "background: #000000 url('" + this.displayOptions.icons.close_icon + "') no-repeat scroll center center;" +
+                    "background-size: 18px 18px;" +
+                "}";
+        }
+
+        if (this.displayOptions.icons.spinner) {
+            iconsStyles +=
+                ".fluid_video_wrapper .vast_video_loading:before {" +
+                    "background-image: url('" + this.displayOptions.icons.spinner + "');" +
+                "}";
+        }
+
+        if (iconsStyles.length === 0) {
+            return;
+        }
+
+        style.innerHTML =iconsStyles
+
+        var player = this;
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);
+
+        videoPlayerTag.parentNode.insertBefore(style, videoPlayerTag);
+    },
+
     handleFullscreen: function() {
         var player = this;
 
@@ -4513,6 +4612,11 @@ var fluidPlayerClass = {
                 p2pConfig: {
                     logLevel: false,
                 }
+            },
+            icons: {
+                icons: '',
+                close_icon: '',
+                spinner: ''
             }
         };
 
@@ -4547,6 +4651,8 @@ var fluidPlayerClass = {
         }
 
         player.setLayout();
+
+        player.setCustomStyles();
 
         //Set the volume control state
         player.latestVolume = videoPlayer.volume;
