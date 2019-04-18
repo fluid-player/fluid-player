@@ -2230,9 +2230,10 @@ var fluidPlayerClass = {
         }
 
         document.getElementById(videoPlayerId + '_fluid_initial_play').classList.add('transform-active');
+        var videoPlayerSaveId = videoPlayerId;
         setTimeout(
             function() {
-                document.getElementById(videoPlayerId + '_fluid_initial_play').classList.remove('transform-active');
+                document.getElementById(videoPlayerSaveId + '_fluid_initial_play').classList.remove('transform-active');
             },
             800
         );
@@ -2250,9 +2251,30 @@ var fluidPlayerClass = {
         var player = fluidPlayerClass.getInstanceById(videoPlayerId);
 
         var videoPlayerTag = document.getElementById(videoPlayerId);
-        var durationText = player.pad(parseInt(videoPlayerTag.currentTime / 60)) + ':' + player.pad(parseInt(videoPlayerTag.currentTime % 60)) +
-            ' / ' +
-            player.pad(parseInt(player.currentVideoDuration / 60)) + ':' + player.pad(parseInt(player.currentVideoDuration % 60));
+
+        var totalTimeDateObject = new Date(player.currentVideoDuration * 1000);
+        var totalHours = player.pad(totalTimeDateObject.getUTCHours());
+        var totalMinutes = player.pad(totalTimeDateObject.getUTCMinutes());
+        var totalSeconds = player.pad(totalTimeDateObject.getSeconds());
+
+        if (totalHours >= 1) {
+            var totalTime = totalHours + ':' + totalMinutes + ':' + totalSeconds; 
+        } else {
+            var totalTime = totalMinutes + ':' + totalSeconds;
+        }
+
+        var currentTimeDateObject = new Date(videoPlayerTag.currentTime * 1000);
+        var currentHours = player.pad(currentTimeDateObject.getUTCHours());
+        var currentMinutes = player.pad(currentTimeDateObject.getUTCMinutes());
+        var currentSeconds = player.pad(currentTimeDateObject.getSeconds());
+
+        if (currentHours >= 1) {
+            var currentPlayTime = currentHours + ':' + currentMinutes + ':' + currentSeconds; 
+        }  else {
+            var currentPlayTime = currentMinutes + ':' + currentSeconds;
+        }
+
+        var durationText =  currentPlayTime + ' / ' + totalTime;
 
         var timePlaceholder = document.getElementById(videoPlayerId + '_fluid_control_duration');
         timePlaceholder.innerHTML = durationText;
@@ -3105,7 +3127,18 @@ var fluidPlayerClass = {
             var hoverQ = fluidPlayerClass.getEventOffsetX(event, progressContainer);
 
             hoverSecondQ = player.currentVideoDuration * hoverQ / totalWidth;
-            showad = player.pad(parseInt(hoverSecondQ / 60)) + ':' + player.pad(parseInt(hoverSecondQ % 60));
+
+            var hoverTimeObject = new Date(hoverSecondQ * 1000);
+            var hoverHours = player.pad(hoverTimeObject.getUTCHours());
+            var hoverMinutes = player.pad(hoverTimeObject.getUTCMinutes());
+            var hoverSeconds = player.pad(hoverTimeObject.getSeconds());
+
+            if (hoverHours >= 1) {
+                var showad = hoverHours + ':' + hoverMinutes + ':' + hoverSeconds;
+            } else {
+                var showad = hoverMinutes + ':' + hoverSeconds;
+            }
+
             hoverTimeItem.innerText = showad;
 
             hoverTimeItem.style.display = 'block';
