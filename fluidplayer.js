@@ -2247,34 +2247,30 @@ var fluidPlayerClass = {
         currentProgressTag.style.width = (videoPlayerTag.currentTime / player.currentVideoDuration * 100) + '%';
     },
 
+    //Format time to hh:mm:ss
+    formatTime: function(duration) {
+      var formatDateObj = new Date(duration * 1000);
+      var formatHours = this.pad(formatDateObj.getUTCHours());
+      var formatMinutes = this.pad(formatDateObj.getUTCMinutes());
+      var formatSeconds = this.pad(formatDateObj.getSeconds());
+
+      if (formatHours >= 1) {
+        var result = formatHours + ':' + formatMinutes + ':' + formatSeconds;
+      } else {
+        var result = formatMinutes + ':' + formatSeconds;
+      }
+
+      return result;
+    },
+
     contolDurationUpdate: function(videoPlayerId) {
         var player = fluidPlayerClass.getInstanceById(videoPlayerId);
-
         var videoPlayerTag = document.getElementById(videoPlayerId);
 
-        var totalTimeDateObject = new Date(player.currentVideoDuration * 1000);
-        var totalHours = player.pad(totalTimeDateObject.getUTCHours());
-        var totalMinutes = player.pad(totalTimeDateObject.getUTCMinutes());
-        var totalSeconds = player.pad(totalTimeDateObject.getSeconds());
+        var currentPlayTime = player.formatTime(videoPlayerTag.currentTime);
+        var totalTime = player.formatTime(player.currentVideoDuration);
 
-        if (totalHours >= 1) {
-            var totalTime = totalHours + ':' + totalMinutes + ':' + totalSeconds; 
-        } else {
-            var totalTime = totalMinutes + ':' + totalSeconds;
-        }
-
-        var currentTimeDateObject = new Date(videoPlayerTag.currentTime * 1000);
-        var currentHours = player.pad(currentTimeDateObject.getUTCHours());
-        var currentMinutes = player.pad(currentTimeDateObject.getUTCMinutes());
-        var currentSeconds = player.pad(currentTimeDateObject.getSeconds());
-
-        if (currentHours >= 1) {
-            var currentPlayTime = currentHours + ':' + currentMinutes + ':' + currentSeconds; 
-        }  else {
-            var currentPlayTime = currentMinutes + ':' + currentSeconds;
-        }
-
-        var durationText =  currentPlayTime + ' / ' + totalTime;
+        var durationText = currentPlayTime + ' / ' + totalTime;
 
         var timePlaceholder = document.getElementById(videoPlayerId + '_fluid_control_duration');
         timePlaceholder.innerHTML = durationText;
@@ -3127,23 +3123,11 @@ var fluidPlayerClass = {
             var hoverQ = fluidPlayerClass.getEventOffsetX(event, progressContainer);
 
             hoverSecondQ = player.currentVideoDuration * hoverQ / totalWidth;
-
-            var hoverTimeObject = new Date(hoverSecondQ * 1000);
-            var hoverHours = player.pad(hoverTimeObject.getUTCHours());
-            var hoverMinutes = player.pad(hoverTimeObject.getUTCMinutes());
-            var hoverSeconds = player.pad(hoverTimeObject.getSeconds());
-
-            if (hoverHours >= 1) {
-                var showad = hoverHours + ':' + hoverMinutes + ':' + hoverSeconds;
-            } else {
-                var showad = hoverMinutes + ':' + hoverSeconds;
-            }
-
+            showad = player.formatTime(hoverSecondQ);
             hoverTimeItem.innerText = showad;
 
             hoverTimeItem.style.display = 'block';
             hoverTimeItem.style.left = (hoverSecondQ / videoPlayer.duration * 100) + "%";
-
         }, false);
 
         // Hide timeline preview on mouseout
