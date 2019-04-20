@@ -868,6 +868,11 @@ var fluidPlayerClass = {
 
                     player.displayOptions.vastOptions.vastAdvanced.vastLoadedCallback();
 
+                    if (player.hasTitle()) {
+                      var title = document.getElementById(player.videoPlayerId + '_title');
+                      title.style.display = 'none';
+                    }
+
                 } else {
 
                     player.stopProcessAndReportError(adListId);
@@ -1680,6 +1685,11 @@ var fluidPlayerClass = {
 
         if (player.displayOptions.vastOptions.showProgressbarMarkers) {
             player.showAdMarkers();
+        }
+
+        if (player.hasTitle()) {
+          var title = document.getElementById(player.videoPlayerId + '_title');
+          title.style.display = 'inline';
         }
     },
 
@@ -2806,6 +2816,7 @@ var fluidPlayerClass = {
         }
 
         videoPlayerInstance.hideControlBar.call(playerElement);
+        videoPlayerInstance.hideTitle.call(playerElement);
     },
 
     handleMouseenterForKeyboard: function () {
@@ -3733,6 +3744,46 @@ var fluidPlayerClass = {
         videoPlayerTag.load();
     },
 
+    initTitle: function() {
+        var player = this;
+        var videoPlayer = document.getElementById(player.videoPlayerId);
+        if (player.displayOptions.layoutControls.title) {
+            var titleHolder = document.createElement('div');
+            titleHolder.id = player.videoPlayerId + '_title';
+            videoPlayer.parentNode.insertBefore(titleHolder, null);
+            titleHolder.innerHTML += player.displayOptions.layoutControls.title;
+            titleHolder.classList.add('fp_title');
+        }
+    },
+
+    hasTitle: function () {
+        var title = document.getElementById(this.videoPlayerId + '_title');
+        var titleOption = this.displayOptions.layoutControls.title;
+        return (title && titleOption != null) ? true : false;
+    },
+
+    hideTitle: function() {
+        var videoInstanceId = fluidPlayerClass.getInstanceIdByWrapperId(this.getAttribute('id'));
+        var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
+        var videoPlayerTag = document.getElementById(videoInstanceId);
+        var titleHolder = document.getElementById(videoPlayerInstance.videoPlayerId + '_title');
+        
+        if (videoPlayerInstance.hasTitle()) {
+          titleHolder.classList.add('fade_out');
+        }  
+    },
+
+    showTitle: function() {
+        var videoInstanceId = fluidPlayerClass.getInstanceIdByWrapperId(this.getAttribute('id'));
+        var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
+        var videoPlayerTag = document.getElementById(videoInstanceId);
+        var titleHolder = document.getElementById(videoPlayerInstance.videoPlayerId + '_title');
+
+        if (videoPlayerInstance.hasTitle()) {
+          titleHolder.classList.remove('fade_out');
+        }  
+    },
+
     initLogo: function() {
         var player = this;
         var videoPlayer = document.getElementById(player.videoPlayerId);
@@ -4011,6 +4062,8 @@ var fluidPlayerClass = {
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
         videoPlayerTag.addEventListener('userInactive', player.hideControlBar);
         videoPlayerTag.addEventListener('userActive', player.showControlBar);
+        videoPlayerTag.addEventListener('userInactive', player.hideTitle);
+        videoPlayerTag.addEventListener('userActive', player.showTitle);
     },
 
     initMute: function() {
@@ -4456,6 +4509,7 @@ var fluidPlayerClass = {
                     keepPosition:             false
                 },
                 theatreAdvanced:              false,
+                title:                        null,
                 logo: {
                     imageUrl:                 null,
                     position:                 'top left',
@@ -4559,6 +4613,8 @@ var fluidPlayerClass = {
 
         player.initLogo();
 
+        player.initTitle();
+
         player.initMute();
 
         player.initLoop();
@@ -4657,6 +4713,7 @@ var fluidPlayerClass = {
         if (!player.mobileInfo.userOs) {
             videoWrapper.addEventListener('mouseleave', player.handleMouseleave, false);
             videoWrapper.addEventListener('mouseenter', player.showControlBar, false);
+            videoWrapper.addEventListener('mouseenter', player.showTitle, false);
         } else {
             //On mobile mouseleave behavior does not make sense, so it's better to keep controls, once the playback starts
             //Autohide behavior on timer is a separate functionality
