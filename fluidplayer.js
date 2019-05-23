@@ -4506,7 +4506,7 @@ var fluidPlayerClass = {
                 adClickable:                  true,
                 vastTimeout:                  5000,
                 showProgressbarMarkers:       false,
-                showPlayButton:               true,
+                showPlayButton:               false,
                 maxAllowedVastTagRedirects:   3,
 
                 vastAdvanced: {
