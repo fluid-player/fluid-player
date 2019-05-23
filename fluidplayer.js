@@ -2208,7 +2208,7 @@ var fluidPlayerClass = {
 
             if (this.isCurrentlyPlayingAd && player.displayOptions.vastOptions.showPlayButton) {
                 document.getElementById(videoPlayerId + '_fluid_initial_play').style.display = "block";
-                document.getElementById(videoPlayerId + '_fluid_initial_play_button').style.opacity = "0";
+                document.getElementById(videoPlayerId + '_fluid_initial_play_button').style.opacity = "1";
             }
 
             if (fpLogo) {
@@ -4506,7 +4506,7 @@ var fluidPlayerClass = {
                 adClickable:                  true,
                 vastTimeout:                  5000,
                 showProgressbarMarkers:       false,
-                showPlayButton:               false,
+                showPlayButton:               true,
                 maxAllowedVastTagRedirects:   3,
 
                 vastAdvanced: {
