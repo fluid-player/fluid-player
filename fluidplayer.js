@@ -3301,72 +3301,40 @@ var fluidPlayerClass = {
         var style = document.createElement('style');
 
         var iconsStyles = '';
-        var controls_icons = [
-            {
-                name: 'fluid_button_play',
-                position: 'background-position: -15px -19px;',
-            },
-            {
-                name: 'fluid_button_pause',
-                position: 'background-position: -15px -57px;',
-            },
-            {
-                name: 'fluid_button_volume',
-                position: 'background-position: -52px -19px;',
-            },
-            {
-                name: 'fluid_button_mute',
-                position: 'background-position: -15px -19px;',
-            },
-            {
-                name: 'fluid_button_video_source',
-                position: 'background-position: -122px -19px;',
-            },
-            {
-                name: 'fluid_button_fullscreen',
-                position: 'background-position: -88px -19px;',
-            },
-            {
-                name: 'fluid_button_fullscreen_exit',
-                position: 'background-position: -88px -57px;',
-            },
-            {
-                name: 'fluid_button_playback_rate',
-                position: 'background-position: -232px -19px;',
-            },
-            {
-                name: 'fluid_button_download',
-                position: 'background-position: -194px -18px;',
-            },
-            {
-                name: 'fluid_button_theatre',
-                position: 'background-position: -195px -56px;',
-            },
-        ]
-
+        
         if (this.displayOptions.icons.icons) {
-            controls_icons.map((control, index) => {
-                iconsStyles += ".fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button." + control.name + ":before";
+            if (this.displayOptions.icons.buttons) {
+                const buttons = Object.entries(this.displayOptions.icons.buttons);
 
-                iconsStyles += controls_icons.length -1 !== index ?  "," : " {";
-            })
+                var controls_icons = [];
 
-            iconsStyles += "background: url('" + this.displayOptions.icons.icons + "') no-repeat; }";
+                for (const [name, pos] of buttons) {
+                  controls_icons.push({name: name, position: `background-position: ${pos}`});
+                }
 
-            controls_icons.map((control) => {
-                iconsStyles += " .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button." + control.name + ":before {" +
-                control.position + "} ";
-            })
-                
-            iconsStyles += 
-                ".add_icon_clickthrough:before {" +
-                    "background: url('" + this.displayOptions.icons.icons + "') no-repeat;" +
-                    "background-position: -162px -57px;" +
-                "}";
-                ".source_button_icon {" +
-                    "background: url('" + this.displayOptions.icons.icons + "') no-repeat;" +
-                    "background-position: -164px -21px;" +
-                "}";
+                controls_icons.map((control, index) => {
+                    iconsStyles += ".fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button." + control.name + ":before";
+
+                    iconsStyles += controls_icons.length -1 !== index ?  "," : " {";
+                })
+
+                iconsStyles += "background: url('" + this.displayOptions.icons.icons + "') no-repeat; }";
+
+                controls_icons.map((control) => {
+                    iconsStyles += " .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button." + control.name + ":before {" +
+                    control.position + "} ";
+                })
+                    
+                iconsStyles += 
+                    ".add_icon_clickthrough:before {" +
+                        "background: url('" + this.displayOptions.icons.icons + "') no-repeat;" +
+                        "background-position: -162px -57px;" +
+                    "}";
+                    ".source_button_icon {" +
+                        "background: url('" + this.displayOptions.icons.icons + "') no-repeat;" +
+                        "background-position: -164px -21px;" +
+                    "}";
+            }    
         }
 
         if (this.displayOptions.icons.close_icon) {
@@ -4616,7 +4584,19 @@ var fluidPlayerClass = {
             icons: {
                 icons: '',
                 close_icon: '',
-                spinner: ''
+                spinner: '',
+                buttons: {
+                    fluid_button_play: '',
+                    fluid_button_pause: '',
+                    fluid_button_volume: '',
+                    fluid_button_mute: '',
+                    fluid_button_video_source: '',
+                    fluid_button_fullscreen: '',
+                    fluid_button_fullscreen_exit: '',
+                    fluid_button_playback_rate: '',
+                    fluid_button_download: '',
+                    fluid_button_theatre: ''
+                }
             }
         };
 
