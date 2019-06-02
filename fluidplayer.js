@@ -697,18 +697,37 @@ var fluidPlayerClass = {
         var player = this;
         var videoPlayerTag = document.getElementById(this.videoPlayerId);
         var list = [];
-        list.length = 0;
+        
+        if (roll == 'preRoll') {
 
-        list = player.findRoll(roll);
+            var vastList = Object.values(player.adList);
 
-        for (var i = 0; i < list.length; i++) {
-            var adListId = list[i];
+            for (const [key, vast] of vastList.entries()) {
+                
+                if (vast.roll == 'preRoll' && vast.played == false) {
+                    var firstPreRoll = vast.id;
+                    break;
+                }
+            }
 
-            if (player.adList[adListId].vastLoaded !== true && player.adList[adListId].error !== true) {
-                player.processUrl(player.adList[adListId].vastTag, adListId);
-                videoPlayerTag.addEventListener('adId_' + adListId, player[roll]);
+            player.processUrl(player.adList[firstPreRoll].vastTag, firstPreRoll);
+            videoPlayerTag.addEventListener('adId_' + firstPreRoll, player[roll]);
+
+        } else {
+
+            list = player.findRoll(roll);
+
+            for (var i = 0; i < list.length; i++) {
+                var adListId = list[i];
+
+                if (player.adList[adListId].vastLoaded !== true && player.adList[adListId].error !== true) {
+                    player.processUrl(player.adList[adListId].vastTag, adListId);
+                    videoPlayerTag.addEventListener('adId_' + adListId, player[roll]);
+                }
             }
         }
+        
+
     },
 
     toggleLoader: function(showLoader) {
@@ -976,7 +995,7 @@ var fluidPlayerClass = {
 
             player.sendRequest(
                 vastTag,
-                true,
+                false,
                 player.displayOptions.vastOptions.vastTimeout,
                 handleXmlHttpReq
             );
@@ -1495,7 +1514,6 @@ var fluidPlayerClass = {
                 return;
             }
 
-
             player.createBoard(adListId);
             onPauseAd = document.getElementById('fluid_nonLinear_' + adListId);
             onPauseAd.style.display = 'none';
@@ -1700,7 +1718,25 @@ var fluidPlayerClass = {
     onVastAdEnded: function() {
         //"this" is the HTML5 video tag, because it disptches the "ended" event
         var player = fluidPlayerClass.getInstanceById(this.id);
-        player.switchToMainVideo();
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);
+        var vastList = Object.values(player.adList);
+
+        for (const [key, vast] of vastList.entries()) {
+            
+            if (vast.roll === 'preRoll' && vast.played === false) {
+                var roll = vast.roll;
+                var currentVast = vast.id;    
+                break;
+            }
+        }
+
+        if (typeof(currentVast)  !== 'undefined') {
+            player.processUrl(player.adList[currentVast].vastTag, currentVast);
+            videoPlayerTag.addEventListener('adId_' + currentVast, player[roll]);
+        } else {
+            player.switchToMainVideo();
+        }
+       
         player.vastOptions = null;
         player.adFinished = true;
     },
