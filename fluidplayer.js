@@ -697,12 +697,12 @@ var fluidPlayerClass = {
         var player = this;
         var videoPlayerTag = document.getElementById(this.videoPlayerId);
         var list = [];
+
+        var vastList = Object.values(player.adList);
         
         if (roll == 'preRoll') {
-
-            var vastList = Object.values(player.adList);
-
-            for (const [key, vast] of vastList.entries()) {
+            
+            for (var [key, vast] of vastList.entries()) {
                 
                 if (vast.roll == 'preRoll' && vast.played == false) {
                     var firstPreRoll = vast.id;
@@ -713,21 +713,56 @@ var fluidPlayerClass = {
             player.processUrl(player.adList[firstPreRoll].vastTag, firstPreRoll);
             videoPlayerTag.addEventListener('adId_' + firstPreRoll, player[roll]);
 
-        } else {
+        } else if (roll === 'midRoll') {
+            
+            var midRolls = [];
 
-            list = player.findRoll(roll);
+            for (var [key, vast] of vastList.entries()) {
+                
+                for (var [secKey, secVast] of vastList.entries()) {
 
-            for (var i = 0; i < list.length; i++) {
-                var adListId = list[i];
+                    if(vastList[key].timer === vastList[secKey].timer && typeof(vastList[key].timer)  !== 'undefined' && vastList[key].roll ==='midRoll'){ 
+                        midRolls.push(vastList[secKey]);
+                        vastList[secKey] = 'added';
+                    }    
+                }
+            }
+
+            for (var i = 0; i < midRolls.length; i++) {
+                var adListId = midRolls[i].id;
+                if (!midRolls[i].increment ) {
+                    midRolls[i].timer = parseInt(midRolls[i].timer) + i;
+                    midRolls[i].increment = true;
+
+                    if (player.adList[adListId].vastLoaded !== true && player.adList[adListId].error !== true) {
+                        player.processUrl(player.adList[adListId].vastTag, adListId);
+                        videoPlayerTag.addEventListener('adId_' + adListId, player[roll]);
+                    }
+                }    
+            }
+
+        } else if (roll = 'postRoll') {
+
+            var postRolls = [];
+            
+            for (var [key, vast] of vastList.entries()) {
+                
+                if (vastList[key].roll == 'postRoll') {
+                    postRolls.push(vastList[key]);
+                }
+            }
+
+            for (var i = 0; i < postRolls.length; i++) {
+                var adListId = postRolls[i].id;
+                postRolls[i].timer = Math.floor(player.mainVideoDuration);
+                postRolls[i].timer-= i;
 
                 if (player.adList[adListId].vastLoaded !== true && player.adList[adListId].error !== true) {
                     player.processUrl(player.adList[adListId].vastTag, adListId);
                     videoPlayerTag.addEventListener('adId_' + adListId, player[roll]);
                 }
             }
-        }
-        
-
+        }     
     },
 
     toggleLoader: function(showLoader) {
@@ -1042,13 +1077,12 @@ var fluidPlayerClass = {
         //spec configs by roll
         switch (roll) {
             case 'midRoll':
-                videoPlayerTag.mainVideoCurrentTime = videoPlayerTag.currentTime - 1;
+                videoPlayerTag.mainVideoCurrentTime = videoPlayerTag.currentTime + 1;
                 break;
 
             case 'postRoll':
-                videoPlayerTag.mainVideoCurrentTime = 0;
+                videoPlayerTag.mainVideoCurrentTime = videoPlayerTag.currentTime + 1;
                 player.autoplayAfterAd = false;
-                videoPlayerTag.currentTime = player.mainVideoDuration;
                 break;
         }
 
@@ -1288,6 +1322,7 @@ var fluidPlayerClass = {
 
         time = parseInt(player.getCurrentTime()) + parseInt(duration);
         player.scheduleTask({time: time, closeStaticAd: adListId});
+
     },
 
 
@@ -1467,7 +1502,7 @@ var fluidPlayerClass = {
         }
     },
 
-    midRoll: function (event) {
+    midRoll: function (event) { 
         var player = fluidPlayerClass.getInstanceById(this.id);
         var videoPlayerTag = document.getElementById(this.getAttribute('id'));
         videoPlayerTag.removeEventListener(event.type, player.midRoll); //todo pass id?!
@@ -1490,6 +1525,7 @@ var fluidPlayerClass = {
         }
 
         player.scheduleTask({time: time, playRoll: 'midRoll', adListId: adListId});
+
     },
 
 
@@ -1498,7 +1534,19 @@ var fluidPlayerClass = {
         var videoPlayerTag = document.getElementById(this.getAttribute('id'));
         videoPlayerTag.removeEventListener(event.type, player.postRoll);
         var adListId = event.type.replace('adId_', '');
-        player.scheduleTask({time: Math.floor(player.mainVideoDuration), playRoll: 'postRoll', adListId: adListId});
+        var time = player.adList[adListId].timer;
+
+        if(typeof time == 'string' && time.indexOf("%") !== -1) {
+            time = time.replace('%', '');
+            time = Math.floor(player.mainVideoDuration / 100 * time);
+        }
+
+        if (player.displayOptions.vastOptions.showProgressbarMarkers &&
+            player.adList[adListId].adType === "nonLinear") {
+            player.createAdMarker(adListId, time);
+        }
+
+        player.scheduleTask({time: time, playRoll: 'postRoll', adListId: adListId});
     },
 
 
@@ -1617,7 +1665,7 @@ var fluidPlayerClass = {
                         }
 
                         //Remove ad from the play list
-                        delete player.timerPool[keyTime];
+                        // delete player.timerPool[keyTime];
                     }
 
                 }
