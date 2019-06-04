@@ -728,17 +728,18 @@ var fluidPlayerClass = {
                 }
             }
 
-            for (var i = 0; i < midRolls.length; i++) {
-                var adListId = midRolls[i].id;
-                if (!midRolls[i].increment ) {
-                    midRolls[i].timer = parseInt(midRolls[i].timer) + i;
-                    midRolls[i].increment = true;
+            for (var [key, vast] of midRolls.entries()) {
+                
+                if (vast.roll == 'midRoll' && vast.played == false) {
+                    var firstMidRoll = vast.id;
+                    player.adList[vast.id].firstMidRoll = true;
+                    break;
+                }
+            }
 
-                    if (player.adList[adListId].vastLoaded !== true && player.adList[adListId].error !== true) {
-                        player.processUrl(player.adList[adListId].vastTag, adListId);
-                        videoPlayerTag.addEventListener('adId_' + adListId, player[roll]);
-                    }
-                }    
+            if (typeof(firstMidRoll)  !== 'undefined') {
+                player.processUrl(player.adList[firstMidRoll].vastTag, firstMidRoll);
+                videoPlayerTag.addEventListener('adId_' + firstMidRoll, player[roll]);
             }
 
         } else if (roll = 'postRoll') {
@@ -752,15 +753,19 @@ var fluidPlayerClass = {
                 }
             }
 
-            for (var i = 0; i < postRolls.length; i++) {
-                var adListId = postRolls[i].id;
-                postRolls[i].timer = Math.floor(player.mainVideoDuration);
-                postRolls[i].timer-= i;
-
-                if (player.adList[adListId].vastLoaded !== true && player.adList[adListId].error !== true) {
-                    player.processUrl(player.adList[adListId].vastTag, adListId);
-                    videoPlayerTag.addEventListener('adId_' + adListId, player[roll]);
+            for (var [key, vast] of postRolls.entries()) {
+                
+                if (vast.roll == 'postRoll' && vast.played == false) {
+                    var firstPostRoll = vast.id;
+                    player.adList[vast.id].firstPostRoll = true;
+                    break;
                 }
+            }
+
+            if (typeof(firstPostRoll)  !== 'undefined') {
+                player.adList[firstPostRoll].timer = Math.floor(player.mainVideoDuration);
+                player.processUrl(player.adList[firstPostRoll].vastTag, firstPostRoll);
+                videoPlayerTag.addEventListener('adId_' + firstPostRoll, player[roll]);
             }
         }     
     },
@@ -1077,12 +1082,18 @@ var fluidPlayerClass = {
         //spec configs by roll
         switch (roll) {
             case 'midRoll':
-                videoPlayerTag.mainVideoCurrentTime = videoPlayerTag.currentTime + 1;
+                
+                if (typeof(player.mainVideoCurrentForRoll) === "undefined") {
+                    player.mainVideoCurrentForRoll = videoPlayerTag.currentTime;
+                }
+                
+                videoPlayerTag.mainVideoCurrentTime = player.mainVideoCurrentForRoll;
                 break;
 
             case 'postRoll':
-                videoPlayerTag.mainVideoCurrentTime = videoPlayerTag.currentTime + 1;
+                videoPlayerTag.mainVideoCurrentTime = 0;
                 player.autoplayAfterAd = false;
+                videoPlayerTag.currentTime = player.mainVideoDuration;
                 break;
         }
 
@@ -1530,6 +1541,7 @@ var fluidPlayerClass = {
 
 
     postRoll: function (event) {
+
         var player = fluidPlayerClass.getInstanceById(this.id);
         var videoPlayerTag = document.getElementById(this.getAttribute('id'));
         videoPlayerTag.removeEventListener(event.type, player.postRoll);
@@ -1769,13 +1781,46 @@ var fluidPlayerClass = {
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
         var vastList = Object.values(player.adList);
 
-        for (const [key, vast] of vastList.entries()) {
+        if (Math.floor(player.getCurrentTime()) >= Math.floor(player.mainVideoDuration)) {
             
-            if (vast.roll === 'preRoll' && vast.played === false) {
-                var roll = vast.roll;
-                var currentVast = vast.id;    
-                break;
+            // mark all midroll as viewed
+            var midRolls = [];
+            var vastList = Object.values(player.adList);
+
+            for (var [key, vast] of vastList.entries()) {
+                
+                for (var [secKey, secVast] of vastList.entries()) {
+
+                    if(vastList[key].timer === vastList[secKey].timer && typeof(vastList[key].timer)  !== 'undefined' && vastList[key].roll ==='midRoll'){ 
+                        midRolls.push(vastList[secKey]);
+                        vastList[secKey] = 'added';
+                    }    
+                }
             }
+
+            for (var [key, vast] of midRolls.entries()) {
+                
+                if (vast.roll == 'midRoll' && vast.played == false) {
+                    player.adList[vast.id].played = true;
+                }
+            }
+            // -
+        }
+        
+    
+
+        for (const [key, vast] of vastList.entries()) {
+
+            if (vast.played === false) {
+                var roll = 'preRoll';
+                var currentVast = vast.id;
+
+                if (vast.firstMidRoll === true || vast.firstPostRoll === true) {
+                    currentVast = undefined;
+                    break;
+                }
+                break;
+            }            
         }
 
         if (typeof(currentVast)  !== 'undefined') {
