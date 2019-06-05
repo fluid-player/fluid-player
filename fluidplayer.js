@@ -700,7 +700,6 @@ var fluidPlayerClass = {
         var vastList = Object.values(player.adList);
         
         if (roll == 'preRoll') {
-            
             for (var [key, vast] of vastList.entries()) {
                 if (vast.roll == 'preRoll' && vast.played == false) {
                     var firstPreRoll = vast.id;
@@ -710,9 +709,7 @@ var fluidPlayerClass = {
 
             player.processUrl(player.adList[firstPreRoll].vastTag, firstPreRoll);
             videoPlayerTag.addEventListener('adId_' + firstPreRoll, player[roll]);
-
         } else if (roll === 'midRoll') {
-            
             var midRolls = [];
 
             for (var [key, vast] of vastList.entries()) {
@@ -736,9 +733,7 @@ var fluidPlayerClass = {
                 player.processUrl(player.adList[firstMidRoll].vastTag, firstMidRoll);
                 videoPlayerTag.addEventListener('adId_' + firstMidRoll, player[roll]);
             }
-
         } else if (roll = 'postRoll') {
-
             var postRolls = [];
             
             for (var [key, vast] of vastList.entries()) {
@@ -1075,11 +1070,9 @@ var fluidPlayerClass = {
         //spec configs by roll
         switch (roll) {
             case 'midRoll':
-                
                 if (typeof(player.mainVideoCurrentForRoll) === "undefined") {
                     player.mainVideoCurrentForRoll = videoPlayerTag.currentTime;
                 }
-                
                 videoPlayerTag.mainVideoCurrentTime = player.mainVideoCurrentForRoll;
                 break;
 
@@ -1089,7 +1082,6 @@ var fluidPlayerClass = {
                 videoPlayerTag.currentTime = player.mainVideoDuration;
                 break;
         }
-
 
         var playVideoPlayer = function(adListId) {
             player.switchPlayerToVastMode = function() {
@@ -1323,10 +1315,8 @@ var fluidPlayerClass = {
             }
         }, 400);
 
-
         time = parseInt(player.getCurrentTime()) + parseInt(duration);
         player.scheduleTask({time: time, closeStaticAd: adListId});
-
     },
 
 
@@ -1458,7 +1448,6 @@ var fluidPlayerClass = {
             player.switchToMainVideo();
             player.createNonLinearStatic(adListId);
         }
-
     },
 
     createAdMarker: function (adListId, time) {
@@ -1529,12 +1518,10 @@ var fluidPlayerClass = {
         }
 
         player.scheduleTask({time: time, playRoll: 'midRoll', adListId: adListId});
-
     },
 
 
     postRoll: function (event) {
-
         var player = fluidPlayerClass.getInstanceById(this.id);
         var videoPlayerTag = document.getElementById(this.getAttribute('id'));
         videoPlayerTag.removeEventListener(event.type, player.postRoll);
@@ -1771,15 +1758,12 @@ var fluidPlayerClass = {
         var vastList = Object.values(player.adList);
 
         if (Math.floor(player.getCurrentTime()) >= Math.floor(player.mainVideoDuration)) {
-            
             // mark all midroll as viewed
             var midRolls = [];
             var vastList = Object.values(player.adList);
 
             for (var [key, vast] of vastList.entries()) {
-                
                 for (var [secKey, secVast] of vastList.entries()) {
-
                     if(vastList[key].timer === vastList[secKey].timer && typeof(vastList[key].timer)  !== 'undefined' && vastList[key].roll ==='midRoll'){ 
                         midRolls.push(vastList[secKey]);
                         vastList[secKey] = 'added';
@@ -1788,18 +1772,13 @@ var fluidPlayerClass = {
             }
 
             for (var [key, vast] of midRolls.entries()) {
-                
                 if (vast.roll == 'midRoll' && vast.played == false) {
                     player.adList[vast.id].played = true;
                 }
             }
-            // -
         }
         
-    
-
         for (const [key, vast] of vastList.entries()) {
-
             if (vast.played === false) {
                 var roll = 'preRoll';
                 var currentVast = vast.id;
