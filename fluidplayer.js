@@ -697,13 +697,11 @@ var fluidPlayerClass = {
         var player = this;
         var videoPlayerTag = document.getElementById(this.videoPlayerId);
         var list = [];
-
         var vastList = Object.values(player.adList);
         
         if (roll == 'preRoll') {
             
             for (var [key, vast] of vastList.entries()) {
-                
                 if (vast.roll == 'preRoll' && vast.played == false) {
                     var firstPreRoll = vast.id;
                     break;
@@ -718,9 +716,7 @@ var fluidPlayerClass = {
             var midRolls = [];
 
             for (var [key, vast] of vastList.entries()) {
-                
                 for (var [secKey, secVast] of vastList.entries()) {
-
                     if(vastList[key].timer === vastList[secKey].timer && typeof(vastList[key].timer)  !== 'undefined' && vastList[key].roll ==='midRoll'){ 
                         midRolls.push(vastList[secKey]);
                         vastList[secKey] = 'added';
@@ -729,7 +725,6 @@ var fluidPlayerClass = {
             }
 
             for (var [key, vast] of midRolls.entries()) {
-                
                 if (vast.roll == 'midRoll' && vast.played == false) {
                     var firstMidRoll = vast.id;
                     player.adList[vast.id].firstMidRoll = true;
@@ -747,14 +742,12 @@ var fluidPlayerClass = {
             var postRolls = [];
             
             for (var [key, vast] of vastList.entries()) {
-                
                 if (vastList[key].roll == 'postRoll') {
                     postRolls.push(vastList[key]);
                 }
             }
 
             for (var [key, vast] of postRolls.entries()) {
-                
                 if (vast.roll == 'postRoll' && vast.played == false) {
                     var firstPostRoll = vast.id;
                     player.adList[vast.id].firstPostRoll = true;
@@ -1513,7 +1506,7 @@ var fluidPlayerClass = {
         }
     },
 
-    midRoll: function (event) { 
+    midRoll: function (event) {
         var player = fluidPlayerClass.getInstanceById(this.id);
         var videoPlayerTag = document.getElementById(this.getAttribute('id'));
         videoPlayerTag.removeEventListener(event.type, player.midRoll); //todo pass id?!
@@ -1525,7 +1518,7 @@ var fluidPlayerClass = {
 
         var time = player.adList[adListId].timer;
 
-        if(typeof time == 'string' && time.indexOf("%") !== -1) {
+        if (typeof time == 'string' && time.indexOf("%") !== -1) {
             time = time.replace('%', '');
             time = Math.floor(player.mainVideoDuration / 100 * time);
         }
@@ -1548,7 +1541,7 @@ var fluidPlayerClass = {
         var adListId = event.type.replace('adId_', '');
         var time = player.adList[adListId].timer;
 
-        if(typeof time == 'string' && time.indexOf("%") !== -1) {
+        if (typeof time == 'string' && time.indexOf("%") !== -1) {
             time = time.replace('%', '');
             time = Math.floor(player.mainVideoDuration / 100 * time);
         }
@@ -1675,11 +1668,7 @@ var fluidPlayerClass = {
                                 player.hideAdMarker(adIdToCheck);
                             }
                         }
-
-                        //Remove ad from the play list
-                        // delete player.timerPool[keyTime];
                     }
-
                 }
 
 
