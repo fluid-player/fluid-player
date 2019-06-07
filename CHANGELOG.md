@@ -6,6 +6,7 @@
 * [Pull #306](https://github.com/fluid-player/fluid-player/pull/306) Remove unsupported browser layout parts
 * [Pull #331](https://github.com/fluid-player/fluid-player/pull/331) Add ability to change controls titles
 * [Pull #332](https://github.com/fluid-player/fluid-player/pull/332) Fix multiple videos play
+* [Pull #335](https://github.com/fluid-player/fluid-player/pull/335) Improve timecode
 
 ## 2.4.4
 * [Pull #289](https://github.com/fluid-player/fluid-player/pull/289) Fix window.getComputedStyle call on null
