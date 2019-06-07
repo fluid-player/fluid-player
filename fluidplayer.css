@@ -849,6 +849,17 @@ _:-ms-lang(x),
     opacity: 1;
 }
 
+.fp_title {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: #ffffff;
+    font-size: 15px;
+    font-family: 'Roboto', sans-serif, Verdana, Arial;
+    font-weight: normal;
+    white-space: nowrap;
+}
+
 /* Pulse class and keyframe animation */
 .transform-active {
     animation: flash 1s infinite;
