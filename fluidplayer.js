@@ -3267,6 +3267,8 @@ var fluidPlayerClass = {
 
         player.initPlayButton();
 
+        player.setVideoPreload();
+
         player.createPlaybackList();
 
         player.createDownload();
@@ -3987,6 +3989,13 @@ var fluidPlayerClass = {
         return !(style.opacity == 0 || style.visibility == 'hidden');
     },
 
+    setVideoPreload: function() {
+        var player = this;
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);
+
+        videoPlayerTag.setAttribute('preload', this.displayOptions.layoutControls.preload);
+    },
+
     hideControlBar: function () {
         var videoInstanceId = fluidPlayerClass.getInstanceIdByWrapperId(this.getAttribute('id'));
         var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
@@ -4498,6 +4507,7 @@ var fluidPlayerClass = {
                 closeButtonCaption:           'Close', // Remove?
                 fillToContainer:              false,
                 autoPlay:                     false,
+                preload:                      'auto',
                 mute:                         false,
                 loop:                         null,
                 keyboardControl:              true,
