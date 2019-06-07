@@ -2224,9 +2224,10 @@ var fluidPlayerClass = {
         }
 
         document.getElementById(videoPlayerId + '_fluid_initial_play').classList.add('transform-active');
+        var videoPlayerSaveId = videoPlayerId;
         setTimeout(
             function() {
-                document.getElementById(videoPlayerId + '_fluid_initial_play').classList.remove('transform-active');
+                document.getElementById(videoPlayerSaveId + '_fluid_initial_play').classList.remove('transform-active');
             },
             800
         );
