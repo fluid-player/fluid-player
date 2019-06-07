@@ -2,6 +2,7 @@
 
 ## Master
 * [Pull #325](https://github.com/fluid-player/fluid-player/pull/325) Add poster image size option (posterImageSize)
+* [Pull #330](https://github.com/fluid-player/fluid-player/pull/330) Add showPlayButton config to display Play button on ad
 
 ## 2.4.4
 * [Pull #289](https://github.com/fluid-player/fluid-player/pull/289) Fix window.getComputedStyle call on null
