@@ -2241,13 +2241,30 @@ var fluidPlayerClass = {
         currentProgressTag.style.width = (videoPlayerTag.currentTime / player.currentVideoDuration * 100) + '%';
     },
 
+    //Format time to hh:mm:ss
+    formatTime: function(duration) {
+      var formatDateObj = new Date(duration * 1000);
+      var formatHours = this.pad(formatDateObj.getUTCHours());
+      var formatMinutes = this.pad(formatDateObj.getUTCMinutes());
+      var formatSeconds = this.pad(formatDateObj.getSeconds());
+
+      if (formatHours >= 1) {
+        var result = formatHours + ':' + formatMinutes + ':' + formatSeconds;
+      } else {
+        var result = formatMinutes + ':' + formatSeconds;
+      }
+
+      return result;
+    },
+
     contolDurationUpdate: function(videoPlayerId) {
         var player = fluidPlayerClass.getInstanceById(videoPlayerId);
-
         var videoPlayerTag = document.getElementById(videoPlayerId);
-        var durationText = player.pad(parseInt(videoPlayerTag.currentTime / 60)) + ':' + player.pad(parseInt(videoPlayerTag.currentTime % 60)) +
-            ' / ' +
-            player.pad(parseInt(player.currentVideoDuration / 60)) + ':' + player.pad(parseInt(player.currentVideoDuration % 60));
+
+        var currentPlayTime = player.formatTime(videoPlayerTag.currentTime);
+        var totalTime = player.formatTime(player.currentVideoDuration);
+
+        var durationText = currentPlayTime + ' / ' + totalTime;
 
         var timePlaceholder = document.getElementById(videoPlayerId + '_fluid_control_duration');
         timePlaceholder.innerHTML = durationText;
@@ -3095,12 +3112,11 @@ var fluidPlayerClass = {
             var hoverQ = fluidPlayerClass.getEventOffsetX(event, progressContainer);
 
             hoverSecondQ = player.currentVideoDuration * hoverQ / totalWidth;
-            showad = player.pad(parseInt(hoverSecondQ / 60)) + ':' + player.pad(parseInt(hoverSecondQ % 60));
+            showad = player.formatTime(hoverSecondQ);
             hoverTimeItem.innerText = showad;
 
             hoverTimeItem.style.display = 'block';
             hoverTimeItem.style.left = (hoverSecondQ / videoPlayer.duration * 100) + "%";
-
         }, false);
 
         // Hide timeline preview on mouseout
