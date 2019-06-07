@@ -7,6 +7,7 @@
 * [Pull #331](https://github.com/fluid-player/fluid-player/pull/331) Add ability to change controls titles
 * [Pull #332](https://github.com/fluid-player/fluid-player/pull/332) Fix multiple videos play
 * [Pull #335](https://github.com/fluid-player/fluid-player/pull/335) Improve timecode
+* [Pull #335](https://github.com/fluid-player/fluid-player/pull/336) Add title
 
 ## 2.4.4
 * [Pull #289](https://github.com/fluid-player/fluid-player/pull/289) Fix window.getComputedStyle call on null
