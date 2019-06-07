@@ -2187,7 +2187,7 @@ var fluidPlayerClass = {
             }
 
             if (menuOptionPlay !== null) {
-                menuOptionPlay.innerHTML = 'Pause';
+                menuOptionPlay.innerHTML = this.displayOptions.captions.pause;
             }
 
         } else {
@@ -2204,7 +2204,7 @@ var fluidPlayerClass = {
             }
 
             if (menuOptionPlay !== null) {
-                menuOptionPlay.innerHTML = 'Play';
+                menuOptionPlay.innerHTML = this.displayOptions.captions.play;
             }
         }
     },
@@ -2279,14 +2279,14 @@ var fluidPlayerClass = {
             muteButtonTag.className = muteButtonTag.className.replace(/\bfluid_button_mute\b/g, 'fluid_button_volume');
 
             if (menuOptionMute !== null) {
-                menuOptionMute.innerHTML = 'Mute';
+                menuOptionMute.innerHTML = this.displayOptions.captions.mute;
             }
 
         } else {
             muteButtonTag.className = muteButtonTag.className.replace(/\bfluid_button_volume\b/g, 'fluid_button_mute');
 
             if (menuOptionMute !== null) {
-                menuOptionMute.innerHTML = 'Unmute';
+                menuOptionMute.innerHTML = this.displayOptions.captions.unmute;
             }
         }
         currentVolumeTag.style.width = (videoPlayerTag.volume * volumebarTotalWidth) + 'px';
@@ -2345,7 +2345,7 @@ var fluidPlayerClass = {
     fullscreenOn: function (fullscreenButton, menuOptionFullscreen) {
         fullscreenButton.className = fullscreenButton.className.replace(/\bfluid_button_fullscreen\b/g, 'fluid_button_fullscreen_exit');
         if (menuOptionFullscreen !== null) {
-            menuOptionFullscreen.innerHTML = 'Exit Fullscreen';
+            menuOptionFullscreen.innerHTML = this.displayOptions.captions.exitFullscreen;
         }
         this.fullscreenMode = true;
     },
@@ -3121,9 +3121,9 @@ var fluidPlayerClass = {
         divContextMenu.style.display = 'none';
         divContextMenu.style.position = 'absolute';
         divContextMenu.innerHTML = '<ul>'+
-            '    <li id="' + player.videoPlayerId + 'context_option_play">Play</li>' +
-            '    <li id="' + player.videoPlayerId + 'context_option_mute">Mute</li>' +
-            '    <li id="' + player.videoPlayerId + 'context_option_fullscreen">Fullscreen</li>' +
+            '    <li id="' + player.videoPlayerId + 'context_option_play">' + this.displayOptions.captions.play + '</li>' +
+            '    <li id="' + player.videoPlayerId + 'context_option_mute">' + this.displayOptions.captions.mute + '</li>' +
+            '    <li id="' + player.videoPlayerId + 'context_option_fullscreen">' + this.displayOptions.captions.fullscreen + '</li>' +
             '    <li id="' + player.videoPlayerId + 'context_option_homepage">Fluid Player ' + player.version + '</li>' +
             '</ul>';
 
@@ -4500,6 +4500,14 @@ var fluidPlayerClass = {
                 p2pConfig: {
                     logLevel: false,
                 }
+            },
+            captions: {
+                play: 'Play',
+                pause: 'Pause',
+                mute: 'Mute',
+                unmute: 'Unmute',
+                fullscreen: 'Fullscreen',
+                exitFullscreen: 'Exit Fullscreen',
             }
         };
 
