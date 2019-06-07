@@ -719,11 +719,6 @@ var fluidPlayerClass = {
             player.isLoading = false;
         }
 
-        if (this.displayOptions.layoutControls.layout=== 'browser') {
-            //The browser handles all the layout of the video tag
-            return;
-        }
-
         var loaderDiv = document.getElementById('vast_video_loading_' + this.videoPlayerId);
 
         if (showLoader) {
@@ -1060,13 +1055,12 @@ var fluidPlayerClass = {
 
                 player.vastLogoBehaviour(true);
 
-                if (player.displayOptions.layoutControls.layout!== 'browser') {
-                    var progressbarContainer = document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container');
 
-                    if (progressbarContainer !== null) {
-                        document.getElementById(player.videoPlayerId + '_vast_control_currentprogress').style.backgroundColor = player.displayOptions.layoutControls.adProgressColor;
-                    }
+                var progressbarContainer = document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container');
+                if (progressbarContainer !== null) {
+                    document.getElementById(player.videoPlayerId + '_vast_control_currentprogress').style.backgroundColor = player.displayOptions.layoutControls.adProgressColor;
                 }
+
 
                 if (player.displayOptions.vastOptions.adText || player.adList[adListId].adText) {
                     var adTextToShow = (player.adList[adListId].adText !== null) ? player.adList[adListId].adText : player.displayOptions.vastOptions.adText;
@@ -1662,21 +1656,15 @@ var fluidPlayerClass = {
         player.displayOptions.vastOptions.vastAdvanced.vastVideoEndedCallback();
         player.vastOptions = null;
 
-        if (player.displayOptions.layoutControls.layout!== 'browser') {
-            player.setBuffering();
-            var progressbarContainer = document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container');
+        player.setBuffering();
+        var progressbarContainer = document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container');
 
-            if (progressbarContainer !== null) {
-                backgroundColor = (player.displayOptions.layoutControls.primaryColor) ? player.displayOptions.layoutControls.primaryColor : "white";
-                document.getElementById(player.videoPlayerId + '_vast_control_currentprogress').style.backgroundColor = backgroundColor;
-            }
+        if (progressbarContainer !== null) {
+            backgroundColor = (player.displayOptions.layoutControls.primaryColor) ? player.displayOptions.layoutControls.primaryColor : "white";
+            document.getElementById(player.videoPlayerId + '_vast_control_currentprogress').style.backgroundColor = backgroundColor;
         }
 
         videoPlayerTag.removeEventListener('ended', player.onVastAdEnded);
-
-        if (player.displayOptions.layoutControls.layout=== 'browser') {
-            videoPlayerTag.setAttribute('controls', 'controls');
-        }
 
         if (player.displayOptions.vastOptions.showProgressbarMarkers) {
             player.showAdMarkers();
@@ -2274,11 +2262,6 @@ var fluidPlayerClass = {
 
     contolVolumebarUpdate: function(videoPlayerId) {
         var player = fluidPlayerClass.getInstanceById(videoPlayerId);
-
-        if (player.displayOptions.layoutControls.layout === 'browser') {
-            return;
-        }
-
         var videoPlayerTag = document.getElementById(videoPlayerId);
         var currentVolumeTag = document.getElementById(videoPlayerId + '_fluid_control_currentvolume');
         var volumeposTag = document.getElementById(videoPlayerId + '_fluid_control_volume_currentpos');
@@ -2943,19 +2926,19 @@ var fluidPlayerClass = {
                 player.displayOptions.vastOptions.vastAdvanced.noVastVideoCallback();
             }
 
-            if (player.displayOptions.layoutControls.layout !== 'browser') { //The original player play/pause toggling is managed by the browser
-                if (videoPlayerTag.paused) {
-                    if (player.dashPlayer) {
-                        player.dashPlayer.play();
-                    } else {
-                        videoPlayerTag.play();
-                    }
-                    this.playPauseAnimationToggle(true);
-                } else if (!isFirstStart) {
-                    videoPlayerTag.pause();
-                    this.playPauseAnimationToggle(false);
+
+            if (videoPlayerTag.paused) {
+                if (player.dashPlayer) {
+                    player.dashPlayer.play();
+                } else {
+                    videoPlayerTag.play();
                 }
+                this.playPauseAnimationToggle(true);
+            } else if (!isFirstStart) {
+                videoPlayerTag.pause();
+                this.playPauseAnimationToggle(false);
             }
+
 
             player.toggleOnPauseAd();
 
@@ -3290,17 +3273,9 @@ var fluidPlayerClass = {
             player.playPauseToggle(videoPlayerTag);
         }, false);
 
-        switch (this.displayOptions.layoutControls.layout) {
-            case 'browser':
-                //Nothing special to do here at this point.
-                break;
-
-            default:
-                //Mobile Safari - because it does not emit a click event on initial click of the video
-                videoPlayerTag.addEventListener('play', player.initialPlay, false);
-                this.setDefaultLayout();
-                break;
-        }
+        //Mobile Safari - because it does not emit a click event on initial click of the video
+        videoPlayerTag.addEventListener('play', player.initialPlay, false);
+        this.setDefaultLayout();
     },
 
     handleFullscreen: function() {
@@ -3577,9 +3552,6 @@ var fluidPlayerClass = {
     createVideoSourceSwitch: function() {
         var player = this;
         var videoPlayer = document.getElementById(player.videoPlayerId);
-        if (player.displayOptions.layoutControls.layout === 'browser') {
-            return;
-        }
 
         var sources = [];
         var sourcesList = videoPlayer.querySelectorAll('source');
@@ -3932,7 +3904,7 @@ var fluidPlayerClass = {
     },
 
     hasControlBar: function () {
-        return (document.getElementById(this.videoPlayerId + '_fluid_controls_container') && this.displayOptions.layoutControls.layout != "browser") ? true : false;
+        return (document.getElementById(this.videoPlayerId + '_fluid_controls_container')) ? true : false;
     },
 
     isControlBarVisible: function() {
@@ -3952,7 +3924,7 @@ var fluidPlayerClass = {
         var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
         var videoPlayerTag = document.getElementById(videoInstanceId);
 
-        if (videoPlayerInstance.isCurrentlyPlayingAd && !videoPlayerTag.paused && videoPlayerInstance.displayOptions.layoutControls.layout !== 'browser') {
+        if (videoPlayerInstance.isCurrentlyPlayingAd && !videoPlayerTag.paused) {
             videoPlayerInstance.toggleAdCountdown(true);
         }
 
@@ -3984,7 +3956,7 @@ var fluidPlayerClass = {
         var videoPlayerInstance = fluidPlayerClass.getInstanceById(videoInstanceId);
         var videoPlayerTag = document.getElementById(videoInstanceId);
 
-        if (videoPlayerInstance.isCurrentlyPlayingAd && !videoPlayerTag.paused && videoPlayerInstance.displayOptions.layoutControls.layout !== 'browser') {
+        if (videoPlayerInstance.isCurrentlyPlayingAd && !videoPlayerTag.paused) {
             videoPlayerInstance.toggleAdCountdown(false);
         }
 
@@ -4494,7 +4466,7 @@ var fluidPlayerClass = {
                     height:                   null,
                     width:                    null
                 },
-                layout:                       'default', //options: 'default', 'browser', '<custom>'
+                layout:                       'default', //options: 'default', '<custom>'
                 playerInitCallback:           (function() {}),
                 persistentSettings:           {
                     volume:                   true,
