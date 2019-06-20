@@ -3582,9 +3582,20 @@ var fluidPlayerClass = {
 
     createSubtitlesSwitch: function(){
         var player = this;
-
+        var videoPlayer = document.getElementById(player.videoPlayerId);
         if (player.displayOptions.layoutControls.subtitlesEnabled) {
+            var tracks = [];
+            var tracksList = videoPlayer.querySelectorAll('track');
+            [].forEach.call(tracksList, function (track) {
+                if (track.kind === 'subtitles' && track.src) {
+                    tracks.push({'title': track.label, 'url': track.src, 'lang': track.srclang});
+                }
+            });
+
             
+            player.subtitlesTrackSources = tracks;
+            
+
         } else {
             // No other video sources
             document.getElementById(player.videoPlayerId + '_fluid_control_subtitles').style.display = 'none';
@@ -3593,24 +3604,6 @@ var fluidPlayerClass = {
 
     openCloseSubtitlesSwitch: function() {
         var player = this;
-        var sourceChangeList = document.getElementById(this.videoPlayerId + '_fluid_control_video_source_list');
-        var sourceChangeListContainer = document.getElementById(this.videoPlayerId + '_fluid_control_video_source');
-
-        if (player.isCurrentlyPlayingAd) {
-            sourceChangeList.style.display = 'none';
-            return;
-        }
-
-        if (sourceChangeList.style.display == 'none') {
-            sourceChangeList.style.display = 'block';
-            var mouseOut = function(event) {
-                sourceChangeListContainer.removeEventListener('mouseleave', mouseOut);
-                sourceChangeList.style.display = 'none';
-            };
-            sourceChangeListContainer.addEventListener('mouseleave', mouseOut);
-        } else {
-            sourceChangeList.style.display = 'none';
-        }
     },
 
     createVideoSourceSwitch: function() {
