@@ -3583,27 +3583,101 @@ var fluidPlayerClass = {
     createSubtitlesSwitch: function(){
         var player = this;
         var videoPlayer = document.getElementById(player.videoPlayerId);
+        var subtitlesOff = 'OFF'
+
+
         if (player.displayOptions.layoutControls.subtitlesEnabled) {
-            var tracks = [];
+            var tracks = [];            
+            tracks.push({'label': subtitlesOff, 'url': 'na', 'lang': subtitlesOff});
+
             var tracksList = videoPlayer.querySelectorAll('track');
+
             [].forEach.call(tracksList, function (track) {
                 if (track.kind === 'subtitles' && track.src) {
-                    tracks.push({'title': track.label, 'url': track.src, 'lang': track.srclang});
+                    tracks.push({'label': track.label, 'url': track.src, 'lang': track.srclang});
                 }
             });
-
             
-            player.subtitlesTrackSources = tracks;
+            player.subtitlesTracks = tracks;
+            var subtitlesChangeButton = document.getElementById(player.videoPlayerId + '_fluid_control_subtitles');
+            var appendSubtitleChange = false;
+
+            var subtitlesChangeList = document.createElement('div');
+            subtitlesChangeList.id = player.videoPlayerId + '_fluid_control_subtitles_list';
+            subtitlesChangeList.className = 'fluid_subtitles_list';
+            subtitlesChangeList.style.display = 'none';
+
+            var firstSubtitle = true;
+            player.subtitlesTracks.forEach(function(subtitle) {
+
+                var subtitleSelected = (firstSubtitle) ? "subtitle_selected" :  "";
+                firstSubtitle = false;
+                var subtitlesChangeDiv = document.createElement('div');
+                subtitlesChangeDiv.id        = 'subtitle_' + player.videoPlayerId + '_' + subtitle.label;
+                subtitlesChangeDiv.className = 'fluid_subtitle_list_item';
+                subtitlesChangeDiv.innerHTML = '<span class="subtitle_button_icon ' + subtitleSelected + '"></span>' + subtitle.label;
+
+                subtitlesChangeDiv.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    var subtitleChangedTo = this;
+                    var subtitleIcons = document.getElementsByClassName('subtitle_button_icon');
+                    for (var i = 0; i < subtitleIcons.length; i++) {
+                        subtitleIcons[i].className = subtitleIcons[i].className.replace("subtitle_selected", "");
+                    }
+                    subtitleChangedTo.firstChild.className += ' subtitle_selected';
+
+                    player.subtitlesTracks.forEach(function(subtitle) {
+                        if (subtitle.label == subtitleChangedTo.innerText.replace(/(\r\n\t|\n|\r\t)/gm,"")) {
+                            // player.setBuffering();
+                            // player.setVideoSource(subtitle.url);
+                            // player.fluidStorage.fluidQuality = subtitle.label;
+                        }
+                    });
+
+                    player.openCloseSubtitlesSwitch();
+
+                });
+                subtitlesChangeList.appendChild(subtitlesChangeDiv);
+                appendSubtitleChange = true;
+            });
+
+            if (appendSubtitleChange) {
+                subtitlesChangeButton.appendChild(subtitlesChangeList);
+                subtitlesChangeButton.addEventListener('click', function() {
+                    player.openCloseSubtitlesSwitch();
+                });
+            } else {
+                // Didn't give any subtitle options
+                document.getElementById(player.videoPlayerId + '_fluid_control_subtitles').style.display = 'none';
+            }
             
 
         } else {
-            // No other video sources
+            // No other video subtitles
             document.getElementById(player.videoPlayerId + '_fluid_control_subtitles').style.display = 'none';
         }        
     },
 
     openCloseSubtitlesSwitch: function() {
         var player = this;
+        var subtitleChangeList = document.getElementById(this.videoPlayerId + '_fluid_control_subtitles_list');
+        var sourceChangeListContainer = document.getElementById(this.videoPlayerId + '_fluid_control_subtitles');
+
+        if (player.isCurrentlyPlayingAd) {
+            subtitleChangeList.style.display = 'none';
+            return;
+        }
+
+        if (subtitleChangeList.style.display == 'none') {
+            subtitleChangeList.style.display = 'block';
+            var mouseOut = function(event) {
+                sourceChangeListContainer.removeEventListener('mouseleave', mouseOut);
+                subtitleChangeList.style.display = 'none';
+            };
+            sourceChangeListContainer.addEventListener('mouseleave', mouseOut);
+        } else {
+            subtitleChangeList.style.display = 'none';
+        }
     },
 
     createVideoSourceSwitch: function() {
@@ -4616,6 +4690,7 @@ var fluidPlayerClass = {
                 mute: 'Mute',
                 unmute: 'Unmute',
                 fullscreen: 'Fullscreen',
+                subtitles: 'Subtitles',
                 exitFullscreen: 'Exit Fullscreen',
             }
         };
