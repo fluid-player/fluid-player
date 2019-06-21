@@ -3582,89 +3582,59 @@ var fluidPlayerClass = {
 
     subtitleFetchParse: function(subtitleItem){
         var player = this;
-                    var convertedVttRawData = [];
-                    player.sendRequest(
-                    subtitleItem.url,
-                    true,
-                    player.displayOptions.vastOptions.vastTimeout,
-                    function() {
-                        var convertVttRawData = function(vttRawData) {
-                            if (!(
-                                (typeof vttRawData.cues !== 'undefined') &&
-                                (vttRawData.cues.length)
-                            )) {
-                                return [];
-                            }
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);
+        player.subtitlesData =  [];
 
-                            var result = [];
-                            var tempThumbnailData = null;
-                            var tempThumbnailCoordinates = null;
+        player.sendRequest(
+        subtitleItem.url,
+        true,
+        player.displayOptions.vastOptions.vastTimeout,
+        function(player) {
+            var convertVttRawData = function(vttRawData) {
+                if (!(
+                    (typeof vttRawData.cues !== 'undefined') &&
+                    (vttRawData.cues.length)
+                )) {
+                    return [];
+                }
 
-                            for (var i = 0; i < vttRawData.cues.length; i++) {
-                                tempThumbnailData = vttRawData.cues[i].text.split('#');
-                                var xCoords = 0, yCoords = 0, wCoords = 122.5, hCoords = 69;
+                var result = [];
 
-                                // .vtt file contains sprite corrdinates
-                                if (
-                                    (tempThumbnailData.length === 2) &&
-                                    (tempThumbnailData[1].indexOf('xywh=') === 0)
-                                ) {
-                                    tempThumbnailCoordinates = tempThumbnailData[1].substring(5);
-                                    tempThumbnailCoordinates = tempThumbnailCoordinates.split(',');
+                for (var i = 0; i < vttRawData.cues.length; i++) {
+                    tempThumbnailData = vttRawData.cues[i].text.split('#');
 
-                                    if (tempThumbnailCoordinates.length === 4) {
-                                        player.displayOptions.layoutControls.timelinePreview.spriteImage = true;
-                                        xCoords = parseInt(tempThumbnailCoordinates[0]);
-                                        yCoords = parseInt(tempThumbnailCoordinates[1]);
-                                        wCoords = parseInt(tempThumbnailCoordinates[2]);
-                                        hCoords = parseInt(tempThumbnailCoordinates[3]);
-                                    }
-                                }
+                    result.push({
+                        startTime: vttRawData.cues[i].startTime,
+                        endTime: vttRawData.cues[i].endTime,
+                        text:  vttRawData.cues[i].text,
+                        cue: vttRawData.cues[i]
+                    })
+                }
 
-                                if (player.displayOptions.layoutControls.timelinePreview.spriteRelativePath
-                                    && player.displayOptions.layoutControls.timelinePreview.file.indexOf('/') !== -1
-                                    && (typeof player.displayOptions.layoutControls.timelinePreview.sprite === 'undefined' || player.displayOptions.layoutControls.timelinePreview.sprite == '')
-                                ) {
-                                    imageUrl = player.displayOptions.layoutControls.timelinePreview.file.substring(0, player.displayOptions.layoutControls.timelinePreview.file.lastIndexOf('/'));
-                                    imageUrl += '/' + tempThumbnailData[0];
-                                } else {
-                                    imageUrl = (player.displayOptions.layoutControls.timelinePreview.sprite ? player.displayOptions.layoutControls.timelinePreview.sprite : tempThumbnailData[0]);
-                                }
+                return result;
+            };
 
-                                result.push({
-                                    startTime: vttRawData.cues[i].startTime,
-                                    endTime: vttRawData.cues[i].endTime,
-                                    image: imageUrl,
-                                    x: xCoords,
-                                    y: yCoords,
-                                    w: wCoords,
-                                    h: hCoords
-                                });
-                            }
+            var xmlHttpReq = this;
 
-                            return result;
-                        };
+            if ((xmlHttpReq.readyState === 4) && (xmlHttpReq.status !== 200)) {
+                //The response returned an error.
+                return;
+            }
 
-                        var xmlHttpReq = this;
+            if (!((xmlHttpReq.readyState === 4) && (xmlHttpReq.status === 200))) {
+                return;
+            }
 
-                        if ((xmlHttpReq.readyState === 4) && (xmlHttpReq.status !== 200)) {
-                            //The response returned an error.
-                            return;
-                        }
+            var textResponse = xmlHttpReq.responseText;
 
-                        if (!((xmlHttpReq.readyState === 4) && (xmlHttpReq.status === 200))) {
-                            return;
-                        }
+            var webVttParser = new WebVTTParser();
+            var vttRawData = webVttParser.parse(textResponse);
 
-                        var textResponse = xmlHttpReq.responseText;
+            player.subtitlesData = convertVttRawData(vttRawData);
+            console.log(player.subtitlesData); 
 
-                        var webVttParser = new WebVTTParser();
-                        var vttRawData = webVttParser.parse(textResponse);
-
-                        convertedVttRawData = convertVttRawData(vttRawData);
-                        console.log(this);
-                    }
-                );                  
+            }
+         );                  
     },
 
     createSubtitlesSwitch: function(){
