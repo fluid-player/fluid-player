@@ -3580,11 +3580,19 @@ var fluidPlayerClass = {
 
     },
 
+    createSubtitles: function(){
+        var player = this;
+
+        fluidPlayerClass.requestScript(
+            fluidPlayerScriptLocation + fluidPlayerClass.vttParserScript,
+            player.createSubtitlesSwitch.bind(this)
+        );
+    },
+
     createSubtitlesSwitch: function(){
         var player = this;
         var videoPlayer = document.getElementById(player.videoPlayerId);
         var subtitlesOff = 'OFF'
-
 
         if (player.displayOptions.layoutControls.subtitlesEnabled) {
             var tracks = [];            
@@ -3628,9 +3636,102 @@ var fluidPlayerClass = {
 
                     player.subtitlesTracks.forEach(function(subtitle) {
                         if (subtitle.label == subtitleChangedTo.innerText.replace(/(\r\n\t|\n|\r\t)/gm,"")) {
-                            // player.setBuffering();
-                            // player.setVideoSource(subtitle.url);
-                            // player.fluidStorage.fluidQuality = subtitle.label;
+                            
+                            if(subtitle.label === subtitlesOff){
+                                console.log('no subtitles to show');
+                            }else{
+                                console.log(subtitle.lang);
+                            }
+
+                    player.sendRequest(
+                        subtitle.url,
+                        true,
+                        player.displayOptions.vastOptions.vastTimeout,
+                        function() {
+                            var convertVttRawData = function(vttRawData) {
+                                if (!(
+                                    (typeof vttRawData.cues !== 'undefined') &&
+                                    (vttRawData.cues.length)
+                                )) {
+                                    return [];
+                                }
+
+                                var result = [];
+                                var tempThumbnailData = null;
+                                var tempThumbnailCoordinates = null;
+
+                                for (var i = 0; i < vttRawData.cues.length; i++) {
+                                    tempThumbnailData = vttRawData.cues[i].text.split('#');
+                                    var xCoords = 0, yCoords = 0, wCoords = 122.5, hCoords = 69;
+
+                                    // .vtt file contains sprite corrdinates
+                                    if (
+                                        (tempThumbnailData.length === 2) &&
+                                        (tempThumbnailData[1].indexOf('xywh=') === 0)
+                                    ) {
+                                        tempThumbnailCoordinates = tempThumbnailData[1].substring(5);
+                                        tempThumbnailCoordinates = tempThumbnailCoordinates.split(',');
+
+                                        if (tempThumbnailCoordinates.length === 4) {
+                                            player.displayOptions.layoutControls.timelinePreview.spriteImage = true;
+                                            xCoords = parseInt(tempThumbnailCoordinates[0]);
+                                            yCoords = parseInt(tempThumbnailCoordinates[1]);
+                                            wCoords = parseInt(tempThumbnailCoordinates[2]);
+                                            hCoords = parseInt(tempThumbnailCoordinates[3]);
+                                        }
+                                    }
+
+                                    if (player.displayOptions.layoutControls.timelinePreview.spriteRelativePath
+                                        && player.displayOptions.layoutControls.timelinePreview.file.indexOf('/') !== -1
+                                        && (typeof player.displayOptions.layoutControls.timelinePreview.sprite === 'undefined' || player.displayOptions.layoutControls.timelinePreview.sprite == '')
+                                    ) {
+                                        imageUrl = player.displayOptions.layoutControls.timelinePreview.file.substring(0, player.displayOptions.layoutControls.timelinePreview.file.lastIndexOf('/'));
+                                        imageUrl += '/' + tempThumbnailData[0];
+                                    } else {
+                                        imageUrl = (player.displayOptions.layoutControls.timelinePreview.sprite ? player.displayOptions.layoutControls.timelinePreview.sprite : tempThumbnailData[0]);
+                                    }
+
+                                    result.push({
+                                        startTime: vttRawData.cues[i].startTime,
+                                        endTime: vttRawData.cues[i].endTime,
+                                        image: imageUrl,
+                                        x: xCoords,
+                                        y: yCoords,
+                                        w: wCoords,
+                                        h: hCoords
+                                    });
+                                }
+
+                                return result;
+                            };
+
+                            var xmlHttpReq = this;
+
+                            if ((xmlHttpReq.readyState === 4) && (xmlHttpReq.status !== 200)) {
+                                //The response returned an error.
+                                return;
+                            }
+
+                            if (!((xmlHttpReq.readyState === 4) && (xmlHttpReq.status === 200))) {
+                                return;
+                            }
+
+                            var textResponse = xmlHttpReq.responseText;
+
+                            var webVttParser = new WebVTTParser();
+                            var vttRawData = webVttParser.parse(textResponse);
+
+                            player.subtitlesData = convertVttRawData(vttRawData);
+                        }
+                    );
+                            /*
+                                1. get vtt file
+                                2. parse vtt file
+                                3. generate a data set
+                                4. based on time stamp display the subtitle text
+                                5. when the controls bar is appearing on player, add below 53px. Else 25px
+                            */
+
                         }
                     });
 
@@ -3639,6 +3740,7 @@ var fluidPlayerClass = {
                 });
                 subtitlesChangeList.appendChild(subtitlesChangeDiv);
                 appendSubtitleChange = true;
+            
             });
 
             if (appendSubtitleChange) {
@@ -4748,7 +4850,7 @@ var fluidPlayerClass = {
 
         player.createVideoSourceSwitch();
         
-        player.createSubtitlesSwitch();
+        player.createSubtitles();
 
         player.userActivityChecker();
 
