@@ -3580,9 +3580,11 @@ var fluidPlayerClass = {
 
     },
 
-    subtitleFetchParse: function(){
+    subtitleFetchParse: function(subtitleItem){
+        var player = this;
+                    var convertedVttRawData = [];
                     player.sendRequest(
-                    subtitle.url,
+                    subtitleItem.url,
                     true,
                     player.displayOptions.vastOptions.vastTimeout,
                     function() {
@@ -3659,9 +3661,10 @@ var fluidPlayerClass = {
                         var webVttParser = new WebVTTParser();
                         var vttRawData = webVttParser.parse(textResponse);
 
-                        player.subtitlesData = convertVttRawData(vttRawData);
+                        convertedVttRawData = convertVttRawData(vttRawData);
+                        console.log(this);
                     }
-                );        
+                );                  
     },
 
     createSubtitlesSwitch: function(){
@@ -3674,6 +3677,15 @@ var fluidPlayerClass = {
             tracks.push({'label': subtitlesOff, 'url': 'na', 'lang': subtitlesOff});
 
             var tracksList = videoPlayer.querySelectorAll('track');
+
+            //disable showing the captions
+            try{
+                [].forEach.call(videoPlayer.textTracks,function(textTrack){
+                    textTrack.mode = 'hidden';
+                })
+            }catch(e){
+
+            }
 
             [].forEach.call(tracksList, function (track) {
                 if (track.kind === 'subtitles' && track.src) {
@@ -3716,9 +3728,11 @@ var fluidPlayerClass = {
                             console.log('no subtitles to show');
                         }else{
                             console.log(subtitle.lang);
+                            
+                            console.log(player.subtitleFetchParse(subtitle));
                         }
 
-                        player.subtitleFetchParse();
+
                             /*
                                 1. get vtt file
                                 2. parse vtt file
