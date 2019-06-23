@@ -3582,8 +3582,7 @@ var fluidPlayerClass = {
 
     subtitleFetchParse: function(subtitleItem){
         var player = this;
-        var videoPlayerTag = document.getElementById(player.videoPlayerId);
-        player.subtitlesData =  [];
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);        
 
         player.sendRequest(
         subtitleItem.url,
@@ -3601,7 +3600,7 @@ var fluidPlayerClass = {
                 var result = [];
 
                 for (var i = 0; i < vttRawData.cues.length; i++) {
-                    tempThumbnailData = vttRawData.cues[i].text.split('#');
+                    tempThumbnailData = vttRawData.cues[i].text.split('#');                    
 
                     result.push({
                         startTime: vttRawData.cues[i].startTime,
@@ -3630,8 +3629,33 @@ var fluidPlayerClass = {
             var webVttParser = new WebVTTParser();
             var vttRawData = webVttParser.parse(textResponse);
 
-            player.subtitlesData = convertVttRawData(vttRawData);
-            console.log(player.subtitlesData); 
+            player.subtitlesData = convertVttRawData(vttRawData);                        
+
+            //attach subtitles to show based on time
+            var videoPlayerSubtitlesUpdate = function() {
+                if (player.subtitlesData.length === 0) {
+                    videoPlayerTag.removeEventListener('timeupdate', videoPlayerSubtitlesUpdate);
+                    return;
+                }
+
+                var currentTime = Math.floor(videoPlayerTag.currentTime);
+                let subtitlesAvailable = false;
+
+                for(let i=0;i<player.subtitlesData.length;i++){
+                    if (currentTime >= (player.subtitlesData[i].startTime) && currentTime <= (player.subtitlesData[i].endTime)) {                        
+                        console.log(player.subtitlesData[i].text);
+                        subtitlesAvailable = true;
+                    }
+                }
+
+                if(!subtitlesAvailable){
+                    // hide subtitles view
+                    console.log('hide subtitles view');
+                }
+
+            };
+
+            videoPlayerTag.addEventListener('timeupdate', videoPlayerSubtitlesUpdate);            
 
             }
          );                  
@@ -3641,6 +3665,7 @@ var fluidPlayerClass = {
         var player = this;
         var videoPlayer = document.getElementById(player.videoPlayerId);
         var subtitlesOff = 'OFF'
+        player.subtitlesData =  [];
 
         if (player.displayOptions.layoutControls.subtitlesEnabled) {
             var tracks = [];            
@@ -3696,27 +3721,17 @@ var fluidPlayerClass = {
                         
                         if(subtitle.label === subtitlesOff){
                             console.log('no subtitles to show');
+                            player.subtitlesData =  [];
                         }else{
-                            console.log(subtitle.lang);
-                            
+                            console.log(subtitle.lang);                            
                             console.log(player.subtitleFetchParse(subtitle));
                         }
-
-
-                            /*
-                                1. get vtt file
-                                2. parse vtt file
-                                3. generate a data set
-                                4. based on time stamp display the subtitle text
-                                5. when the controls bar is appearing on player, add below 53px. Else 25px
-                            */
-
-                        }
-                    });
-
+                    }
+                 });
                     player.openCloseSubtitlesSwitch();
 
                 });
+
                 subtitlesChangeList.appendChild(subtitlesChangeDiv);
                 appendSubtitleChange = true;
             
