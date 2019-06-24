@@ -432,6 +432,24 @@
     z-index: 1;
 }
 
+.fluid_video_wrapper.fluid_player_layout_default .fluid_subtitles_container {
+    color: white;
+    position: absolute;
+    bottom: 53px;
+    left: 0;
+    right: 0;
+    height: auto;
+    z-index: 1;
+    text-align: center;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_subtitles_container div{
+    display: inline;
+    background: black;
+    color: white;
+    font-size: 1.5em;    
+}
+
 .fluid_video_wrapper.fluid_player_layout_default .fade_out {
     visibility: hidden;
     opacity: 0;

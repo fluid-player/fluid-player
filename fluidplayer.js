@@ -3589,7 +3589,7 @@ var fluidPlayerClass = {
         subtitleItem.url,
         true,
         player.displayOptions.vastOptions.vastTimeout,
-        function(player) {
+        function() {
             var convertVttRawData = function(vttRawData) {
                 if (!(
                     (typeof vttRawData.cues !== 'undefined') &&
@@ -3626,7 +3626,7 @@ var fluidPlayerClass = {
             }
 
             var textResponse = xmlHttpReq.responseText;
-
+            
             var parser = new WebVTT.Parser(window, WebVTT.StringDecoder());
             var cues = [];
             var regions = [];
@@ -3640,40 +3640,15 @@ var fluidPlayerClass = {
             parser.flush();
             player.subtitlesData = cues;
 
+            //player.subtitlesData = convertVttRawData(vttRawData);
+
             // var webVttParser = new WebVTTParser();
             // var vttRawData = webVttParser.parse(textResponse);
             // console.log(vttRawData);
-            // player.subtitlesData = convertVttRawData(vttRawData);                        
-
-            //attach subtitles to show based on time
-            var videoPlayerSubtitlesUpdate = function() {
-                if (player.subtitlesData.length === 0) {
-                    videoPlayerTag.removeEventListener('timeupdate', videoPlayerSubtitlesUpdate);
-                    return;
-                }
-
-                var currentTime = Math.floor(videoPlayerTag.currentTime);
-                let subtitlesAvailable = false;
-
-                for(let i=0;i<player.subtitlesData.length;i++){
-                    if (currentTime >= (player.subtitlesData[i].startTime) && currentTime <= (player.subtitlesData[i].endTime)) {                        
-                        //console.log(player.subtitlesData[i].text);
-                        console.log(WebVTT.convertCueToDOMTree(window, player.subtitlesData[i].text));
-                        subtitlesAvailable = true;
-                    }
-                }
-
-                if(!subtitlesAvailable){
-                    // hide subtitles view
-                    console.log('hide subtitles view');
-                }
-
-            };
-
-            videoPlayerTag.addEventListener('timeupdate', videoPlayerSubtitlesUpdate);            
+            // player.subtitlesData = convertVttRawData(vttRawData);                               
 
             }
-         );                  
+         );                     
     },
 
     createSubtitlesSwitch: function(){
@@ -3687,15 +3662,6 @@ var fluidPlayerClass = {
             tracks.push({'label': subtitlesOff, 'url': 'na', 'lang': subtitlesOff});
 
             var tracksList = videoPlayer.querySelectorAll('track');
-
-            //disable showing the captions
-            try{
-                [].forEach.call(videoPlayer.textTracks,function(textTrack){
-                    textTrack.mode = 'hidden';
-                })
-            }catch(e){
-
-            }
 
             [].forEach.call(tracksList, function (track) {
                 if (track.kind === 'subtitles' && track.src) {
@@ -3739,7 +3705,8 @@ var fluidPlayerClass = {
                             player.subtitlesData =  [];
                         }else{
                             console.log(subtitle.lang);                            
-                            console.log(player.subtitleFetchParse(subtitle));
+                            player.subtitleFetchParse(subtitle);
+                            console.log(player.subtitlesData);
                         }
                     }
                  });
@@ -3766,7 +3733,32 @@ var fluidPlayerClass = {
         } else {
             // No other video subtitles
             document.getElementById(player.videoPlayerId + '_fluid_control_subtitles').style.display = 'none';
-        }        
+        }                     
+
+        //attach subtitles to show based on time
+        var videoPlayerSubtitlesUpdate = function() {
+            var currentTime = Math.floor(videoPlayer.currentTime);
+            var subtitlesAvailable = false;
+            var subtitlesContainer =  document.getElementById(player.videoPlayerId+'_fluid_subtitles_container');
+
+            for(let i=0;i<player.subtitlesData.length;i++){
+                if (currentTime >= (player.subtitlesData[i].startTime) && currentTime <= (player.subtitlesData[i].endTime)) {
+                    //console.log(player.subtitlesData[i].text);
+                    console.log(WebVTT.convertCueToDOMTree(window, player.subtitlesData[i].text));
+                    subtitlesContainer.innerHTML = '';
+                    subtitlesContainer.appendChild(WebVTT.convertCueToDOMTree(window, player.subtitlesData[i].text));
+                    subtitlesAvailable = true;
+                }
+            }
+
+            if(!subtitlesAvailable){
+                // hide subtitles view
+                console.log('hide subtitles view');
+                subtitlesContainer.innerHTML = '';
+            }
+        };
+
+        videoPlayer.addEventListener('timeupdate', videoPlayerSubtitlesUpdate); 
     },
 
     openCloseSubtitlesSwitch: function() {
@@ -3793,11 +3785,27 @@ var fluidPlayerClass = {
 
     createSubtitles: function(){
         var player = this;
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);
+
+        var divSubtitlesContainer = document.createElement('div');
+        divSubtitlesContainer.id = player.videoPlayerId + '_fluid_subtitles_container';
+        divSubtitlesContainer.className = 'fluid_subtitles_container';
+        videoPlayerTag.parentNode.insertBefore(divSubtitlesContainer, videoPlayerTag.nextSibling);
 
         fluidPlayerClass.requestScript(
             fluidPlayerScriptLocation + fluidPlayerClass.subtitlesParseScript,
             player.createSubtitlesSwitch.bind(this)
         );
+
+
+        //disable showing the captions
+        try{
+            [].forEach.call(videoPlayerTag.textTracks,function(textTrack){
+                textTrack.mode = 'hidden';
+            })
+        }catch(e){
+        }
+
     },
 
     createVideoSourceSwitch: function() {
@@ -4802,7 +4810,9 @@ var fluidPlayerClass = {
             hlsjsConfig: {
                 p2pConfig: {
                     logLevel: false,
-                }
+                },
+                enableWebVTT: false,
+                enableCEA708Captions: false,
             },
             captions: {
                 play: 'Play',
