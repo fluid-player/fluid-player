@@ -102,6 +102,7 @@ fluidPlayer = function(idVideoPlayer, options) {
 
 var fluidPlayerClass = {
     vttParserScript: '/scripts/webvtt.min.js',
+    subtitlesParseScript: '/scripts/vtt.js',
     instances: [],
     notCloned: ['notCloned', 'vttParserScript', 'instances', 'getInstanceById',
         'requestStylesheet', 'reqiestScript', 'isTouchDevice', 'vastOptions',
@@ -3626,10 +3627,23 @@ var fluidPlayerClass = {
 
             var textResponse = xmlHttpReq.responseText;
 
-            var webVttParser = new WebVTTParser();
-            var vttRawData = webVttParser.parse(textResponse);
+            var parser = new WebVTT.Parser(window, WebVTT.StringDecoder());
+            var cues = [];
+            var regions = [];
+            parser.oncue = function(cue) {
+              cues.push(cue);
+            };
+            parser.onregion = function(region) {
+              regions.push(region);
+            }
+            parser.parse(textResponse);
+            parser.flush();
+            player.subtitlesData = cues;
 
-            player.subtitlesData = convertVttRawData(vttRawData);                        
+            // var webVttParser = new WebVTTParser();
+            // var vttRawData = webVttParser.parse(textResponse);
+            // console.log(vttRawData);
+            // player.subtitlesData = convertVttRawData(vttRawData);                        
 
             //attach subtitles to show based on time
             var videoPlayerSubtitlesUpdate = function() {
@@ -3643,7 +3657,8 @@ var fluidPlayerClass = {
 
                 for(let i=0;i<player.subtitlesData.length;i++){
                     if (currentTime >= (player.subtitlesData[i].startTime) && currentTime <= (player.subtitlesData[i].endTime)) {                        
-                        console.log(player.subtitlesData[i].text);
+                        //console.log(player.subtitlesData[i].text);
+                        console.log(WebVTT.convertCueToDOMTree(window, player.subtitlesData[i].text));
                         subtitlesAvailable = true;
                     }
                 }
@@ -3780,7 +3795,7 @@ var fluidPlayerClass = {
         var player = this;
 
         fluidPlayerClass.requestScript(
-            fluidPlayerScriptLocation + fluidPlayerClass.vttParserScript,
+            fluidPlayerScriptLocation + fluidPlayerClass.subtitlesParseScript,
             player.createSubtitlesSwitch.bind(this)
         );
     },
