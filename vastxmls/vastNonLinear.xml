@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VAST version="3.0">
+  <Ad id="2259750">
+    <InLine>
+      <AdSystem>ExoClick</AdSystem>
+      <AdTitle/>
+      <Error><![CDATA[http://main.exoclick.com/view.php?errorcode=[ERRORCODE]&idzone=2950070]]></Error>
+      <Creatives>
+        <Creative sequence="1" id="18895532">
+          <NonLinearAds>
+            <NonLinear width="300" height="250">
+              <StaticResource creativeType="image/jpeg"><![CDATA[https://static.exoclick.com/library/457491/ed36456e6ce9dfe40fa373854593a38cccab7f94.jpg]]></StaticResource>
+              <NonLinearClickThrough><![CDATA[http://www.fluidplayer.com/]]></NonLinearClickThrough>
+            </NonLinear>
+          </NonLinearAds>
+        </Creative>
+      </Creatives>
+    </InLine>
+  </Ad>
+</VAST>
