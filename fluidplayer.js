@@ -3736,7 +3736,18 @@ var fluidPlayerClass = {
         }                     
 
         //attach subtitles to show based on time
+        //this function is for rendering of subtitles when content is playing
         var videoPlayerSubtitlesUpdate = function() {
+            //if content is playing then no subtitles
+            var currentTime = Math.floor(videoPlayer.currentTime);
+            var subtitlesAvailable = false;
+            var subtitlesContainer =  document.getElementById(player.videoPlayerId+'_fluid_subtitles_container');
+                        
+            if(player.isCurrentlyPlayingAd){
+                 subtitlesContainer.innerHTML = '';
+                return;
+            }
+
             var currentTime = Math.floor(videoPlayer.currentTime);
             var subtitlesAvailable = false;
             var subtitlesContainer =  document.getElementById(player.videoPlayerId+'_fluid_subtitles_container');
