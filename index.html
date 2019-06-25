@@ -7,12 +7,14 @@
 <!--   <link rel="stylesheet" href="defaultcss.css" type="text/css"/> -->
 
 </head>
-<body>
+<body style="text-align: center;">
 
   <h1 style="text-align: center;"> Fluid Player Subtitles</h1>
 
   <video id='myVideo' controls style="width: 640px; height: 360px;">
     <source src='https://wowzaec2demo.streamlock.net/vod-multitrack/_definst_/smil:ElephantsDream/elephantsdream2.smil/playlist.m3u8' title='1080p'  type='application/x-mpegURL' />
+    <source src='https://wowzaec2demo.streamlock.net/vod-multitrack/_definst_/smil:ElephantsDream/elephantsdream2.smil/playlist.m3u8' title='620p'  type='application/x-mpegURL' />
+    <source src='https://wowzaec2demo.streamlock.net/vod-multitrack/_definst_/smil:ElephantsDream/elephantsdream2.smil/playlist.m3u8' title='480p'  type='application/x-mpegURL' />        
 
     <track label="English" kind="subtitles" srclang="en"
            src="subtitles/english.vtt" default>
@@ -42,7 +44,7 @@
               {
                   roll: 'midRoll',
                   vastTag: 'vastxmls/vastLinear.xml',
-                  timer: 15,
+                  timer: 20,
                   adClickable: true
               },              
               {

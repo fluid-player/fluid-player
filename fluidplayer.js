@@ -3701,12 +3701,12 @@ var fluidPlayerClass = {
                     if (subtitle.label == subtitleChangedTo.innerText.replace(/(\r\n\t|\n|\r\t)/gm,"")) {
                         
                         if(subtitle.label === subtitlesOff){
-                            console.log('no subtitles to show');
+                            //console.log('no subtitles to show');
                             player.subtitlesData =  [];
                         }else{
-                            console.log(subtitle.lang);                            
+                            //console.log(subtitle.lang);                            
                             player.subtitleFetchParse(subtitle);
-                            console.log(player.subtitlesData);
+                            //console.log(player.subtitlesData);
                         }
                     }
                  });
@@ -3738,40 +3738,46 @@ var fluidPlayerClass = {
         //attach subtitles to show based on time
         //this function is for rendering of subtitles when content is playing
         var videoPlayerSubtitlesUpdate = function() {
-            //if content is playing then no subtitles
-            var currentTime = Math.floor(videoPlayer.currentTime);
-            var subtitlesAvailable = false;
-            var subtitlesContainer =  document.getElementById(player.videoPlayerId+'_fluid_subtitles_container');
-                        
-            if(player.isCurrentlyPlayingAd){
-                 subtitlesContainer.innerHTML = '';
-                return;
-            }
-
-            var currentTime = Math.floor(videoPlayer.currentTime);
-            var subtitlesAvailable = false;
-            var subtitlesContainer =  document.getElementById(player.videoPlayerId+'_fluid_subtitles_container');
-
-            for(let i=0;i<player.subtitlesData.length;i++){
-                if (currentTime >= (player.subtitlesData[i].startTime) && currentTime <= (player.subtitlesData[i].endTime)) {
-                    //console.log(player.subtitlesData[i].text);
-                    console.log(WebVTT.convertCueToDOMTree(window, player.subtitlesData[i].text));
-                    subtitlesContainer.innerHTML = '';
-                    subtitlesContainer.appendChild(WebVTT.convertCueToDOMTree(window, player.subtitlesData[i].text));
-                    subtitlesAvailable = true;
-                }
-            }
-
-            if(!subtitlesAvailable){
-                // hide subtitles view
-                console.log('hide subtitles view');
-                subtitlesContainer.innerHTML = '';
-            }
+            player.renderSubtitles();
         };
 
         videoPlayer.addEventListener('timeupdate', videoPlayerSubtitlesUpdate); 
     },
 
+    renderSubtitles: function(){
+        var player = this;
+        var videoPlayer = document.getElementById(player.videoPlayerId);
+        
+        //if content is playing then no subtitles
+        var currentTime = Math.floor(videoPlayer.currentTime);
+        var subtitlesAvailable = false;
+        var subtitlesContainer =  document.getElementById(player.videoPlayerId+'_fluid_subtitles_container');
+                    
+        if(player.isCurrentlyPlayingAd){
+             subtitlesContainer.innerHTML = '';
+            return;
+        }
+
+        var currentTime = Math.floor(videoPlayer.currentTime);
+        var subtitlesAvailable = false;
+        var subtitlesContainer =  document.getElementById(player.videoPlayerId+'_fluid_subtitles_container');
+
+        for(let i=0;i<player.subtitlesData.length;i++){
+            if (currentTime >= (player.subtitlesData[i].startTime) && currentTime <= (player.subtitlesData[i].endTime)) {
+                //console.log(player.subtitlesData[i].text);
+                //console.log(WebVTT.convertCueToDOMTree(window, player.subtitlesData[i].text));
+                subtitlesContainer.innerHTML = '';
+                subtitlesContainer.appendChild(WebVTT.convertCueToDOMTree(window, player.subtitlesData[i].text));
+                subtitlesAvailable = true;
+            }
+        }
+
+        if(!subtitlesAvailable){
+            // hide subtitles view
+            //console.log('hide subtitles view');
+            subtitlesContainer.innerHTML = '';
+        }        
+    },
     openCloseSubtitlesSwitch: function() {
         var player = this;
         var subtitleChangeList = document.getElementById(this.videoPlayerId + '_fluid_control_subtitles_list');
@@ -3816,7 +3822,6 @@ var fluidPlayerClass = {
             })
         }catch(e){
         }
-
     },
 
     createVideoSourceSwitch: function() {

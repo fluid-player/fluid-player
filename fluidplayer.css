@@ -435,7 +435,7 @@
 .fluid_video_wrapper.fluid_player_layout_default .fluid_subtitles_container {
     color: white;
     position: absolute;
-    bottom: 53px;
+    bottom: 46px;
     left: 0;
     right: 0;
     height: auto;
@@ -447,7 +447,10 @@
     display: inline;
     background: black;
     color: white;
-    font-size: 1.5em;    
+    font-size: 1.5em;  
+    font-family: 'Roboto', sans-serif;
+    padding: 0.25em;
+    border-radius: 4px;  
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .fade_out {
