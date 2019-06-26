@@ -5127,6 +5127,11 @@ var fluidPlayerClass = {
                     }
                 });
                 break;
+            case 'playing':
+                videoPlayer.addEventListener('playing', function() {                    
+                        functionCall();                    
+                });
+                break;                
             case 'theatreModeOn':
                 videoPlayer.addEventListener('theatreModeOn', function() {
                     functionCall();
