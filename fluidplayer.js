@@ -3255,6 +3255,16 @@ var fluidPlayerClass = {
             }
         };
 
+
+        /*
+            Dobule click fullscreen
+        */
+        if(player.displayOptions.layoutControls.doubleclickFullscreen){
+            videoPlayerTag.addEventListener('dblclick', function() {
+                player.fullscreenToggle();
+            }, false);            
+        }
+
         var initiateVolumebarTimerId = setInterval(initiateVolumebar, 100);
 
         player.initHtmlOnPauseBlock();
@@ -3639,14 +3649,7 @@ var fluidPlayerClass = {
             parser.parse(textResponse);
             parser.flush();
             player.subtitlesData = cues;
-
-            //player.subtitlesData = convertVttRawData(vttRawData);
-
-            // var webVttParser = new WebVTTParser();
-            // var vttRawData = webVttParser.parse(textResponse);
-            // console.log(vttRawData);
-            // player.subtitlesData = convertVttRawData(vttRawData);                               
-
+                             
             }
          );                     
     },
@@ -4760,6 +4763,7 @@ var fluidPlayerClass = {
                 playbackRateEnabled:          false,
                 subtitlesEnabled:             false,
                 allowTheatre:                 true,
+                doubleclickFullscreen:        true,
                 theatreSettings: {
                     width:                    '100%',
                     height:                   '60%',
