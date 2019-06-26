@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../fluidplayer.css" type="text/css"/>
+    <script src="../fluidplayer.js"></script>
+    <style>
+    .player{
+        width:400px;
+        height:400px;
+        }
+    </style>
+</head>
+<body>
+    <video id="video-id1" class='player'> <source src="https://cdn.fluidplayer.com/videos/valerian-480p.mkv" type="video/mp4"/> </video>
+
+    <video id="video-id2" class='player'> <source src="https://cdn.fluidplayer.com/videos/valerian-480p.mkv" type="video/mp4"/> </video>
+
+    <video id="video-id3" class='player'> <source src="https://cdn.fluidplayer.com/videos/valerian-480p.mkv" type="video/mp4"/> </video>
+</body>
+<script>
+    var player1 = fluidPlayer("video-id1",{
+           layoutControls: {
+              primaryColor: "#28B8ED",
+              playbackRateEnabled: true,
+           }
+        });
+    var player2 = fluidPlayer("video-id2",{
+           layoutControls: {
+              primaryColor: "#28B8ED",
+              playbackRateEnabled: true,
+           }
+        });
+    var player3 = fluidPlayer("video-id3",{
+           layoutControls: {
+              primaryColor: "#28B8ED",
+              playbackRateEnabled: true,
+           }
+        });
+
+    player1.on('playing', function(){ 
+        player2.pause();
+        player3.pause();  
+    });
+
+    player2.on('playing', function(){ 
+        player1.pause();
+        player3.pause();
+    });
+
+    player3.on('playing', function(){ 
+        player1.pause();
+        player2.pause();
+    });    
+</script>
+</html>
