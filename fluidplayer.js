@@ -2651,6 +2651,7 @@ var fluidPlayerClass = {
     setVastList: function () {
         var player = this;
         var ads = {};
+        var adGroupedByRolls = {preRoll:[], postRoll:[], midRoll:[], onPauseRoll:[]};
         var def = {id: null, roll: null, played: false, vastLoaded: false, error: false, adText: null, adTextPosition: null};
         var idPart = 0;
 
@@ -2720,6 +2721,24 @@ var fluidPlayerClass = {
             }
         }
 
+        // group the ads by roll
+
+        Object.keys(ads).map(function(e) {
+           if(ads[e].roll.toLowerCase() === 'preRoll'.toLowerCase()){
+            adGroupedByRolls.preRoll.push(ads[e]);
+           }
+           else if(ads[e].roll.toLowerCase() === 'midRoll'.toLowerCase()){
+            adGroupedByRolls.midRoll.push(ads[e]);
+           }
+           else if(ads[e].roll.toLowerCase() === 'postRoll'.toLowerCase()){
+            adGroupedByRolls.postRoll.push(ads[e]);
+           }
+           else if(ads[e].roll.toLowerCase() === 'onPauseRoll'.toLowerCase()){
+            adGroupedByRolls.onPauseRoll.push(ads[e]);
+           }
+        });
+
+        player.adGroupedByRolls = adGroupedByRolls;
         player.adList = ads;
     },
 
