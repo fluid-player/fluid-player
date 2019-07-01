@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>FluidPlayer Subtitles</title>
+  <title>FluidPlayer multi ads</title>
   <script type="text/javascript" src="fluidplayer.js"></script>
   <link rel="stylesheet" href="fluidplayer.css" type="text/css"/>
 <!--   <link rel="stylesheet" href="defaultcss.css" type="text/css"/> -->
@@ -9,7 +9,7 @@
 </head>
 <body style="text-align: center;">
 
-  <h1 style="text-align: center;"> Fluid Player Subtitles</h1>
+  <h1 style="text-align: center;"> Fluid Player multi ads</h1>
 
   <video id='myVideo' controls style="width: 640px; height: 360px;">
     <source src='https://wowzaec2demo.streamlock.net/vod-multitrack/_definst_/smil:ElephantsDream/elephantsdream2.smil/playlist.m3u8' title='1080p'  type='application/x-mpegURL' />
@@ -27,19 +27,24 @@
   <script type="text/javascript">
     var myPlayer = fluidPlayer('myVideo',{
       layoutControls: {
-        subtitlesEnabled: true
+        subtitlesEnabled: true,
+        doubleclickFullscreen: false
       },
       vastOptions: {
           adList: [
+              // {
+              //     roll: 'preRoll',
+              //     vastTag: 'vastxmls/vastLinear.xml',
+              //     adText: 'Advertising supports us directly'
+              // },
               {
                   roll: 'preRoll',
-                  vastTag: 'vastxmls/vastLinear.xml',
+                  vastTag: 'vastxmls/vastLinear_ad2.xml',
                   adText: 'Advertising supports us directly'
               },
               {
                   roll: 'preRoll',
-                  vastTag: 'vastxmls/vastLinear_ads2.xml',
-                  adText: 'Advertising supports us directly'
+                  vastTag: 'vastxmls/vastNonLinear.xml',
               },                           
               {
                   roll: 'midRoll',
@@ -54,7 +59,7 @@
               },              
               {
                   roll: 'midRoll',
-                  vastTag: 'vastxmls/vastLinear.xml',
+                  vastTag: 'vastxmls/vastLinear_ad2.xml',
                   timer: 20,
                   adClickable: true
               },              

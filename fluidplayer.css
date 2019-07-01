@@ -732,7 +732,7 @@ _:-ms-lang(x),
     user-select: none;
 }
 
-.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button_subtitles .fluid_video_sources_title, 
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button_video_source .fluid_video_sources_title, 
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button_subtitles .fluid_subtitles_title {
     width: 80px;
     overflow: hidden;

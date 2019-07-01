@@ -1386,6 +1386,7 @@ var fluidPlayerClass = {
         videoPlayerTag.removeEventListener(event.type, player.preRoll);
         player.firstPlayLaunched = true;
         var adListId = event.type.replace('adId_', '');
+        var time = 0;
 
         if (player.adList[adListId].played === true) {
             return;
@@ -1397,8 +1398,10 @@ var fluidPlayerClass = {
         }
 
         if (player.adList[adListId].adType == 'nonLinear') {
-            player.switchToMainVideo();
-            player.createNonLinearStatic(adListId);
+            //if(player.adGroupedByRolls.preRoll.l)
+            //player.switchToMainVideo();
+            //player.createNonLinearStatic(adListId);
+            player.scheduleTask({time: time, playRoll: 'midRoll', adListId: adListId});
         }
 
     },
@@ -2722,7 +2725,7 @@ var fluidPlayerClass = {
         }
 
         // group the ads by roll
-
+        // pushing object references and forming json        
         Object.keys(ads).map(function(e) {
            if(ads[e].roll.toLowerCase() === 'preRoll'.toLowerCase()){
             adGroupedByRolls.preRoll.push(ads[e]);
