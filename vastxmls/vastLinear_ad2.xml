@@ -29,7 +29,7 @@
                      <ClickTracking><![CDATA[http://example2.com/view2?tracking_event=click&idzone=9999999]]></ClickTracking>
                   </VideoClicks>
                   <MediaFiles>
-                     <MediaFile delivery="progressive" type="video/mp4"><![CDATA[https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_10mb.mp4]]></MediaFile>
+                     <MediaFile delivery="progressive" type="video/mp4"><![CDATA[http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4]]></MediaFile>
                   </MediaFiles>
                </Linear>
             </Creative>
