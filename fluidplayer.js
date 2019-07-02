@@ -1628,7 +1628,7 @@ var fluidPlayerClass = {
 
             for (var keyTime in player.timerPool) {
 
-                time = Math.floor(player.getCurrentTime());
+                var time = Math.floor(player.getCurrentTime());
                 if(time != keyTime || player.isCurrentlyPlayingAd) {
                     continue;
                 }
