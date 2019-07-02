@@ -1134,24 +1134,9 @@ var fluidPlayerClass = {
         
     },
 
-    playNextVideoAdInPod: function(){
-        // wait for event from previous ad complete
-        // and then render new ad
-        // var adListId = ;
-
-        // check if this is the last ad in the pod, then empty the player.temproaryAdPods array
-
+    playNextVideoAdInPod: function(adListId){
         var player = this;
-        var getFirstUnPlayedAd = false;
-        var adListId = player.checkIfAvailableNextAdPod();
-        if(adListId === null){            
-            player.switchToMainVideo();
-            player.vastOptions = null;
-            player.adFinished = true;
-            return;
-        }else{
-            player.renderVideoAd(adListId);
-        }        
+        player.renderVideoAd(adListId);            
     },
 
     playRoll: function(adListId) {
@@ -1658,7 +1643,7 @@ var fluidPlayerClass = {
 
                         var vastOptions = player.adPool[adIdToCheck];
 
-                        if(vastOptions.adType == 'linear'){                            
+                        if(vastOptions.adType == 'linear'){                           
                             player.playRoll(adIdToCheck);
                         }
                         if(vastOptions.adType == 'nonLinear'){
@@ -1797,28 +1782,17 @@ var fluidPlayerClass = {
 
         player.deleteVastAdElements();
 
-        // if(player.temproaryAdPods.length === 0 || (player.temproaryAdPods.length === 1 && player.temproaryAdPods[0].played === true)){
-        //     player.switchToMainVideo();
-        //     player.vastOptions = null;
-        //     player.adFinished = true;            
-        // }else{
-        //     videoPlayerTag.removeEventListener('ended', player.onVastAdEnded);
-        //     player.isCurrentlyPlayingAd = false;
-        //     player.vastOptions = null;
-        //     player.adFinished = true;            
-        //     player.playNextVideoAdInPod();
-        // }
         var adList = player.checkIfAvailableNextAdPod();
         if(adList === null){
-             player.switchToMainVideo();
-             player.vastOptions = null;
-             player.adFinished = true;   
+            player.switchToMainVideo();
+            player.vastOptions = null;
+            player.adFinished = true;
         }else{
             videoPlayerTag.removeEventListener('ended', player.onVastAdEnded);
             player.isCurrentlyPlayingAd = false;
             player.vastOptions = null;
             player.adFinished = true;            
-            player.playNextVideoAdInPod();
+            player.playNextVideoAdInPod(adList);
         }
 
     },
