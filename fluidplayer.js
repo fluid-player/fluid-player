@@ -1624,8 +1624,7 @@ var fluidPlayerClass = {
     },
 
     getAllLinearAdsFromKeyTime: function(keyTimeObj){
-        var adListIds = [];
-        console.log(keyTimeObj);
+        var adListIds = [];        
 
         for (let i = 0; i < keyTimeObj.length; i++) {
             adListIds.push(keyTimeObj[i].adListId);
@@ -1664,7 +1663,6 @@ var fluidPlayerClass = {
                             var vastOptions = player.adPool[adIdToCheck];
 
                             if(vastOptions.adType == 'linear'){
-                                //console.log('invoke ad '+adIdToCheck);
 
                                 if(player.timerPool[keyTime].length >1){
                                  var adListIds = player.getAllLinearAdsFromKeyTime(player.timerPool[keyTime]);  
@@ -3870,12 +3868,9 @@ var fluidPlayerClass = {
                     if (subtitle.label == subtitleChangedTo.innerText.replace(/(\r\n\t|\n|\r\t)/gm,"")) {
                         
                         if(subtitle.label === subtitlesOff){
-                            //console.log('no subtitles to show');
                             player.subtitlesData =  [];
-                        }else{
-                            //console.log(subtitle.lang);                            
+                        }else{                   
                             player.subtitleFetchParse(subtitle);
-                            //console.log(player.subtitlesData);
                         }
                     }
                  });
@@ -3933,8 +3928,6 @@ var fluidPlayerClass = {
 
         for(let i=0;i<player.subtitlesData.length;i++){
             if (currentTime >= (player.subtitlesData[i].startTime) && currentTime <= (player.subtitlesData[i].endTime)) {
-                //console.log(player.subtitlesData[i].text);
-                //console.log(WebVTT.convertCueToDOMTree(window, player.subtitlesData[i].text));
                 subtitlesContainer.innerHTML = '';
                 subtitlesContainer.appendChild(WebVTT.convertCueToDOMTree(window, player.subtitlesData[i].text));
                 subtitlesAvailable = true;
@@ -3942,8 +3935,6 @@ var fluidPlayerClass = {
         }
 
         if(!subtitlesAvailable){
-            // hide subtitles view
-            //console.log('hide subtitles view');
             subtitlesContainer.innerHTML = '';
         }        
     },
