@@ -1027,7 +1027,7 @@ var fluidPlayerClass = {
         }
     },
 
-    renderVideoAd: function(adListId){
+    renderVideoAd: function(adListId,backupTheVideoTime = true){
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
@@ -1036,7 +1036,10 @@ var fluidPlayerClass = {
             //get the proper ad
             player.vastOptions = player.adPool[adListId];
 
-            player.backupMainVideoContentTime(adListId);
+            if(backupTheVideoTime){
+                player.backupMainVideoContentTime(adListId);                
+            }
+
 
             var playVideoPlayer = function(adListId) {
                 player.switchPlayerToVastMode = function() {
@@ -1136,10 +1139,10 @@ var fluidPlayerClass = {
 
     playNextVideoAdInPod: function(adListId){
         var player = this;
-        player.renderVideoAd(adListId);            
+        player.renderVideoAd(adListId,false);
     },
 
-    playRoll: function(adListId) {
+    playRoll: function(adListId,adPods) {
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
         
@@ -1149,7 +1152,13 @@ var fluidPlayerClass = {
         }
         
         // register all the ad pods
-        player.temproaryAdPods.push(player.adList[adListId]);
+        if(adPods){
+            for (let i = 0; i < adPods.length; i++) {
+                player.temproaryAdPods.push(player.adList[adPods[i]]);                
+            }
+        }else{
+            player.temproaryAdPods.push(player.adList[adListId]);
+        }
 
         if(player.vastOptions !== null && player.vastOptions.adType.toLowerCase() === 'linear'){
             return;
@@ -1408,7 +1417,7 @@ var fluidPlayerClass = {
         var player = this;
         var found = false;
         for(let i = 0; i < groupedRolls.length; i++) {
-            if (player.adList[groupedRolls[i].id].adType.toLowerCase() === 'linear') {
+            if (player.adList[groupedRolls[i].id].adType && player.adList[groupedRolls[i].id].adType === 'linear') {
                 found = true;
                 break;
             }
@@ -1614,6 +1623,16 @@ var fluidPlayerClass = {
         player.trackSingleEvent(status);
     },
 
+    getAllLinearAdsFromKeyTime: function(keyTimeObj){
+        var adListIds = [];
+        console.log(keyTimeObj);
+
+        for (let i = 0; i < keyTimeObj.length; i++) {
+            adListIds.push(keyTimeObj[i].adListId);
+        }
+
+        return adListIds;
+    },
 
     adTimer: function() {
         var player = this;
@@ -1633,44 +1652,75 @@ var fluidPlayerClass = {
                     continue;
                 }
 
-                //Task: playRoll
-                if (player.timerPool[keyTime] && player.timerPool[keyTime].hasOwnProperty('playRoll')) {
+                for (let index = 0; index < player.timerPool[keyTime].length; index++) {
+                    //Task: playRoll
+                    if (player.timerPool[keyTime] && player.timerPool[keyTime][index] && player.timerPool[keyTime][index].hasOwnProperty('playRoll')) {
 
-                    var adIdToCheck = player.timerPool[keyTime].adListId;
-                    var playRoll = player.timerPool[keyTime].playRoll;
+                        var adIdToCheck = player.timerPool[keyTime][index].adListId;
+                        var playRoll = player.timerPool[keyTime][index].playRoll;
 
-                    if(player.adList[adIdToCheck].played == false) {
+                        if(player.adList[adIdToCheck].played == false) {
 
-                        var vastOptions = player.adPool[adIdToCheck];
+                            var vastOptions = player.adPool[adIdToCheck];
 
-                        if(vastOptions.adType == 'linear'){                           
-                            player.playRoll(adIdToCheck);
-                        }
-                        if(vastOptions.adType == 'nonLinear'){
-                            player.createNonLinearStatic(adIdToCheck);
-                            if (player.displayOptions.vastOptions.showProgressbarMarkers) {
-                                player.hideAdMarker(adIdToCheck);
+                            if(vastOptions.adType == 'linear'){
+                                //console.log('invoke ad '+adIdToCheck);
+
+                                if(player.timerPool[keyTime].length >1){
+                                 var adListIds = player.getAllLinearAdsFromKeyTime(player.timerPool[keyTime]);  
+                                 player.playRoll(adIdToCheck,adListIds);
+                                }else{
+                                  player.playRoll(adIdToCheck);  
+                                }
+                                
+                                //player.playRoll(adIdToCheck);
+                                //linearAdPods.push(adIdToCheck);
+                            }
+                            if(vastOptions.adType == 'nonLinear'){
+                                player.createNonLinearStatic(adIdToCheck);
+                                if (player.displayOptions.vastOptions.showProgressbarMarkers) {
+                                    player.hideAdMarker(adIdToCheck);
+                                }
+                            }
+                            
+                            //Remove ad from the play list
+                            if(player.timerPool[keyTime].length === 1){
+                                delete player.timerPool[keyTime];
+                                break;
+                            }else{
+                                player.timerPool[keyTime].splice(index, 1);
+                            }
+
+                        }else if(player.adList[adIdToCheck].played == true){
+                            //Remove ad from the play list
+                            if(player.timerPool[keyTime].length === 1){
+                                delete player.timerPool[keyTime];
+                                break;
+                            }else{
+                                player.timerPool[keyTime].splice(index, 1);
                             }
                         }
 
-                        //Remove ad from the play list
-                        delete player.timerPool[keyTime];
                     }
 
-                }
 
+                    //Task: close nonLinear ads
+                    if (player.timerPool[keyTime] && player.timerPool[keyTime][index].hasOwnProperty('closeStaticAd')) {
+                        var adListId = player.timerPool[keyTime][index].closeStaticAd;
 
-                //Task: close nonLinear ads
-                if (player.timerPool[keyTime] && player.timerPool[keyTime].hasOwnProperty('closeStaticAd')) {
-                    var adListId = player.timerPool[keyTime].closeStaticAd;
+                        if(player.adList[adListId].played == true) {
+                            player.completeNonLinearStatic(adListId);
 
-                    if(player.adList[adListId].played == true) {
-                        player.completeNonLinearStatic(adListId);
+                            //Remove ad from the play list
+                            if(player.timerPool[keyTime].length === 1){
+                                delete player.timerPool[keyTime];
+                                break;
+                            }else{
+                                player.timerPool[keyTime].splice(index, 1);
+                            }
+                        }
 
-                        //Remove ad from the play list
-                        delete player.timerPool[keyTime];
                     }
-
                 }
 
             }
@@ -1680,7 +1730,11 @@ var fluidPlayerClass = {
 
 
     scheduleTask: function (task) {
-        this.timerPool[task.time] = task;
+        var player = this;
+        if(!player.timerPool.hasOwnProperty(task.time)){
+            player.timerPool[task.time] = [];
+        }
+        player.timerPool[task.time].push(task);
     },
 
     deleteVastAdElements: function(){
@@ -1727,7 +1781,7 @@ var fluidPlayerClass = {
         var progressbarContainer = document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container');
 
         if (progressbarContainer !== null) {
-            backgroundColor = (player.displayOptions.layoutControls.primaryColor) ? player.displayOptions.layoutControls.primaryColor : "white";
+            var backgroundColor = (player.displayOptions.layoutControls.primaryColor) ? player.displayOptions.layoutControls.primaryColor : "white";
             document.getElementById(player.videoPlayerId + '_vast_control_currentprogress').style.backgroundColor = backgroundColor;
         }
 
@@ -2089,7 +2143,7 @@ var fluidPlayerClass = {
     },
 
     removeSkipButton: function() {
-        btn = document.getElementById('skip_button_' + this.videoPlayerId);
+        var btn = document.getElementById('skip_button_' + this.videoPlayerId);
         if (btn) {
             btn.parentElement.removeChild(btn);
         }
@@ -2801,7 +2855,7 @@ var fluidPlayerClass = {
                     player.announceLocalError(102, 'Wrong adList parameters.');
                     continue;
                 }
-                id = 'ID' + idPart;
+                var id = 'ID' + idPart;
 
                 ads[id] = Object.assign({}, def);
                 ads[id] = Object.assign(ads[id], player.displayOptions.vastOptions.adList[key]);
@@ -3344,7 +3398,7 @@ var fluidPlayerClass = {
 
         // Primary Colour
 
-        backgroundColor = (player.displayOptions.layoutControls.primaryColor) ? player.displayOptions.layoutControls.primaryColor : "white";
+        var backgroundColor = (player.displayOptions.layoutControls.primaryColor) ? player.displayOptions.layoutControls.primaryColor : "white";
         document.getElementById(player.videoPlayerId + '_vast_control_currentprogress').style.backgroundColor = backgroundColor;
 
         videoPlayerTag.parentNode.insertBefore(divLoading, videoPlayerTag.nextSibling);
@@ -4243,7 +4297,7 @@ var fluidPlayerClass = {
         var containerDiv = document.createElement('div');
         containerDiv.id = player.videoPlayerId + '_fluid_initial_play_button';
         containerDiv.className = 'fluid_html_on_pause';
-        backgroundColor = (player.displayOptions.layoutControls.primaryColor) ? player.displayOptions.layoutControls.primaryColor : "#333333";
+        var backgroundColor = (player.displayOptions.layoutControls.primaryColor) ? player.displayOptions.layoutControls.primaryColor : "#333333";
         containerDiv.innerHTML = '<div id="' + player.videoPlayerId + '_fluid_initial_play" class="fluid_initial_play" style="background-color:' + backgroundColor + '"><div id="' + player.videoPlayerId + '_fluid_state_button" class="fluid_initial_play_button"></div></div>';
         var initPlayFunction = function() {
             player.playPauseToggle(videoPlayer);
@@ -4297,7 +4351,7 @@ var fluidPlayerClass = {
             player.newActivity = true;
         };
 
-        activityCheck = setInterval(function () {
+        var activityCheck = setInterval(function () {
 
             if (player.newActivity === true) {
                 if (!isMouseStillDown && !player.isLoading) {
