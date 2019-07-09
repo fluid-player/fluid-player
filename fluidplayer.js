@@ -1137,11 +1137,6 @@ var fluidPlayerClass = {
         
     },
 
-    playNextVideoAdInPod: function(adListId){
-        var player = this;
-        player.renderVideoAd(adListId,false);
-    },
-
     playRoll: function(adListId,adPods) {
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
@@ -1834,8 +1829,8 @@ var fluidPlayerClass = {
 
         player.deleteVastAdElements();
 
-        var adList = player.checkIfAvailableNextAdPod();
-        if(adList === null){
+        var availableNextAdID = player.checkIfAvailableNextAdPod();
+        if(availableNextAdID === null){
             player.switchToMainVideo();
             player.vastOptions = null;
             player.adFinished = true;
@@ -1843,8 +1838,8 @@ var fluidPlayerClass = {
             videoPlayerTag.removeEventListener('ended', player.onVastAdEnded);
             player.isCurrentlyPlayingAd = false;
             player.vastOptions = null;
-            player.adFinished = true;            
-            player.playNextVideoAdInPod(adList);
+            player.adFinished = true;                        
+            player.renderVideoAd(availableNextAdID,false); // passing false so it doesn't backup the Ad playbacktime as video playback time
         }
 
     },
