@@ -1366,7 +1366,9 @@ var fluidPlayerClass = {
         //get the proper ad
         player.vastOptions = player.adPool[adListId];
         player.createBoard(adListId);
-
+        if (player.adList[adListId].error === true) {
+            return;
+        }
         player.adFinished = false;
         player.trackSingleEvent('start');
 
