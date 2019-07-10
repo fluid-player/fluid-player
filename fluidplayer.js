@@ -1712,7 +1712,9 @@ var fluidPlayerClass = {
                 player.createBoard(adListId);
                 player.currentOnPauseRollAd = adListId;
                 onPauseAd = document.getElementById('fluid_nonLinear_' + adListId);
-                onPauseAd.style.display = 'none';
+                if (onPauseAd) {
+                    onPauseAd.style.display = 'none';
+                }
             } else {
                 player.onPauseRollAdPods.push(adListId);
             }
