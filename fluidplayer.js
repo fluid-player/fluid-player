@@ -1403,7 +1403,13 @@ var fluidPlayerClass = {
 
         if (typeof vastSettings.staticResource === 'undefined'
             || player.supportedStaticTypes.indexOf(vastSettings.creativeType) === -1) {
+            //Couldn’t find NonLinear resource with supported type.
             player.adList[adListId].error = true;
+            if (!player.vastOptions || typeof player.vastOptions.errorUrl === 'undefined') {
+                player.announceLocalError(503);
+            } else {
+                player.announceError(503);
+            }
             return;
         }
 
