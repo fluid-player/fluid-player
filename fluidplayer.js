@@ -1149,10 +1149,10 @@ var fluidPlayerClass = {
         // register all the ad pods
         if(adPods){
             for (let i = 0; i < adPods.length; i++) {
-                player.temproaryAdPods.push(player.adList[adPods[i]]);                
+                player.temporaryAdPods.push(player.adList[adPods[i]]);                
             }
         }else{
-            player.temproaryAdPods.push(player.adList[adListId]);
+            player.temporaryAdPods.push(player.adList[adListId]);
         }
 
         if(player.vastOptions !== null && player.vastOptions.adType.toLowerCase() === 'linear'){
@@ -1554,11 +1554,11 @@ var fluidPlayerClass = {
                 player.announceLocalError(101);
                 return;
             }
-
-
+            
             player.createBoard(adListId);
             onPauseAd = document.getElementById('fluid_nonLinear_' + adListId);
             onPauseAd.style.display = 'none';
+
         }
     },
 
@@ -1583,10 +1583,10 @@ var fluidPlayerClass = {
 
         if (player.hasValidOnPauseAd() && !player.isCurrentlyPlayingAd) {
 
-            onPauseRoll = player.findRoll('onPauseRoll');
-            adListId = onPauseRoll[0];
+            var onPauseRoll = player.findRoll('onPauseRoll');
+            var adListId = onPauseRoll[0];
             player.vastOptions = player.adPool[adListId];
-            onPauseAd = document.getElementById('fluid_nonLinear_' + adListId);
+            var onPauseAd = document.getElementById('fluid_nonLinear_' + adListId);
 
             if (onPauseAd && videoPlayerTag.paused) {
                 onPauseAd.style.display = 'flex';
@@ -1802,12 +1802,12 @@ var fluidPlayerClass = {
         var adListId = null;
 
         //remove all played and error ads
-        for (var i = 0; i < player.temproaryAdPods.length; i++) {
-            if(player.temproaryAdPods[i].played || player.temproaryAdPods[i].error){
-                player.temproaryAdPods.splice(i, 1);
+        for (var i = 0; i < player.temporaryAdPods.length; i++) {
+            if(player.temporaryAdPods[i].played || player.temporaryAdPods[i].error){
+                player.temporaryAdPods.splice(i, 1);
             }
-            if(!getFirstUnPlayedAd && player.temproaryAdPods.length >0 && player.temproaryAdPods[i].played === false){
-                adListId = player.temproaryAdPods[i].id;
+            if(!getFirstUnPlayedAd && player.temporaryAdPods.length >0 && player.temporaryAdPods[i].played === false){
+                adListId = player.temporaryAdPods[i].id;
                 getFirstUnPlayedAd = true;
             }
         }
@@ -4853,7 +4853,7 @@ var fluidPlayerClass = {
         player.adList                  = {};
         player.adPool                  = {};
         player.adGroupedByRolls        = {};
-        player.temproaryAdPods         = [];
+        player.temporaryAdPods         = [];
         player.availableRolls          = ['preRoll', 'midRoll', 'postRoll', 'onPauseRoll'];
         player.supportedNonLinearAd    = ['300x250', '468x60', '728x90'];
         player.autoplayAfterAd         = true;
