@@ -1362,6 +1362,7 @@ var fluidPlayerClass = {
 
         board.id = 'fluid_nonLinear_' + adListId;
         board.className = 'fluid_nonLinear_' + vAlign;
+        board.className += ' fluid_nonLinear_ad';
         board.innerHTML = creative.outerHTML;
 
         //Bind the Onclick event
@@ -1385,6 +1386,7 @@ var fluidPlayerClass = {
         closeBtn.className = 'close_button';
         closeBtn.innerHTML = '';
         closeBtn.title = player.displayOptions.layoutControls.closeButtonCaption;
+        var tempadListId = adListId;
         closeBtn.onclick = function (event) {
             this.parentElement.remove(player);
             if (typeof event.stopImmediatePropagation !== 'undefined') {
@@ -1392,6 +1394,15 @@ var fluidPlayerClass = {
             }
             player.adFinished = true;
             clearInterval(player.nonLinearTracking);
+
+            //if any other onPauseRoll then render it
+            if(player.adList[tempadListId].roll === 'onPauseRoll' && player.onPauseRollAdPods[0]){
+                var getNextOnPauseRollAd = player.onPauseRollAdPods[0];
+                player.createBoard(getNextOnPauseRollAd);
+                player.currentOnPauseRollAd = player.onPauseRollAdPods[0];
+                delete player.onPauseRollAdPods[0];
+            }
+
             return false;
         };
 
@@ -1554,10 +1565,16 @@ var fluidPlayerClass = {
                 player.announceLocalError(101);
                 return;
             }
-            
-            player.createBoard(adListId);
-            onPauseAd = document.getElementById('fluid_nonLinear_' + adListId);
-            onPauseAd.style.display = 'none';
+
+            var linearAdExists = document.getElementsByClassName('fluid_nonLinear_ad')[0];
+            if(!linearAdExists){
+                player.createBoard(adListId);
+                player.currentOnPauseRollAd = adListId;
+                onPauseAd = document.getElementById('fluid_nonLinear_' + adListId);
+                onPauseAd.style.display = 'none';                
+            }else{
+                player.onPauseRollAdPods.push(adListId);
+            }
 
         }
     },
@@ -1584,7 +1601,12 @@ var fluidPlayerClass = {
         if (player.hasValidOnPauseAd() && !player.isCurrentlyPlayingAd) {
 
             var onPauseRoll = player.findRoll('onPauseRoll');
-            var adListId = onPauseRoll[0];
+            if(player.currentOnPauseRollAd !== ''){
+                var adListId = player.currentOnPauseRollAd;
+            }else{
+                var adListId = onPauseRoll[0];
+            }
+            
             player.vastOptions = player.adPool[adListId];
             var onPauseAd = document.getElementById('fluid_nonLinear_' + adListId);
 
@@ -4853,6 +4875,8 @@ var fluidPlayerClass = {
         player.adList                  = {};
         player.adPool                  = {};
         player.adGroupedByRolls        = {};
+        player.onPauseRollAdPods       = [];
+        player.currentOnPauseRollAd    = '';
         player.temporaryAdPods         = [];
         player.availableRolls          = ['preRoll', 'midRoll', 'postRoll', 'onPauseRoll'];
         player.supportedNonLinearAd    = ['300x250', '468x60', '728x90'];

@@ -23,7 +23,7 @@
                             <Tracking event="complete"><![CDATA[http://example2.com/view?tracking_event=complete&idzone=9999999]]></Tracking>
                         </TrackingEvents>
                         <NonLinear width="468" height="60" minSuggestedDuration="00:00:05">
-                            <StaticResource creativeType="image/jpeg"><![CDATA[https://docs.fluidplayer.com/demo/468x60Ad.jpg]]></StaticResource>
+                            <StaticResource creativeType="image/jpeg"><![CDATA[https://i2.wp.com/theonlineadvertisingguide.com/wp-content/uploads/2014/01/Gls_468x60.png?w=480&h=60]]></StaticResource>
                             <NonLinearClickThrough><![CDATA[http://example2.com/]]></NonLinearClickThrough>
                             <NonLinearClickTracking><![CDATA[http://example2.com/view?tracking_event=click&idzone=9999999]]></NonLinearClickTracking>
                         </NonLinear>
