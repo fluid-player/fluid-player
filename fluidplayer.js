@@ -1158,7 +1158,7 @@ var fluidPlayerClass = {
         if(player.vastOptions !== null && player.vastOptions.adType.toLowerCase() === 'linear'){
             return;
         }else{
-            player.renderVideoAd(adListId);
+            player.renderVideoAd(adListId,true);
         }
     },
 
@@ -1637,87 +1637,79 @@ var fluidPlayerClass = {
 
         player.isTimer = !player.isTimer;
 
-        player.timer = setInterval(function () {
+        player.timer = setInterval(function() {
 
             for (var keyTime in player.timerPool) {
 
                 var time = Math.floor(player.getCurrentTime());
-                if(time != keyTime || player.isCurrentlyPlayingAd) {
+                if (time != keyTime || player.isCurrentlyPlayingAd) {
                     continue;
                 }
 
                 for (let index = 0; index < player.timerPool[keyTime].length; index++) {
                     //Task: playRoll
                     if (player.timerPool[keyTime] && player.timerPool[keyTime][index] && player.timerPool[keyTime][index].hasOwnProperty('playRoll')) {
-
                         var adIdToCheck = player.timerPool[keyTime][index].adListId;
                         var playRoll = player.timerPool[keyTime][index].playRoll;
 
-                        if(player.adList[adIdToCheck].played == false) {
-
+                        if (player.adList[adIdToCheck].played == false) {
                             var vastOptions = player.adPool[adIdToCheck];
 
-                            if(vastOptions.adType == 'linear'){
+                            if (vastOptions.adType == 'linear') {
 
-                                if(player.timerPool[keyTime].length >1){
-                                 var adListIds = player.getAllLinearAdsFromKeyTime(player.timerPool[keyTime]);  
-                                 player.playRoll(adIdToCheck,adListIds);
-                                }else{
-                                  player.playRoll(adIdToCheck);  
+                                if (player.timerPool[keyTime].length > 1) {
+                                    var adListIds = player.getAllLinearAdsFromKeyTime(player.timerPool[keyTime]);
+                                    player.playRoll(adIdToCheck, adListIds);
+                                } else {
+                                    player.playRoll(adIdToCheck);
                                 }
-                                
-                                //player.playRoll(adIdToCheck);
-                                //linearAdPods.push(adIdToCheck);
                             }
-                            if(vastOptions.adType == 'nonLinear'){
+
+                            if (vastOptions.adType == 'nonLinear') {
                                 player.createNonLinearStatic(adIdToCheck);
                                 if (player.displayOptions.vastOptions.showProgressbarMarkers) {
                                     player.hideAdMarker(adIdToCheck);
                                 }
                             }
-                            
+
                             //Remove ad from the play list
-                            if(player.timerPool[keyTime].length === 1){
+                            if (player.timerPool[keyTime].length === 1) {
                                 delete player.timerPool[keyTime];
                                 break;
-                            }else{
+                            } else {
                                 player.timerPool[keyTime].splice(index, 1);
                             }
 
-                        }else if(player.adList[adIdToCheck].played == true){
+                        } else if (player.adList[adIdToCheck].played == true) {
                             //Remove ad from the play list
-                            if(player.timerPool[keyTime].length === 1){
+                            if (player.timerPool[keyTime].length === 1) {
                                 delete player.timerPool[keyTime];
                                 break;
-                            }else{
+                            } else {
                                 player.timerPool[keyTime].splice(index, 1);
                             }
                         }
 
                     }
-
 
                     //Task: close nonLinear ads
                     if (player.timerPool[keyTime] && player.timerPool[keyTime][index].hasOwnProperty('closeStaticAd')) {
                         var adListId = player.timerPool[keyTime][index].closeStaticAd;
 
-                        if(player.adList[adListId].played == true) {
+                        if (player.adList[adListId].played == true) {
                             player.completeNonLinearStatic(adListId);
 
                             //Remove ad from the play list
-                            if(player.timerPool[keyTime].length === 1){
+                            if (player.timerPool[keyTime].length === 1) {
                                 delete player.timerPool[keyTime];
                                 break;
-                            }else{
+                            } else {
                                 player.timerPool[keyTime].splice(index, 1);
                             }
                         }
-
                     }
                 }
-
             }
-
         }, 800);
     },
 
