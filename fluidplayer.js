@@ -1674,7 +1674,7 @@ var fluidPlayerClass = {
                         var adIdToCheck = player.timerPool[keyTime][index].adListId;
                         var playRoll = player.timerPool[keyTime][index].playRoll;
 
-                        if (player.adList[adIdToCheck].played == false) {
+                        if (player.adList[adIdToCheck].played === false) {
                             var vastOptions = player.adPool[adIdToCheck];
 
                             if (vastOptions.adType == 'linear') {
@@ -1702,7 +1702,7 @@ var fluidPlayerClass = {
                                 player.timerPool[keyTime].splice(index, 1);
                             }
 
-                        } else if (player.adList[adIdToCheck].played == true) {
+                        } else if (player.adList[adIdToCheck].played === true) {
                             //Remove ad from the play list
                             if (player.timerPool[keyTime].length === 1) {
                                 delete player.timerPool[keyTime];
