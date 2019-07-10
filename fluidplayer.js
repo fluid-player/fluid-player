@@ -1825,9 +1825,16 @@ var fluidPlayerClass = {
 
         //remove all played and error ads
         for (var i = 0; i < player.temporaryAdPods.length; i++) {
-            if(player.temporaryAdPods[i].played || player.temporaryAdPods[i].error){
+            
+            if(!player.temporaryAdPods[i]){
+                player.temporaryAdPods.splice(i, 1);
+                break;
+            }
+
+            if(player.temporaryAdPods[i] && player.temporaryAdPods[i].played || player.temporaryAdPods[i].error){
                 player.temporaryAdPods.splice(i, 1);
             }
+
             if(!getFirstUnPlayedAd && player.temporaryAdPods.length >0 && player.temporaryAdPods[i].played === false){
                 adListId = player.temporaryAdPods[i].id;
                 getFirstUnPlayedAd = true;
