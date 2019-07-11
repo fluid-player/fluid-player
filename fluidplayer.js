@@ -1137,19 +1137,19 @@ var fluidPlayerClass = {
         
     },
 
-    playRoll: function(adListId,adPods) {
+    playRoll: function(adListId) {
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
         
-        if (!player.adPool.hasOwnProperty(adListId)) {
+        if (!player.adPool.hasOwnProperty(adListId[0])) {
             player.announceLocalError(101);
             return;
         }
         
         // register all the ad pods
-        if(adPods){
-            for (let i = 0; i < adPods.length; i++) {
-                player.temporaryAdPods.push(player.adList[adPods[i]]);                
+        if(adListId.length > 1){
+            for (let i = 0; i < adListId.length; i++) {
+                player.temporaryAdPods.push(player.adList[adListId[i]]);                
             }
         }else{
             player.temporaryAdPods.push(player.adList[adListId]);
@@ -1158,7 +1158,7 @@ var fluidPlayerClass = {
         if(player.vastOptions !== null && player.vastOptions.adType.toLowerCase() === 'linear'){
             return;
         }else{
-            player.renderVideoAd(adListId,true);
+            player.renderVideoAd(adListId[0],true);
         }
     },
 
@@ -1447,14 +1447,15 @@ var fluidPlayerClass = {
         var videoPlayerTag = document.getElementById(this.getAttribute('id'));
         videoPlayerTag.removeEventListener(event.type, player.preRoll);
         player.firstPlayLaunched = true;
-        var adListId = event.type.replace('adId_', '');
+        var adListId = [];
+        adListId[0] = event.type.replace('adId_', '');
         var time = 0;
 
-        if (player.adList[adListId].played === true) {
+        if (player.adList[adListId[0]].played === true) {
             return;
         }
 
-        if (player.adList[adListId].adType === 'linear') {
+        if (player.adList[adListId[0]].adType === 'linear') {
             player.toggleLoader(true);
             player.playRoll(adListId);
         }
@@ -1464,12 +1465,12 @@ var fluidPlayerClass = {
            if preroll ad contains only non-linear then play nonlinear
         */
 
-        if (player.adList[adListId].adType === 'nonLinear') {
+        if (player.adList[adListId[0]].adType === 'nonLinear') {
             if(player.rollGroupContainsLinear(player.adGroupedByRolls.preRoll)) {
-                player.scheduleTask({time: time, playRoll: 'midRoll', adListId: adListId});
+                player.scheduleTask({time: time, playRoll: 'midRoll', adListId: adListId[0]});
             }else{
                 player.switchToMainVideo();
-                player.createNonLinearStatic(adListId);
+                player.createNonLinearStatic(adListId[0]);
             }
         }
     },
@@ -1650,6 +1651,17 @@ var fluidPlayerClass = {
         return adListIds;
     },
 
+    removeItemFromTimerPool: function(keyTime,index){
+        var player = this;
+
+        if (player.timerPool[keyTime].length === 1) {
+            delete player.timerPool[keyTime];
+            breakTheLoop = true;
+        } else {
+            player.timerPool[keyTime].splice(index, 1);
+        }
+    },
+
     adTimer: function() {
         var player = this;
 
@@ -1667,69 +1679,43 @@ var fluidPlayerClass = {
                 if (time != keyTime || player.isCurrentlyPlayingAd) {
                     continue;
                 }
-
-                for (let index = 0; index < player.timerPool[keyTime].length; index++) {
+                
+                for (let index = player.timerPool[keyTime].length -1; index >= 0; index--) {
                     //Task: playRoll
-                    if (player.timerPool[keyTime] && player.timerPool[keyTime][index] && player.timerPool[keyTime][index].hasOwnProperty('playRoll')) {
+                    if (player.timerPool[keyTime] && player.timerPool[keyTime][index] && player.timerPool[keyTime][index].hasOwnProperty('playRoll') && player.adList[player.timerPool[keyTime][index].adListId].played === false) {
                         var adIdToCheck = player.timerPool[keyTime][index].adListId;
                         var playRoll = player.timerPool[keyTime][index].playRoll;
+                        var vastOptions = player.adPool[adIdToCheck];
 
-                        if (player.adList[adIdToCheck].played === false) {
-                            var vastOptions = player.adPool[adIdToCheck];
-
-                            if (vastOptions.adType == 'linear') {
-
-                                if (player.timerPool[keyTime].length > 1) {
-                                    var adListIds = player.getAllLinearAdsFromKeyTime(player.timerPool[keyTime]);
-                                    player.playRoll(adIdToCheck, adListIds);
-                                } else {
-                                    player.playRoll(adIdToCheck);
-                                }
-                            }
-
-                            if (vastOptions.adType == 'nonLinear') {
+                        switch (vastOptions.adType){
+                            case 'linear':
+                                var adListIds = player.getAllLinearAdsFromKeyTime(player.timerPool[keyTime]);
+                                player.playRoll(adListIds);
+                            break;
+                            case 'nonLinear':
                                 player.createNonLinearStatic(adIdToCheck);
                                 if (player.displayOptions.vastOptions.showProgressbarMarkers) {
                                     player.hideAdMarker(adIdToCheck);
-                                }
-                            }
-
-                            //Remove ad from the play list
-                            if (player.timerPool[keyTime].length === 1) {
-                                delete player.timerPool[keyTime];
-                                break;
-                            } else {
-                                player.timerPool[keyTime].splice(index, 1);
-                            }
-
-                        } else if (player.adList[adIdToCheck].played === true) {
-                            //Remove ad from the play list
-                            if (player.timerPool[keyTime].length === 1) {
-                                delete player.timerPool[keyTime];
-                                break;
-                            } else {
-                                player.timerPool[keyTime].splice(index, 1);
-                            }
+                                }                                
+                            break;                                
+                            default:
                         }
-
+                        // remove element from the ad pool
+                        player.removeItemFromTimerPool(keyTime,index);                        
+                    }else if(player.timerPool[keyTime] && player.timerPool[keyTime][index] && player.timerPool[keyTime][index].hasOwnProperty('playRoll') && player.adList[player.timerPool[keyTime][index].adListId].played === true){
+                        player.removeItemFromTimerPool(keyTime,index);
                     }
 
                     //Task: close nonLinear ads
-                    if (player.timerPool[keyTime] && player.timerPool[keyTime][index].hasOwnProperty('closeStaticAd')) {
+                    if (player.timerPool[keyTime] && player.timerPool[keyTime][index] && player.timerPool[keyTime][index].hasOwnProperty('closeStaticAd')) {
                         var adListId = player.timerPool[keyTime][index].closeStaticAd;
 
                         if (player.adList[adListId].played == true) {
                             player.completeNonLinearStatic(adListId);
-
-                            //Remove ad from the play list
-                            if (player.timerPool[keyTime].length === 1) {
-                                delete player.timerPool[keyTime];
-                                break;
-                            } else {
-                                player.timerPool[keyTime].splice(index, 1);
-                            }
+                            // remove element from the ad pool
+                            player.removeItemFromTimerPool(keyTime,index);                   
                         }
-                    }
+                    }                    
                 }
             }
         }, 800);
@@ -1825,7 +1811,7 @@ var fluidPlayerClass = {
 
         //remove all played and error ads
         for (var i = 0; i < player.temporaryAdPods.length; i++) {
-            
+
             if(!player.temporaryAdPods[i]){
                 player.temporaryAdPods.splice(i, 1);
                 break;
