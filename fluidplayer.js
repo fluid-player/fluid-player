@@ -1804,7 +1804,7 @@ var fluidPlayerClass = {
         }
     },
 
-    checkIfAvailableNextAdPod: function(){
+    getIfAvailableNextAdPod: function(){
         var player = this;
         var getFirstUnPlayedAd = false;
         var adListId = null;
@@ -1836,7 +1836,7 @@ var fluidPlayerClass = {
 
         player.deleteVastAdElements();
 
-        var availableNextAdID = player.checkIfAvailableNextAdPod();
+        var availableNextAdID = player.getIfAvailableNextAdPod();
         if(availableNextAdID === null){
             player.switchToMainVideo();
             player.vastOptions = null;
