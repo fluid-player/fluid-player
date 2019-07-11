@@ -1451,6 +1451,9 @@ var fluidPlayerClass = {
                 newBannerHeight = origHeight;
             }
 
+            //Show the board only if media loaded
+            document.getElementById('fluid_nonLinear_' + adListId).style.display = '';
+
             img = document.getElementById(creative.id);
             img.width = newBannerWidth;
             img.height = newBannerHeight;
@@ -1462,6 +1465,7 @@ var fluidPlayerClass = {
         board.className = 'fluid_nonLinear_' + vAlign;
         board.className += ' fluid_nonLinear_ad';
         board.innerHTML = creative.outerHTML;
+        board.style.display = 'none';
 
         //Bind the Onclick event
         board.onclick = function () {
