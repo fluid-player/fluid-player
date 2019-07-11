@@ -1152,7 +1152,7 @@ var fluidPlayerClass = {
                 player.temporaryAdPods.push(player.adList[adListId[i]]);                
             }
         }else{
-            player.temporaryAdPods.push(player.adList[adListId]);
+            player.temporaryAdPods.push(player.adList[adListId[0]]);
         }
 
         if(player.vastOptions !== null && player.vastOptions.adType.toLowerCase() === 'linear'){
