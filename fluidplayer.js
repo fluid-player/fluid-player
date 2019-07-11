@@ -1158,7 +1158,8 @@ var fluidPlayerClass = {
         if(player.vastOptions !== null && player.vastOptions.adType.toLowerCase() === 'linear'){
             return;
         }else{
-            player.renderVideoAd(adListId[0],true);
+            var adListIdToPlay = player.temporaryAdPods.pop().id;
+            player.renderVideoAd(adListIdToPlay,true);            
         }
     },
 
@@ -1651,15 +1652,11 @@ var fluidPlayerClass = {
         return adListIds;
     },
 
-    removeItemFromTimerPool: function(keyTime,index){
+    removeItemFromTimerPool: function(keyTime){
         var player = this;
-
-        if (player.timerPool[keyTime].length === 1) {
-            delete player.timerPool[keyTime];
-            breakTheLoop = true;
-        } else {
-            player.timerPool[keyTime].splice(index, 1);
-        }
+        
+        //remove element
+        delete player.timerPool[keyTime];
     },
 
     adTimer: function() {
@@ -1701,9 +1698,10 @@ var fluidPlayerClass = {
                             default:
                         }
                         // remove element from the ad pool
-                        player.removeItemFromTimerPool(keyTime,index);                        
+                        player.removeItemFromTimerPool(keyTime);                        
                     }else if(player.timerPool[keyTime] && player.timerPool[keyTime][index] && player.timerPool[keyTime][index].hasOwnProperty('playRoll') && player.adList[player.timerPool[keyTime][index].adListId].played === true){
-                        player.removeItemFromTimerPool(keyTime,index);
+                        // remove element from the ad pool
+                        player.removeItemFromTimerPool(keyTime);
                     }
 
                     //Task: close nonLinear ads
@@ -1713,7 +1711,7 @@ var fluidPlayerClass = {
                         if (player.adList[adListId].played == true) {
                             player.completeNonLinearStatic(adListId);
                             // remove element from the ad pool
-                            player.removeItemFromTimerPool(keyTime,index);                   
+                            player.removeItemFromTimerPool(keyTime);                   
                         }
                     }                    
                 }
@@ -1808,27 +1806,16 @@ var fluidPlayerClass = {
         var player = this;
         var getFirstUnPlayedAd = false;
         var adListId = null;
-
-        //remove all played and error ads
-        for (var i = 0; i < player.temporaryAdPods.length; i++) {
-
-            if(!player.temporaryAdPods[i]){
-                player.temporaryAdPods.splice(i, 1);
-                break;
-            }
-
-            if(player.temporaryAdPods[i] && player.temporaryAdPods[i].played || player.temporaryAdPods[i].error){
-                player.temporaryAdPods.splice(i, 1);
-            }
-
-            if(!getFirstUnPlayedAd && player.temporaryAdPods.length >0 && player.temporaryAdPods[i].played === false){
-                adListId = player.temporaryAdPods[i].id;
-                getFirstUnPlayedAd = true;
-            }
+                
+        // if temporaryAdPods is not empty
+        if(player.temporaryAdPods.length > 0){
+            var temporaryAdPods = player.temporaryAdPods.pop();
+            adListId = temporaryAdPods.id;
         }
 
         return adListId;
     },
+
     onVastAdEnded: function() {
         //"this" is the HTML5 video tag, because it disptches the "ended" event
         var player = fluidPlayerClass.getInstanceById(this.id);
