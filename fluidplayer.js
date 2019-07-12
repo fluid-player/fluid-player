@@ -1157,10 +1157,13 @@ var fluidPlayerClass = {
 
         if(player.vastOptions !== null && player.vastOptions.adType.toLowerCase() === 'linear'){
             return;
-        }else{
-            var adListIdToPlay = player.temporaryAdPods.pop().id;
-            player.renderVideoAd(adListIdToPlay,true);            
         }
+
+        var adListIdToPlay = player.getNextAdPod();
+        if(adListIdToPlay !== null){
+            player.renderVideoAd(adListIdToPlay,true);
+        }        
+        
     },
 
     scheduleTrackingEvent : function(currentTime, duration) {
@@ -1642,7 +1645,7 @@ var fluidPlayerClass = {
         player.trackSingleEvent(status);
     },
 
-    getAllLinearAdsFromKeyTime: function(keyTimeObj){
+    getAdsFromKeyTime: function(keyTimeObj){
         var adListIds = [];        
 
         for (let i = 0; i < keyTimeObj.length; i++) {
@@ -1686,7 +1689,7 @@ var fluidPlayerClass = {
 
                         switch (vastOptions.adType){
                             case 'linear':
-                                var adListIds = player.getAllLinearAdsFromKeyTime(player.timerPool[keyTime]);
+                                var adListIds = player.getAdsFromKeyTime(player.timerPool[keyTime]);
                                 player.playRoll(adListIds);
                             break;
                             case 'nonLinear':
@@ -3915,7 +3918,7 @@ var fluidPlayerClass = {
         var subtitlesAvailable = false;
         var subtitlesContainer =  document.getElementById(player.videoPlayerId+'_fluid_subtitles_container');
 
-        for(let i=0;i<player.subtitlesData.length;i++){
+        for(let i = 0; i < player.subtitlesData.length; i++){
             if (currentTime >= (player.subtitlesData[i].startTime) && currentTime <= (player.subtitlesData[i].endTime)) {
                 subtitlesContainer.innerHTML = '';
                 subtitlesContainer.appendChild(WebVTT.convertCueToDOMTree(window, player.subtitlesData[i].text));
