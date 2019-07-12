@@ -1027,7 +1027,7 @@ var fluidPlayerClass = {
         }
     },
 
-    renderVideoAd: function(adListId,backupTheVideoTime = true){
+    renderVideoAd: function(adListId,backupTheVideoTime){
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
