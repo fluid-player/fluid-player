@@ -1147,13 +1147,9 @@ var fluidPlayerClass = {
         }
         
         // register all the ad pods
-        if(adListId.length > 1){
-            for (let i = 0; i < adListId.length; i++) {
-                player.temporaryAdPods.push(player.adList[adListId[i]]);                
-            }
-        }else{
-            player.temporaryAdPods.push(player.adList[adListId[0]]);
-        }
+        for (let i = 0; i < adListId.length; i++) {
+            player.temporaryAdPods.push(player.adList[adListId[i]]);                
+        }        
 
         if(player.vastOptions !== null && player.vastOptions.adType.toLowerCase() === 'linear'){
             return;
