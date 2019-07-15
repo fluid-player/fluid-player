@@ -1640,11 +1640,12 @@ var fluidPlayerClass = {
         player.trackSingleEvent(status);
     },
 
-    getAdsFromKeyTime: function(keyTimeObj){
+    getLinearAdsFromKeyTime: function(keyTimeObj){
+        var player = this;
         var adListIds = [];        
 
         for (let i = 0; i < keyTimeObj.length; i++) {
-            if(!keyTimeObj[i].hasOwnProperty('closeStaticAd')){
+            if(!keyTimeObj[i].hasOwnProperty('closeStaticAd') && player.adList[keyTimeObj[i].adListId] !== 'nonLinear'){
                 adListIds.push(keyTimeObj[i].adListId);    
             }            
         }
@@ -1688,7 +1689,7 @@ var fluidPlayerClass = {
 
                     switch (vastOptions.adType){
                         case 'linear':
-                            var adListIds = player.getAdsFromKeyTime(player.timerPool[keyTime]);
+                            var adListIds = player.getLinearAdsFromKeyTime(player.timerPool[keyTime]);
                             player.playRoll(adListIds);
                         break;
                         case 'nonLinear':
