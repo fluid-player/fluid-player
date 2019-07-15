@@ -1139,15 +1139,14 @@ var fluidPlayerClass = {
 
     playRoll: function(adListId) {
         var player = this;
-        var videoPlayerTag = document.getElementById(player.videoPlayerId);
-        
-        if (!player.adPool.hasOwnProperty(adListId[0])) {
-            player.announceLocalError(101);
-            return;
-        }
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);        
         
         // register all the ad pods
         for (let i = 0; i < adListId.length; i++) {
+            if (!player.adPool.hasOwnProperty(adListId[i])) {
+                player.announceLocalError(101);
+                return;
+            }
             player.temporaryAdPods.push(player.adList[adListId[i]]);                
         }        
 
