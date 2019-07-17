@@ -1640,15 +1640,16 @@ var fluidPlayerClass = {
         player.trackSingleEvent(status);
     },
 
-    getLinearAdsFromKeyTime: function(keyTimeObj){
+    getLinearAdsFromKeyTime: function(keyTimeLinearObj){
         var player = this;
-        var adListIds = [];        
+        var adListIds = [];
 
-        for (let i = 0; i < keyTimeObj.length; i++) {
-            if(!keyTimeObj[i].hasOwnProperty('closeStaticAd') && player.adList[keyTimeObj[i].adListId] !== 'nonLinear'){
-                adListIds.push(keyTimeObj[i].adListId);    
-            }            
+        for (let i = 0; i < keyTimeLinearObj.length; i++) {
+            if(player.adList[keyTimeLinearObj[i].adListId].played === false){                
+                adListIds.push(keyTimeLinearObj[i].adListId);                        
+            }
         }
+
         return adListIds;
     },
 
@@ -1669,40 +1670,65 @@ var fluidPlayerClass = {
                 return;
             }
 
-            var timerPoolKeytimeLength = player.timerPool[keyTime].length;
+            var timerPoolKeytimeCloseStaticAdsLength = player.timerPool[keyTime]['closeStaticAd'].length;
+            var timerPoolKeytimeLinearAdsLength = player.timerPool[keyTime]['linear'].length;
+            var timerPoolKeytimeNonlinearAdsLength = player.timerPool[keyTime]['nonLinear'].length;
 
-            for (var index = 0; index < timerPoolKeytimeLength; index++) {
-                // Task: close nonLinear ads
-                if (player.timerPool[keyTime][index].hasOwnProperty('closeStaticAd')) {
-                    var adListId = player.timerPool[keyTime][index].closeStaticAd;
+            // remove the item from keytime if no ads to play
+            if(timerPoolKeytimeCloseStaticAdsLength === 0 && timerPoolKeytimeLinearAdsLength === 0 && timerPoolKeytimeNonlinearAdsLength === 0){
+                delete player.timerPool[keyTime];
+                return;
+            }
+
+            // Task: close nonLinear ads
+            if (timerPoolKeytimeCloseStaticAdsLength > 0) {
+                for (let index = 0; index < timerPoolKeytimeCloseStaticAdsLength; index++) {
+                    var adListId = player.timerPool[keyTime]['closeStaticAd'][index].closeStaticAd;
 
                     if (player.adList[adListId].played === true) {
-                        player.completeNonLinearStatic(adListId);
+                        player.completeNonLinearStatic(adListId);                        
                     }
                 }
 
-                // Task: playRoll
-                if (player.timerPool[keyTime][index].hasOwnProperty('playRoll') && player.adList[player.timerPool[keyTime][index].adListId].played === false) {
-                    var adIdToCheck = player.timerPool[keyTime][index].adListId;
-                    var playRoll = player.timerPool[keyTime][index].playRoll;
-                    var vastOptions = player.adPool[adIdToCheck];
+                // empty closeStaticAd from the timerpool after closing
+                player.timerPool[keyTime]['closeStaticAd'] = [];                                    
+            }
 
-                    switch (vastOptions.adType){
-                        case 'linear':
-                            var adListIds = player.getLinearAdsFromKeyTime(player.timerPool[keyTime]);
-                            player.playRoll(adListIds);
-                        break;
-                        case 'nonLinear':
-                            player.createNonLinearStatic(adIdToCheck);
-                            if (player.displayOptions.vastOptions.showProgressbarMarkers) {
-                                player.hideAdMarker(adIdToCheck);
-                            }                                
-                        break;                                
-                        default:
-                    }                
-                    break;
-                }                                                            
-            }            
+            // Task: play linear ads
+            if (timerPoolKeytimeLinearAdsLength > 0) {
+                var adListIds = player.getLinearAdsFromKeyTime(player.timerPool[keyTime]['linear']);
+                if(adListIds.length > 0){
+                    player.playRoll(adListIds);
+
+                    // empty the linear ads from the timerpool after played 
+                    player.timerPool[keyTime]['linear'] = [];
+
+                    // return after starting video ad, so non-linear will not overlap
+                    return;
+                }
+            }
+
+            // Task: play nonLinear ads
+            if (timerPoolKeytimeNonlinearAdsLength > 0) {
+                for (let index = 0; index < timerPoolKeytimeNonlinearAdsLength; index++) {
+                    var adListId = player.timerPool[keyTime]['nonLinear'][index].adListId;
+                    var vastOptions = player.adPool[adListId];
+
+                    if(player.adList[adListId].played === false){
+                        player.createNonLinearStatic(adListId);
+                        if (player.displayOptions.vastOptions.showProgressbarMarkers) {
+                            player.hideAdMarker(adListId);
+                        }
+
+                        // delete linear after playing
+                        player.timerPool[keyTime]['nonLinear'].splice(index, 1);
+
+                        // return after starting non-linear ad, so multiple non-linear will not overlap
+                        // unplayed non-linear will appear if user seeks back to the time :)
+                        return;
+                    } 
+                }
+            }
 
         }, 800);
     },
@@ -1711,9 +1737,17 @@ var fluidPlayerClass = {
     scheduleTask: function (task) {
         var player = this;
         if(!player.timerPool.hasOwnProperty(task.time)){
-            player.timerPool[task.time] = [];
+            player.timerPool[task.time] = {linear: [], nonLinear: [], closeStaticAd: []};
         }
-        player.timerPool[task.time].push(task);
+
+        if(task.hasOwnProperty('playRoll') && player.adList[task.adListId].adType === 'linear'){
+            player.timerPool[task.time]['linear'].push(task);
+        }else if(task.hasOwnProperty('playRoll') && player.adList[task.adListId].adType === 'nonLinear'){
+            player.timerPool[task.time]['nonLinear'].push(task);
+        }else if(task.hasOwnProperty('closeStaticAd')){
+            player.timerPool[task.time]['closeStaticAd'].push(task);
+        }
+
     },
 
     deleteVastAdElements: function(){
