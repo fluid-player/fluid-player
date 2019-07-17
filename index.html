@@ -45,7 +45,13 @@
               },
               {
                   roll: 'preRoll',
-                  vastTag: 'vastxmls/vastLinear_ad2.xml',
+                  vastTag: 'vastxmls/vastNonLinear1.xml',
+                  fallbackVastTags: ['vastxmls/vastNonLinear2.xml'],
+              },
+              {
+                  roll: 'preRoll',
+                  vastTag: 'vastxmls/vastLinear_ad22.xml',
+                  fallbackVastTags: ['vastxmls/vastLinear_ad33.xml', 'vastxmls/vastLinear_ad4.xml'],
                   adText: 'Advertising supports us directly ----- Pre roll 2'
               },   
               {
@@ -67,11 +73,12 @@
               },              
               {
                   roll: 'midRoll',
-                  vastTag: 'vastxmls/vastLinear.xml',
+                  vastTag: 'vastxmls/vastLinear_ad22.xml',
+                  fallbackVastTags: ['vastxmls/vastLinear_ad4.xml', 'vastxmls/vastLinear_ad3.xml'],
                   timer: 15,
                   adClickable: true,
                   adText: 'Advertising supports us directly ----- Mid-roll 1'
-              }, 
+              },
               {
                   roll: 'midRoll',
                   vastTag: 'vastxmls/vastLinear.xml',
@@ -81,7 +88,8 @@
               },  
               {
                   roll: 'midRoll',
-                  vastTag: 'vastxmls/vastLinear.xml',
+                  vastTag: 'vastxmls/vastLinear11.xml',
+                  fallbackVastTags: ['vastxmls/vastLinear_ad44.xml', 'vastxmls/vastLinear_ad3.xml'],
                   timer: 25,
                   adClickable: true,
                   adText: 'Advertising supports us directly ----- Mid-roll 1'
