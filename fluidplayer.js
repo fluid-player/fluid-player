@@ -768,11 +768,11 @@ var fluidPlayerClass = {
      * @param adListId
      * @param tmpOptions
      */
-    processVastXml: function (xmlResponse, adListId, tmpOptions) {
+    processVastXml: function (xmlResponse, adListId, tmpOptions, vastObj) {
         var player = this;
 
         if (!xmlResponse) {
-            player.stopProcessAndReportError(adListId);
+            player.stopProcessAndReportError(adListId, vastObj);
             return;
         }
 
@@ -859,6 +859,7 @@ var fluidPlayerClass = {
                     player.adList[adListId].vastLoaded = true;
                     player.adPool[adListId] = Object.assign({}, tmpOptions);
                     var event = document.createEvent('Event');
+                    event.vastObj = vastObj;
                     event.initEvent('adId_' + adListId, false, true);
                     document.getElementById(player.videoPlayerId).dispatchEvent(event);
 
@@ -871,13 +872,13 @@ var fluidPlayerClass = {
 
                 } else {
 
-                    player.stopProcessAndReportError(adListId);
+                    player.stopProcessAndReportError(adListId, vastObj);
 
                 }
 
             }
         } else {
-            player.stopProcessAndReportError(adListId);
+            player.stopProcessAndReportError(adListId, vastObj);
         }
 
     },
@@ -915,6 +916,7 @@ var fluidPlayerClass = {
 
         if(vastObj.hasOwnProperty('fallbackVastTags') && vastObj.fallbackVastTags.length > 0){
             vastTag = vastObj.fallbackVastTags.shift();
+            vastObj.vastTag = vastTag;
 
             var numberOfRedirects = 0;
             var tmpOptions = {
@@ -932,7 +934,10 @@ var fluidPlayerClass = {
                 tmpOptions,
                 vastObj            
             );
-        }
+                     
+        }else{
+            player.preRollFail(vastObj);            
+        }        
     },
 
     resolveVastTag: function (vastTag, numberOfRedirects, adListId, tmpOptions, vastObj) {
@@ -940,23 +945,22 @@ var fluidPlayerClass = {
 
         if(!vastTag || vastTag == '') {
             player.resolveFallbackVastTag(vastTag, numberOfRedirects, adListId, tmpOptions, vastObj);
-            player.stopProcessAndReportError(adListId);
+            player.stopProcessAndReportError(adListId, vastObj);
             return;
         }
 
         var handleXmlHttpReq = function () {
             var xmlHttpReq = this;
 
-
             if (xmlHttpReq.readyState === 4 && xmlHttpReq.status === 404) {
                 player.resolveFallbackVastTag(vastTag, numberOfRedirects, adListId, tmpOptions, vastObj);
-                player.stopProcessAndReportError(adListId);
+                player.stopProcessAndReportError(adListId, vastObj);
                 return;
             }
 
             if (xmlHttpReq.readyState === 4 && xmlHttpReq.status === 0) {
                 player.resolveFallbackVastTag(vastTag, numberOfRedirects, adListId, tmpOptions, vastObj);
-                player.stopProcessAndReportError(adListId); //Most likely that Ad Blocker exists
+                player.stopProcessAndReportError(adListId, vastObj); //Most likely that Ad Blocker exists
                 return;
             }
 
@@ -966,7 +970,7 @@ var fluidPlayerClass = {
 
             if ((xmlHttpReq.readyState === 4) && (xmlHttpReq.status !== 200)) {
                 player.resolveFallbackVastTag(vastTag, numberOfRedirects, adListId, tmpOptions, vastObj);
-                player.stopProcessAndReportError(adListId);
+                player.stopProcessAndReportError(adListId, vastObj);
                 return;
             }
 
@@ -974,13 +978,13 @@ var fluidPlayerClass = {
                 var xmlResponse = xmlHttpReq.responseXML;
             } catch (e) {
                 player.resolveFallbackVastTag(vastTag, numberOfRedirects, adListId, tmpOptions, vastObj);
-                player.stopProcessAndReportError(adListId);
+                player.stopProcessAndReportError(adListId, vastObj);
                 return;
             }
 
             if (!xmlResponse) {
                 player.resolveFallbackVastTag(vastTag, numberOfRedirects, adListId, tmpOptions, vastObj);
-                player.stopProcessAndReportError(adListId);
+                player.stopProcessAndReportError(adListId, vastObj);
                 return;
             }
 
@@ -993,27 +997,27 @@ var fluidPlayerClass = {
                     player.resolveVastTag(vastAdTagUri, numberOfRedirects, adListId, tmpOptions);
                 } else {
                     player.resolveFallbackVastTag(vastTag, numberOfRedirects, adListId, tmpOptions, vastObj);
-                    player.stopProcessAndReportError(adListId);
+                    player.stopProcessAndReportError(adListId, vastObj);
                     return;
                 }
             }
 
             if (numberOfRedirects > player.displayOptions.vastOptions.maxAllowedVastTagRedirects && !player.inLineFound) {
                 player.resolveFallbackVastTag(vastTag, numberOfRedirects, adListId, tmpOptions, vastObj);
-                player.stopProcessAndReportError(adListId);
+                player.stopProcessAndReportError(adListId, vastObj);
                 return;
             }
 
-            player.processVastXml(xmlResponse, adListId, tmpOptions);
-        };
+            player.processVastXml(xmlResponse, adListId, tmpOptions, vastObj);
+        }
 
         if (numberOfRedirects <= player.displayOptions.vastOptions.maxAllowedVastTagRedirects) {
 
             player.sendRequest(
                 vastTag,
                 true,
-                player.displayOptions.vastOptions.vastTimeout,
-                handleXmlHttpReq
+                player.displayOptions.vastOptions.vastTimeout,                
+                handleXmlHttpReq               
             );
         }                    
 
@@ -1025,7 +1029,7 @@ var fluidPlayerClass = {
      *
      * @param adListId
      */
-    stopProcessAndReportError: function(adListId) {
+    stopProcessAndReportError: function(adListId,vastObj) {
         var player = this;
 
         //Set the error flag for the Ad
@@ -1038,7 +1042,6 @@ var fluidPlayerClass = {
         } else {
             player.announceLocalError(101);
         }
-
     },
 
     backupMainVideoContentTime: function(adListId){
@@ -1475,11 +1478,73 @@ var fluidPlayerClass = {
         return found;
     },
 
+    preRollFail: function(vastObj){
+        var player = this;
+        var preRollsLength = player.preRollAdPodsLength;
+
+        // pass only this is the only vast item or all fallback vast exhausted
+        if(vastObj.hasOwnProperty('fallbackVastTags') && vastObj.fallbackVastTags.length !== 0){
+            return;
+        }
+
+        player.preRollVastResolved++;
+
+        if(player.preRollVastResolved === preRollsLength){
+            player.preRollAllAdsResolvedPlay();
+        }
+    },
+
+    preRollSuccess: function(vastObj){
+        var player = this;
+        var preRollsLength = player.preRollAdPodsLength;
+
+        player.preRollVastResolved++;
+
+        if(player.preRollVastResolved === preRollsLength){
+            player.preRollAllAdsResolvedPlay();
+        }
+    },
+
+    preRollAllAdsResolvedPlay: function(){
+        var player = this;
+        var time = 0;
+        var adListIds = player.preRollAdPods;
+        var adsByType = {
+            linear: [],
+            nonLinear: []
+        }
+
+        player.firstPlayLaunched = true;
+
+        for(let index = 0; index < adListIds.length; index++){
+
+            if (player.adList[adListIds[index]].played === true) {
+                return
+            }
+
+            if (player.adList[adListIds[index]].adType === 'linear') {
+                adsByType.linear.push(adListIds[index]);
+            }
+            
+            if (player.adList[adListIds[index]].adType === 'nonLinear') {
+                adsByType.nonLinear.push(adListIds[index]);
+                player.scheduleTask({time: time, playRoll: 'midRoll', adListId: adsByType.nonLinear.shift()});
+            }
+        }
+
+        if (adsByType.linear.length > 0) {
+            player.toggleLoader(true);
+            player.playRoll(adsByType.linear);
+        }
+
+    },
+
     preRoll: function (event) {
         var player = fluidPlayerClass.getInstanceById(this.id);
         var videoPlayerTag = document.getElementById(this.getAttribute('id'));
+        var vastObj = event.vastObj;
         videoPlayerTag.removeEventListener(event.type, player.preRoll);
-        player.firstPlayLaunched = true;
+        
         var adListId = [];
         adListId[0] = event.type.replace('adId_', '');
         var time = 0;
@@ -1488,19 +1553,9 @@ var fluidPlayerClass = {
             return;
         }
 
-        if (player.adList[adListId[0]].adType === 'linear') {
-            player.toggleLoader(true);
-            player.playRoll(adListId);
-        }
+        player.preRollAdPods.push(adListId[0]);
 
-        /* if the pre-roll ad contains borth linear and non-linear
-              then schedule non-linear preroll as midroll with adtime 0
-           if preroll ad contains only non-linear then play nonlinear
-        */
-
-        if (player.adList[adListId[0]].adType === 'nonLinear') {
-            player.scheduleTask({time: time, playRoll: 'midRoll', adListId: adListId[0]});            
-        }
+        player.preRollSuccess(vastObj);        
     },
 
     createAdMarker: function (adListId, time) {
@@ -3196,6 +3251,7 @@ var fluidPlayerClass = {
 
             //trigger the loading of the VAST Tag
             player.prepareVast('preRoll');
+            player.preRollAdPodsLength = preRolls.length;
         }
 
         var prepareVastAdsThatKnowDuration = function() {
@@ -4908,6 +4964,10 @@ var fluidPlayerClass = {
         player.adGroupedByRolls        = {};
         player.onPauseRollAdPods       = [];
         player.currentOnPauseRollAd    = '';
+        player.preRollAdsResolved      = false;
+        player.preRollAdPods           = [];
+        player.preRollAdPodsLength     = 0;
+        player.preRollVastResolved     = 0;
         player.temporaryAdPods         = [];
         player.availableRolls          = ['preRoll', 'midRoll', 'postRoll', 'onPauseRoll'];
         player.supportedNonLinearAd    = ['300x250', '468x60', '728x90'];
