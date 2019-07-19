@@ -1737,6 +1737,75 @@ var fluidPlayerClass = {
         return adListIds;
     },
 
+    adKeytimePlay: function(keyTime) {
+        var player = this;
+                
+        if (!player.timerPool[keyTime] || player.isCurrentlyPlayingAd) {
+            return;
+        }
+
+        var timerPoolKeytimeCloseStaticAdsLength = player.timerPool[keyTime]['closeStaticAd'].length;
+        var timerPoolKeytimeLinearAdsLength = player.timerPool[keyTime]['linear'].length;
+        var timerPoolKeytimeNonlinearAdsLength = player.timerPool[keyTime]['nonLinear'].length;
+
+        // remove the item from keytime if no ads to play
+        if(timerPoolKeytimeCloseStaticAdsLength === 0 && timerPoolKeytimeLinearAdsLength === 0 && timerPoolKeytimeNonlinearAdsLength === 0){
+            delete player.timerPool[keyTime];
+            return;
+        }
+
+        // Task: close nonLinear ads
+        if (timerPoolKeytimeCloseStaticAdsLength > 0) {
+            for (let index = 0; index < timerPoolKeytimeCloseStaticAdsLength; index++) {
+                var adListId = player.timerPool[keyTime]['closeStaticAd'][index].closeStaticAd;
+
+                if (player.adList[adListId].played === true) {
+                    player.completeNonLinearStatic(adListId);                        
+                }
+            }
+
+            // empty closeStaticAd from the timerpool after closing
+            player.timerPool[keyTime]['closeStaticAd'] = [];                                    
+        }
+
+        // Task: play linear ads
+        if (timerPoolKeytimeLinearAdsLength > 0) {
+            var adListIds = player.getLinearAdsFromKeyTime(player.timerPool[keyTime]['linear']);
+            if(adListIds.length > 0){
+                player.playRoll(adListIds);
+
+                // empty the linear ads from the timerpool after played 
+                player.timerPool[keyTime]['linear'] = [];
+
+                // return after starting video ad, so non-linear will not overlap
+                return;
+            }
+        }
+
+        // Task: play nonLinear ads
+        if (timerPoolKeytimeNonlinearAdsLength > 0) {
+            for (let index = 0; index < timerPoolKeytimeNonlinearAdsLength; index++) {
+                var adListId = player.timerPool[keyTime]['nonLinear'][index].adListId;
+                var vastOptions = player.adPool[adListId];
+
+                if(player.adList[adListId].played === false){
+                    player.createNonLinearStatic(adListId);
+                    if (player.displayOptions.vastOptions.showProgressbarMarkers) {
+                        player.hideAdMarker(adListId);
+                    }
+
+                    // delete linear after playing
+                    player.timerPool[keyTime]['nonLinear'].splice(index, 1);
+
+                    // return after starting non-linear ad, so multiple non-linear will not overlap
+                    // unplayed non-linear will appear if user seeks back to the time :)
+                    return;
+                } 
+            }
+        }
+
+    },
+
     adTimer: function() {
         var player = this;
 
@@ -1746,75 +1815,9 @@ var fluidPlayerClass = {
 
         player.isTimer = !player.isTimer;
 
-        player.timer = setInterval(function() {
-
-            var keyTime = Math.floor(player.getCurrentTime());
-
-            if (!player.timerPool[keyTime] || player.isCurrentlyPlayingAd) {
-                return;
-            }
-
-            var timerPoolKeytimeCloseStaticAdsLength = player.timerPool[keyTime]['closeStaticAd'].length;
-            var timerPoolKeytimeLinearAdsLength = player.timerPool[keyTime]['linear'].length;
-            var timerPoolKeytimeNonlinearAdsLength = player.timerPool[keyTime]['nonLinear'].length;
-
-            // remove the item from keytime if no ads to play
-            if(timerPoolKeytimeCloseStaticAdsLength === 0 && timerPoolKeytimeLinearAdsLength === 0 && timerPoolKeytimeNonlinearAdsLength === 0){
-                delete player.timerPool[keyTime];
-                return;
-            }
-
-            // Task: close nonLinear ads
-            if (timerPoolKeytimeCloseStaticAdsLength > 0) {
-                for (let index = 0; index < timerPoolKeytimeCloseStaticAdsLength; index++) {
-                    var adListId = player.timerPool[keyTime]['closeStaticAd'][index].closeStaticAd;
-
-                    if (player.adList[adListId].played === true) {
-                        player.completeNonLinearStatic(adListId);                        
-                    }
-                }
-
-                // empty closeStaticAd from the timerpool after closing
-                player.timerPool[keyTime]['closeStaticAd'] = [];                                    
-            }
-
-            // Task: play linear ads
-            if (timerPoolKeytimeLinearAdsLength > 0) {
-                var adListIds = player.getLinearAdsFromKeyTime(player.timerPool[keyTime]['linear']);
-                if(adListIds.length > 0){
-                    player.playRoll(adListIds);
-
-                    // empty the linear ads from the timerpool after played 
-                    player.timerPool[keyTime]['linear'] = [];
-
-                    // return after starting video ad, so non-linear will not overlap
-                    return;
-                }
-            }
-
-            // Task: play nonLinear ads
-            if (timerPoolKeytimeNonlinearAdsLength > 0) {
-                for (let index = 0; index < timerPoolKeytimeNonlinearAdsLength; index++) {
-                    var adListId = player.timerPool[keyTime]['nonLinear'][index].adListId;
-                    var vastOptions = player.adPool[adListId];
-
-                    if(player.adList[adListId].played === false){
-                        player.createNonLinearStatic(adListId);
-                        if (player.displayOptions.vastOptions.showProgressbarMarkers) {
-                            player.hideAdMarker(adListId);
-                        }
-
-                        // delete linear after playing
-                        player.timerPool[keyTime]['nonLinear'].splice(index, 1);
-
-                        // return after starting non-linear ad, so multiple non-linear will not overlap
-                        // unplayed non-linear will appear if user seeks back to the time :)
-                        return;
-                    } 
-                }
-            }
-
-        }, 800);
+        var keyTime = Math.floor(player.getCurrentTime());
+        
+        player.timer = setInterval(player.adKeytimePlay(keyTime), 800);
     },
 
 
@@ -1953,6 +1956,11 @@ var fluidPlayerClass = {
 
         //we can remove timer as no more ad will be shown
         if (Math.floor(player.getCurrentTime()) >= Math.floor(player.mainVideoDuration)) {
+
+            // play pre-roll ad
+            // sometime pre-roll ad will be missed because we are clearing the timer
+            player.adKeytimePlay(Math.floor(player.mainVideoDuration));
+            
             clearInterval(player.timer);
         }
 
