@@ -706,7 +706,7 @@ var fluidPlayerClass = {
             var adListId = list[i];
 
             if (player.adList[adListId].vastLoaded !== true && player.adList[adListId].error !== true) {
-                player.processUrl(player.adList[adListId].vastTag, adListId, player.adList[adListId]);
+                player.processUrl(player.adList[adListId], adListId);
                 videoPlayerTag.addEventListener('adId_' + adListId, player[roll]);
             }
         }
@@ -772,7 +772,7 @@ var fluidPlayerClass = {
         var player = this;
 
         if (!xmlResponse) {
-            player.stopProcessAndReportError(adListId, vastObj);
+            player.stopProcessAndReportError(adListId);
             return;
         }
 
@@ -859,7 +859,7 @@ var fluidPlayerClass = {
                     player.adList[adListId].vastLoaded = true;
                     player.adPool[adListId] = Object.assign({}, tmpOptions);
                     var event = document.createEvent('Event');
-                    event.vastObj = vastObj;
+                    //event.vastObj = vastObj;
                     event.initEvent('adId_' + adListId, false, true);
                     document.getElementById(player.videoPlayerId).dispatchEvent(event);
 
@@ -872,13 +872,13 @@ var fluidPlayerClass = {
 
                 } else {
 
-                    player.stopProcessAndReportError(adListId, vastObj);
+                    player.stopProcessAndReportError(adListId);
 
                 }
 
             }
         } else {
-            player.stopProcessAndReportError(adListId, vastObj);
+            player.stopProcessAndReportError(adListId);
         }
 
     },
@@ -890,7 +890,7 @@ var fluidPlayerClass = {
      * @param vastTag
      * @param adListId
      */
-    processUrl: function (vastTag, adListId, vastObj) {
+    processUrl: function (vastObj, adListId) {
         var player = this;
         var numberOfRedirects = 0;
         var tmpOptions = {
@@ -901,51 +901,52 @@ var fluidPlayerClass = {
             vastLoaded: false
         };
 
+        var tryFallbackVast = function(player){
+            var player = player;
+            var vastTag;
+
+            if(vastObj.hasOwnProperty('fallbackVastTags') && vastObj.fallbackVastTags.length > 0){
+                vastTag = vastObj.fallbackVastTags.shift();
+
+                var numberOfRedirects = 0;
+                var tmpOptions = {
+                    tracking: [],
+                    stopTracking: [],
+                    impression: [],
+                    clicktracking: [],
+                    vastLoaded: false
+                };
+
+                player.resolveVastTag(
+                    vastTag,
+                    numberOfRedirects,
+                    adListId,
+                    tmpOptions,
+                    tryFallbackVast            
+                );
+                         
+            }else{
+                if(vastObj.roll === 'preRoll'){
+                    player.preRollFail(vastObj);
+                }            
+            }
+        }
+
         player.resolveVastTag(
-            vastTag,
+            vastObj.vastTag,
             numberOfRedirects,
             adListId,
             tmpOptions,
-            vastObj            
+            tryFallbackVast
         );
     },
 
-    resolveFallbackVastTag: function(vastTag, numberOfRedirects, adListId, tmpOptions, vastObj){
-        var vastTag = vastTag;
-        var player = this;
-
-        if(vastObj.hasOwnProperty('fallbackVastTags') && vastObj.fallbackVastTags.length > 0){
-            vastTag = vastObj.fallbackVastTags.shift();
-            vastObj.vastTag = vastTag;
-
-            var numberOfRedirects = 0;
-            var tmpOptions = {
-                tracking: [],
-                stopTracking: [],
-                impression: [],
-                clicktracking: [],
-                vastLoaded: false
-            };
-
-            player.resolveVastTag(
-                vastTag,
-                numberOfRedirects,
-                adListId,
-                tmpOptions,
-                vastObj            
-            );
-                     
-        }else{
-            player.preRollFail(vastObj);            
-        }        
-    },
-
-    resolveVastTag: function (vastTag, numberOfRedirects, adListId, tmpOptions, vastObj) {
+    resolveVastTag: function (vastTag, numberOfRedirects, adListId, tmpOptions, tryFallbackVast) {
         var player = this;
 
         if(!vastTag || vastTag == '') {
-            player.resolveFallbackVastTag(vastTag, numberOfRedirects, adListId, tmpOptions, vastObj);
-            player.stopProcessAndReportError(adListId, vastObj);
+            tryFallbackVast(player);
+            player.stopProcessAndReportError(adListId);
             return;
         }
 
@@ -953,14 +954,14 @@ var fluidPlayerClass = {
             var xmlHttpReq = this;
 
             if (xmlHttpReq.readyState === 4 && xmlHttpReq.status === 404) {
-                player.resolveFallbackVastTag(vastTag, numberOfRedirects, adListId, tmpOptions, vastObj);
-                player.stopProcessAndReportError(adListId, vastObj);
+                tryFallbackVast(player);
+                player.stopProcessAndReportError(adListId);
                 return;
             }
 
             if (xmlHttpReq.readyState === 4 && xmlHttpReq.status === 0) {
-                player.resolveFallbackVastTag(vastTag, numberOfRedirects, adListId, tmpOptions, vastObj);
-                player.stopProcessAndReportError(adListId, vastObj); //Most likely that Ad Blocker exists
+                tryFallbackVast(player);
+                player.stopProcessAndReportError(adListId); //Most likely that Ad Blocker exists
                 return;
             }
 
@@ -969,22 +970,22 @@ var fluidPlayerClass = {
             }
 
             if ((xmlHttpReq.readyState === 4) && (xmlHttpReq.status !== 200)) {
-                player.resolveFallbackVastTag(vastTag, numberOfRedirects, adListId, tmpOptions, vastObj);
-                player.stopProcessAndReportError(adListId, vastObj);
+                tryFallbackVast(player);
+                player.stopProcessAndReportError(adListId);
                 return;
             }
 
             try {
                 var xmlResponse = xmlHttpReq.responseXML;
             } catch (e) {
-                player.resolveFallbackVastTag(vastTag, numberOfRedirects, adListId, tmpOptions, vastObj);
-                player.stopProcessAndReportError(adListId, vastObj);
+                tryFallbackVast(player);
+                player.stopProcessAndReportError(adListId);
                 return;
             }
 
             if (!xmlResponse) {
-                player.resolveFallbackVastTag(vastTag, numberOfRedirects, adListId, tmpOptions, vastObj);
-                player.stopProcessAndReportError(adListId, vastObj);
+                tryFallbackVast(player);
+                player.stopProcessAndReportError(adListId);
                 return;
             }
 
@@ -996,19 +997,19 @@ var fluidPlayerClass = {
                 if (vastAdTagUri) {
                     player.resolveVastTag(vastAdTagUri, numberOfRedirects, adListId, tmpOptions);
                 } else {
-                    player.resolveFallbackVastTag(vastTag, numberOfRedirects, adListId, tmpOptions, vastObj);
-                    player.stopProcessAndReportError(adListId, vastObj);
+                    tryFallbackVast(player);
+                    player.stopProcessAndReportError(adListId);
                     return;
                 }
             }
 
             if (numberOfRedirects > player.displayOptions.vastOptions.maxAllowedVastTagRedirects && !player.inLineFound) {
-                player.resolveFallbackVastTag(vastTag, numberOfRedirects, adListId, tmpOptions, vastObj);
-                player.stopProcessAndReportError(adListId, vastObj);
+                tryFallbackVast(player);
+                player.stopProcessAndReportError(adListId);
                 return;
             }
 
-            player.processVastXml(xmlResponse, adListId, tmpOptions, vastObj);
+            player.processVastXml(xmlResponse, adListId, tmpOptions);
         }
 
         if (numberOfRedirects <= player.displayOptions.vastOptions.maxAllowedVastTagRedirects) {
@@ -1478,34 +1479,29 @@ var fluidPlayerClass = {
         return found;
     },
 
-    preRollFail: function(vastObj){
-        var player = this;
-        var preRollsLength = player.preRollAdPodsLength;
-
-        // pass only this is the only vast item or all fallback vast exhausted
-        if(vastObj.hasOwnProperty('fallbackVastTags') && vastObj.fallbackVastTags.length !== 0){
-            return;
-        }
-
-        player.preRollVastResolved++;
-
-        if(player.preRollVastResolved === preRollsLength){
-            player.preRollAllAdsResolvedPlay();
-        }
-    },
-
-    preRollSuccess: function(vastObj){
+    preRollFail: function(){
         var player = this;
         var preRollsLength = player.preRollAdPodsLength;
 
         player.preRollVastResolved++;
 
         if(player.preRollVastResolved === preRollsLength){
-            player.preRollAllAdsResolvedPlay();
+            player.preRollAdsPlay();
         }
     },
 
-    preRollAllAdsResolvedPlay: function(){
+    preRollSuccess: function(){
+        var player = this;
+        var preRollsLength = player.preRollAdPodsLength;
+
+        player.preRollVastResolved++;
+
+        if(player.preRollVastResolved === preRollsLength){
+            player.preRollAdsPlay();
+        }
+    },
+
+    preRollAdsPlay: function(){
         var player = this;
         var time = 0;
         var adListIds = player.preRollAdPods;
@@ -1815,9 +1811,11 @@ var fluidPlayerClass = {
 
         player.isTimer = !player.isTimer;
 
-        var keyTime = Math.floor(player.getCurrentTime());
-        
-        player.timer = setInterval(player.adKeytimePlay(keyTime), 800);
+        player.timer = setInterval(
+            function(){
+                var keyTime = Math.floor(player.getCurrentTime());
+                player.adKeytimePlay(keyTime)
+            }, 800);
     },
 
 
