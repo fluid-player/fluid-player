@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>FluidPlayer multi ads</title>
+  <script type="text/javascript" src="fluidplayer.js"></script>
+  <link rel="stylesheet" href="fluidplayer.css" type="text/css"/>
+<!--   <link rel="stylesheet" href="defaultcss.css" type="text/css"/> -->
+
+</head>
+<body style="text-align: center;">
+
+  <h1 style="text-align: center;"> Fluid Player multi ads</h1>
+
+  <video id='myVideo' controls style="width: 640px; height: 360px;">
+     <source src='https://docs.fluidplayer.com/streaming/stream_dash.mpd' type='application/dash+xml' title="720p" />
+
+  </video>
+
+</body>
+  <script type="text/javascript">
+    var myPlayer = fluidPlayer('myVideo');
+  </script>
+</html>
