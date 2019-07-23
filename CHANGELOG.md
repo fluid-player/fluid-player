@@ -1,6 +1,9 @@
 # CHANGELOG
 
-## Master
+## 2.4.6
+* [Pull #358](https://github.com/fluid-player/fluid-player/pull/358) fix bug with dash js api
+
+## 2.4.5
 * [Pull #325](https://github.com/fluid-player/fluid-player/pull/325) Add poster image size option (posterImageSize)
 * [Pull #330](https://github.com/fluid-player/fluid-player/pull/330) Add showPlayButton config to display Play button on ad
 * [Pull #306](https://github.com/fluid-player/fluid-player/pull/306) Remove unsupported browser layout parts
