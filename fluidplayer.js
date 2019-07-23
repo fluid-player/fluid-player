@@ -4348,7 +4348,7 @@ var fluidPlayerClass = {
         if ( typeof ( window.MediaSource || window.WebKitMediaSource ) === "function") {
             var playVideo = (!this.autoplayAfterAd) ? this.autoplayAfterAd : this.displayOptions.layoutControls.autoPlay; // If false we want to override the autoPlay, as it comes from postRoll
             var dashPlayer = dashjs.MediaPlayer().create();
-            dashPlayer.getDebug().setLogToBrowserConsole(false); // Remove default logging that clogs up the console
+            dashPlayer.updateSettings({ 'debug': { 'logLevel': dashjs.Debug.LOG_LEVEL_NONE }}); // Remove default logging that clogs up the console
             dashPlayer.initialize(document.getElementById(this.videoPlayerId), this.originalSrc, playVideo);
             this.dashPlayer = dashPlayer;
         } else {
