@@ -768,11 +768,11 @@ var fluidPlayerClass = {
      * @param adListId
      * @param tmpOptions
      */
-    processVastXml: function (xmlResponse, adListId, tmpOptions, callBack) {
+    processVastXml: function (xmlResponse, tmpOptions, callBack) {
         var player = this;
 
         if (!xmlResponse) {
-            player.stopProcessAndReportError(adListId);
+            player.stopProcessAndReportError(vastTag);
             return;
         }
 
@@ -852,21 +852,19 @@ var fluidPlayerClass = {
             //Extract the Ad data if it is actually the Ad (!wrapper)
             if (!player.hasVastAdTagUri(xmlResponse) && player.hasInLine(xmlResponse)) {
 
-                player.adList[adListId].adType = tmpOptions.adType ? tmpOptions.adType : 'unknown';
-
                 if (typeof tmpOptions.mediaFile !== 'undefined' || typeof tmpOptions.staticResource !== 'undefined') {
 
                     callBack(true, tmpOptions);
 
                 } else {
 
-                    player.stopProcessAndReportError(adListId);
+                    player.stopProcessAndReportError(vastTag);
 
                 }
 
             }
         } else {
-            player.stopProcessAndReportError(adListId);
+            player.stopProcessAndReportError(vastTag);
         }
 
     },
@@ -888,6 +886,9 @@ var fluidPlayerClass = {
 
             if (pass) {
                 // ok
+
+                player.adList[adListId].adType = tmpOptions.adType ? tmpOptions.adType : 'unknown';
+
                 player.adList[adListId].vastLoaded = true;
                 player.adPool[adListId] = Object.assign({}, tmpOptions);
                 var event = document.createEvent('Event');
@@ -903,7 +904,7 @@ var fluidPlayerClass = {
 
             } else {
                 // fallback
-                var vastTag;
+                var vastTag;                
 
                 if (vastObj.hasOwnProperty('fallbackVastTags') && vastObj.fallbackVastTags.length > 0) {
                     vastTag = vastObj.fallbackVastTags.shift();
@@ -912,6 +913,7 @@ var fluidPlayerClass = {
                     if (vastObj.roll === 'preRoll') {
                         player.preRollFail(vastObj);
                     }
+                    player.adList[adListId].error = true;
                 }
             }
         }
@@ -922,6 +924,8 @@ var fluidPlayerClass = {
     processUrl: function (vastTag, adListId, callBack) {
         let player = this;
         let numberOfRedirects = 0;
+        //let adListId = adListId;
+
         let tmpOptions = {
             tracking: [],
             stopTracking: [],
@@ -933,18 +937,17 @@ var fluidPlayerClass = {
         player.resolveVastTag(
             vastTag,
             numberOfRedirects,
-            adListId,
             tmpOptions,
             callBack
         );
     },
 
-    resolveVastTag: function (vastTag, numberOfRedirects, adListId, tmpOptions, callBack) {
+    resolveVastTag: function (vastTag, numberOfRedirects, tmpOptions, callBack) {
         var player = this;
 
         if(!vastTag || vastTag == '') {
             callBack(false);
-            player.stopProcessAndReportError(adListId);
+            player.stopProcessAndReportError(vastTag);
             return;
         }
 
@@ -953,13 +956,13 @@ var fluidPlayerClass = {
 
             if (xmlHttpReq.readyState === 4 && xmlHttpReq.status === 404) {
                 callBack(false);
-                player.stopProcessAndReportError(adListId);
+                player.stopProcessAndReportError(vastTag);
                 return;
             }
 
             if (xmlHttpReq.readyState === 4 && xmlHttpReq.status === 0) {
                 callBack(false);
-                player.stopProcessAndReportError(adListId); //Most likely that Ad Blocker exists
+                player.stopProcessAndReportError(vastTag); //Most likely that Ad Blocker exists
                 return;
             }
 
@@ -969,7 +972,7 @@ var fluidPlayerClass = {
 
             if ((xmlHttpReq.readyState === 4) && (xmlHttpReq.status !== 200)) {
                 callBack(false);
-                player.stopProcessAndReportError(adListId);
+                player.stopProcessAndReportError(vastTag);
                 return;
             }
 
@@ -977,13 +980,13 @@ var fluidPlayerClass = {
                 var xmlResponse = xmlHttpReq.responseXML;
             } catch (e) {
                 callBack(false);
-                player.stopProcessAndReportError(adListId);
+                player.stopProcessAndReportError(vastTag);
                 return;
             }
 
             if (!xmlResponse) {
                 callBack(false);
-                player.stopProcessAndReportError(adListId);
+                player.stopProcessAndReportError(vastTag);
                 return;
             }
 
@@ -993,21 +996,21 @@ var fluidPlayerClass = {
 
                 var vastAdTagUri = player.getVastAdTagUriFromWrapper(xmlResponse);
                 if (vastAdTagUri) {
-                    player.resolveVastTag(vastAdTagUri, numberOfRedirects, adListId, tmpOptions);
+                    player.resolveVastTag(vastAdTagUri, numberOfRedirects, vastTag, tmpOptions);
                 } else {
                     callBack(false);
-                    player.stopProcessAndReportError(adListId);
+                    player.stopProcessAndReportError(vastTag);
                     return;
                 }
             }
 
             if (numberOfRedirects > player.displayOptions.vastOptions.maxAllowedVastTagRedirects && !player.inLineFound) {
                 callBack(false);
-                player.stopProcessAndReportError(adListId);
+                player.stopProcessAndReportError(vastTag);
                 return;
             }
 
-            player.processVastXml(xmlResponse, adListId, tmpOptions, callBack);
+            player.processVastXml(xmlResponse, tmpOptions, callBack);
         }
 
         if (numberOfRedirects <= player.displayOptions.vastOptions.maxAllowedVastTagRedirects) {
@@ -1028,19 +1031,10 @@ var fluidPlayerClass = {
      *
      * @param adListId
      */
-    stopProcessAndReportError: function(adListId) {
+    stopProcessAndReportError: function(vastTag) {
         var player = this;
 
-        //Set the error flag for the Ad
-        player.adList[adListId].error = true;
-
-        //The response returned an error. Proceeding with the main video.
-        //Try to switch main video only if it is a preRoll scenario
-        if (typeof adListId !== 'undefined' && player.adList[adListId]['roll'] == 'preRoll') {
-            player.playMainVideoWhenVastFails(900);
-        } else {
-            player.announceLocalError(101);
-        }
+        player.announceLocalError(101);        
     },
 
     backupMainVideoContentTime: function(adListId){
@@ -1529,6 +1523,8 @@ var fluidPlayerClass = {
         if (adsByType.linear.length > 0) {
             player.toggleLoader(true);
             player.playRoll(adsByType.linear);
+        }else{
+            player.playMainVideoWhenVastFails(900);
         }
 
     },
