@@ -1,55 +1,143 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <link rel="stylesheet" href="../fluidplayer.css" type="text/css"/>
-    <script src="../fluidplayer.js"></script>
-    <style>
-    .player{
-        width:400px;
-        height:400px;
-        }
-    </style>
+  <title>FluidPlayer multi ads</title>
+  <script type="text/javascript" src="fluidplayer.js"></script>
+  <link rel="stylesheet" href="fluidplayer.css" type="text/css"/>
+<!--   <link rel="stylesheet" href="defaultcss.css" type="text/css"/> -->
+
 </head>
-<body>
-    <video id="video-id1" class='player'> <source src="https://cdn.vehiclevisuals.com/dash/LeakDetectionAVUS_,480,720,1080,.mp4.urlset/manifest.mpd" type='application/dash+xml'/> </video>
+<body style="text-align: center;">
 
-    <video id="video-id2" class='player'> <source src="https://cdn.fluidplayer.com/videos/valerian-480p.mkv" type="video/mp4"/> </video>
+  <h1 style="text-align: center;"> Fluid Player multi ads</h1>
 
-    <video id="video-id3" class='player'> <source src="https://cdn.fluidplayer.com/videos/valerian-480p.mkv" type="video/mp4"/> </video>
+  <video id='myVideo' controls style="width: 640px; height: 360px;">
+    <source src='http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4' title='1080p'  type="video/mp4"  />
+
+    <track label="English" kind="subtitles" srclang="en"
+           src="subtitles/english.vtt" default>
+    <track label="Deutsch" kind="subtitles" srclang="de"
+           src="subtitles/deutsch.vtt">
+
+  </video>
+
 </body>
-<script>
-    var player1 = fluidPlayer("video-id1",{
-           layoutControls: {
-              primaryColor: "#28B8ED",
-              playbackRateEnabled: true,
-           }
-        });
-    var player2 = fluidPlayer("video-id2",{
-           layoutControls: {
-              primaryColor: "#28B8ED",
-              playbackRateEnabled: true,
-           }
-        });
-    var player3 = fluidPlayer("video-id3",{
-           layoutControls: {
-              primaryColor: "#28B8ED",
-              playbackRateEnabled: true,
-           }
-        });
-
-    player1.on('playing', function(){ 
-        player2.pause();
-        player3.pause();  
+  <script type="text/javascript">
+    var myPlayer = fluidPlayer('myVideo',{
+      layoutControls: {
+        subtitlesEnabled: true,
+        doubleclickFullscreen: true
+      },
+      vastOptions: {
+          adList: [
+              {
+                  roll: 'onPauseRoll',
+                  vastTag: 'vastxmls/vastNonLinear.xml',
+              },
+              {
+                  roll: 'onPauseRoll',
+                  vastTag: 'vastxmls/vastNonLinear2.xml',
+              },
+              {
+                  roll: 'preRoll',
+                  vastTag: 'vastxmls/vastLinear.xml',
+                  adText: 'Advertising supports us directly ----- Pre roll 1'
+              },
+              {
+                  roll: 'preRoll',
+                  vastTag: 'vastxmls/vastNonLinear.xml',
+                  fallbackVastTags: ['vastxmls/vastNonLinear2.xml'],
+              },
+              {
+                  roll: 'preRoll',
+                  vastTag: 'vastxmls/vastLinear_ad22.xml',
+                  fallbackVastTags: ['vastxmls/vastLinear_ad33.xml', 'vastxmls/vastLinear_ad4.xml'],
+                  adText: 'Advertising supports us directly ----- Pre roll 2'
+              },   
+              {
+                  roll: 'midRoll',
+                  vastTag: 'vastxmls/vastLinear.xml',
+                  timer: 11,
+                  adClickable: true,
+                  adText: 'Advertising supports us directly ----- Mid-roll 1'
+              },  
+              {
+                  roll: 'midRoll',
+                  vastTag: 'vastxmls/vastNonLinear.xml',
+                  timer: 15
+              },
+              {
+                  roll: 'midRoll',
+                  vastTag: 'vastxmls/vastNonLinear2.xml',
+                  timer: 15
+              },              
+              {
+                  roll: 'midRoll',
+                  vastTag: 'vastxmls/vastLinear_ad22.xml',
+                  fallbackVastTags: ['vastxmls/vastLinear_ad4.xml', 'vastxmls/vastLinear_ad3.xml'],
+                  timer: 15,
+                  adClickable: true,
+                  adText: 'Advertising supports us directly ----- Mid-roll 1'
+              },
+              {
+                  roll: 'midRoll',
+                  vastTag: 'vastxmls/vastLinear.xml',
+                  timer: 20,
+                  adClickable: true,
+                  adText: 'Advertising supports us directly ----- Mid-roll 1'
+              },  
+              {
+                  roll: 'midRoll',
+                  vastTag: 'vastxmls/vastLinear11.xml',
+                  fallbackVastTags: ['vastxmls/vastLinear_ad44.xml', 'vastxmls/vastLinear_ad3.xml'],
+                  timer: 25,
+                  adClickable: true,
+                  adText: 'Advertising supports us directly ----- Mid-roll 1'
+              },
+              {
+                  roll: 'midRoll',
+                  vastTag: 'vastxmls/vastLinear_ad2.xml',
+                  timer: 25,
+                  adClickable: true,
+                  adText: 'Advertising supports us directly ----- Mid-roll 2'
+              },
+              {
+                  roll: 'midRoll',
+                  vastTag: 'vastxmls/vastNonLinear.xml',
+                  timer: 25
+              },
+              {
+                  roll: 'midRoll',
+                  vastTag: 'vastxmls/vastNonLinear2.xml',
+                  timer: 25
+              },                 
+              {
+                  roll: 'midRoll',
+                  vastTag: 'vastxmls/vastNonLinear.xml',
+                  timer: 27
+              },              
+              {
+                  roll: 'midRoll',
+                  vastTag: 'vastxmls/vastLinear.xml',
+                  timer: 30,
+                  adClickable: true,
+                  adText: 'Advertising supports us directly ----- Mid-roll 1'
+              },                        
+              {
+                  roll: 'postRoll',
+                  vastTag: 'vastxmls/vastLinear.xml',
+                  adText: 'Thanks for watching',
+                  adTextPosition: 'top right'
+              },
+              {
+                  roll: 'postRoll',
+                  vastTag: 'vastxmls/vastLinear_ad2.xml',
+                  adClickable: true,
+                  adText: 'Advertising supports us directly ----- Post-roll 2',
+                  adTextPosition: 'top right'
+              },              
+          ]
+      }      
     });
-
-    player2.on('playing', function(){ 
-        player1.pause();
-        player3.pause();
-    });
-
-    player3.on('playing', function(){ 
-        player1.pause();
-        player2.pause();
-    });    
-</script>
+  </script>
 </html>

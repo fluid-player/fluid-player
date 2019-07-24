@@ -706,7 +706,7 @@ var fluidPlayerClass = {
             var adListId = list[i];
 
             if (player.adList[adListId].vastLoaded !== true && player.adList[adListId].error !== true) {
-                player.processUrl(player.adList[adListId], adListId);
+                player.processVastWithRetries(player.adList[adListId]);
                 videoPlayerTag.addEventListener('adId_' + adListId, player[roll]);
             }
         }
@@ -859,7 +859,6 @@ var fluidPlayerClass = {
                     player.adList[adListId].vastLoaded = true;
                     player.adPool[adListId] = Object.assign({}, tmpOptions);
                     var event = document.createEvent('Event');
-                    //event.vastObj = vastObj;
                     event.initEvent('adId_' + adListId, false, true);
                     document.getElementById(player.videoPlayerId).dispatchEvent(event);
 
@@ -890,10 +889,33 @@ var fluidPlayerClass = {
      * @param vastTag
      * @param adListId
      */
-    processUrl: function (vastObj, adListId) {
-        var player = this;
-        var numberOfRedirects = 0;
-        var tmpOptions = {
+
+    processVastWithRetries: function(vastObj){
+        let player = this;
+        let vastTag = vastObj.vastTag;
+        let adListId = vastObj.id;
+
+        let tryFallbackVast = function(player){
+            var player = player;
+            var vastTag;
+
+            if(vastObj.hasOwnProperty('fallbackVastTags') && vastObj.fallbackVastTags.length > 0){
+                vastTag = vastObj.fallbackVastTags.shift();
+                player.processUrl(vastTag, adListId, tryFallbackVast);
+            }else{
+                if(vastObj.roll === 'preRoll'){
+                    player.preRollFail(vastObj);
+                }
+            }
+        }
+
+        player.processUrl(vastTag, adListId, tryFallbackVast);
+    },
+
+    processUrl: function (vastTag, adListId, tryFallbackVast) {
+        let player = this;
+        let numberOfRedirects = 0;
+        let tmpOptions = {
             tracking: [],
             stopTracking: [],
             impression: [],
@@ -901,39 +923,8 @@ var fluidPlayerClass = {
             vastLoaded: false
         };
 
-        var tryFallbackVast = function(player){
-            var player = player;
-            var vastTag;
-
-            if(vastObj.hasOwnProperty('fallbackVastTags') && vastObj.fallbackVastTags.length > 0){
-                vastTag = vastObj.fallbackVastTags.shift();
-
-                var numberOfRedirects = 0;
-                var tmpOptions = {
-                    tracking: [],
-                    stopTracking: [],
-                    impression: [],
-                    clicktracking: [],
-                    vastLoaded: false
-                };
-
-                player.resolveVastTag(
-                    vastTag,
-                    numberOfRedirects,
-                    adListId,
-                    tmpOptions,
-                    tryFallbackVast            
-                );
-                         
-            }else{
-                if(vastObj.roll === 'preRoll'){
-                    player.preRollFail(vastObj);
-                }            
-            }
-        }
-
         player.resolveVastTag(
-            vastObj.vastTag,
+            vastTag,
             numberOfRedirects,
             adListId,
             tmpOptions,
