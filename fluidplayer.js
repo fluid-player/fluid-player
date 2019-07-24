@@ -3931,7 +3931,7 @@ var fluidPlayerClass = {
             var tracksList = videoPlayer.querySelectorAll('track');
 
             [].forEach.call(tracksList, function (track) {
-                if (track.kind === 'subtitles' && track.src) {
+                if (track.kind === 'metadata' && track.src) {
                     tracks.push({'label': track.label, 'url': track.src, 'lang': track.srclang});
                 }
             });
@@ -4073,15 +4073,6 @@ var fluidPlayerClass = {
             fluidPlayerScriptLocation + fluidPlayerClass.subtitlesParseScript,
             player.createSubtitlesSwitch.bind(this)
         );
-
-
-        //disable showing the captions
-        try{
-            [].forEach.call(videoPlayerTag.textTracks,function(textTrack){
-                textTrack.mode = 'hidden';
-            })
-        }catch(e){
-        }
     },
 
     createVideoSourceSwitch: function() {
@@ -4224,8 +4215,8 @@ var fluidPlayerClass = {
         var loadedMetadata = function() {
             videoPlayerTag.currentTime = newCurrentTime;
             videoPlayerTag.removeEventListener('loadedmetadata', loadedMetadata);
-            // Safari ios fix to set currentTime
-            if (player.mobileInfo.userOs == 'iOS') {
+            // Safari ios and mac fix to set currentTime
+            if (player.mobileInfo.userOs == 'iOS' || player.getBrowserVersion().browserName.toLowerCase() === 'safari') {
                 videoPlayerTag.addEventListener('playing', videoPlayStart);
             }
 
@@ -5268,6 +5259,16 @@ var fluidPlayerClass = {
         if (player.displayOptions.layoutControls.controlBar.autoHide) {
             player.linkControlBarUserActivity();
         }
+
+        // disable showing the captions, if user added subtitles track 
+        // we are taking subtitles track kind as metadata        
+
+        try{
+            [].forEach.call(videoPlayerTag.textTracks,function(textTrack){
+                textTrack.mode = 'hidden';
+            })
+        }catch(e){
+        }        
     },
 
     // "API" Functions
