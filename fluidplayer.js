@@ -101,6 +101,8 @@ fluidPlayer = function (idVideoPlayer, options) {
 };
 
 var fluidPlayerClass = {
+    hlsJsScript: '/scripts/hls.min.js',
+    dashJsScript: '/scripts/dash.min.js',
     vttParserScript: '/scripts/webvtt.min.js',
     subtitlesParseScript: '/scripts/vtt.js',
     instances: [],
@@ -4820,7 +4822,7 @@ var fluidPlayerClass = {
             case 'application/dash+xml': // MPEG-DASH
                 if (!this.dashScriptLoaded) { // First time trying adding in DASH streamer, get the script
                     this.dashScriptLoaded = true;
-                    fluidPlayerClass.requestScript('https://cdn.dashjs.org/latest/dash.mediaplayer.min.js', this.initialiseDash.bind(this));
+                    fluidPlayerClass.requestScript(fluidPlayerClass.dashJsScript, this.initialiseDash.bind(this));
                 } else {
                     this.initialiseDash();
                 }
@@ -4828,7 +4830,7 @@ var fluidPlayerClass = {
             case 'application/x-mpegURL': // HLS
                 if (!this.hlsScriptLoaded && !window.Hls) { // First time trying adding in DASH streamer, get the script
                     this.hlsScriptLoaded = true;
-                    fluidPlayerClass.requestScript('https://cdn.jsdelivr.net/npm/hls.js@latest', this.initialiseHls.bind(this));
+                    fluidPlayerClass.requestScript(fluidPlayerClass.hlsJsScript, this.initialiseHls.bind(this));
                 } else {
                     this.initialiseHls();
                 }
