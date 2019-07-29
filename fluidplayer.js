@@ -822,10 +822,6 @@ var fluidPlayerClass = {
                 }
             }
 
-            if ((typeof tmpOptions.iconClick !== 'undefined') && (tmpOptions.iconClick !== null) && tmpOptions.iconClick.length) {
-                player.adList[adListId].landingPage = tmpOptions.iconClick;
-            }
-
             var arrayCreativeNonLinears = creative[0].getElementsByTagName('NonLinearAds');
 
             if ((typeof arrayCreativeNonLinears !== 'undefined') && (arrayCreativeNonLinears !== null) && arrayCreativeNonLinears.length) {
@@ -888,6 +884,12 @@ var fluidPlayerClass = {
 
             if (pass) {
                 // ok
+
+                if (tmpOptions.adType === 'linear') {
+                    if ((typeof tmpOptions.iconClick !== 'undefined') && (tmpOptions.iconClick !== null) && tmpOptions.iconClick.length) {
+                        player.adList[adListId].landingPage = tmpOptions.iconClick;
+                    }
+                }
 
                 player.adList[adListId].adType = tmpOptions.adType ? tmpOptions.adType : 'unknown';
 
