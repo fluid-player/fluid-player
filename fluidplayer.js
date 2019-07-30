@@ -842,7 +842,7 @@ var fluidPlayerClass = {
             //Extract the Ad data if it is actually the Ad (!wrapper)
             if (!player.hasVastAdTagUri(xmlResponse) && player.hasInLine(xmlResponse)) {
 
-                if (typeof tmpOptions.mediaFile !== 'undefined' || typeof tmpOptions.staticResource !== 'undefined') {
+                if (typeof tmpOptions.mediaFileList !== 'undefined' || typeof tmpOptions.staticResource !== 'undefined') {
 
                     callBack(true, tmpOptions);
 
