@@ -899,8 +899,9 @@ var fluidPlayerClass = {
                 }
 
             } else {
-                // fallback
-                var vastTag;
+                // when vast failed
+
+                player.stopProcessAndReportError(vastTag);
 
                 if (vastObj.hasOwnProperty('fallbackVastTags') && vastObj.fallbackVastTags.length > 0) {
                     vastTag = vastObj.fallbackVastTags.shift();
