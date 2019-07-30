@@ -1417,6 +1417,12 @@ var fluidPlayerClass = {
         var creative = new Image();
         creative.src = vastSettings.staticResource;
         creative.id = 'fluid_nonLinear_imgCreative_' + adListId + '_' + player.videoPlayerId;
+
+        creative.onerror = function () {
+            player.adList[adListId].error = true;
+            player.announceError(500);
+        };
+
         creative.onload = function () {
 
             //Set banner size based on the below priority
