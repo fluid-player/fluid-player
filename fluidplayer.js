@@ -5382,6 +5382,12 @@ var fluidPlayerClass = {
             case 'play':
                 videoPlayer.onplay = functionCall;
                 break;
+            case 'seeked':
+                videoPlayer.onseeked = functionCall;
+                break;
+            case 'ended':
+                videoPlayer.onended = functionCall;
+                break;
             case 'pause':
                 videoPlayer.addEventListener('pause', function () {
                     if (!player.fluidPseudoPause) {
