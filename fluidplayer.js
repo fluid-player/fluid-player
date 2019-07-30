@@ -446,10 +446,9 @@ var fluidPlayerClass = {
         return tidyString;
     },
 
-    getMediaFileFromLinear: function (linear) {
+    getMediaFileListFromLinear: function (linear) {
         var mediaFileList = [];
         var mediaFiles = this.getMediaFilesFromLinear(linear);
-        console.log(mediaFiles.length, 'length');
         if (mediaFiles.length) {
             for (var n = 0; n < mediaFiles.length; n++) {
                 mediaFileList.push({
@@ -810,7 +809,7 @@ var fluidPlayerClass = {
                     tmpOptions.skipoffset = player.convertTimeStringToSeconds(creativeLinear.getAttribute('skipoffset'));
                     tmpOptions.clickthroughUrl = player.getClickThroughUrlFromLinear(creativeLinear);
                     tmpOptions.duration = player.getDurationFromLinear(creativeLinear);
-                    tmpOptions.mediaFile = player.getMediaFileFromLinear(creativeLinear);
+                    tmpOptions.mediaFileList = player.getMediaFileListFromLinear(creativeLinear);
                     tmpOptions.iconClick = player.getIconClickThroughFromLinear(creativeLinear);
                 }
             }
@@ -1126,7 +1125,7 @@ var fluidPlayerClass = {
                 player.detachStreamers();
 
             //Try to load multiple
-            var selectedMediaFile = player.getSupportedMediaFile(player.vastOptions.mediaFile);
+            var selectedMediaFile = player.getSupportedMediaFile(player.vastOptions.mediaFileList);
 
             if (selectedMediaFile === false) {
                 //Couldn’t find MediaFile that is supported by this video player, based on the attributes of the MediaFile element.
