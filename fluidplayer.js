@@ -1202,15 +1202,15 @@ var fluidPlayerClass = {
         var adSupportedType = false;
         if (mediaFiles.length) {
             for (var i = 0; i < mediaFiles.length; i++) {
-                var supportLevel = this.isSupportedMediaFileType(mediaFiles[i]['type']);
+                var supportLevel = this.getMediaFileTypeSupportLevel(mediaFiles[i]['type']);
 
-                if(supportLevel === "maybe" || supportLevel === "probably") {
+                if (supportLevel === "maybe" || supportLevel === "probably") {
                     selectedMediaFile = mediaFiles[i]['src'];
                     adSupportedType = true;
                 }
 
                 //one of the best(s) option, no need to seek more
-                if(supportLevel === "probably") {
+                if (supportLevel === "probably") {
                     break;
                 }
             }
@@ -1223,8 +1223,12 @@ var fluidPlayerClass = {
         return selectedMediaFile;
     },
 
-    isSupportedMediaFileType: function (mediaType) {
-        if(mediaType === null){
+    /**
+     * Reports how likely it is that the current browser will be able to play media of a given MIME type.
+     * return (string): "probably", "maybe", "no" or null
+     */
+    getMediaFileTypeSupportLevel: function (mediaType) {
+        if (mediaType === null) {
             return null;
         }
 
