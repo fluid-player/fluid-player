@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## Master
+* [Pull #354](https://github.com/fluid-player/fluid-player/pull/354) VAST Multiple medifile support, annuance proper error codes and some bug fixes
+
 ## 2.4.6
 * [Pull #358](https://github.com/fluid-player/fluid-player/pull/358) fix bug with dash js api
 
