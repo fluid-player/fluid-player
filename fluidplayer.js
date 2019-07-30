@@ -339,18 +339,6 @@ var fluidPlayerClass = {
         return ((typeof vastAdTagURI !== 'undefined') && vastAdTagURI.length);
     },
 
-    hasVastAdTagUriFromWrapper: function (creative) {
-        var player = this;
-
-        if ((typeof creative !== 'undefined') && creative.length) {
-            var arrayCreativeLinears = creative[0].getElementsByTagName('Linear');
-            if ((typeof arrayCreativeLinears !== 'undefined') && (arrayCreativeLinears !== null) && arrayCreativeLinears.length) {
-                return player.getMediaFileFromLinear(arrayCreativeLinears[0]);
-            }
-        }
-
-        return false;
-    },
 
     getClickThroughUrlFromNonLinear: function (nonLinear) {
         var result = '';
