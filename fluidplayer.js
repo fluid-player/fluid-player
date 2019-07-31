@@ -987,7 +987,7 @@ var fluidPlayerClass = {
 
                 var vastAdTagUri = player.getVastAdTagUriFromWrapper(xmlResponse);
                 if (vastAdTagUri) {
-                    player.resolveVastTag(vastAdTagUri, numberOfRedirects, vastTag, tmpOptions);
+                    player.resolveVastTag(vastAdTagUri, numberOfRedirects, tmpOptions, callBack);
                 } else {
                     callBack(false);
                     return;
