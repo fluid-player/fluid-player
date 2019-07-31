@@ -4888,7 +4888,7 @@ var fluidPlayerClass = {
             case 'application/dash+xml': // MPEG-DASH
                 if (!this.dashScriptLoaded) { // First time trying adding in DASH streamer, get the script
                     this.dashScriptLoaded = true;
-                    fluidPlayerClass.requestScript(fluidPlayerClass.dashJsScript, this.initialiseDash.bind(this));
+                    fluidPlayerClass.requestScript(fluidPlayerScriptLocation + fluidPlayerClass.dashJsScript, this.initialiseDash.bind(this));
                 } else {
                     this.initialiseDash();
                 }
@@ -4896,7 +4896,7 @@ var fluidPlayerClass = {
             case 'application/x-mpegURL': // HLS
                 if (!this.hlsScriptLoaded && !window.Hls) { // First time trying adding in DASH streamer, get the script
                     this.hlsScriptLoaded = true;
-                    fluidPlayerClass.requestScript(fluidPlayerClass.hlsJsScript, this.initialiseHls.bind(this));
+                    fluidPlayerClass.requestScript(fluidPlayerScriptLocation + fluidPlayerClass.hlsJsScript, this.initialiseHls.bind(this));
                 } else {
                     this.initialiseHls();
                 }
