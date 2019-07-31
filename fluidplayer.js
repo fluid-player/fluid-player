@@ -921,6 +921,7 @@ var fluidPlayerClass = {
     processUrl: function (vastTag, callBack) {
         var player = this;
         var numberOfRedirects = 0;
+        //var adListId = adListId;
 
         var tmpOptions = {
             tracking: [],
