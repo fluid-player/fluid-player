@@ -1,6 +1,7 @@
 # CHANGELOG
 
 ## Master
+* [Pull #361](https://github.com/fluid-player/fluid-player/pull/361) Adding subtitles, multiple ad-roll, fallback vast ad, fixing dash playback, double click to fullscreen
 * [Pull #354](https://github.com/fluid-player/fluid-player/pull/354) VAST Multiple medifile support, annuance proper error codes and some bug fixes
 
 ## 2.4.6

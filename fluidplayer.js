@@ -766,7 +766,7 @@ var fluidPlayerClass = {
         var player = this;
 
         if (!xmlResponse) {
-            player.stopProcessAndReportError(vastTag);
+            callBack(false);
             return;
         }
 
@@ -848,13 +848,13 @@ var fluidPlayerClass = {
 
                 } else {
 
-                    player.stopProcessAndReportError(vastTag);
+                    callBack(false);
 
                 }
 
             }
         } else {
-            player.stopProcessAndReportError(vastTag);
+            callBack(false);
         }
 
     },
@@ -899,8 +899,9 @@ var fluidPlayerClass = {
                 }
 
             } else {
-                // fallback
-                var vastTag;
+                // when vast failed
+
+                player.stopProcessAndReportError(vastTag);
 
                 if (vastObj.hasOwnProperty('fallbackVastTags') && vastObj.fallbackVastTags.length > 0) {
                     vastTag = vastObj.fallbackVastTags.shift();
@@ -943,7 +944,6 @@ var fluidPlayerClass = {
 
         if (!vastTag || vastTag == '') {
             callBack(false);
-            player.stopProcessAndReportError(vastTag);
             return;
         }
 
@@ -952,13 +952,11 @@ var fluidPlayerClass = {
 
             if (xmlHttpReq.readyState === 4 && xmlHttpReq.status === 404) {
                 callBack(false);
-                player.stopProcessAndReportError(vastTag);
                 return;
             }
 
             if (xmlHttpReq.readyState === 4 && xmlHttpReq.status === 0) {
-                callBack(false);
-                player.stopProcessAndReportError(vastTag); //Most likely that Ad Blocker exists
+                callBack(false); //Most likely that Ad Blocker exists
                 return;
             }
 
@@ -967,8 +965,7 @@ var fluidPlayerClass = {
             }
 
             if ((xmlHttpReq.readyState === 4) && (xmlHttpReq.status !== 200)) {
-                callBack(false);
-                player.stopProcessAndReportError(vastTag);
+                callBack(false);                
                 return;
             }
 
@@ -976,13 +973,11 @@ var fluidPlayerClass = {
                 var xmlResponse = xmlHttpReq.responseXML;
             } catch (e) {
                 callBack(false);
-                player.stopProcessAndReportError(vastTag);
                 return;
             }
 
             if (!xmlResponse) {
                 callBack(false);
-                player.stopProcessAndReportError(vastTag);
                 return;
             }
 
@@ -995,14 +990,12 @@ var fluidPlayerClass = {
                     player.resolveVastTag(vastAdTagUri, numberOfRedirects, vastTag, tmpOptions);
                 } else {
                     callBack(false);
-                    player.stopProcessAndReportError(vastTag);
                     return;
                 }
             }
 
             if (numberOfRedirects > player.displayOptions.vastOptions.maxAllowedVastTagRedirects && !player.inLineFound) {
                 callBack(false);
-                player.stopProcessAndReportError(vastTag);
                 return;
             }
 
