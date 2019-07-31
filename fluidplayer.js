@@ -112,7 +112,7 @@ var fluidPlayerClass = {
         'toggleElementText', 'getMobileOs', 'findClosestParent', 'activeVideoPlayerId',
         'getInstanceIdByWrapperId', 'timer', 'timerPool', 'adList', 'adPool',
         'isUserActive', 'isCurrentlyPlayingAd', 'initialAnimationSet'],
-    version: '2.4.6',
+    version: '2.4.7',
     homepage: 'https://www.fluidplayer.com/',
     activeVideoPlayerId: null,
 
@@ -868,11 +868,11 @@ var fluidPlayerClass = {
      */
 
     processVastWithRetries: function (vastObj) {
-        let player = this;
-        let vastTag = vastObj.vastTag;
-        let adListId = vastObj.id;
+        var player = this;
+        var vastTag = vastObj.vastTag;
+        var adListId = vastObj.id;
 
-        let handleVastResult = function (pass, tmpOptions) {
+        var handleVastResult = function (pass, tmpOptions) {
 
             if (pass) {
                 // ok
@@ -919,11 +919,11 @@ var fluidPlayerClass = {
     },
 
     processUrl: function (vastTag, callBack) {
-        let player = this;
-        let numberOfRedirects = 0;
-        //let adListId = adListId;
+        var player = this;
+        var numberOfRedirects = 0;
+        //var adListId = adListId;
 
-        let tmpOptions = {
+        var tmpOptions = {
             tracking: [],
             stopTracking: [],
             impression: [],
@@ -1170,7 +1170,7 @@ var fluidPlayerClass = {
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
         // register all the ad pods
-        for (let i = 0; i < adListId.length; i++) {
+        for (var i = 0; i < adListId.length; i++) {
             if (!player.adPool.hasOwnProperty(adListId[i])) {
                 player.announceLocalError(101);
                 return;
@@ -1514,7 +1514,7 @@ var fluidPlayerClass = {
     rollGroupContainsLinear: function (groupedRolls) {
         var player = this;
         var found = false;
-        for(let i = 0; i < groupedRolls.length; i++) {
+        for(var i = 0; i < groupedRolls.length; i++) {
             if (player.adList[groupedRolls[i].id].adType && player.adList[groupedRolls[i].id].adType === 'linear') {
                 found = true;
                 break;
@@ -1525,7 +1525,7 @@ var fluidPlayerClass = {
     rollGroupContainsNonlinear: function (groupedRolls) {
         var player = this;
         var found = false;
-        for(let i = 0; i < groupedRolls.length; i++) {
+        for(var i = 0; i < groupedRolls.length; i++) {
             if (player.adList[groupedRolls[i].id].adType.toLowerCase() === 'nonlinear') {
                 found = true;
                 break;
@@ -1567,7 +1567,7 @@ var fluidPlayerClass = {
 
         player.firstPlayLaunched = true;
 
-        for (let index = 0; index < adListIds.length; index++) {
+        for (var index = 0; index < adListIds.length; index++) {
 
             if (player.adList[adListIds[index]].played === true) {
                 return
@@ -1783,7 +1783,7 @@ var fluidPlayerClass = {
         var player = this;
         var adListIds = [];
 
-        for (let i = 0; i < keyTimeLinearObj.length; i++) {
+        for (var i = 0; i < keyTimeLinearObj.length; i++) {
             if (player.adList[keyTimeLinearObj[i].adListId].played === false) {
                 adListIds.push(keyTimeLinearObj[i].adListId);
             }
@@ -1811,7 +1811,7 @@ var fluidPlayerClass = {
 
         // Task: close nonLinear ads
         if (timerPoolKeytimeCloseStaticAdsLength > 0) {
-            for (let index = 0; index < timerPoolKeytimeCloseStaticAdsLength; index++) {
+            for (var index = 0; index < timerPoolKeytimeCloseStaticAdsLength; index++) {
                 var adListId = player.timerPool[keyTime]['closeStaticAd'][index].closeStaticAd;
 
                 if (player.adList[adListId].played === true) {
@@ -1839,7 +1839,7 @@ var fluidPlayerClass = {
 
         // Task: play nonLinear ads
         if (timerPoolKeytimeNonlinearAdsLength > 0) {
-            for (let index = 0; index < timerPoolKeytimeNonlinearAdsLength; index++) {
+            for (var index = 0; index < timerPoolKeytimeNonlinearAdsLength; index++) {
                 var adListId = player.timerPool[keyTime]['nonLinear'][index].adListId;
                 var vastOptions = player.adPool[adListId];
 
@@ -4087,7 +4087,7 @@ var fluidPlayerClass = {
         var subtitlesAvailable = false;
         var subtitlesContainer =  document.getElementById(player.videoPlayerId+'_fluid_subtitles_container');
 
-        for (let i = 0; i < player.subtitlesData.length; i++) {
+        for (var i = 0; i < player.subtitlesData.length; i++) {
             if (currentTime >= (player.subtitlesData[i].startTime) && currentTime <= (player.subtitlesData[i].endTime)) {
                 subtitlesContainer.innerHTML = '';
                 subtitlesContainer.appendChild(WebVTT.convertCueToDOMTree(window, player.subtitlesData[i].text));
