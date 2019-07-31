@@ -1441,8 +1441,11 @@ var fluidPlayerClass = {
                 newBannerHeight = origHeight;
             }
 
-            //Show the board only if media loaded
-            document.getElementById('fluid_nonLinear_' + adListId).style.display = '';
+            if( player.adList[adListId].roll !== 'onPauseRoll' ){
+                //Show the board only if media loaded
+                document.getElementById('fluid_nonLinear_' + adListId).style.display = '';                
+            }
+
 
             img = document.getElementById(creative.id);
             img.width = newBannerWidth;
