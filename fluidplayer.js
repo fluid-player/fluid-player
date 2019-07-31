@@ -101,10 +101,10 @@ fluidPlayer = function (idVideoPlayer, options) {
 };
 
 var fluidPlayerClass = {
-    hlsJsScript: '/scripts/hls.min.js',
-    dashJsScript: '/scripts/dash.min.js',
-    vttParserScript: '/scripts/webvtt.min.js',
-    subtitlesParseScript: '/scripts/vtt.js',
+    hlsJsScript: 'https://cdn.fluidplayer.com/v2/current/scripts/hls.min.js',
+    dashJsScript: 'http://cdn.fluidplayer.com/v2/current/scripts/dash.min.js',
+    vttParserScript: 'http://cdn.fluidplayer.com/v2/current/scripts/webvtt.min.js',
+    subtitlesParseScript: 'http://cdn.fluidplayer.com/v2/current/scripts/vtt.js',
     instances: [],
     notCloned: ['notCloned', 'vttParserScript', 'instances', 'getInstanceById',
         'requestStylesheet', 'reqiestScript', 'isTouchDevice', 'vastOptions',
