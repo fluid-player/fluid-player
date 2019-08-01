@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## Master
+* [Pull #367](https://github.com/fluid-player/fluid-player/pull/367) Fixing display of ad count down timer
+
 ## 2.4.7
 * [Pull #361](https://github.com/fluid-player/fluid-player/pull/361) Adding subtitles, multiple ad-roll, fallback vast ad, fixing dash playback, double click to fullscreen
 * [Pull #354](https://github.com/fluid-player/fluid-player/pull/354) VAST Multiple mediafile support, announce proper error codes and some bug fixes
