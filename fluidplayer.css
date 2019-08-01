@@ -397,7 +397,6 @@
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .ad_countdown {
-    display: none;
     position: absolute;
     right: 0px;
     width: 75px;
