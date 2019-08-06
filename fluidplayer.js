@@ -4143,9 +4143,28 @@ var fluidPlayerClass = {
         );
     },
 
-    createCardboardSwitch: function (){
+    createCardboardSwitch: function () {
         var player = this;
-        
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);
+
+        // Create a container for 360degree
+        var VrContainer = document.createElement('div');
+        VrContainer.id = player.videoPlayerId + '_fluid_vr_container';
+        VrContainer.className = 'fluid_vr_container';
+
+        // Create a JoyStick and append to VR container
+        var VrJoystick = document.createElement('div');
+        VrJoystick.id = player.videoPlayerId + '_fluid_vr_joystick';
+        VrJoystick.className = 'fluid_vr_joystick';
+        VrContainer.appendChild(VrJoystick);
+
+        videoPlayerTag.parentNode.insertBefore(VrContainer, videoPlayerTag.nextSibling);
+
+        player.vrPanorama = new PANOLENS.VideoPanorama( '', { videoElement:  videoPlayerTag } );
+
+        player.vrViewer = new PANOLENS.Viewer( { container: VrContainer, controlBar: false } );
+        player.vrViewer.add( player.vrPanorama );
+
     },
 
     createCardboard: function () {
@@ -5040,6 +5059,8 @@ var fluidPlayerClass = {
         videoPlayer.setAttribute('playsinline', '');
         videoPlayer.setAttribute('webkit-playsinline', '');
 
+        player.vrPanorama             = null;
+        player.vrViewer               = null;
         player.vastOptions             = null;
         player.videoPlayerId           = idVideoPlayer;
         player.originalSrc             = player.getCurrentSrc();
