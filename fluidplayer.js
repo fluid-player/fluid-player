@@ -4143,7 +4143,7 @@ var fluidPlayerClass = {
         );
     },
 
-    createCarboardSwitch: function (){
+    createCardboardSwitch: function (){
         var player = this;
         
     },
@@ -4159,14 +4159,20 @@ var fluidPlayerClass = {
 
                     fluidPlayerClass.requestScript(
                         fluidPlayerScriptLocation + fluidPlayerClass.panolensScript,
-                        function(){
+                        function () {
 
-                            player.createCarboardSwitch();
+                            player.createCardboardSwitch();
                        
                         })
 
                 }
             );
+
+        }else{
+            
+            var cardBoardBtn = document.getElementById(player.videoPlayerId + '_fluid_control_cardboard');
+            cardBoardBtn.style.display = 'none';
+
         } 
     },
 
