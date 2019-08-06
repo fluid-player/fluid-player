@@ -105,6 +105,8 @@ var fluidPlayerClass = {
     dashJsScript: '/scripts/dash.min.js',
     vttParserScript: '/scripts/webvtt.min.js',
     subtitlesParseScript: '/scripts/vtt.js',
+    panolensScript: '/scripts/panolens.min.js',
+    threeJsScript: '/scripts/three.min.js',
     instances: [],
     notCloned: ['notCloned', 'vttParserScript', 'instances', 'getInstanceById',
         'requestStylesheet', 'reqiestScript', 'isTouchDevice', 'vastOptions',
@@ -4102,6 +4104,7 @@ var fluidPlayerClass = {
             subtitlesContainer.innerHTML = '';
         }
     },
+
     openCloseSubtitlesSwitch: function () {
         var player = this;
         var subtitleChangeList = document.getElementById(this.videoPlayerId + '_fluid_control_subtitles_list');
@@ -4137,6 +4140,33 @@ var fluidPlayerClass = {
             fluidPlayerScriptLocation + fluidPlayerClass.subtitlesParseScript,
             player.createSubtitlesSwitch.bind(this)
         );
+    },
+
+    createCarboardSwitch: function (){
+        var player = this;
+        
+    },
+
+    createCardboard: function () {
+        var player = this;
+        
+        if(player.displayOptions.layoutControls.showCardBoardView){
+
+            fluidPlayerClass.requestScript(
+                fluidPlayerScriptLocation + fluidPlayerClass.threeJsScript,
+                function () {
+
+                    fluidPlayerClass.requestScript(
+                        fluidPlayerScriptLocation + fluidPlayerClass.panolensScript,
+                        function(){
+
+                            player.createCarboardSwitch();
+                       
+                        })
+
+                }
+            );
+        } 
     },
 
     createVideoSourceSwitch: function () {
@@ -5078,6 +5108,7 @@ var fluidPlayerClass = {
                 allowDownload:                false,
                 playbackRateEnabled:          false,
                 subtitlesEnabled:             false,
+                showCardBoardView:            false,
                 allowTheatre:                 true,
                 doubleclickFullscreen:        true,
                 theatreSettings: {
@@ -5215,6 +5246,8 @@ var fluidPlayerClass = {
         player.createVideoSourceSwitch();
 
         player.createSubtitles();
+
+        player.createCardboard();
 
         player.userActivityChecker();
 
