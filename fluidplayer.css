@@ -433,6 +433,15 @@
     z-index: 1;    
 }
 
+.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick {
+    height: 100px;
+    width: 100px;
+    left: 10px;
+    top: 10px;
+    position: absolute;
+    background: black;
+}
+
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container {
     color: white;
     position: absolute;
