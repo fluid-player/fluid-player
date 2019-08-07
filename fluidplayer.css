@@ -455,7 +455,7 @@
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_up{
-    background-position: -15.5px -16.5px;
+    background-position: -336px -55px;
     -webkit-transform: rotate(270deg);  /* Chrome, Opera 15+, Safari 3.1+ */
     -ms-transform: rotate(270deg);  /* IE 9 */
     transform: rotate(270deg);  /* Firefox 16+, IE 10+, Opera  */
@@ -466,7 +466,7 @@
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_left{
-    background-position: -15.5px -16.5px;
+    background-position: -336px -55px;
     -webkit-transform: rotate(180deg);  /* Chrome, Opera 15+, Safari 3.1+ */
     -ms-transform: rotate(1890deg);  /* IE 9 */
     transform: rotate(180deg);  /* Firefox 16+, IE 10+, Opera  */   
@@ -477,7 +477,7 @@
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_right{
-    background-position: -15.5px -16.5px;
+    background-position: -336px -55px;
     -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
     -ms-transform: rotate(0deg);  /* IE 9 */
     transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera  */  
@@ -488,7 +488,7 @@
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_down{
-    background-position: -15.5px -16.5px;
+    background-position: -336px -55px;
     -webkit-transform: rotate(90deg);  /* Chrome, Opera 15+, Safari 3.1+ */
     -ms-transform: rotate(90deg);  /* IE 9 */
     transform: rotate(90deg);  /* Firefox 16+, IE 10+, Opera  */  

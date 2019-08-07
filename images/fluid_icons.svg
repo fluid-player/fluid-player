@@ -41,9 +41,9 @@
      id="namedview65"
      showgrid="false"
      inkscape:pagecheckerboard="true"
-     inkscape:zoom="3.7276408"
-     inkscape:cx="367.30585"
-     inkscape:cy="74.142635"
+     inkscape:zoom="10.714953"
+     inkscape:cx="348.63023"
+     inkscape:cy="34.011655"
      inkscape:window-x="67"
      inkscape:window-y="27"
      inkscape:window-maximized="1"
@@ -54,7 +54,7 @@
      id="desc4">Created using Figma</desc>
   <path
      id="path4087"
-     d="m 347.64062,35.962891 a 6.9826789,6.9826789 0 0 0 6.98438,-6.984375 6.9826789,6.9826789 0 0 0 -6.98438,-6.982422 6.9826789,6.9826789 0 0 0 -6.98242,6.982422 6.9826789,6.9826789 0 0 0 6.98242,6.984375 z m 0,-2.476562 a 4.5078053,4.5078053 0 0 1 -4.50781,-4.507813 4.5078053,4.5078053 0 0 1 4.50781,-4.507812 4.5078053,4.5078053 0 0 1 4.50781,4.507812 4.5078053,4.5078053 0 0 1 -4.50781,4.507813 z"
+     d="m 347.64062,35.959 a 6.9826789,6.9826789 0 0 0 6.98438,-6.984375 6.9826789,6.9826789 0 0 0 -6.98438,-6.982422 6.9826789,6.9826789 0 0 0 -6.98242,6.982422 6.9826789,6.9826789 0 0 0 6.98242,6.984375 z m 0,-2.476562 a 4.5078053,4.5078053 0 0 1 -4.50781,-4.507813 4.5078053,4.5078053 0 0 1 4.50781,-4.507812 4.5078053,4.5078053 0 0 1 4.50781,4.507812 4.5078053,4.5078053 0 0 1 -4.50781,4.507813 z"
      style="fill:#ffffff;fill-opacity:1;stroke-width:1.70873225"
      inkscape:connector-curvature="0" />
   <path
@@ -320,4 +320,80 @@
      cy="-28.97954"
      transform="scale(1,-1)"
      r="4.5078053" />
+  <g
+     id="g7787"
+     transform="matrix(-0.02885349,0,0,-0.02885337,352.04486,75.172258)"
+     style="fill:#ffffff;fill-opacity:1">
+    <g
+       id="g7731"
+       transform="translate(-90.566882,42.049084)"
+       style="fill:#ffffff;fill-opacity:1">
+	<path
+   id="path7729"
+   d="M 242.607,0 C 108.629,0 0.001,108.628 0.001,242.606 c 0,133.976 108.628,242.606 242.606,242.606 133.978,0 242.604,-108.631 242.604,-242.606 C 485.212,108.628 376.585,0 242.607,0 Z M 401.815,288.094 H 219.862 v 90.979 L 83.397,242.606 219.862,106.141 v 90.978 h 181.953 z"
+   inkscape:connector-curvature="0"
+   style="fill:#ffffff;fill-opacity:1" />
+
+</g>
+    <g
+       id="g7733"
+       style="fill:#ffffff;fill-opacity:1">
+</g>
+    <g
+       id="g7735"
+       style="fill:#ffffff;fill-opacity:1">
+</g>
+    <g
+       id="g7737"
+       style="fill:#ffffff;fill-opacity:1">
+</g>
+    <g
+       id="g7739"
+       style="fill:#ffffff;fill-opacity:1">
+</g>
+    <g
+       id="g7741"
+       style="fill:#ffffff;fill-opacity:1">
+</g>
+    <g
+       id="g7743"
+       style="fill:#ffffff;fill-opacity:1">
+</g>
+    <g
+       id="g7745"
+       style="fill:#ffffff;fill-opacity:1">
+</g>
+    <g
+       id="g7747"
+       style="fill:#ffffff;fill-opacity:1">
+</g>
+    <g
+       id="g7749"
+       style="fill:#ffffff;fill-opacity:1">
+</g>
+    <g
+       id="g7751"
+       style="fill:#ffffff;fill-opacity:1">
+</g>
+    <g
+       id="g7753"
+       style="fill:#ffffff;fill-opacity:1">
+</g>
+    <g
+       id="g7755"
+       style="fill:#ffffff;fill-opacity:1">
+</g>
+    <g
+       id="g7757"
+       style="fill:#ffffff;fill-opacity:1">
+</g>
+    <g
+       id="g7759"
+       style="fill:#ffffff;fill-opacity:1">
+</g>
+    <g
+       id="g7761"
+       style="fill:#ffffff;fill-opacity:1">
+</g>
+  </g>
 </svg>
