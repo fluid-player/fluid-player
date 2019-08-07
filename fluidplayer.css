@@ -451,7 +451,12 @@
     height: 24px;
     width: 24px;
     position: relative;
-    background: url(images/fluid_icons.svg) no-repeat;   
+    background: url(images/fluid_icons.svg) no-repeat;
+    opacity: 0.8;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_button:hover{
+    opacity: 1;
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_up{

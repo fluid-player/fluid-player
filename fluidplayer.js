@@ -4156,6 +4156,24 @@ var fluidPlayerClass = {
         return joystickButton;
     },
 
+    carboardGetCurrentPosition: function () {
+        var player = this;
+
+        var intersects, point, panoramaWorldPosition, outputPosition;
+
+        point = player.vrViewer.getCamera().position;
+        panoramaWorldPosition = player.vrViewer.panorama.getWorldPosition();
+
+        // Panorama is scaled -1 on X axis
+        outputPosition = new THREE.Vector3(
+            -parseFloat((point.x - panoramaWorldPosition.x)),
+            parseFloat((point.y - panoramaWorldPosition.y)),
+            parseFloat((point.z - panoramaWorldPosition.z))
+        );
+
+        return outputPosition;
+    },
+
     createCardboardJoystick: function () {
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
@@ -4176,6 +4194,27 @@ var fluidPlayerClass = {
         var zoomInButton = player.createCardboardJoystickButton('zoomin');
         var zoomOutButton = player.createCardboardJoystickButton('zoomout');
 
+        upButton.addEventListener('click', function () {
+            var currentPosition = player.carboardGetCurrentPosition();
+            //player.vrViewer.tweenControlCenter(  new THREE.Vector3(currentPosition.x, currentPosition.y + 0.5, currentPosition.z), 2000 );
+        });
+
+        downButton.addEventListener('click', function () {
+            var currentPosition = player.carboardGetCurrentPosition();
+            //player.vrViewer.tweenControlCenter(  new THREE.Vector3(currentPosition.x, currentPosition.y - 0.5, currentPosition.z), 2000 );
+        });
+
+        rightButton.addEventListener('click', function () {
+            var currentPosition = player.carboardGetCurrentPosition();
+            //player.vrViewer.tweenControlCenter(  new THREE.Vector3(currentPosition.x + 0.5, currentPosition.y, currentPosition.z), 2000 );
+        });
+
+        leftButton.addEventListener('click', function () {
+            var currentPosition = player.carboardGetCurrentPosition();
+            //player.vrViewer.tweenControlCenter(  new THREE.Vector3(currentPosition.x - 0.5, currentPosition.y, currentPosition.z), 2000 );
+            player.vrViewer.camera.position.set(currentPosition.x - 0.5, currentPosition.y, currentPosition.z);
+        });
+
     },
 
     createCardboardView: function () {
@@ -4192,6 +4231,9 @@ var fluidPlayerClass = {
 
         player.vrViewer = new PANOLENS.Viewer( { container: vrContainer, controlBar: false } );
         player.vrViewer.add( player.vrPanorama );
+        
+        // Zoom
+        player.vrViewer.OrbitControls.noZoom = true;
 
         player.createCardboardJoystick();
     },
