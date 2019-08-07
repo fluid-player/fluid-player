@@ -4143,28 +4143,57 @@ var fluidPlayerClass = {
         );
     },
 
-    createCardboardSwitch: function () {
+    createCardboardJoystickButton: function (identity) {
+        var player = this;
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);
+
+        var vrJoystickPanel = document.getElementById(player.videoPlayerId + '_fluid_vr_joystick_panel');
+        var joystickButton = document.createElement('div');
+        joystickButton.id = player.videoPlayerId + '_fluid_vr_joystick_'+identity; 
+        joystickButton.className = 'fluid_vr_button fluid_vr_joystick_'+identity;
+        vrJoystickPanel.appendChild(joystickButton);
+
+        return joystickButton;
+    },
+
+    createCardboardJoystick: function () {
+        var player = this;
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);
+        var vrContainer = document.getElementById(player.videoPlayerId + '_fluid_vr_container');
+
+        // Create a JoyStick and append to VR container
+        var vrJoystickPanel = document.createElement('div');
+        vrJoystickPanel.id = player.videoPlayerId + '_fluid_vr_joystick_panel';
+        vrJoystickPanel.className = 'fluid_vr_joystick_panel';
+        vrContainer.appendChild(vrJoystickPanel);      
+        
+        // Create Joystick buttons
+        var upButton = player.createCardboardJoystickButton('up');
+        var leftButton = player.createCardboardJoystickButton('left');
+        var rightButton = player.createCardboardJoystickButton('right');
+        var downButton = player.createCardboardJoystickButton('down');
+        var centerButton = player.createCardboardJoystickButton('center');
+        var zoomInButton = player.createCardboardJoystickButton('zoomin');
+        var zoomOutButton = player.createCardboardJoystickButton('zoomout');
+
+    },
+
+    createCardboardView: function () {
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
         // Create a container for 360degree
-        var VrContainer = document.createElement('div');
-        VrContainer.id = player.videoPlayerId + '_fluid_vr_container';
-        VrContainer.className = 'fluid_vr_container';
-
-        // Create a JoyStick and append to VR container
-        var VrJoystick = document.createElement('div');
-        VrJoystick.id = player.videoPlayerId + '_fluid_vr_joystick';
-        VrJoystick.className = 'fluid_vr_joystick';
-        VrContainer.appendChild(VrJoystick);
-
-        videoPlayerTag.parentNode.insertBefore(VrContainer, videoPlayerTag.nextSibling);
+        var vrContainer = document.createElement('div');
+        vrContainer.id = player.videoPlayerId + '_fluid_vr_container';
+        vrContainer.className = 'fluid_vr_container';
+        videoPlayerTag.parentNode.insertBefore(vrContainer, videoPlayerTag.nextSibling);
 
         player.vrPanorama = new PANOLENS.VideoPanorama( '', { videoElement:  videoPlayerTag } );
 
-        player.vrViewer = new PANOLENS.Viewer( { container: VrContainer, controlBar: false } );
+        player.vrViewer = new PANOLENS.Viewer( { container: vrContainer, controlBar: false } );
         player.vrViewer.add( player.vrPanorama );
 
+        player.createCardboardJoystick();
     },
 
     createCardboard: function () {
@@ -4180,7 +4209,7 @@ var fluidPlayerClass = {
                         fluidPlayerScriptLocation + fluidPlayerClass.panolensScript,
                         function () {
 
-                            player.createCardboardSwitch();
+                            player.createCardboardView();
                        
                         })
 
