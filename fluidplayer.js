@@ -4259,13 +4259,9 @@ var fluidPlayerClass = {
         var vrContainerChildrens = vrContainer.children
 
         for (var i = 0; i < vrContainerChildrens.length; i++) {
-
             if(vrContainerChildrens[i].className === ''){
-
                 vrContainerChildrens[i].style.display = "none";
-
             }
-
         }
 
         // if mobile device then enable gyroscope controls
@@ -4274,11 +4270,10 @@ var fluidPlayerClass = {
         }
 
         // Store initial camera position
-        player.vrViewer.initialCameraPosition = JSON.parse(JSON.stringify(player.vrViewer.camera.position));
+        player.vrViewer.initialCameraPosition = JSON.parse( JSON.stringify( player.vrViewer.camera.position ) );
 
         if(player.displayOptions.layoutControls.showCardBoardJoystick){
             player.createCardboardJoystick();
-
             // Disable zoom if showing joystick
             player.vrViewer.OrbitControls.noZoom = true;            
         }
