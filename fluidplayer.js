@@ -4246,18 +4246,39 @@ var fluidPlayerClass = {
 
         player.vrPanorama = new PANOLENS.VideoPanorama( '', { videoElement:  videoPlayerTag } );
 
-        player.vrViewer = new PANOLENS.Viewer( { container: vrContainer, controlBar: false } );
+        player.vrViewer = new PANOLENS.Viewer( { container: vrContainer, controlBar: true } );
         player.vrViewer.add( player.vrPanorama );
+
+        player.vrViewer.enableEffect( PANOLENS.MODES.NORMAL );
+        player.vrViewer.onWindowResize();
+
+        // there is a bug in panolens which require user to enable control bar to perform operation, hopefully this will be fixed in new panolens releases
+        // here is a workaround
+        var vrContainer = document.getElementById(player.videoPlayerId + '_fluid_vr_container');
+        var vrContainerChildrens = vrContainer.children
+
+        for (var i = 0; i < vrContainerChildrens.length; i++) {
+            if(vrContainerChildrens[i].className === ''){
+                vrContainerChildrens[i].style.display = "none";
+            }
+        }
+
+        // if mobile device then enable gyroscope controls
+        if( fluidPlayerClass.getMobileOs().userOs === 'Android' || fluidPlayerClass.getMobileOs().userOs === 'iOS' ){
+            player.vrViewer.enableControl(1);
+        }
 
         // Store initial camera position
         player.vrViewer.initialCameraPosition = JSON.parse(JSON.stringify(player.vrViewer.camera.position));
 
         if(player.displayOptions.layoutControls.showCardBoardJoystick){
             player.createCardboardJoystick();
-            
+
             // Disable zoom if showing joystick
             player.vrViewer.OrbitControls.noZoom = true;            
         }
+
+
     },
 
     createCardboard: function () {
