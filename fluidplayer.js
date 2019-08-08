@@ -4237,6 +4237,7 @@ var fluidPlayerClass = {
     createCardboardView: function () {
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
+        var vrSwitchButton = document.getElementById(player.videoPlayerId + '_fluid_control_cardboard');
 
         // Create a container for 360degree
         var vrContainer = document.createElement('div');
@@ -4258,9 +4259,13 @@ var fluidPlayerClass = {
         var vrContainerChildrens = vrContainer.children
 
         for (var i = 0; i < vrContainerChildrens.length; i++) {
+
             if(vrContainerChildrens[i].className === ''){
+
                 vrContainerChildrens[i].style.display = "none";
+
             }
+
         }
 
         // if mobile device then enable gyroscope controls
@@ -4278,6 +4283,29 @@ var fluidPlayerClass = {
             player.vrViewer.OrbitControls.noZoom = true;            
         }
 
+
+        vrSwitchButton.addEventListener('click', function () {
+            
+            var vrJoystickPanel = document.getElementById(player.videoPlayerId + '_fluid_vr_joystick_panel');
+            
+            if(player.vrMode){
+                player.vrViewer.enableEffect( PANOLENS.MODES.NORMAL );
+                player.vrMode = false;
+
+                if(player.displayOptions.layoutControls.showCardBoardJoystick){
+                    vrJoystickPanel.style.display = "block";
+                }
+            }else{
+                player.vrViewer.enableEffect( PANOLENS.MODES.CARDBOARD );
+                player.vrMode = true;
+                
+                // hide the joystick in VR mode
+                if(player.displayOptions.layoutControls.showCardBoardJoystick){
+                    vrJoystickPanel.style.display = "none";
+                }
+
+            }
+        });
 
     },
 
@@ -5173,6 +5201,7 @@ var fluidPlayerClass = {
         videoPlayer.setAttribute('playsinline', '');
         videoPlayer.setAttribute('webkit-playsinline', '');
 
+        player.vrMode                 = false;
         player.vrPanorama             = null;
         player.vrViewer               = null;
         player.vastOptions             = null;
