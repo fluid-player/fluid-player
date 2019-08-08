@@ -4156,23 +4156,26 @@ var fluidPlayerClass = {
         return joystickButton;
     },
 
-    carboardGetCurrentPosition: function () {
-        var player = this;
+    // carboardGetCurrentPosition: function () {
+    //     var player = this;
 
-        var intersects, point, panoramaWorldPosition, outputPosition;
+    //     var intersects, point, panoramaWorldPosition, outputPosition;
+    //     intersects = player.vrViewer.raycaster.intersectObject( player.vrViewer.panorama, true );
 
-        point = player.vrViewer.getCamera().position;
-        panoramaWorldPosition = player.vrViewer.panorama.getWorldPosition();
+    //     if ( intersects.length > 0 ) {
+    //         point = player.vrViewer.getCamera().position;
+    //         panoramaWorldPosition = player.vrViewer.panorama.getWorldPosition();
 
-        // Panorama is scaled -1 on X axis
-        outputPosition = new THREE.Vector3(
-            -parseFloat((point.x - panoramaWorldPosition.x)),
-            parseFloat((point.y - panoramaWorldPosition.y)),
-            parseFloat((point.z - panoramaWorldPosition.z))
-        );
+    //         // Panorama is scaled -1 on X axis
+    //         outputPosition = new THREE.Vector3(
+    //             -parseFloat((point.x - panoramaWorldPosition.x)),
+    //             parseFloat((point.y - panoramaWorldPosition.y)),
+    //             parseFloat((point.z - panoramaWorldPosition.z))
+    //         );
+    //     }
 
-        return outputPosition;
-    },
+    //     return outputPosition;
+    // },
 
     createCardboardJoystick: function () {
         var player = this;
@@ -4194,26 +4197,40 @@ var fluidPlayerClass = {
         var zoomInButton = player.createCardboardJoystickButton('zoomin');
         var zoomOutButton = player.createCardboardJoystickButton('zoomout');
 
+        // Camera movement buttons
         upButton.addEventListener('click', function () {
-            var currentPosition = player.carboardGetCurrentPosition();
-            //player.vrViewer.tweenControlCenter(  new THREE.Vector3(currentPosition.x, currentPosition.y + 0.5, currentPosition.z), 2000 );
+            player.vrViewer.OrbitControls.rotateUp(-0.1);
         });
 
         downButton.addEventListener('click', function () {
-            var currentPosition = player.carboardGetCurrentPosition();
-            //player.vrViewer.tweenControlCenter(  new THREE.Vector3(currentPosition.x, currentPosition.y - 0.5, currentPosition.z), 2000 );
+            player.vrViewer.OrbitControls.rotateUp(0.1);
         });
 
         rightButton.addEventListener('click', function () {
-            var currentPosition = player.carboardGetCurrentPosition();
-            //player.vrViewer.tweenControlCenter(  new THREE.Vector3(currentPosition.x + 0.5, currentPosition.y, currentPosition.z), 2000 );
+            player.vrViewer.OrbitControls.rotateLeft(0.1);
         });
 
         leftButton.addEventListener('click', function () {
-            var currentPosition = player.carboardGetCurrentPosition();
-            //player.vrViewer.tweenControlCenter(  new THREE.Vector3(currentPosition.x - 0.5, currentPosition.y, currentPosition.z), 2000 );
-            player.vrViewer.camera.position.set(currentPosition.x - 0.5, currentPosition.y, currentPosition.z);
+            player.vrViewer.OrbitControls.rotateLeft(-0.1);
         });
+
+        centerButton.addEventListener('click', function () {
+            var initialCameraPosition = player.vrViewer.initialCameraPosition;
+            player.vrViewer.camera.fov = 60;
+            player.vrViewer.camera.updateProjectionMatrix();
+            player.vrViewer.camera.position.set( initialCameraPosition.x, initialCameraPosition.y, initialCameraPosition.z );
+        });
+
+        // Camera Zoom buttons
+        zoomOutButton.addEventListener('click', function () {
+            player.vrViewer.camera.fov *= 1.1;
+            player.vrViewer.camera.updateProjectionMatrix();
+        });
+
+        zoomInButton.addEventListener('click', function () {
+            player.vrViewer.camera.fov *= 0.9;
+            player.vrViewer.camera.updateProjectionMatrix();
+        });                
 
     },
 
@@ -4231,11 +4248,16 @@ var fluidPlayerClass = {
 
         player.vrViewer = new PANOLENS.Viewer( { container: vrContainer, controlBar: false } );
         player.vrViewer.add( player.vrPanorama );
-        
-        // Zoom
-        player.vrViewer.OrbitControls.noZoom = true;
 
-        player.createCardboardJoystick();
+        // Store initial camera position
+        player.vrViewer.initialCameraPosition = JSON.parse(JSON.stringify(player.vrViewer.camera.position));
+
+        if(player.displayOptions.layoutControls.showCardBoardJoystick){
+            player.createCardboardJoystick();
+            
+            // Disable zoom if showing joystick
+            player.vrViewer.OrbitControls.noZoom = true;            
+        }
     },
 
     createCardboard: function () {
@@ -5208,6 +5230,7 @@ var fluidPlayerClass = {
                 playbackRateEnabled:          false,
                 subtitlesEnabled:             false,
                 showCardBoardView:            false,
+                showCardBoardJoystick:        false,
                 allowTheatre:                 true,
                 doubleclickFullscreen:        true,
                 theatreSettings: {
