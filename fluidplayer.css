@@ -503,7 +503,7 @@
     position: absolute;
 }
 
-.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_center{
+.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_zoomdefault{
     background-position: -336px -17px;
     top: 72px;
     -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
@@ -531,6 +531,10 @@
     transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera  */
     position: absolute; 
     left: 0; 
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container.fluid_vr_controls_container{
+    width: 50% !important;
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container {

@@ -4177,6 +4177,34 @@ var fluidPlayerClass = {
     //     return outputPosition;
     // },
 
+    cardboardRotateLeftRight: function (param /* 0 - right, 1 - left */) {
+        var player = this;
+        var go = player.vrROTATION_POSITION;
+        var back = - player.vrROTATION_POSITION;
+        var pos  = param < 1 ? go : back;
+        var easing = {val : pos};
+        var tween = new TWEEN.Tween(easing) 
+            .to({val: 0}, player.vrROTATION_SPEED) 
+            .easing(TWEEN.Easing.Quadratic.InOut) 
+            .onUpdate(function() { 
+                player.vrViewer.OrbitControls.rotateLeft(easing.val)
+        }).start();
+    },
+
+    cardboardRotateUpDown: function (param /* 0 - down, 1- up */) {
+        var player = this;
+        var go = player.vrROTATION_POSITION;
+        var back = -player.vrROTATION_POSITION;
+        var pos  = param < 1 ? go : back;
+        var easing = {val : pos};
+        var tween = new TWEEN.Tween(easing) 
+            .to({val: 0}, player.vrROTATION_SPEED) 
+            .easing(TWEEN.Easing.Quadratic.InOut) 
+            .onUpdate(function() { 
+                player.vrViewer.OrbitControls.rotateUp(easing.val)
+        }).start();
+    },
+
     createCardboardJoystick: function () {
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
@@ -4186,39 +4214,41 @@ var fluidPlayerClass = {
         var vrJoystickPanel = document.createElement('div');
         vrJoystickPanel.id = player.videoPlayerId + '_fluid_vr_joystick_panel';
         vrJoystickPanel.className = 'fluid_vr_joystick_panel';
-        vrContainer.appendChild(vrJoystickPanel);      
+        vrContainer.appendChild(vrJoystickPanel);
         
         // Create Joystick buttons
         var upButton = player.createCardboardJoystickButton('up');
         var leftButton = player.createCardboardJoystickButton('left');
         var rightButton = player.createCardboardJoystickButton('right');
         var downButton = player.createCardboardJoystickButton('down');
-        var centerButton = player.createCardboardJoystickButton('center');
+        var zoomDefaultButton = player.createCardboardJoystickButton('zoomdefault');
         var zoomInButton = player.createCardboardJoystickButton('zoomin');
         var zoomOutButton = player.createCardboardJoystickButton('zoomout');
 
         // Camera movement buttons
         upButton.addEventListener('click', function () {
-            player.vrViewer.OrbitControls.rotateUp(-0.1);
+            //player.vrViewer.OrbitControls.rotateUp(-0.1);
+            player.cardboardRotateUpDown(1);
         });
 
         downButton.addEventListener('click', function () {
-            player.vrViewer.OrbitControls.rotateUp(0.1);
+            //player.vrViewer.OrbitControls.rotateUp(0.1);
+            player.cardboardRotateUpDown(0);
         });
 
         rightButton.addEventListener('click', function () {
-            player.vrViewer.OrbitControls.rotateLeft(0.1);
+            //player.vrViewer.OrbitControls.rotateLeft(0.1);
+            player.cardboardRotateLeftRight(0);
         });
 
         leftButton.addEventListener('click', function () {
-            player.vrViewer.OrbitControls.rotateLeft(-0.1);
+            //player.vrViewer.OrbitControls.rotateLeft(-0.1);
+            player.cardboardRotateLeftRight(1);
         });
 
-        centerButton.addEventListener('click', function () {
-            var initialCameraPosition = player.vrViewer.initialCameraPosition;
+        zoomDefaultButton.addEventListener('click', function () {
             player.vrViewer.camera.fov = 60;
             player.vrViewer.camera.updateProjectionMatrix();
-            player.vrViewer.camera.position.set( initialCameraPosition.x, initialCameraPosition.y, initialCameraPosition.z );
         });
 
         // Camera Zoom buttons
@@ -4245,9 +4275,9 @@ var fluidPlayerClass = {
         vrContainer.className = 'fluid_vr_container';
         videoPlayerTag.parentNode.insertBefore(vrContainer, videoPlayerTag.nextSibling);
 
-        player.vrPanorama = new PANOLENS.VideoPanorama( '', { videoElement:  videoPlayerTag, autoplay: true } );
+        player.vrPanorama = new PANOLENS.VideoPanorama( '', { videoElement:  videoPlayerTag, autoplay: false } );
 
-        player.vrViewer = new PANOLENS.Viewer( { container: vrContainer, controlBar: true } );
+        player.vrViewer = new PANOLENS.Viewer( { container: vrContainer, controlBar: true, controlButtons: [] } );
         player.vrViewer.add( player.vrPanorama );
 
         player.vrViewer.enableEffect( PANOLENS.MODES.NORMAL );
@@ -4282,7 +4312,8 @@ var fluidPlayerClass = {
         vrSwitchButton.addEventListener('click', function () {
             
             var vrJoystickPanel = document.getElementById(player.videoPlayerId + '_fluid_vr_joystick_panel');
-            
+            var controlBar = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
+
             if(player.vrMode){
                 player.vrViewer.enableEffect( PANOLENS.MODES.NORMAL );
                 player.vrMode = false;
@@ -4290,6 +4321,7 @@ var fluidPlayerClass = {
                 if(player.displayOptions.layoutControls.showCardBoardJoystick){
                     vrJoystickPanel.style.display = "block";
                 }
+                controlBar.classList.remove("fluid_vr_controls_container");
             }else{
                 player.vrViewer.enableEffect( PANOLENS.MODES.CARDBOARD );
                 player.vrMode = true;
@@ -4299,6 +4331,7 @@ var fluidPlayerClass = {
                     vrJoystickPanel.style.display = "none";
                 }
 
+                controlBar.classList.add("fluid_vr_controls_container");
             }
         });
 
@@ -5196,9 +5229,11 @@ var fluidPlayerClass = {
         videoPlayer.setAttribute('playsinline', '');
         videoPlayer.setAttribute('webkit-playsinline', '');
 
-        player.vrMode                 = false;
-        player.vrPanorama             = null;
-        player.vrViewer               = null;
+        player.vrROTATION_POSITION     = 0.1;
+        player.vrROTATION_SPEED        = 80;
+        player.vrMode                  = false;
+        player.vrPanorama              = null;
+        player.vrViewer                = null;
         player.vastOptions             = null;
         player.videoPlayerId           = idVideoPlayer;
         player.originalSrc             = player.getCurrentSrc();
