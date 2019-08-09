@@ -4285,14 +4285,14 @@ var fluidPlayerClass = {
 
         // there is a bug in panolens which require user to enable control bar to perform operation, hopefully this will be fixed in new panolens releases
         // here is a workaround
-        var vrContainer = document.getElementById(player.videoPlayerId + '_fluid_vr_container');
-        var vrContainerChildrens = vrContainer.children
+        // var vrContainer = document.getElementById(player.videoPlayerId + '_fluid_vr_container');
+        // var vrContainerChildrens = vrContainer.children
 
-        for (var i = 0; i < vrContainerChildrens.length; i++) {
-            if(vrContainerChildrens[i].className === ''){
-                vrContainerChildrens[i].style.display = "none";
-            }
-        }
+        // for (var i = 0; i < vrContainerChildrens.length; i++) {
+        //     if(vrContainerChildrens[i].className === ''){
+        //         vrContainerChildrens[i].style.display = "none";
+        //     }
+        // }
 
         // if mobile device then enable gyroscope controls
         if( fluidPlayerClass.getMobileOs().userOs === 'Android' || fluidPlayerClass.getMobileOs().userOs === 'iOS' ){
@@ -4316,6 +4316,7 @@ var fluidPlayerClass = {
 
             if(player.vrMode){
                 player.vrViewer.enableEffect( PANOLENS.MODES.NORMAL );
+                player.vrViewer.onWindowResize();
                 player.vrMode = false;
 
                 if(player.displayOptions.layoutControls.showCardBoardJoystick){
@@ -4324,13 +4325,13 @@ var fluidPlayerClass = {
                 controlBar.classList.remove("fluid_vr_controls_container");
             }else{
                 player.vrViewer.enableEffect( PANOLENS.MODES.CARDBOARD );
+                player.vrViewer.onWindowResize();
                 player.vrMode = true;
                 
                 // hide the joystick in VR mode
                 if(player.displayOptions.layoutControls.showCardBoardJoystick){
                     vrJoystickPanel.style.display = "none";
                 }
-
                 controlBar.classList.add("fluid_vr_controls_container");
             }
         });
