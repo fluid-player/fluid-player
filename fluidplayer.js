@@ -4277,24 +4277,12 @@ var fluidPlayerClass = {
 
         player.vrPanorama = new PANOLENS.VideoPanorama( '', { videoElement:  videoPlayerTag, autoplay: false } );
 
-        player.vrViewer = new PANOLENS.Viewer( { container: vrContainer, controlBar: true, controlButtons: [] } );
+        player.vrViewer = new PANOLENS.Viewer( { container: vrContainer, controlBar: true, controlButtons: [], enableReticle: false } );
         player.vrViewer.add( player.vrPanorama );
 
         player.vrViewer.enableEffect( PANOLENS.MODES.NORMAL );
         player.vrViewer.onWindowResize();
 
-        // there is a bug in panolens which require user to enable control bar to perform operation, hopefully this will be fixed in new panolens releases
-        // here is a workaround
-        // var vrContainer = document.getElementById(player.videoPlayerId + '_fluid_vr_container');
-        // var vrContainerChildrens = vrContainer.children
-
-        // for (var i = 0; i < vrContainerChildrens.length; i++) {
-        //     if(vrContainerChildrens[i].className === ''){
-        //         vrContainerChildrens[i].style.display = "none";
-        //     }
-        // }
-
-        // if mobile device then enable gyroscope controls
         if( fluidPlayerClass.getMobileOs().userOs === 'Android' || fluidPlayerClass.getMobileOs().userOs === 'iOS' ){
             player.vrViewer.enableControl(1);
         }
@@ -4307,7 +4295,6 @@ var fluidPlayerClass = {
             // Disable zoom if showing joystick
             player.vrViewer.OrbitControls.noZoom = true;            
         }
-
 
         vrSwitchButton.addEventListener('click', function () {
             
@@ -4326,6 +4313,7 @@ var fluidPlayerClass = {
             }else{
                 player.vrViewer.enableEffect( PANOLENS.MODES.CARDBOARD );
                 player.vrViewer.onWindowResize();
+                player.vrViewer.disableReticleControl();
                 player.vrMode = true;
                 
                 // hide the joystick in VR mode
@@ -4334,8 +4322,8 @@ var fluidPlayerClass = {
                 }
                 controlBar.classList.add("fluid_vr_controls_container");
             }
+            
         });
-
     },
 
     createCardboard: function () {
