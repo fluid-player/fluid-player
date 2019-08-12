@@ -4275,6 +4275,10 @@ var fluidPlayerClass = {
         vrContainer.className = 'fluid_vr_container';
         videoPlayerTag.parentNode.insertBefore(vrContainer, videoPlayerTag.nextSibling);
 
+        // OverRide some conflicting functions from panolens
+        PANOLENS.VideoPanorama.prototype.pauseVideo = function(){};
+        PANOLENS.VideoPanorama.prototype.playVideo = function(){};
+        
         player.vrPanorama = new PANOLENS.VideoPanorama( '', { videoElement:  videoPlayerTag, autoplay: false } );
 
         player.vrViewer = new PANOLENS.Viewer( { container: vrContainer, controlBar: true, controlButtons: [], enableReticle: false } );
