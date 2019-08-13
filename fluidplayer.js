@@ -4298,9 +4298,10 @@ var fluidPlayerClass = {
     cardBoardSwitchToVR: function () {
         var player = this;
         var vrJoystickPanel = document.getElementById(player.videoPlayerId + '_fluid_vr_joystick_panel');
-        var controlBar = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
+        var controlBar = document.getElementById(player.videoPlayerId + '_fluid_controls_container');        
 
-        player.vrViewer.enableEffect( PANOLENS.MODES.CARDBOARD );
+        player.vrViewer.enableEffect( PANOLENS.MODES.CARDBOARD );        
+
         player.vrViewer.onWindowResize();
         player.vrViewer.disableReticleControl();
 
@@ -4317,7 +4318,6 @@ var fluidPlayerClass = {
             document.getElementById(player.videoPlayerId + '_fluid_initial_play').style.display = "none";
             document.getElementById(player.videoPlayerId + '_fluid_initial_play_button').style.opacity = "1";
         }
-
 
         // hide volume control bar
         var volumeContainer = document.getElementById(player.videoPlayerId + '_fluid_control_volume_container')
@@ -4337,7 +4337,7 @@ var fluidPlayerClass = {
     //     // changing placement of mute button
 
     //     var player = this;
-        
+
     // },
 
     cardBoardAlterDefaultControls: function () {
