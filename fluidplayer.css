@@ -396,6 +396,11 @@
     line-height: 21px;
 }
 
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_fluid_control_duration.cardboard_time {
+    left: 13px;
+    top: -15px;    
+}
+
 .fluid_video_wrapper.fluid_player_layout_default .ad_countdown {
     display: none;
     position: absolute;
@@ -663,7 +668,7 @@ _:-ms-lang(x),
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right {
-    left: 78px;
+    left: 60px;
     right: 20px;
 }
 

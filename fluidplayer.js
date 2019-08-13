@@ -4264,6 +4264,89 @@ var fluidPlayerClass = {
 
     },
 
+    cardBoardResize: function () {
+        var player = this;
+        var videoPlayerTag = document.getElementById(this.videoPlayerId);
+        videoPlayerTag.addEventListener('theatreModeOn', function () {
+            player.vrViewer.onWindowResize();
+        });
+
+        videoPlayerTag.addEventListener('theatreModeOff', function () {
+            player.vrViewer.onWindowResize();
+        });        
+    },
+
+    cardBoardSwitchToNormal: function () {
+        var player = this;
+        var vrJoystickPanel = document.getElementById(player.videoPlayerId + '_fluid_vr_joystick_panel');
+        var controlBar = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
+
+        player.vrViewer.enableEffect( PANOLENS.MODES.NORMAL );
+        player.vrViewer.onWindowResize();
+        player.vrMode = false;
+
+        if(player.displayOptions.layoutControls.showCardBoardJoystick){
+            vrJoystickPanel.style.display = "block";
+        }
+        controlBar.classList.remove("fluid_vr_controls_container");
+
+        // show volume control bar
+        var volumeContainer = document.getElementById(player.videoPlayerId + '_fluid_control_volume_container')
+        volumeContainer.style.display = "block";        
+    },
+
+    cardBoardSwitchToVR: function () {
+        var player = this;
+        var vrJoystickPanel = document.getElementById(player.videoPlayerId + '_fluid_vr_joystick_panel');
+        var controlBar = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
+
+        player.vrViewer.enableEffect( PANOLENS.MODES.CARDBOARD );
+        player.vrViewer.onWindowResize();
+        player.vrViewer.disableReticleControl();
+
+        player.vrMode = true;
+        
+        // hide the joystick in VR mode
+        if ( player.displayOptions.layoutControls.showCardBoardJoystick ) {
+            vrJoystickPanel.style.display = "none";
+        }
+        controlBar.classList.add("fluid_vr_controls_container");
+
+        var initialPlay = document.getElementById(player.videoPlayerId + '_fluid_initial_play');
+        if ( initialPlay ) {
+            document.getElementById(player.videoPlayerId + '_fluid_initial_play').style.display = "none";
+            document.getElementById(player.videoPlayerId + '_fluid_initial_play_button').style.opacity = "1";
+        }
+
+
+        // hide volume control bar
+        var volumeContainer = document.getElementById(player.videoPlayerId + '_fluid_control_volume_container')
+        volumeContainer.style.display = "none";
+    },
+
+    cardBoardMoveTimeInfo: function () {
+        var player = this;        
+        var timePlaceholder = document.getElementById(player.videoPlayerId + '_fluid_control_duration');
+        var controlBar = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
+
+        timePlaceholder.classList.add("cardboard_time");
+        controlBar.appendChild(timePlaceholder);
+    },
+
+    // cardBoardMuteButton: function () {
+    //     // changing placement of mute button
+
+    //     var player = this;
+        
+    // },
+
+    cardBoardAlterDefaultControls: function () {
+        var player = this;
+
+        player.cardBoardMoveTimeInfo();
+
+    },
+
     createCardboardView: function () {
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
@@ -4287,9 +4370,16 @@ var fluidPlayerClass = {
         player.vrViewer.enableEffect( PANOLENS.MODES.NORMAL );
         player.vrViewer.onWindowResize();
 
-        if( fluidPlayerClass.getMobileOs().userOs === 'Android' || fluidPlayerClass.getMobileOs().userOs === 'iOS' ){
+        // if Mobile device then enable controls using gyroscope
+        if ( fluidPlayerClass.getMobileOs().userOs === 'Android' || fluidPlayerClass.getMobileOs().userOs === 'iOS' ){
             player.vrViewer.enableControl(1);
         }
+
+        // Make Changes for default skin
+        player.cardBoardAlterDefaultControls();
+
+        // resize on toggle theater mode
+        player.cardBoardResize();
 
         // Store initial camera position
         player.vrViewer.initialCameraPosition = JSON.parse( JSON.stringify( player.vrViewer.camera.position ) );
@@ -4297,34 +4387,19 @@ var fluidPlayerClass = {
         if(player.displayOptions.layoutControls.showCardBoardJoystick){
             player.createCardboardJoystick();
             // Disable zoom if showing joystick
-            player.vrViewer.OrbitControls.noZoom = true;            
+            player.vrViewer.OrbitControls.noZoom = true;
         }
 
-        vrSwitchButton.addEventListener('click', function () {
-            
-            var vrJoystickPanel = document.getElementById(player.videoPlayerId + '_fluid_vr_joystick_panel');
-            var controlBar = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
+        vrSwitchButton.addEventListener('click', function () {        
 
-            if(player.vrMode){
-                player.vrViewer.enableEffect( PANOLENS.MODES.NORMAL );
-                player.vrViewer.onWindowResize();
-                player.vrMode = false;
+            if ( player.vrMode ) {
 
-                if(player.displayOptions.layoutControls.showCardBoardJoystick){
-                    vrJoystickPanel.style.display = "block";
-                }
-                controlBar.classList.remove("fluid_vr_controls_container");
-            }else{
-                player.vrViewer.enableEffect( PANOLENS.MODES.CARDBOARD );
-                player.vrViewer.onWindowResize();
-                player.vrViewer.disableReticleControl();
-                player.vrMode = true;
-                
-                // hide the joystick in VR mode
-                if(player.displayOptions.layoutControls.showCardBoardJoystick){
-                    vrJoystickPanel.style.display = "none";
-                }
-                controlBar.classList.add("fluid_vr_controls_container");
+                player.cardBoardSwitchToNormal();
+
+            } else {
+
+                player.cardBoardSwitchToVR();
+
             }
             
         });
