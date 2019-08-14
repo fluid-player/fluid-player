@@ -4381,7 +4381,7 @@ var fluidPlayerClass = {
         var controlBar = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
-        player.vrViewer.enableEffect( PANOLENS.MODES.STEREO );        
+        player.vrViewer.enableEffect( PANOLENS.MODES.CARDBOARD );        
 
         player.vrViewer.onWindowResize();
         player.vrViewer.disableReticleControl();
@@ -4422,8 +4422,8 @@ var fluidPlayerClass = {
         videoPlayerTag.parentNode.insertBefore(vrContainer, videoPlayerTag.nextSibling);
 
         // OverRide some conflicting functions from panolens
-        PANOLENS.VideoPanorama.prototype.pauseVideo = function(){};
-        PANOLENS.VideoPanorama.prototype.playVideo = function(){};
+        PANOLENS.VideoPanorama.prototype.pauseVideo = function () {};
+        PANOLENS.VideoPanorama.prototype.playVideo = function () {};
         
         player.vrPanorama = new PANOLENS.VideoPanorama( '', { videoElement:  videoPlayerTag, autoplay: false } );
 
@@ -4448,7 +4448,9 @@ var fluidPlayerClass = {
         player.vrViewer.initialCameraPosition = JSON.parse( JSON.stringify( player.vrViewer.camera.position ) );
 
         if(player.displayOptions.layoutControls.showCardBoardJoystick){
-            player.createCardboardJoystick();
+            if (!( fluidPlayerClass.getMobileOs().userOs === 'Android' || fluidPlayerClass.getMobileOs().userOs === 'iOS' )){
+                player.createCardboardJoystick();
+            }            
             // Disable zoom if showing joystick
             player.vrViewer.OrbitControls.noZoom = true;
         }
