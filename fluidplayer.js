@@ -2470,7 +2470,7 @@ var fluidPlayerClass = {
             '</div>' +
             '<div class="fluid_controls_right">' +
             '   <div id="' + this.videoPlayerId + '_fluid_control_fullscreen" class="fluid_button fluid_control_fullscreen fluid_button_fullscreen"></div>' +
-            '   <div id="' + this.videoPlayerId + '_fluid_control_theatre" class="fluid_button fluid_button_theatre"></div>' +
+            '   <div id="' + this.videoPlayerId + '_fluid_control_theatre" class="fluid_button fluid_control_theatre fluid_button_theatre"></div>' +
             '   <div id="' + this.videoPlayerId + '_fluid_control_cardboard" class="fluid_button fluid_control_cardboard fluid_button_cardboard"></div>' +
             '   <div id="' + this.videoPlayerId + '_fluid_control_subtitles" class="fluid_button fluid_button_subtitles"></div>' +
             '   <div id="' + this.videoPlayerId + '_fluid_control_video_source" class="fluid_button fluid_button_video_source"></div>' +
@@ -3444,7 +3444,7 @@ var fluidPlayerClass = {
 
         // Theatre mode
         if (player.displayOptions.layoutControls.allowTheatre && !player.isInIframe) {
-            document.getElementById(player.videoPlayerId + '_fluid_control_theatre').addEventListener('click', function () {
+            fluidPlayerClass.delegate(videoPlayerTag.parentNode, 'click', '.fluid_control_theatre', function() {
                 player.theatreToggle(player.videoPlayerId);
             });
         } else {
@@ -4450,7 +4450,7 @@ var fluidPlayerClass = {
         }
 
         fluidPlayerClass.delegate(videoPlayerTag.parentNode, 'click', '.fluid_control_cardboard', function() {
-            
+
             if ( player.vrMode ) {
 
                 player.cardBoardSwitchToNormal();
