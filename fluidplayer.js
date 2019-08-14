@@ -2573,9 +2573,12 @@ var fluidPlayerClass = {
     contolProgressbarUpdate: function (videoPlayerId) {
         var player = fluidPlayerClass.getInstanceById(videoPlayerId);
         var videoPlayerTag = document.getElementById(videoPlayerId);
-        var currentProgressTag = document.getElementById(videoPlayerId + '_vast_control_currentprogress');
+        var currentProgressTag = videoPlayerTag.parentNode.getElementsByClassName('fluid_controls_currentprogress');
 
-        currentProgressTag.style.width = (videoPlayerTag.currentTime / player.currentVideoDuration * 100) + '%';
+        for (var i = 0; i < currentProgressTag.length; i++) {
+            currentProgressTag[i].style.width = (videoPlayerTag.currentTime / player.currentVideoDuration * 100) + '%';
+        }
+        
     },
 
     //Format time to hh:mm:ss
@@ -2884,7 +2887,7 @@ var fluidPlayerClass = {
         var player = fluidPlayerClass.getInstanceById(videoPlayerId);
         player.displayOptions.layoutControls.playPauseAnimation = false;
         // we need an initial position for touchstart events, as mouse up has no offset x for iOS
-        var initialPosition = fluidPlayerClass.getEventOffsetX(event, document.getElementById(videoPlayerId + '_fluid_controls_progress_container'));
+        var initialPosition = fluidPlayerClass.getEventOffsetX(event, event.srcElement.parentNode);
 
         if (player.isCurrentlyPlayingAd) {
             return;
@@ -2906,7 +2909,7 @@ var fluidPlayerClass = {
         }
 
         function onProgressbarMouseMove (event) {
-            var currentX = fluidPlayerClass.getEventOffsetX(event, document.getElementById(videoPlayerId + '_fluid_controls_progress_container'));
+            var currentX = fluidPlayerClass.getEventOffsetX(event, event.srcElement.parentNode);
             initialPosition = NaN; // mouse up will fire after the move, we don't want to trigger the initial position in the event of iOS
             shiftTime(videoPlayerId, currentX);
             player.contolProgressbarUpdate(player.videoPlayerId);
@@ -2918,7 +2921,7 @@ var fluidPlayerClass = {
             document.removeEventListener('touchmove', onProgressbarMouseMove);
             document.removeEventListener('mouseup', onProgressbarMouseUp);
             document.removeEventListener('touchend', onProgressbarMouseUp);
-            var clickedX = fluidPlayerClass.getEventOffsetX(event, document.getElementById(videoPlayerId + '_fluid_controls_progress_container'));
+            var clickedX = fluidPlayerClass.getEventOffsetX(event, event.srcElement.parentNode);
             if (isNaN(clickedX) && !isNaN(initialPosition)) {
                 clickedX = initialPosition;
             }
@@ -3418,7 +3421,8 @@ var fluidPlayerClass = {
         var isMobileChecks = fluidPlayerClass.getMobileOs();
         var eventOn = (isMobileChecks.userOs) ? 'touchstart' : 'mousedown';
 
-        document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container').addEventListener(eventOn, function (event) {
+        fluidPlayerClass.delegate(videoPlayerTag.parentNode, eventOn, '.fluid_controls_progress_container', function ( event ) {
+        //document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container').addEventListener(eventOn, function (event) {
             player.onProgressbarMouseDown(player.videoPlayerId, event);
         }, false);
 
@@ -4377,7 +4381,7 @@ var fluidPlayerClass = {
         var controlBar = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
-        player.vrViewer.enableEffect( PANOLENS.MODES.CARDBOARD );        
+        player.vrViewer.enableEffect( PANOLENS.MODES.STEREO );        
 
         player.vrViewer.onWindowResize();
         player.vrViewer.disableReticleControl();
@@ -5023,16 +5027,26 @@ var fluidPlayerClass = {
         var player = this;
         var videoPlayer = document.getElementById(player.videoPlayerId);
 
-        var bufferBar = document.getElementById(player.videoPlayerId + "_buffered_amount");
-        bufferBar.style.width = 0;
+        var bufferBar = videoPlayer.parentNode.getElementsByClassName('fluid_controls_buffered');
+
+        for (var j = 0; j < bufferBar.length; j++) {
+            bufferBar[j].style.width = 0;
+        }
+        
 
         // Buffering
         logProgress = function () {
             var duration =  videoPlayer.duration;
             if (duration > 0) {
                 for (var i = 0; i < videoPlayer.buffered.length; i++) {
+
                     if (videoPlayer.buffered.start(videoPlayer.buffered.length - 1 - i) < videoPlayer.currentTime) {
-                        bufferBar.style.width = (videoPlayer.buffered.end(videoPlayer.buffered.length - 1 - i) / duration) * 100 + "%";
+
+                        var newBufferLength = (videoPlayer.buffered.end(videoPlayer.buffered.length - 1 - i) / duration) * 100 + "%";
+
+                        for (var j = 0; j < bufferBar.length; j++) {
+                            bufferBar[j].style.width =  newBufferLength;   
+                        }                        
 
                         // Stop checking for buffering if the video is fully buffered
                         if ((videoPlayer.buffered.end(videoPlayer.buffered.length - 1 - i) / duration) == "1") {
