@@ -2457,7 +2457,7 @@ var fluidPlayerClass = {
 
     generateCustomControlTags: function () {
         return '<div class="fluid_controls_left">' +
-            '   <div id="' + this.videoPlayerId + '_fluid_control_playpause" class="fluid_button fluid_button_play"></div>' +
+            '   <div id="' + this.videoPlayerId + '_fluid_control_playpause" class="fluid_button fluid_button_play fluid_control_playpause"></div>' +
             '</div>' +
             '<div id="' + this.videoPlayerId + '_fluid_controls_progress_container" class="fluid_controls_progress_container fluid_slider">' +
             '   <div class="fluid_controls_progress">' +
@@ -2469,9 +2469,9 @@ var fluidPlayerClass = {
             '   <div id="' + this.videoPlayerId + '_ad_markers_holder" class="fluid_controls_ad_markers_holder"></div>' +
             '</div>' +
             '<div class="fluid_controls_right">' +
-            '   <div id="' + this.videoPlayerId + '_fluid_control_fullscreen" class="fluid_button fluid_button_fullscreen"></div>' +
+            '   <div id="' + this.videoPlayerId + '_fluid_control_fullscreen" class="fluid_button fluid_control_fullscreen fluid_button_fullscreen"></div>' +
             '   <div id="' + this.videoPlayerId + '_fluid_control_theatre" class="fluid_button fluid_button_theatre"></div>' +
-            '   <div id="' + this.videoPlayerId + '_fluid_control_cardboard" class="fluid_button fluid_button_cardboard"></div>' +
+            '   <div id="' + this.videoPlayerId + '_fluid_control_cardboard" class="fluid_button fluid_control_cardboard fluid_button_cardboard"></div>' +
             '   <div id="' + this.videoPlayerId + '_fluid_control_subtitles" class="fluid_button fluid_button_subtitles"></div>' +
             '   <div id="' + this.videoPlayerId + '_fluid_control_video_source" class="fluid_button fluid_button_video_source"></div>' +
             '   <div id="' + this.videoPlayerId + '_fluid_control_playback_rate" class="fluid_button fluid_button_playback_rate"></div>' +
@@ -2483,16 +2483,17 @@ var fluidPlayerClass = {
             '           </div>' +
             '       </div>' +
             '   </div>' +
-            '   <div id="' + this.videoPlayerId + '_fluid_control_mute" class="fluid_button fluid_button_volume"></div>' +
-            '   <div id="' + this.videoPlayerId + '_fluid_control_duration" class="fluid_fluid_control_duration">00:00 / 00:00</div>' +
+            '   <div id="' + this.videoPlayerId + '_fluid_control_mute" class="fluid_button fluid_button_volume fluid_control_mute"></div>' +
+            '   <div id="' + this.videoPlayerId + '_fluid_control_duration" class="fluid_control_duration fluid_fluid_control_duration">00:00 / 00:00</div>' +
             '</div>';
     },
 
     controlPlayPauseToggle: function (videoPlayerId) {
-        var playPauseButton = document.getElementById(videoPlayerId + '_fluid_control_playpause');
-        var menuOptionPlay = document.getElementById(videoPlayerId + 'context_option_play');
-        var player = fluidPlayerClass.getInstanceById(videoPlayerId);
-        var controlsDisplay = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
+        var player = fluidPlayerClass.getInstanceById(videoPlayerId);        
+        var videoPlayer = document.getElementById(player.videoPlayerId);
+        var playPauseButton = videoPlayer.parentNode.getElementsByClassName('fluid_control_playpause');
+        var menuOptionPlay = document.getElementById(videoPlayerId + 'context_option_play');        
+        var controlsDisplay = videoPlayer.parentNode.getElementsByClassName('fluid_controls_container');
         var fpLogo = document.getElementById(player.videoPlayerId + '_logo');
         var videoPlayer = document.getElementById(player.videoPlayerId);
 
@@ -2503,8 +2504,15 @@ var fluidPlayerClass = {
         }
 
         if (!videoPlayer.paused) {
-            playPauseButton.className = playPauseButton.className.replace(/\bfluid_button_play\b/g, 'fluid_button_pause');
-            controlsDisplay.classList.remove('initial_controls_show');
+
+            for ( var i = 0; i < playPauseButton.length; i++ ){
+                playPauseButton[i].className = playPauseButton[i].className.replace(/\bfluid_button_play\b/g, 'fluid_button_pause');
+            }        
+
+            for ( var i = 0; i < controlsDisplay.length; i++ ){
+                controlsDisplay[i].classList.remove('initial_controls_show');    
+            }            
+
             if (fpLogo) {
                 fpLogo.classList.remove('initial_controls_show');
             }
@@ -2514,8 +2522,14 @@ var fluidPlayerClass = {
             }
 
         } else {
-            playPauseButton.className = playPauseButton.className.replace(/\bfluid_button_pause\b/g, 'fluid_button_play');
-            controlsDisplay.classList.add('initial_controls_show');
+            
+            for ( var i = 0; i < playPauseButton.length; i++ ){
+                playPauseButton[i].className = playPauseButton[i].className.replace(/\bfluid_button_pause\b/g, 'fluid_button_play');
+            }                
+
+            for ( var i = 0; i < controlsDisplay.length; i++ ){
+                controlsDisplay[i].classList.add('initial_controls_show');    
+            }
 
             if (this.isCurrentlyPlayingAd && player.displayOptions.vastOptions.showPlayButton) {
                 document.getElementById(videoPlayerId + '_fluid_initial_play').style.display = "block";
@@ -2589,8 +2603,12 @@ var fluidPlayerClass = {
 
         var durationText = currentPlayTime + ' / ' + totalTime;
 
-        var timePlaceholder = document.getElementById(videoPlayerId + '_fluid_control_duration');
-        timePlaceholder.innerHTML = durationText;
+        var timePlaceholder = videoPlayerTag.parentNode.getElementsByClassName('fluid_control_duration');
+
+        for (var i = 0; i < timePlaceholder.length; i++) {
+            timePlaceholder[i].innerHTML = durationText;
+        }
+        
     },
 
     pad: function (value) {
@@ -2608,7 +2626,7 @@ var fluidPlayerClass = {
         var volumeposTag = document.getElementById(videoPlayerId + '_fluid_control_volume_currentpos');
         var volumebarTotalWidth = document.getElementById(videoPlayerId + '_fluid_control_volume').clientWidth;
         var volumeposTagWidth = volumeposTag.clientWidth;
-        var muteButtonTag = document.getElementById(videoPlayerId + '_fluid_control_mute');
+        var muteButtonTag = videoPlayerTag.parentNode.getElementsByClassName('fluid_control_mute');
         var menuOptionMute = document.getElementById(videoPlayerId + 'context_option_mute');
 
         if (videoPlayerTag.volume) {
@@ -2617,14 +2635,18 @@ var fluidPlayerClass = {
         }
 
         if (videoPlayerTag.volume && !videoPlayerTag.muted) {
-            muteButtonTag.className = muteButtonTag.className.replace(/\bfluid_button_mute\b/g, 'fluid_button_volume');
+            for (var i = 0; i < muteButtonTag.length; i++) {
+                muteButtonTag[i].className = muteButtonTag[i].className.replace(/\bfluid_button_mute\b/g, 'fluid_button_volume');
+            }            
 
             if (menuOptionMute !== null) {
                 menuOptionMute.innerHTML = this.displayOptions.captions.mute;
             }
 
         } else {
-            muteButtonTag.className = muteButtonTag.className.replace(/\bfluid_button_volume\b/g, 'fluid_button_mute');
+            for (var i = 0; i < muteButtonTag.length; i++) {
+                muteButtonTag[i].className = muteButtonTag[i].className.replace(/\bfluid_button_volume\b/g, 'fluid_button_mute');
+            }            
 
             if (menuOptionMute !== null) {
                 menuOptionMute.innerHTML = this.displayOptions.captions.unmute;
@@ -2676,7 +2698,9 @@ var fluidPlayerClass = {
     },
 
     fullscreenOff: function (fullscreenButton, menuOptionFullscreen) {
-        fullscreenButton.className = fullscreenButton.className.replace(/\bfluid_button_fullscreen_exit\b/g, 'fluid_button_fullscreen');
+        for (var i = 0; i < fullscreenButton.length; i++) {
+            fullscreenButton[i].className = fullscreenButton[i].className.replace(/\bfluid_button_fullscreen_exit\b/g, 'fluid_button_fullscreen');
+        }  
         if (menuOptionFullscreen !== null) {
             menuOptionFullscreen.innerHTML = 'Fullscreen';
         }
@@ -2684,7 +2708,11 @@ var fluidPlayerClass = {
     },
 
     fullscreenOn: function (fullscreenButton, menuOptionFullscreen) {
-        fullscreenButton.className = fullscreenButton.className.replace(/\bfluid_button_fullscreen\b/g, 'fluid_button_fullscreen_exit');
+
+        for (var i = 0; i < fullscreenButton.length; i++) {
+            fullscreenButton[i].className = fullscreenButton[i].className.replace(/\bfluid_button_fullscreen\b/g, 'fluid_button_fullscreen_exit');
+        }
+
         if (menuOptionFullscreen !== null) {
             menuOptionFullscreen.innerHTML = this.displayOptions.captions.exitFullscreen;
         }
@@ -2694,11 +2722,12 @@ var fluidPlayerClass = {
     fullscreenToggle: function () {
         fluidPlayerClass.activeVideoPlayerId = this.videoPlayerId;
 
+        var videoPlayerTag = document.getElementById(this.videoPlayerId);
         var fullscreenTag = document.getElementById('fluid_video_wrapper_' + this.videoPlayerId);
         var requestFullscreenFunctionNames = this.checkFullscreenSupport('fluid_video_wrapper_' + this.videoPlayerId);
-        var fullscreenButton = document.getElementById(this.videoPlayerId + '_fluid_control_fullscreen');
+        var fullscreenButton = videoPlayerTag.parentNode.getElementsByClassName('fluid_control_fullscreen');
         var menuOptionFullscreen = document.getElementById(this.videoPlayerId + 'context_option_fullscreen');
-        var videoPlayerTag = document.getElementById(this.videoPlayerId);
+        
 
         // Disable Theatre mode if it's on while we toggle fullscreen
         if (this.theatreMode) {
@@ -3362,7 +3391,7 @@ var fluidPlayerClass = {
         var videoPlayerTag = document.getElementById(this.videoPlayerId);
 
         //Set the Play/Pause behaviour
-        document.getElementById(this.videoPlayerId + '_fluid_control_playpause').addEventListener('click', function () {
+        fluidPlayerClass.delegate(videoPlayerTag.parentNode, 'click', '.fluid_control_playpause', function() {
 
             if (!player.firstPlayLaunched) {
                 videoPlayerTag.removeEventListener('play', player.initialPlay);
@@ -3402,14 +3431,14 @@ var fluidPlayerClass = {
             player.contolVolumebarUpdate(player.videoPlayerId);
         });
 
-        document.getElementById(player.videoPlayerId + '_fluid_control_mute').addEventListener('click', function () {
+        fluidPlayerClass.delegate(videoPlayerTag.parentNode, 'click', '.fluid_control_mute', function() {
             player.muteToggle(player.videoPlayerId);
         });
 
         player.setBuffering();
 
         //Set the fullscreen control
-        document.getElementById(player.videoPlayerId + '_fluid_control_fullscreen').addEventListener('click', function () {
+        fluidPlayerClass.delegate(videoPlayerTag.parentNode, 'click', '.fluid_control_fullscreen', function() {        
             player.fullscreenToggle();
         });
 
@@ -4280,10 +4309,15 @@ var fluidPlayerClass = {
         var player = this;
         var vrJoystickPanel = document.getElementById(player.videoPlayerId + '_fluid_vr_joystick_panel');
         var controlBar = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
         player.vrViewer.enableEffect( PANOLENS.MODES.NORMAL );
         player.vrViewer.onWindowResize();
         player.vrMode = false;
+
+        // remove dual control bar
+        var newControlBar = videoPlayerTag.parentNode.getElementsByClassName('fluid_vr2_controls_container')[0];
+        videoPlayerTag.parentNode.removeChild(newControlBar);
 
         if(player.displayOptions.layoutControls.showCardBoardJoystick){
             vrJoystickPanel.style.display = "block";
@@ -4293,12 +4327,55 @@ var fluidPlayerClass = {
         // show volume control bar
         var volumeContainer = document.getElementById(player.videoPlayerId + '_fluid_control_volume_container')
         volumeContainer.style.display = "block";        
+
+    },
+
+
+    cardBoardHideDefaultControls: function () {
+        var player = this;
+        var vrJoystickPanel = document.getElementById(player.videoPlayerId + '_fluid_vr_joystick_panel');
+        var initialPlay = document.getElementById(player.videoPlayerId + '_fluid_initial_play');
+        var volumeContainer = document.getElementById(player.videoPlayerId + '_fluid_control_volume_container');
+        var controlBar = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
+
+        // hide the joystick in VR mode
+        if ( player.displayOptions.layoutControls.showCardBoardJoystick ) {
+            vrJoystickPanel.style.display = "none";
+        }
+
+        // hide big play icon
+        if ( initialPlay ) {
+            document.getElementById(player.videoPlayerId + '_fluid_initial_play').style.display = "none";
+            document.getElementById(player.videoPlayerId + '_fluid_initial_play_button').style.opacity = "1";
+        }
+
+        // hide volume control bar
+        volumeContainer.style.display = "none";
+
+    },
+
+    cardBoardCreateVRControls: function () {
+        var player = this;
+        var controlBar = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);
+
+        // create and append dual control bar
+        var newControlBar = controlBar.cloneNode(true);
+        newControlBar.removeAttribute('id');
+        newControlBar.querySelectorAll('*').forEach(function(node) {
+            node.removeAttribute('id');
+        });
+
+        newControlBar.classList.add("fluid_vr2_controls_container");        
+        videoPlayerTag.parentNode.insertBefore( newControlBar, videoPlayerTag.nextSibling );
+  
     },
 
     cardBoardSwitchToVR: function () {
         var player = this;
         var vrJoystickPanel = document.getElementById(player.videoPlayerId + '_fluid_vr_joystick_panel');
-        var controlBar = document.getElementById(player.videoPlayerId + '_fluid_controls_container');        
+        var controlBar = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
         player.vrViewer.enableEffect( PANOLENS.MODES.CARDBOARD );        
 
@@ -4307,21 +4384,11 @@ var fluidPlayerClass = {
 
         player.vrMode = true;
         
-        // hide the joystick in VR mode
-        if ( player.displayOptions.layoutControls.showCardBoardJoystick ) {
-            vrJoystickPanel.style.display = "none";
-        }
         controlBar.classList.add("fluid_vr_controls_container");
 
-        var initialPlay = document.getElementById(player.videoPlayerId + '_fluid_initial_play');
-        if ( initialPlay ) {
-            document.getElementById(player.videoPlayerId + '_fluid_initial_play').style.display = "none";
-            document.getElementById(player.videoPlayerId + '_fluid_initial_play_button').style.opacity = "1";
-        }
+        player.cardBoardHideDefaultControls();
+        player.cardBoardCreateVRControls();
 
-        // hide volume control bar
-        var volumeContainer = document.getElementById(player.videoPlayerId + '_fluid_control_volume_container')
-        volumeContainer.style.display = "none";
     },
 
     cardBoardMoveTimeInfo: function () {
@@ -4333,24 +4400,16 @@ var fluidPlayerClass = {
         controlBar.appendChild(timePlaceholder);
     },
 
-    // cardBoardMuteButton: function () {
-    //     // changing placement of mute button
-
-    //     var player = this;
-
-    // },
-
     cardBoardAlterDefaultControls: function () {
         var player = this;
 
         player.cardBoardMoveTimeInfo();
-
     },
 
     createCardboardView: function () {
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
-        var vrSwitchButton = document.getElementById(player.videoPlayerId + '_fluid_control_cardboard');
+        var vrSwitchButton = videoPlayerTag.parentNode.getElementsByClassName('fluid_control_cardboard');
 
         // Create a container for 360degree
         var vrContainer = document.createElement('div');
@@ -4390,8 +4449,8 @@ var fluidPlayerClass = {
             player.vrViewer.OrbitControls.noZoom = true;
         }
 
-        vrSwitchButton.addEventListener('click', function () {        
-
+        fluidPlayerClass.delegate(videoPlayerTag.parentNode, 'click', '.fluid_control_cardboard', function() {
+            
             if ( player.vrMode ) {
 
                 player.cardBoardSwitchToNormal();
@@ -4859,24 +4918,33 @@ var fluidPlayerClass = {
             videoPlayerInstance.toggleAdCountdown(true);
         }
 
+        // handles both VR and Normal condition
         if (videoPlayerInstance.hasControlBar()) {
-            var divVastControls = document.getElementById(videoPlayerInstance.videoPlayerId + '_fluid_controls_container');
-            var fpLogo = document.getElementById(videoPlayerInstance.videoPlayerId + '_logo');
+            var divVastControls = videoPlayerTag.parentNode.getElementsByClassName('fluid_controls_container');
+            var fpLogo = videoPlayerTag.parentNode.getElementsByClassName('fp_logo');
 
-            if (videoPlayerInstance.displayOptions.layoutControls.controlBar.animated) {
-                divVastControls.classList.remove('fade_in');
-                divVastControls.classList.add('fade_out');
-                if (fpLogo) {
-                    fpLogo.classList.remove('fade_in');
-                    fpLogo.classList.add('fade_out');
-                }
-            } else {
-                divVastControls.style.display = 'none';
-                if (fpLogo) {
-                    fpLogo.style.display = 'none';
-                }
+            for (var i = 0; i < divVastControls.length; i++) {
+                if (videoPlayerInstance.displayOptions.layoutControls.controlBar.animated) {
+                    divVastControls[i].classList.remove('fade_in');
+                    divVastControls[i].classList.add('fade_out');
+                } else {
+                    divVastControls[i].style.display = 'none';
+
+                }                
             }
 
+            for (var i = 0; i < fpLogo.length; i++) {
+                if ( videoPlayerInstance.displayOptions.layoutControls.controlBar.animated ) {
+                    if ( fpLogo[i] ) {
+                        fpLogo[i].classList.remove('fade_in');
+                        fpLogo[i].classList.add('fade_out');
+                    }
+                } else {
+                    if ( fpLogo[i] ) {
+                        fpLogo[i].style.display = 'none';
+                    }                    
+                }
+            }
         }
 
         videoPlayerTag.style.cursor = 'none';
@@ -4892,22 +4960,31 @@ var fluidPlayerClass = {
         }
 
         if (videoPlayerInstance.hasControlBar()) {
-            var divVastControls = document.getElementById(videoPlayerInstance.videoPlayerId + '_fluid_controls_container');
-            var fpLogo = document.getElementById(videoPlayerInstance.videoPlayerId + '_logo');
+            var divVastControls = videoPlayerTag.parentNode.getElementsByClassName('fluid_controls_container');
+            var fpLogo = videoPlayerTag.parentNode.getElementsByClassName('fp_logo');
 
-            if (videoPlayerInstance.displayOptions.layoutControls.controlBar.animated) {
-                divVastControls.classList.remove('fade_out');
-                divVastControls.classList.add('fade_in');
-                if (fpLogo) {
-                    fpLogo.classList.remove('fade_out');
-                    fpLogo.classList.add('fade_in');
-                }
-            } else {
-                divVastControls.style.display = 'block';
-                if (fpLogo) {
-                    fpLogo.style.display = 'block';
+            for (var i = 0; i < divVastControls.length; i++) {
+                if (videoPlayerInstance.displayOptions.layoutControls.controlBar.animated) {
+                    divVastControls[i].classList.remove('fade_out');
+                    divVastControls[i].classList.add('fade_in');
+                } else {
+                    divVastControls[i].style.display = 'block';
+                }    
+            }
+
+            for (var i = 0; i < fpLogo.length; i++) {
+                if (videoPlayerInstance.displayOptions.layoutControls.controlBar.animated) {
+                    if ( fpLogo[i] ) {
+                        fpLogo[i].classList.remove('fade_out');
+                        fpLogo[i].classList.add('fade_in');
+                    }
+                } else {
+                    if ( fpLogo[i] ) {
+                        fpLogo[i].style.display = 'block';
+                    }
                 }
             }
+
         }
 
         if (!fluidPlayerClass.isTouchDevice()) {
@@ -5804,5 +5881,19 @@ var fluidPlayerClass = {
         }
 
         this.initLogo();
+    },
+
+    // this functions helps in adding event listeners for future dynamic elements
+    //delegate(document, "click", ".some_elem", callBackFunction);
+    delegate: function (el, evt, sel, handler) {
+        el.addEventListener(evt, function(event) {
+            var t = event.target;
+            while (t && t !== this) {
+                if (t.matches(sel)) {
+                    handler.call(t, event);
+                }
+                t = t.parentNode;
+            }
+        });
     }
 };

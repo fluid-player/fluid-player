@@ -542,6 +542,11 @@
     width: 50% !important;
 }
 
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container.fluid_vr2_controls_container{
+    width: 50% !important;
+    left: 50%;
+}
+
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container {
     color: white;
     position: absolute;
