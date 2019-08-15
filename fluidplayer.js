@@ -453,9 +453,16 @@ var fluidPlayerClass = {
         var mediaFiles = this.getMediaFilesFromLinear(linear);
         if (mediaFiles.length) {
             for (var n = 0; n < mediaFiles.length; n++) {
+
+                var mediaType = mediaFiles[n].getAttribute('mediaType');
+                if(!mediaType){
+                    mediaType = '2d';
+                }
+
                 mediaFileList.push({
                     'src': this.extractNodeData(mediaFiles[n]),
-                    'type': mediaFiles[n].getAttribute('type')
+                    'type': mediaFiles[n].getAttribute('type'),
+                    'mediaType': mediaType.toLowerCase()
                 });
             }
         }
@@ -468,9 +475,10 @@ var fluidPlayerClass = {
 
         if (iconClickThrough.length) {
             return this.extractNodeData(iconClickThrough[0]);
-        } else {
-            this.displayOptions.vastOptions.adCTAText = false;
         }
+        //  else {
+        //     this.displayOptions.vastOptions.adCTAText = false;
+        // }
 
         return '';
     },
@@ -880,13 +888,20 @@ var fluidPlayerClass = {
                 // ok
 
                 if (tmpOptions.adType === 'linear') {
+
                     if ((typeof tmpOptions.iconClick !== 'undefined') && (tmpOptions.iconClick !== null) && tmpOptions.iconClick.length) {
                         player.adList[adListId].landingPage = tmpOptions.iconClick;
                     }
+
+                    var selectedMediaFile = player.getSupportedMediaFile(tmpOptions.mediaFileList);
+                    if (selectedMediaFile !== false) {
+                        player.adList[adListId].mediaType = selectedMediaFile.mediaType;
+                    }
+
                 }
 
                 player.adList[adListId].adType = tmpOptions.adType ? tmpOptions.adType : 'unknown';
-
+                
                 player.adList[adListId].vastLoaded = true;
                 player.adPool[adListId] = Object.assign({}, tmpOptions);
                 var event = document.createEvent('Event');
@@ -1056,30 +1071,44 @@ var fluidPlayerClass = {
             //get the proper ad
             player.vastOptions = player.adPool[adListId];
 
-            if (backupTheVideoTime) {
+            if ( backupTheVideoTime ) {
                 player.backupMainVideoContentTime(adListId);
             }
 
-
             var playVideoPlayer = function (adListId) {
                 player.switchPlayerToVastMode = function () {
+
                     //Get the actual duration from the video file if it is not present in the VAST XML
                     if (!player.vastOptions.duration) {
                         player.vastOptions.duration = videoPlayerTag.duration;
                     }
 
-                    var addClickthroughLayer = (typeof player.adList[adListId].adClickable != "undefined") ? player.adList[adListId].adClickable: player.displayOptions.vastOptions.adClickable;
-                    if (addClickthroughLayer) {
-                        player.addClickthroughLayer(player.videoPlayerId);
+                    if ( player.displayOptions.layoutControls.showCardBoardView ) {
+                        
+                        if ( !player.adList[adListId].landingPage ) {
+                            player.addCTAButton(player.adPool[adListId].clickthroughUrl);
+                        } else {
+                            player.addCTAButton(player.adList[adListId].landingPage);
+                        }
+
+                    } else {
+
+                        var addClickthroughLayer = (typeof player.adList[adListId].adClickable != "undefined") ? player.adList[adListId].adClickable: player.displayOptions.vastOptions.adClickable;
+
+                        if (addClickthroughLayer) {
+                            player.addClickthroughLayer(player.videoPlayerId);
+                        }
+
+                        player.addCTAButton(player.adList[adListId].landingPage);
+                        
                     }
+
 
                     if (player.vastOptions.skipoffset !== false) {
                         player.addSkipButton();
                     }
 
-                    videoPlayerTag.loop = false;
-
-                    player.addCTAButton(player.adList[adListId].landingPage);
+                    videoPlayerTag.loop = false;                    
 
                     player.addAdCountdown();
 
@@ -1088,11 +1117,10 @@ var fluidPlayerClass = {
                     player.vastLogoBehaviour(true);
 
 
-                    var progressbarContainer = document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container');
-                    if (progressbarContainer !== null) {
-                        document.getElementById(player.videoPlayerId + '_vast_control_currentprogress').style.backgroundColor = player.displayOptions.layoutControls.adProgressColor;
+                    var progressbarContainer = videoPlayerTag.parentNode.getElementsByClassName('fluid_controls_currentprogress');
+                    for (var i = 0; i < progressbarContainer.length; i++) {
+                        progressbarContainer[i].style.backgroundColor = player.displayOptions.layoutControls.adProgressColor;
                     }
-
 
                     if (player.displayOptions.vastOptions.adText || player.adList[adListId].adText) {
                         var adTextToShow = (player.adList[adListId].adText !== null) ? player.adList[adListId].adText : player.displayOptions.vastOptions.adText;
@@ -1110,6 +1138,34 @@ var fluidPlayerClass = {
                     player.trackSingleEvent('impression');
 
                     videoPlayerTag.removeEventListener('loadedmetadata', player.switchPlayerToVastMode);
+                
+
+                    // if in vr mode then do not show 
+                    if ( player.vrMode ) {
+
+                        var adCountDownTimerText = document.getElementById('ad_countdown' + player.videoPlayerId);
+                        var ctaButton = document.getElementById(player.videoPlayerId+'_fluid_cta');
+                        var addAdPlayingTextOverlay = document.getElementById(player.videoPlayerId+'_fluid_ad_playing');
+                        var skipBtn = document.getElementById('skip_button_' + player.videoPlayerId);
+
+                        if ( adCountDownTimerText ) {
+                            adCountDownTimerText.style.display = 'none';
+                        }
+
+                        if ( ctaButton ) {
+                            ctaButton.style.display = 'none';
+                        }
+
+                        if ( addAdPlayingTextOverlay ) {
+                            addAdPlayingTextOverlay.style.display = 'none';
+                        }
+
+                        if ( skipBtn ) {
+                            skipBtn.style.display = 'none';
+                        }                                                                        
+                        
+                    }
+
                 };
 
                 videoPlayerTag.pause();
@@ -1119,22 +1175,29 @@ var fluidPlayerClass = {
                 // Remove the streaming objects to prevent errors on the VAST content
                 player.detachStreamers();
 
-            //Try to load multiple
-            var selectedMediaFile = player.getSupportedMediaFile(player.vastOptions.mediaFileList);
+                //Try to load multiple
+                var selectedMediaFile = player.getSupportedMediaFile(player.vastOptions.mediaFileList);
+                
+                // if player in cardboard mode then, linear ads media type should be a '360' video
+                if ( player.displayOptions.layoutControls.showCardBoardView && player.adList[adListId].mediaType !== '360' ) {
+                    player.adList[adListId].error = true;
+                    player.playMainVideoWhenVastFails(403);
+                    return false;
+                }
 
-            if (selectedMediaFile === false) {
-                //Couldn’t find MediaFile that is supported by this video player, based on the attributes of the MediaFile element.
-                player.adList[adListId].error = true;
-                player.playMainVideoWhenVastFails(403);
-                return false;
-            }
+                if ( selectedMediaFile.src === false ) {
+                    //Couldn’t find MediaFile that is supported by this video player, based on the attributes of the MediaFile element.
+                    player.adList[adListId].error = true;
+                    player.playMainVideoWhenVastFails(403);
+                    return false;
+                }
 
-            videoPlayerTag.src = selectedMediaFile;
-            player.isCurrentlyPlayingAd = true;
-            if (player.displayOptions.vastOptions.showProgressbarMarkers) {
-                player.hideAdMarkers();
-            }
-            videoPlayerTag.load();
+                videoPlayerTag.src = selectedMediaFile.src;
+                player.isCurrentlyPlayingAd = true;
+                if (player.displayOptions.vastOptions.showProgressbarMarkers) {
+                    player.hideAdMarkers();
+                }
+                videoPlayerTag.load();
 
                 //Handle the ending of the Pre-Roll ad
                 videoPlayerTag.addEventListener('ended', player.onVastAdEnded);
@@ -1199,8 +1262,8 @@ var fluidPlayerClass = {
             for (var i = 0; i < mediaFiles.length; i++) {
                 var supportLevel = this.getMediaFileTypeSupportLevel(mediaFiles[i]['type']);
 
-                if (supportLevel === "maybe" || supportLevel === "probably") {
-                    selectedMediaFile = mediaFiles[i]['src'];
+                if (supportLevel === "maybe" || supportLevel === "probably") {                      
+                    selectedMediaFile = mediaFiles[i];
                     adSupportedType = true;
                 }
 
@@ -1848,7 +1911,8 @@ var fluidPlayerClass = {
                 var adListId = player.timerPool[keyTime]['nonLinear'][index].adListId;
                 var vastOptions = player.adPool[adListId];
 
-                if (player.adList[adListId].played === false) {
+                // we are not supporting nonLinear ads in cardBoard mode
+                if (player.adList[adListId].played === false && !player.displayOptions.layoutControls.showCardBoardView) {
                     player.createNonLinearStatic(adListId);
                     if (player.displayOptions.vastOptions.showProgressbarMarkers) {
                         player.hideAdMarker(adListId);
@@ -1944,7 +2008,13 @@ var fluidPlayerClass = {
 
         if (progressbarContainer !== null) {
             var backgroundColor = (player.displayOptions.layoutControls.primaryColor) ? player.displayOptions.layoutControls.primaryColor : "white";
-            document.getElementById(player.videoPlayerId + '_vast_control_currentprogress').style.backgroundColor = backgroundColor;
+            
+            var currentProgressBar = videoPlayerTag.parentNode.getElementsByClassName('fluid_controls_currentprogress');
+
+            for (var i = 0; i < currentProgressBar.length; i++) {
+                currentProgressBar[i].style.backgroundColor = backgroundColor;
+            }
+
         }
 
         videoPlayerTag.removeEventListener('ended', player.onVastAdEnded);
@@ -2075,7 +2145,7 @@ var fluidPlayerClass = {
         var durationText = parseInt(adCountdown);
         divAdCountdown.id = 'ad_countdown' + this.videoPlayerId;
         divAdCountdown.className = 'ad_countdown';
-        divAdCountdown.innerHTML = "Ad - " + durationText;
+        divAdCountdown.innerHTML = "<span class='ad_timer_prefix'>Ad - </span>" + durationText;
 
         videoWrapper.appendChild(divAdCountdown);
 
@@ -2090,7 +2160,7 @@ var fluidPlayerClass = {
         var btn = document.getElementById('ad_countdown' + player.videoPlayerId);
 
         if (btn) {
-            btn.innerHTML = "Ad - " + player.pad(parseInt(sec / 60)) + ':' + player.pad(parseInt(sec % 60));
+            btn.innerHTML = "<span class='ad_timer_prefix'>Ad - </span> " + player.pad(parseInt(sec / 60)) + ':' + player.pad(parseInt(sec % 60));
         } else {
             videoPlayerTag.removeEventListener('timeupdate', player.decreaseAdCountdown);
         }
@@ -2230,10 +2300,13 @@ var fluidPlayerClass = {
     },
 
     addCTAButton: function (landingPage) {
-        if (!this.displayOptions.vastOptions.adCTAText) {
+            
+        var player = this;
+
+        if ( !landingPage ) {
             return;
         }
-        var player = this;
+        
         var videoPlayerTag = document.getElementById(this.videoPlayerId);
 
         var ctaButton = document.createElement('div');
@@ -4323,7 +4396,7 @@ var fluidPlayerClass = {
         var newControlBar = videoPlayerTag.parentNode.getElementsByClassName('fluid_vr2_controls_container')[0];
         videoPlayerTag.parentNode.removeChild(newControlBar);
 
-        if(player.displayOptions.layoutControls.showCardBoardJoystick){
+        if(player.displayOptions.layoutControls.showCardBoardJoystick && vrJoystickPanel){
             vrJoystickPanel.style.display = "block";
         }
         controlBar.classList.remove("fluid_vr_controls_container");
@@ -4332,6 +4405,27 @@ var fluidPlayerClass = {
         var volumeContainer = document.getElementById(player.videoPlayerId + '_fluid_control_volume_container')
         volumeContainer.style.display = "block";        
 
+        // show all ads overlays if any
+        var adCountDownTimerText = document.getElementById('ad_countdown' + player.videoPlayerId);
+        var ctaButton = document.getElementById(player.videoPlayerId+'_fluid_cta');
+        var addAdPlayingTextOverlay = document.getElementById(player.videoPlayerId+'_fluid_ad_playing');
+        var skipBtn = document.getElementById('skip_button_' + player.videoPlayerId);
+
+        if ( adCountDownTimerText ) {
+            adCountDownTimerText.style.display = 'block';
+        }
+
+        if ( ctaButton ) {
+            ctaButton.style.display = 'block';
+        }
+
+        if ( addAdPlayingTextOverlay ) {
+            addAdPlayingTextOverlay.style.display = 'block';
+        }
+
+        if ( skipBtn ) {
+            skipBtn.style.display = 'block';
+        }
     },
 
 
@@ -4343,7 +4437,7 @@ var fluidPlayerClass = {
         var controlBar = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
 
         // hide the joystick in VR mode
-        if ( player.displayOptions.layoutControls.showCardBoardJoystick ) {
+        if ( player.displayOptions.layoutControls.showCardBoardJoystick && vrJoystickPanel) {
             vrJoystickPanel.style.display = "none";
         }
 
@@ -4393,6 +4487,29 @@ var fluidPlayerClass = {
         player.cardBoardHideDefaultControls();
         player.cardBoardCreateVRControls();
 
+
+        // hide all ads overlays
+        var adCountDownTimerText = document.getElementById('ad_countdown' + player.videoPlayerId);
+        var ctaButton = document.getElementById(player.videoPlayerId+'_fluid_cta');
+        var addAdPlayingTextOverlay = document.getElementById(player.videoPlayerId+'_fluid_ad_playing');
+        var skipBtn = document.getElementById('skip_button_' + player.videoPlayerId);
+
+        if ( adCountDownTimerText ) {
+            adCountDownTimerText.style.display = 'none';
+        }
+
+        if ( ctaButton ) {
+            ctaButton.style.display = 'none';
+        }
+
+        if ( addAdPlayingTextOverlay ) {
+            addAdPlayingTextOverlay.style.display = 'none';
+        }
+
+        if ( skipBtn ) {
+            skipBtn.style.display = 'none';
+        }
+
     },
 
     cardBoardMoveTimeInfo: function () {
@@ -4424,8 +4541,18 @@ var fluidPlayerClass = {
         // OverRide some conflicting functions from panolens
         PANOLENS.VideoPanorama.prototype.pauseVideo = function () {};
         PANOLENS.VideoPanorama.prototype.playVideo = function () {};
+        //PANOLENS.VideoPanorama.prototype.onLoad = function () {};
+        //PANOLENS.VideoPanorama.prototype.load = function () {};
         
-        player.vrPanorama = new PANOLENS.VideoPanorama( '', { videoElement:  videoPlayerTag, autoplay: false } );
+        if ( fluidPlayerClass.getMobileOs().userOs === 'Android' || fluidPlayerClass.getMobileOs().userOs === 'iOS' ){
+
+            player.vrPanorama = new PANOLENS.VideoPanorama( '', { videoElement:  videoPlayerTag, autoplay: true } );
+
+        } else {
+        
+            player.vrPanorama = new PANOLENS.VideoPanorama( '', { videoElement:  videoPlayerTag, autoplay: player.displayOptions.layoutControls.autoPlay } );            
+        }
+
 
         player.vrViewer = new PANOLENS.Viewer( { container: vrContainer, controlBar: true, controlButtons: [], enableReticle: false } );
         player.vrViewer.add( player.vrPanorama );

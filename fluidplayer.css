@@ -401,6 +401,10 @@
     top: -15px;    
 }
 
+.fluid_video_wrapper.fluid_player_layout_default .ad_countdown .ad_timer_prefix{
+    color: #F2C94C;
+}
+
 .fluid_video_wrapper.fluid_player_layout_default .ad_countdown {
     display: none;
     position: absolute;
