@@ -4519,6 +4519,43 @@ var fluidPlayerClass = {
 
         timePlaceholder.classList.add("cardboard_time");
         controlBar.appendChild(timePlaceholder);
+
+        // override the time display function for this instance
+        player.contolDurationUpdate = function ( videoPlayerId ) {
+            var player = fluidPlayerClass.getInstanceById(videoPlayerId);
+            var videoPlayerTag = document.getElementById(videoPlayerId);
+
+            var currentPlayTime = player.formatTime(videoPlayerTag.currentTime);
+            var totalTime = player.formatTime(player.currentVideoDuration);
+            var timePlaceholder = videoPlayerTag.parentNode.getElementsByClassName('fluid_control_duration');
+
+            var durationText = '';
+
+            if ( player.isCurrentlyPlayingAd ) {
+
+                durationText = "<span class='ad_timer_prefix'>AD : </span>"+currentPlayTime + ' / ' + totalTime;
+
+                for( var index = 0; index < timePlaceholder.length; index++){
+                    timePlaceholder[index].classList.add("ad_timer_prefix");
+                }
+
+
+            } else {
+
+                durationText = currentPlayTime + ' / ' + totalTime;
+
+                for( var index = 0; index < timePlaceholder.length; index++){
+                    timePlaceholder[index].classList.remove("ad_timer_prefix");
+                }
+
+            }
+
+            
+
+            for (var i = 0; i < timePlaceholder.length; i++) {
+                timePlaceholder[i].innerHTML = durationText;
+            }
+        }
     },
 
     cardBoardAlterDefaultControls: function () {
@@ -4539,10 +4576,9 @@ var fluidPlayerClass = {
         videoPlayerTag.parentNode.insertBefore(vrContainer, videoPlayerTag.nextSibling);
 
         // OverRide some conflicting functions from panolens
-        PANOLENS.VideoPanorama.prototype.pauseVideo = function () {};
+        PANOLENS.VideoPanorama.prototype.pauseVideo = function () { };
         PANOLENS.VideoPanorama.prototype.playVideo = function () {};
-        //PANOLENS.VideoPanorama.prototype.onLoad = function () {};
-        //PANOLENS.VideoPanorama.prototype.load = function () {};
+        // PANOLENS.VideoPanorama.prototype.isMobile = function () { return false; };
         
         if ( fluidPlayerClass.getMobileOs().userOs === 'Android' || fluidPlayerClass.getMobileOs().userOs === 'iOS' ){
 
