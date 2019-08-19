@@ -2957,10 +2957,17 @@ var fluidPlayerClass = {
     },
 
     onProgressbarMouseDown: function (videoPlayerId, event) {
+
         var player = fluidPlayerClass.getInstanceById(videoPlayerId);
         player.displayOptions.layoutControls.playPauseAnimation = false;
         // we need an initial position for touchstart events, as mouse up has no offset x for iOS
-        var initialPosition = fluidPlayerClass.getEventOffsetX(event, event.srcElement.parentNode);
+        var initialPosition;
+
+        if ( player.displayOptions.layoutControls.showCardBoardView ) { 
+            initialPosition = fluidPlayerClass.getEventOffsetX(event, event.srcElement.parentNode);
+        } else { 
+            initialPosition = fluidPlayerClass.getEventOffsetX(event, document.getElementById(videoPlayerId + '_fluid_controls_progress_container'));
+        }
 
         if (player.isCurrentlyPlayingAd) {
             return;
@@ -3493,11 +3500,20 @@ var fluidPlayerClass = {
 
         var isMobileChecks = fluidPlayerClass.getMobileOs();
         var eventOn = (isMobileChecks.userOs) ? 'touchstart' : 'mousedown';
+        
+        if ( player.displayOptions.layoutControls.showCardBoardView ) {
 
-        fluidPlayerClass.delegate(videoPlayerTag.parentNode, eventOn, '.fluid_controls_progress_container', function ( event ) {
-        //document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container').addEventListener(eventOn, function (event) {
-            player.onProgressbarMouseDown(player.videoPlayerId, event);
-        }, false);
+            fluidPlayerClass.delegate(videoPlayerTag.parentNode, eventOn, '.fluid_controls_progress_container', function ( event ) {
+                    player.onProgressbarMouseDown(player.videoPlayerId, event);
+                }, false); 
+
+        } else {
+
+            document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container').addEventListener(eventOn, function (event) {
+                player.onProgressbarMouseDown(player.videoPlayerId, event);
+            }, false);
+
+        }
 
         //Set the volume controls
         document.getElementById(player.videoPlayerId + '_fluid_control_volume_container').addEventListener(eventOn, function (event) {
@@ -4565,6 +4581,7 @@ var fluidPlayerClass = {
     },
 
     createCardboardView: function () {
+
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
         var vrSwitchButton = videoPlayerTag.parentNode.getElementsByClassName('fluid_control_cardboard');
@@ -4577,8 +4594,7 @@ var fluidPlayerClass = {
 
         // OverRide some conflicting functions from panolens
         PANOLENS.VideoPanorama.prototype.pauseVideo = function () { };
-        PANOLENS.VideoPanorama.prototype.playVideo = function () {};
-        // PANOLENS.VideoPanorama.prototype.isMobile = function () { return false; };
+        PANOLENS.VideoPanorama.prototype.playVideo = function () { };
         
         if ( fluidPlayerClass.getMobileOs().userOs === 'Android' || fluidPlayerClass.getMobileOs().userOs === 'iOS' ){
 
