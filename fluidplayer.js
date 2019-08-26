@@ -2277,7 +2277,7 @@ var fluidPlayerClass = {
 
             } else {
                 //make the button clickable
-                btn.innerHTML = '<a href="javascript:;" id="skipHref_' + player.videoPlayerId + '" onclick="fluidPlayerClass.getInstanceById(\'' + player.videoPlayerId + '\').pressSkipButton();">'
+                btn.innerHTML = '<a href="javascript:;" id="skipHref_' + player.videoPlayerId + '" onclick="fluidPlayerClass.getInstanceById(\'' + player.videoPlayerId + '\').pressSkipButton(); return false;">'
                     + player.displayOptions.vastOptions.skipButtonClickCaption
                     + '</a>';
 
