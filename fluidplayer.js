@@ -446,6 +446,17 @@ var fluidPlayerClass = {
         return tidyString;
     },
 
+    getAdParametersFromLinear: function(linear){
+        var adParameters = linear.getElementsByTagName('AdParameters');
+        var adParametersData = null;
+
+        if (adParameters.length) {
+            adParametersData = this.extractNodeData(adParameters[0]);
+        }
+        
+        return adParametersData;
+    },
+
     getMediaFileListFromLinear: function (linear) {
         var mediaFileList = [];
         var mediaFiles = this.getMediaFilesFromLinear(linear);
@@ -810,6 +821,7 @@ var fluidPlayerClass = {
                     tmpOptions.clickthroughUrl = player.getClickThroughUrlFromLinear(creativeLinear);
                     tmpOptions.duration = player.getDurationFromLinear(creativeLinear);
                     tmpOptions.mediaFileList = player.getMediaFileListFromLinear(creativeLinear);
+                    tmpOptions.adParameters = player.getAdParametersFromLinear(creativeLinear);
                     tmpOptions.iconClick = player.getIconClickThroughFromLinear(creativeLinear);
                 }
             }
@@ -1110,12 +1122,12 @@ var fluidPlayerClass = {
                     videoPlayerTag.removeEventListener('loadedmetadata', player.switchPlayerToVastMode);
                 };
 
-                videoPlayerTag.pause();
+            videoPlayerTag.pause();
 
-                videoPlayerTag.addEventListener('loadedmetadata', player.switchPlayerToVastMode);
+            videoPlayerTag.addEventListener('loadedmetadata', player.switchPlayerToVastMode);
 
-                // Remove the streaming objects to prevent errors on the VAST content
-                player.detachStreamers();
+            // Remove the streaming objects to prevent errors on the VAST content
+            player.detachStreamers();
 
             //Try to load multiple
             var selectedMediaFile = player.getSupportedMediaFile(player.vastOptions.mediaFileList);
