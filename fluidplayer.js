@@ -461,12 +461,31 @@ var fluidPlayerClass = {
         var mediaFileList = [];
         var mediaFiles = this.getMediaFilesFromLinear(linear);
         if (mediaFiles.length) {
+
             for (var n = 0; n < mediaFiles.length; n++) {
+                
+                var mediaType = mediaFiles[n].getAttribute('mediaType');
+                if(!mediaType){
+                    // if there is no mediaType attribute then the video is 2D
+                    mediaType = '2D';
+                }
+
+                // get all the attributes of media file
                 mediaFileList.push({
                     'src': this.extractNodeData(mediaFiles[n]),
-                    'type': mediaFiles[n].getAttribute('type')
+                    'type': mediaFiles[n].getAttribute('type'),
+                    'apiFramework': mediaFiles[n].getAttribute('apiFramework'),
+                    'codec': mediaFiles[n].getAttribute('codec'),
+                    'id': mediaFiles[n].getAttribute('codec'),
+                    'fileSize': mediaFiles[n].getAttribute('fileSize'),
+                    'delivery': mediaFiles[n].getAttribute('delivery'),
+                    'width': mediaFiles[n].getAttribute('width'),
+                    'height': mediaFiles[n].getAttribute('height'),
+                    'mediaType': mediaType.toLowerCase(),
                 });
+
             }
+
         }
 
         return mediaFileList;
@@ -1122,29 +1141,29 @@ var fluidPlayerClass = {
                     videoPlayerTag.removeEventListener('loadedmetadata', player.switchPlayerToVastMode);
                 };
 
-            videoPlayerTag.pause();
+                videoPlayerTag.pause();
 
-            videoPlayerTag.addEventListener('loadedmetadata', player.switchPlayerToVastMode);
+                videoPlayerTag.addEventListener('loadedmetadata', player.switchPlayerToVastMode);
 
-            // Remove the streaming objects to prevent errors on the VAST content
-            player.detachStreamers();
+                // Remove the streaming objects to prevent errors on the VAST content
+                player.detachStreamers();
 
-            //Try to load multiple
-            var selectedMediaFile = player.getSupportedMediaFile(player.vastOptions.mediaFileList);
+                //Try to load multiple
+                var selectedMediaFile = player.getSupportedMediaFile(player.vastOptions.mediaFileList);
 
-            if (selectedMediaFile === false) {
-                //Couldn’t find MediaFile that is supported by this video player, based on the attributes of the MediaFile element.
-                player.adList[adListId].error = true;
-                player.playMainVideoWhenVastFails(403);
-                return false;
-            }
+                if (selectedMediaFile === false) {
+                    //Couldn’t find MediaFile that is supported by this video player, based on the attributes of the MediaFile element.
+                    player.adList[adListId].error = true;
+                    player.playMainVideoWhenVastFails(403);
+                    return false;
+                }
 
-            videoPlayerTag.src = selectedMediaFile;
-            player.isCurrentlyPlayingAd = true;
-            if (player.displayOptions.vastOptions.showProgressbarMarkers) {
-                player.hideAdMarkers();
-            }
-            videoPlayerTag.load();
+                videoPlayerTag.src = selectedMediaFile;
+                player.isCurrentlyPlayingAd = true;
+                if (player.displayOptions.vastOptions.showProgressbarMarkers) {
+                    player.hideAdMarkers();
+                }
+                videoPlayerTag.load();
 
                 //Handle the ending of the Pre-Roll ad
                 videoPlayerTag.addEventListener('ended', player.onVastAdEnded);
