@@ -475,10 +475,9 @@ var fluidPlayerClass = {
 
         if (iconClickThrough.length) {
             return this.extractNodeData(iconClickThrough[0]);
+        } else {
+            this.displayOptions.vastOptions.adCTAText = false;
         }
-        //  else {
-        //     this.displayOptions.vastOptions.adCTAText = false;
-        // }
 
         return '';
     },
@@ -894,7 +893,7 @@ var fluidPlayerClass = {
                     }
 
                     var selectedMediaFile = player.getSupportedMediaFile(tmpOptions.mediaFileList);
-                    if (selectedMediaFile !== false) {
+                    if (selectedMediaFile) {
                         player.adList[adListId].mediaType = selectedMediaFile.mediaType;
                     }
 

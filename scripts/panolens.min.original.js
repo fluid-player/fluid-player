@@ -1,31 +1,3 @@
-/* 
-    Panolens version "0.11.0";
-*/
-
-/*
-The MIT License (MIT)
-
-Copyright (c) 2015-2019 Ray Chen
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-
 (function(k, d) {
     "object" === typeof exports && "undefined" !== typeof module ? d(exports, require("three")) : "function" === typeof define && define.amd ? define(["exports", "three"], d) : (k = k || self, d(k.PANOLENS = {}, k.THREE))
 })(this, function(k, d) {
@@ -215,12 +187,11 @@ SOFTWARE.
         b = void 0 === b ? {} : b;
         r.call(this);
         this.src = a;
-        /* Removing the conflicting code */
         this.options = Object.assign({
             videoElement: document.createElement("video"),
-            // loop: !0,
-            // muted: !0,
-            // autoplay: !1,
+            loop: !0,
+            muted: !0,
+            autoplay: !1,
             playsinline: !0,
             crossOrigin: "anonymous"
         }, b);
@@ -2824,19 +2795,16 @@ SOFTWARE.
                     method: "updateVideoPlayButton",
                     data: !1
                 });
-                
-                /* Removing the conflicting code */
-                // this.isMobile() && (h.pause(),
-                //     e && b ? this.dispatchEvent({
-                //         type: "panolens-viewer-handler",
-                //         method: "updateVideoPlayButton",
-                //         data: !1
-                //     }) : this.dispatchEvent({
-                //         type: "panolens-viewer-handler",
-                //         method: "updateVideoPlayButton",
-                //         data: !0
-                //     }));
-
+                this.isMobile() && (h.pause(),
+                    e && b ? this.dispatchEvent({
+                        type: "panolens-viewer-handler",
+                        method: "updateVideoPlayButton",
+                        data: !1
+                    }) : this.dispatchEvent({
+                        type: "panolens-viewer-handler",
+                        method: "updateVideoPlayButton",
+                        data: !0
+                    }));
                 window.requestAnimationFrame(function() {
                     k({
                         loaded: 1,
