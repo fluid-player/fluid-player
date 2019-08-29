@@ -1076,7 +1076,35 @@ var fluidPlayerClass = {
         }
     },
 
-    renderVideoAd: function (adListId,backupTheVideoTime) {
+    checkVPAIDInterface: function() {
+        var player = this;
+        var VPAIDCreative = player.vpaidAdUnit;
+        // checks if all the mandatory params present
+        if (
+            VPAIDCreative.handshakeVersion && typeof
+        VPAIDCreative.handshakeVersion == "function" && VPAIDCreative.initAd && typeof
+        VPAIDCreative.initAd == "function" &&
+            VPAIDCreative.startAd && typeof VPAIDCreative.startAd == "function" &&
+            VPAIDCreative.stopAd && typeof VPAIDCreative.stopAd == "function" &&
+            VPAIDCreative.skipAd && typeof VPAIDCreative.skipAd == "function" &&
+            VPAIDCreative.resizeAd && typeof VPAIDCreative.resizeAd == "function" &&
+            VPAIDCreative.pauseAd && typeof VPAIDCreative.pauseAd == "function" &&
+            VPAIDCreative.resumeAd && typeof VPAIDCreative.resumeAd == "function"
+        &&
+            VPAIDCreative.expandAd && typeof VPAIDCreative.expandAd == "function"
+        &&
+            VPAIDCreative.collapseAd && typeof VPAIDCreative.collapseAd == "function"
+        &&
+            VPAIDCreative.subscribe && typeof VPAIDCreative.subscribe == "function" &&
+            VPAIDCreative.unsubscribe && typeof VPAIDCreative.unsubscribe ==
+        "function" ) {
+            return true;
+        }
+
+            return false;
+    },   
+
+    renderLinearAd: function (adListId,backupTheVideoTime) {
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
@@ -1091,6 +1119,63 @@ var fluidPlayerClass = {
 
 
             var playVideoPlayer = function (adListId) {
+                
+                player.loadVpaid = function (selectedMediaFile) {
+                    
+                    var player = this;
+
+                    var iframe = document.createElement('iframe');
+                    iframe.id = "adloaderframe";
+                    iframe.setAttribute("frameborder", "0");
+                    
+                    document.body.appendChild(iframe);
+                    var url = selectedMediaFile.src;
+                    // ‘url’ points to the ad js file
+                    
+                    iframe.contentWindow.document.write('<script src="' + url + '"></scr' + 'ipt>');
+
+                    // set interval with timeout
+                    player.tempVpaidCounter = 0;
+                    player.getVPAIDAdInterval = setInterval( function () {
+
+                        var fn  = iframe.contentWindow['getVPAIDAd'];
+
+                        if (fn && typeof fn == 'function') {
+
+                            player.vpaidAdUnit = fn();
+                            console.log('VPAID interface validation');
+                            console.log(player.checkVPAIDInterface());
+                            clearInterval(player.getVPAIDAdInterval);
+                            player.switchPlayerToVpaidMode();
+
+                        } else {
+
+                            player.tempVpaidCounter++;
+                            if (player.tempVpaidCounter >= 15) {
+                                clearInterval(player.getVPAIDAdInterval);
+                                player.adList[adListId].error = true;
+                                player.playMainVideoWhenVastFails(403);
+                                return false;
+                            }
+
+                        }
+
+                    } ,100);                   
+
+                };
+
+                player.switchPlayerToVpaidMode = function () {
+
+                    var player = this;
+                    var creativeData = {}
+                    creativeData.AdParameters = player.adPool[adListId].adParameters;
+                    
+                    console.log(player.adList[adListId]);
+
+                    player.vpaidAdUnit.initAd(300, 300, 'normal', 1024, creativeData, {});
+
+                },
+
                 player.switchPlayerToVastMode = function () {
                     //Get the actual duration from the video file if it is not present in the VAST XML
                     if (!player.vastOptions.duration) {
@@ -1122,7 +1207,6 @@ var fluidPlayerClass = {
                         document.getElementById(player.videoPlayerId + '_vast_control_currentprogress').style.backgroundColor = player.displayOptions.layoutControls.adProgressColor;
                     }
 
-
                     if (player.displayOptions.vastOptions.adText || player.adList[adListId].adText) {
                         var adTextToShow = (player.adList[adListId].adText !== null) ? player.adList[adListId].adText : player.displayOptions.vastOptions.adText;
                         player.addAdPlayingText(adTextToShow);
@@ -1143,30 +1227,48 @@ var fluidPlayerClass = {
 
                 videoPlayerTag.pause();
 
-                videoPlayerTag.addEventListener('loadedmetadata', player.switchPlayerToVastMode);
-
                 // Remove the streaming objects to prevent errors on the VAST content
                 player.detachStreamers();
 
                 //Try to load multiple
-                var selectedMediaFile = player.getSupportedMediaFile(player.vastOptions.mediaFileList);
+                var selectedMediaFile = player.getSupportedMediaFileObject(player.vastOptions.mediaFileList);
 
-                if (selectedMediaFile === false) {
-                    //Couldn’t find MediaFile that is supported by this video player, based on the attributes of the MediaFile element.
-                    player.adList[adListId].error = true;
-                    player.playMainVideoWhenVastFails(403);
-                    return false;
+                if (!selectedMediaFile.apiFramework) {
+
+                    if (selectedMediaFile.src === false) {
+                        // Couldn’t find MediaFile that is supported by this video player, based on the attributes of the MediaFile element.
+                        player.adList[adListId].error = true;
+                        player.playMainVideoWhenVastFails(403);
+                        return false;
+                    }
+
+                    videoPlayerTag.addEventListener('loadedmetadata', player.switchPlayerToVastMode);
+                    
+                    videoPlayerTag.src = selectedMediaFile.src;
+                    player.isCurrentlyPlayingAd = true;
+
+                    if (player.displayOptions.vastOptions.showProgressbarMarkers) {
+                        player.hideAdMarkers();
+                    }
+
+                    videoPlayerTag.load();
+
+                    //Handle the ending of the Pre-Roll ad
+                    videoPlayerTag.addEventListener('ended', player.onVastAdEnded);
+
+                } else if (selectedMediaFile.apiFramework === 'VPAID') {
+
+                    player.loadVpaid(selectedMediaFile);
+
+                    videoPlayerTag.src = fluidPlayerScriptLocation + 'blank.mp4';
+                    player.isCurrentlyPlayingAd = true;
+
+                    if (player.displayOptions.vastOptions.showProgressbarMarkers) {
+                        player.hideAdMarkers();
+                    }
+
                 }
 
-                videoPlayerTag.src = selectedMediaFile;
-                player.isCurrentlyPlayingAd = true;
-                if (player.displayOptions.vastOptions.showProgressbarMarkers) {
-                    player.hideAdMarkers();
-                }
-                videoPlayerTag.load();
-
-                //Handle the ending of the Pre-Roll ad
-                videoPlayerTag.addEventListener('ended', player.onVastAdEnded);
             };
 
 
@@ -1215,28 +1317,37 @@ var fluidPlayerClass = {
 
         var adListIdToPlay = player.getNextAdPod();
         if (adListIdToPlay !== null) {
-            player.renderVideoAd(adListIdToPlay,true);
+            player.renderLinearAd(adListIdToPlay,true);
         }
 
 
     },
 
-    getSupportedMediaFile: function (mediaFiles) {
+    getSupportedMediaFileObject: function (mediaFiles) {
         var selectedMediaFile = null;
         var adSupportedType = false;
         if (mediaFiles.length) {
             for (var i = 0; i < mediaFiles.length; i++) {
-                var supportLevel = this.getMediaFileTypeSupportLevel(mediaFiles[i]['type']);
 
-                if (supportLevel === "maybe" || supportLevel === "probably") {
-                    selectedMediaFile = mediaFiles[i]['src'];
+                if (!mediaFiles[i].apiFramework) {
+                    var supportLevel = this.getMediaFileTypeSupportLevel(mediaFiles[i]['type']);
+                
+                    if (supportLevel === "maybe" || supportLevel === "probably") {
+                        selectedMediaFile = mediaFiles[i];
+                        adSupportedType = true;
+                    }
+    
+                    //one of the best(s) option, no need to seek more
+                    if (supportLevel === "probably") {
+                        break;
+                    }
+
+                } else {
+                    selectedMediaFile = mediaFiles[i];
                     adSupportedType = true;
-                }
-
-                //one of the best(s) option, no need to seek more
-                if (supportLevel === "probably") {
                     break;
                 }
+
             }
         }
 
@@ -2033,7 +2144,7 @@ var fluidPlayerClass = {
             player.isCurrentlyPlayingAd = false;
             player.vastOptions = null;
             player.adFinished = true;
-            player.renderVideoAd(availableNextAdID,false); // passing false so it doesn't backup the Ad playbacktime as video playback time
+            player.renderLinearAd(availableNextAdID,false); // passing false so it doesn't backup the Ad playbacktime as video playback time
         }
 
     },
@@ -5034,6 +5145,7 @@ var fluidPlayerClass = {
         videoPlayer.setAttribute('playsinline', '');
         videoPlayer.setAttribute('webkit-playsinline', '');
 
+        player.vpaidAdUnit             = null;
         player.vastOptions             = null;
         player.videoPlayerId           = idVideoPlayer;
         player.originalSrc             = player.getCurrentSrc();
