@@ -1167,12 +1167,16 @@ var fluidPlayerClass = {
                 player.switchPlayerToVpaidMode = function () {
 
                     var player = this;
-                    var creativeData = {}
+                    var creativeData = {};
                     creativeData.AdParameters = player.adPool[adListId].adParameters;
                     
+                    var environmentVars = {
+                        slot: document.getElementById('vpaidSlot')
+                    }
+
                     console.log(player.adList[adListId]);
 
-                    player.vpaidAdUnit.initAd(300, 300, 'normal', 1024, creativeData, {});
+                    player.vpaidAdUnit.initAd('100%', '100%', 'normal', 0, creativeData, environmentVars);
 
                 },
 
