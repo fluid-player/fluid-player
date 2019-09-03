@@ -432,6 +432,14 @@
     z-index: 1;
 }
 
+.fluid_video_wrapper.fluid_player_layout_default .fluid_vpaid_iframe {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    left: 0;
+}
+
 .fluid_video_wrapper.fluid_player_layout_default .fluid_subtitles_container {
     color: white;
     position: absolute;
