@@ -1470,13 +1470,14 @@ var fluidPlayerClass = {
                 player.switchPlayerToVpaidMode = function () {
 
                     var player = this;
+                    var vpaidIframe = player.videoPlayerId +"_fluid_vpaid_iframe";
                     var creativeData = {};
                     creativeData.AdParameters = player.adPool[adListId].adParameters;
                     var slotElement = document.createElement('div');
-                    slotElement.id = player.videoPlayerId +"_fluid_vpaid_iframe";
-                    slotElement.className = 'fluid_vpaid_iframe';
+                    slotElement.id = player.videoPlayerId +"_fluid_vpaid_slot";
+                    slotElement.className = 'fluid_vpaid_slot';
 
-                    videoPlayerTag.parentNode.insertBefore(slotElement, videoPlayerTag.nextSibling);
+                    videoPlayerTag.parentNode.insertBefore(slotElement, vpaidIframe.nextSibling);
 
                     var environmentVars = {
                         slot: slotElement,
