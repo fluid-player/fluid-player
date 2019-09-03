@@ -1110,6 +1110,269 @@ var fluidPlayerClass = {
             return false;
     },   
 
+    // Callback for AdPaused 
+    onVpaidAdPaused: function() {
+        console.log("onAdPaused");
+    },
+
+    // Callback for AdPlaying
+    onVpaidAdPlaying: function() {
+        console.log("onAdPlaying");
+    },
+
+    // Callback for AdError
+    onVpaidAdError: function(message) {
+        console.log("onAdError: " + message);
+    },
+
+    // Callback for AdLog
+    onVpaidAdLog: function(message) {
+        console.log("onAdLog: " + message);
+    },
+
+    // Callback for AdUserAcceptInvitation
+    onVpaidAdUserAcceptInvitation: function() {
+        console.log("onAdUserAcceptInvitation");
+    },
+
+    // Callback for AdUserMinimize
+    onVpaidAdUserMinimize: function() {
+        console.log("onAdUserMinimize");
+    },
+
+    // Callback for AdUserClose
+    onVpaidAdUserClose: function() {
+        console.log("onAdUserClose");
+    },
+
+    // Callback for AdUserClose
+    onVpaidAdSkippableStateChange: function() {
+        var player = this;
+        console.log("Ad Skippable State Changed to: " + player.vpaidAdUnit.getAdSkippableState());
+    },
+
+    // Callback for AdUserClose
+    onVpaidAdExpandedChange: function() {
+        var player = this;
+        console.log("Ad Expanded Changed to: " + player.vpaidAdUnit.getAdExpanded());
+    },
+
+    // Pass through for getAdExpanded
+    getVpaidAdExpanded: function() {
+        var player = this;
+        console.log("getAdExpanded");
+        return player.vpaidAdUnit.getAdExpanded();
+    },
+
+    // Pass through for getAdSkippableState
+    getVpaidAdSkippableState: function() {
+        var player = this;
+        console.log("getAdSkippableState");
+        return player.vpaidAdUnit.getAdSkippableState();
+    },
+
+    // Callback for AdSizeChange
+    onVpaidAdSizeChange: function() {
+        var player = this;
+        console.log("Ad size changed to: w=" + player.vpaidAdUnit.getAdWidth() + " h=" + player.vpaidAdUnit.getAdHeight());
+    },
+
+    // Callback for AdDurationChange
+    onVpaidAdDurationChange: function() {
+        var player = this;
+        console.log("Ad Duration Changed to: " + player.vpaidAdUnit.getAdDuration());
+    },
+
+    // Callback for AdRemainingTimeChange
+    onVpaidAdRemainingTimeChange: function() {
+        var player = this;
+        console.log("Ad Remaining Time Changed to: " + player.vpaidAdUnit.getAdRemainingTime());
+    },
+
+    // Pass through for getAdRemainingTime
+    getVpaidAdRemainingTime: function() {
+        var player = this;
+        console.log("getAdRemainingTime");
+        return player.vpaidAdUnit.getAdRemainingTime();
+    },
+
+    // Callback for AdImpression
+    onVpaidAdImpression: function() {
+        console.log("Ad Impression");
+    },
+
+    // Callback for AdClickThru
+    onVpaidAdClickThru: function(url, id, playerHandles) {
+        console.log("Clickthrough portion of the ad was clicked");
+    },
+
+    // Callback for AdInteraction
+    onVpaidAdInteraction: function(id) {
+        console.log("A non-clickthrough event has occured");
+    },
+
+    // Callback for AdUserClose
+    onVpaidAdVideoStart: function() {
+        console.log("Video 0% completed");
+    },
+
+    // Callback for AdUserClose
+    onVpaidAdVideoFirstQuartile: function() {
+        console.log("Video 25% completed");    
+    },
+    // Callback for AdUserClose
+    onVpaidAdVideoMidpoint: function() {
+        console.log("Video 50% completed");
+    },
+
+    // Callback for AdUserClose
+    onVpaidAdVideoThirdQuartile: function() {
+        console.log("Video 75% completed");
+    },
+
+    // Callback for AdVideoComplete
+    onVpaidAdVideoComplete: function() {
+        console.log("Video 100% completed");
+    },
+
+    // Callback for AdLinearChange
+    onVpaidAdLinearChange: function() {
+        var player = this;
+        console.log("Ad linear has changed: " + player.vpaidAdUnit.getAdLinear());
+    },
+
+    // Pass through for getAdLinear
+    getVpaidAdLinear: function() {
+        var player = this;
+        console.log("getAdLinear");
+        return player.vpaidAdUnit.getAdLinear();
+    },
+   
+    // Pass through for startAd()
+    startVpaidAd: function() {
+        var player = this;
+        console.log("startAd");
+        player.vpaidAdUnit.startAd();
+    },
+
+    // Callback for AdLoaded
+    onVpaidAdLoaded: function() {
+        console.log("ad has been loaded");
+    },
+
+    // Callback for StartAd()
+    onStartVpaidAd: function() {
+        console.log("Ad has started");
+    },
+
+    // Pass through for stopAd()
+    stopVpaidAd: function() {
+        var player = this;
+        player.vpaidAdUnit.stopAd();
+    },
+       
+    // Callback for AdUserClose
+    onStopVpaidAd: function() {
+        console.log("Ad has stopped");
+    },
+       
+    // Callback for AdUserClose
+    onSkipVpaidAd: function() {
+        console.log("Ad was skipped");
+    },
+    
+    // Passthrough for setAdVolume
+    setVpaidAdVolume: function(val) {
+        var player = this;
+        player.vpaidAdUnit.setAdVolume(val);
+    },
+       
+    // Passthrough for getAdVolume
+    getVpaidAdVolume: function() {
+        var player = this;
+        return player.vpaidAdUnit.getAdVolume();
+    },
+
+    // Callback for AdVolumeChange
+    onVpaidAdVolumeChange: function() {
+        var player = this;
+        console.log("Ad Volume has changed to - " + player.vpaidAdUnit.getAdVolume());
+    },
+
+    //Passthrough for resizeAd
+    resizeVpaidAd: function(width, height, viewMode) {
+        var player = this;
+        player.vpaidAdUnit.resizeAd();
+    },
+
+    // Passthrough for pauseAd()
+    pauseVpaidAd: function() {
+        var player = this;
+        player.vpaidAdUnit.pauseAd();
+    },
+
+    // Passthrough for resumeAd()
+    resumeVpaidAd: function() {
+        var player = this;
+        player.vpaidAdUnit.resumeAd();
+    },
+
+    //Passthrough for expandAd()
+    expandVpaidAd: function() {
+        var player = this;
+        player.vpaidAdUnit.expandAd();
+    },
+
+    //Passthrough for collapseAd()
+    collapseVpaidAd: function() {
+        var player = this;
+        player.vpaidAdUnit.collapseAd();
+    }, 
+
+
+    vpaidCallbackListeners: function() {
+        var player = this;
+        
+        //The key of the object is the event name and the value is a reference to the callback function that is registered with the creative
+        var callbacks = {
+            AdStarted : player.onStartVpaidAd,
+            AdStopped : player.onStopVpaidAd,
+            AdSkipped : player.onSkipVpaidAd,
+            AdLoaded : player.onVpaidAdLoaded,
+            AdLinearChange : player.onVpaidAdLinearChange,
+            AdSizeChange : player.onVpaidAdSizeChange,
+            AdExpandedChange : player.onVpaidAdExpandedChange,
+            AdSkippableStateChange : player.onVpaidAdSkippableStateChange,
+            AdDurationChange : player.onVpaidAdDurationChange,
+            AdRemainingTimeChange : player.onVpaidAdRemainingTimeChange,
+            AdVolumeChange : player.onVpaidAdVolumeChange,
+            AdImpression : player.onVpaidAdImpression,
+            AdClickThru : player.onVpaidAdClickThru,
+            AdInteraction : player.onVpaidAdInteraction,
+            AdVideoStart : player.onVpaidAdVideoStart,
+            AdVideoFirstQuartile : player.onVpaidAdVideoFirstQuartile,
+            AdVideoMidpoint : player.onVpaidAdVideoMidpoint,
+            AdVideoThirdQuartile : player.onVpaidAdVideoThirdQuartile,
+            AdVideoComplete : player.onVpaidAdVideoComplete,
+            AdUserAcceptInvitation : player.onVpaidAdUserAcceptInvitation,
+            AdUserMinimize : player.onVpaidAdUserMinimize,
+            AdUserClose : player.onVpaidAdUserClose,
+            AdPaused : player.onVpaidAdPaused,
+            AdPlaying : player.onVpaidAdPlaying,
+            AdError : player.onVpaidAdError,
+            AdLog : player.onVpaidAdLog
+        };
+        
+        // Looping through the object and registering each of the callbacks with the creative
+        for ( var eventName in callbacks) {
+
+            player.vpaidAdUnit.subscribe(callbacks[eventName],
+                    eventName, player);
+
+        }
+        
+    },
+
     renderLinearAd: function (adListId,backupTheVideoTime) {
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
@@ -1194,7 +1457,7 @@ var fluidPlayerClass = {
                     // calls this functions after ad unit is loaded in iframe
                     // our video player support version 2.0 and 1.0 VPAID
                     if (player.vpaidAdUnit.handshakeVersion('2.0') === '2.0' || player.vpaidAdUnit.handshakeVersion('2.0') === '1.0') {
-                    
+                        player.vpaidCallbackListeners();
                         player.vpaidAdUnit.initAd('100%', '100%', 'normal', 0, creativeData, environmentVars);
                     
                     } else {
@@ -1206,8 +1469,6 @@ var fluidPlayerClass = {
                     }
                     
                 };
-
-
 
                 player.switchPlayerToVastMode = function () {
                     //Get the actual duration from the video file if it is not present in the VAST XML
