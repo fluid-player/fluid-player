@@ -1289,7 +1289,7 @@ var fluidPlayerClass = {
         console.log("ad has been loaded");
 
         // start the video play as vpaid is loaded successfully
-        player.resumeVpaidAd();
+        player.startVpaidAd();
     },
 
     // Callback for StartAd()
@@ -1334,7 +1334,7 @@ var fluidPlayerClass = {
     //Passthrough for resizeAd
     resizeVpaidAd: function(width, height, viewMode) {
         var player = this;
-        player.vpaidAdUnit.resizeAd();
+        player.vpaidAdUnit.resizeAd(width, height, viewMode);
     },
 
     // Passthrough for pauseAd()
