@@ -1753,9 +1753,12 @@ var fluidPlayerClass = {
             var onPauseAd = document.getElementById('fluid_nonLinear_' + adListId);
 
             if (onPauseAd && videoPlayerTag.paused) {
-                onPauseAd.style.display = 'flex';
-                player.adList[adListId].played = false;
-                player.trackingOnPauseNonLinearAd(adListId, 'start');
+                // adding some delay before displaying onPauseRoll to prevent miss firing of clickThroughAd
+                setTimeout(function(){
+                    onPauseAd.style.display = 'flex';
+                    player.adList[adListId].played = false;
+                    player.trackingOnPauseNonLinearAd(adListId, 'start');
+                }, 500);
             } else if (onPauseAd && !videoPlayerTag.paused) {
                 onPauseAd.style.display = 'none';
                 player.adFinished = true;
