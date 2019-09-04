@@ -767,11 +767,24 @@ var fluidPlayerClass = {
     playMainVideoWhenVpaidFails: function (errorCode) {
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
+        var vpaidIframe = document.getElementById(player.videoPlayerId +"_fluid_vpaid_iframe");
+        var vpaidSlot = document.getElementById(player.videoPlayerId +"_fluid_vpaid_slot");
 
+        if(vpaidIframe){
+            vpaidIframe.remove();
+        }   
+
+        if (vpaidSlot){
+            vpaidSlot.remove();
+        }
+
+        clearInterval(player.getVPAIDAdInterval);
         player.playMainVideoWhenVastFails(errorCode);
     },
 
     playMainVideoWhenVastFails: function (errorCode) {
+        console.log('playMainVideoWhenVastFails called');
+        
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
@@ -1126,6 +1139,7 @@ var fluidPlayerClass = {
     onVpaidAdError: function(message) {
         var player = this;
         console.log("onAdError: " + message);
+        player.onVpaidEnded();
     },
 
     // Callback for AdLog
@@ -1219,6 +1233,7 @@ var fluidPlayerClass = {
             window.open(player.vastOptions.clickthroughUrl);
         }
 
+        player.pauseVpaidAd();
         // fire click tracking
         player.callUris(player.vastOptions.clicktracking);
     },
@@ -1445,6 +1460,8 @@ var fluidPlayerClass = {
 
                 player.loadVpaid = function (selectedMediaFile) {
 
+                    console.log('loadVpaid is called');
+
                     var player = this;
 
                     var vpaidIframe = document.createElement('iframe');
@@ -1470,17 +1487,21 @@ var fluidPlayerClass = {
                             player.vpaidAdUnit = fn();
                             clearInterval(player.getVPAIDAdInterval);
                             if (player.checkVPAIDInterface(player.vpaidAdUnit)) {
+                                player.isCurrentlyPlayingAd = true;
                                 player.switchPlayerToVpaidMode();
                             }
 
                         } else {
 
+                            // video player will wait for 1.5s if vpaid is not loaded the it will move ahead
                             player.tempVpaidCounter++;
                             if (player.tempVpaidCounter >= 15) {
                                 clearInterval(player.getVPAIDAdInterval);
                                 player.adList[adListId].error = true;
                                 player.playMainVideoWhenVpaidFails(403);
                                 return false;
+                            } else {
+                                console.log(player.tempVpaidCounter);
                             }
 
                         }
@@ -1490,6 +1511,8 @@ var fluidPlayerClass = {
                 };
 
                 player.switchPlayerToVpaidMode = function () {
+
+                    console.log('starting function switchPlayerToVpaidMode');
 
                     var player = this;
                     var vpaidIframe = player.videoPlayerId +"_fluid_vpaid_iframe";
@@ -1618,10 +1641,8 @@ var fluidPlayerClass = {
 
                 } else if (selectedMediaFile.apiFramework === 'VPAID') {
 
-                    player.loadVpaid(selectedMediaFile);
-
                     videoPlayerTag.src = fluidPlayerScriptLocation + 'blank.mp4';
-                    player.isCurrentlyPlayingAd = true;
+                    player.loadVpaid(selectedMediaFile);
 
                     if (player.displayOptions.vastOptions.showProgressbarMarkers) {
                         player.hideAdMarkers();
@@ -2413,6 +2434,9 @@ var fluidPlayerClass = {
     },
 
     switchToMainVideo: function () {
+
+        console.log('starting main video');
+
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
@@ -2529,6 +2553,8 @@ var fluidPlayerClass = {
     },
 
     onMainVideoEnded: function () {
+
+        console.log('onMainVideoEnded is called');
         var videoPlayerTag = this;
         var player = fluidPlayerClass.getInstanceById(this.id);
         if (player.isCurrentlyPlayingAd && player.autoplayAfterAd) {  // It may be in-stream ending, and if it's not postroll then we don't execute anything
