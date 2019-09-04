@@ -1329,6 +1329,7 @@ var fluidPlayerClass = {
     // Callback for AdUserClose
     onSkipVpaidAd: function() {
         console.log("Ad was skipped");
+        player.onVpaidEnded();
     },
     
     // Passthrough for setAdVolume
@@ -1641,7 +1642,7 @@ var fluidPlayerClass = {
 
                 } else if (selectedMediaFile.apiFramework === 'VPAID') {
 
-                    videoPlayerTag.src = fluidPlayerScriptLocation + 'blank.mp4';
+                    //videoPlayerTag.src = fluidPlayerScriptLocation + 'blank.mp4';
                     player.loadVpaid(selectedMediaFile);
 
                     if (player.displayOptions.vastOptions.showProgressbarMarkers) {
