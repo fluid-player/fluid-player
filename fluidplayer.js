@@ -939,7 +939,7 @@ var fluidPlayerClass = {
             } else {
                 // when vast failed
 
-                player.stopProcessAndReportError(vastTag);
+                player.reportError('101');
 
                 if (vastObj.hasOwnProperty('fallbackVastTags') && vastObj.fallbackVastTags.length > 0) {
                     vastTag = vastObj.fallbackVastTags.shift();
@@ -1058,10 +1058,10 @@ var fluidPlayerClass = {
      *
      * @param adListId
      */
-    stopProcessAndReportError: function (vastTag) {
+    reportError: function (errorCode) {
         var player = this;
 
-        player.announceLocalError(101);
+        player.announceLocalError(errorCode);
     },
 
     backupMainVideoContentTime: function (adListId) {
@@ -1210,6 +1210,7 @@ var fluidPlayerClass = {
 
     // Callback for AdClickThru
     onVpaidAdClickThru: function(url, id, playerHandles) {
+        var player = this;
         console.log("Clickthrough portion of the ad was clicked");
 
         // if playerHandles flag is set to true
@@ -1218,8 +1219,7 @@ var fluidPlayerClass = {
             window.open(player.vastOptions.clickthroughUrl);
         }
 
-        // fire click tracking 
-        var player = this;
+        // fire click tracking
         player.callUris(player.vastOptions.clicktracking);
     },
 
@@ -1305,7 +1305,10 @@ var fluidPlayerClass = {
        
     // Callback for AdUserClose
     onStopVpaidAd: function() {
+        var player = this;
+
         console.log("Ad has stopped");
+        player.onVpaidEnded();
     },
        
     // Callback for AdUserClose
@@ -1361,6 +1364,25 @@ var fluidPlayerClass = {
         player.vpaidAdUnit.collapseAd();
     }, 
 
+
+    vpaidTimeoutTimerEnd: function () {
+        var player = this;
+        if (player.vpaidTimer){
+            clearTimeout(player.vpaidTimer);
+        }
+    },
+
+    // placeholder for timer function
+    vpaidTimeoutTimerStart: function () {
+        var player = this;
+
+        // clear previous timer if any
+        player.vpaidTimeoutTimerEnd();
+        player.vpaidTimer = setTimeout(function() {
+            player.reportError('901');
+            player.onVpaidEnded();
+        },player.displayOptions.vastOptions.vpaidTimeout);
+    },
 
     vpaidCallbackListenersAttach: function() {
         var player = this;
@@ -2467,12 +2489,30 @@ var fluidPlayerClass = {
         return adListId;
     },
 
+
+    onVpaidEnded: function () {
+        var player = this;
+        var vpaidIframe = document.getElementById(player.videoPlayerId +"_fluid_vpaid_iframe");
+        var vpaidSlot = document.getElementById(player.videoPlayerId +"_fluid_vpaid_slot");
+
+        clearInterval(player.getVPAIDAdInterval);
+        vpaidIframe.remove();
+        vpaidSlot.remove();
+
+        player.checkForNextAd();
+    },
+
     onVastAdEnded: function () {
         //"this" is the HTML5 video tag, because it disptches the "ended" event
         var player = fluidPlayerClass.getInstanceById(this.id);
-        var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
         player.deleteVastAdElements();
+        player.checkForNextAd();
+    },
+
+    checkForNextAd: function () {
+        var player = this;
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
         var availableNextAdID = player.getNextAdPod();
         if (availableNextAdID === null) {
@@ -2486,7 +2526,6 @@ var fluidPlayerClass = {
             player.adFinished = true;
             player.renderLinearAd(availableNextAdID,false); // passing false so it doesn't backup the Ad playbacktime as video playback time
         }
-
     },
 
     onMainVideoEnded: function () {
@@ -5485,6 +5524,7 @@ var fluidPlayerClass = {
         videoPlayer.setAttribute('playsinline', '');
         videoPlayer.setAttribute('webkit-playsinline', '');
 
+        player.vpaidTimer              = null;
         player.vpaidAdUnit             = null;
         player.vastOptions             = null;
         player.videoPlayerId           = idVideoPlayer;
@@ -5618,6 +5658,7 @@ var fluidPlayerClass = {
                 showProgressbarMarkers:       false,
                 showPlayButton:               false,
                 maxAllowedVastTagRedirects:   3,
+                vpaidTimeout              :   3000,
 
                 vastAdvanced: {
                     vastLoadedCallback:       (function () {}),
