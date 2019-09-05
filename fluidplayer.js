@@ -885,6 +885,7 @@ var fluidPlayerClass = {
 
                     //Set initial values
                     tmpOptions.adType = 'nonLinear';
+                    tmpOptions.vpaid = false;
 
                     //Extract the necessary data from the NonLinear node
                     tmpOptions.clickthroughUrl = player.getClickThroughUrlFromNonLinear(creativeNonLinear);
@@ -892,6 +893,12 @@ var fluidPlayerClass = {
                     tmpOptions.dimension = player.getDimensionFromNonLinear(creativeNonLinear); // VAST version < 4.0
                     tmpOptions.staticResource = player.getStaticResourceFromNonLinear(creativeNonLinear);
                     tmpOptions.creativeType = player.getCreativeTypeFromStaticResources(creativeNonLinear);
+                    tmpOptions.adParameters = player.getAdParametersFromLinear(creativeNonLinear);
+
+                    if (tmpOptions.adParameters) {
+                        tmpOptions.vpaid = true;
+                    }
+
                 }
             }
 
@@ -1962,11 +1969,12 @@ var fluidPlayerClass = {
                 if (currentTime >= (duration - 1 )) {
                     player.adFinished = true;
                 }
+
             }
+
         }, 400);
 
-
-        time = parseInt(player.getCurrentTime()) + parseInt(duration);
+        var time = parseInt(player.getCurrentTime()) + parseInt(duration);
         player.scheduleTask({time: time, closeStaticAd: adListId});
     },
 
@@ -2300,8 +2308,8 @@ var fluidPlayerClass = {
                 return;
             }
 
-            var linearAdExists = document.getElementsByClassName('fluid_nonLinear_ad')[0];
-            if (!linearAdExists) {
+            var nonLinearAdExists = document.getElementsByClassName('fluid_nonLinear_ad')[0];
+            if (!nonLinearAdExists) {
                 player.createBoard(adListId);
                 player.currentOnPauseRollAd = adListId;
                 onPauseAd = document.getElementById('fluid_nonLinear_' + adListId);
@@ -2448,7 +2456,7 @@ var fluidPlayerClass = {
                         player.hideAdMarker(adListId);
                     }
 
-                    // delete linear after playing
+                    // delete nonLinear after playing
                     player.timerPool[keyTime]['nonLinear'].splice(index, 1);
 
                     // return after starting non-linear ad, so multiple non-linear will not overlap
