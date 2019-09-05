@@ -1243,8 +1243,10 @@ var fluidPlayerClass = {
     // Callback for AdImpression
     onVpaidAdImpression: function() {
         var player = this;
-
         console.log("Ad Impression");
+
+        //Announce the impressions
+        player.trackSingleEvent('impression');
     },
 
     // Callback for AdClickThru
@@ -1621,9 +1623,6 @@ var fluidPlayerClass = {
                         player.adList[adListId].played = true;
                         player.adFinished = false;
 
-                        //Announce the impressions
-                        player.trackSingleEvent('impression');
-
                     } else {
 
                         player.adList[adListId].error = true;
@@ -1714,7 +1713,6 @@ var fluidPlayerClass = {
 
                 } else if (selectedMediaFile.apiFramework === 'VPAID') {
 
-                    //videoPlayerTag.src = fluidPlayerScriptLocation + 'blank.mp4';
                     player.loadVpaid(selectedMediaFile);
 
                     if (player.displayOptions.vastOptions.showProgressbarMarkers) {
