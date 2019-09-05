@@ -854,6 +854,7 @@ var fluidPlayerClass = {
                     //Set initial values
                     tmpOptions.adFinished = false;
                     tmpOptions.adType = 'linear';
+                    tmpOptions.vpaid = false;
 
                     //Extract the necessary data from the Linear node
                     tmpOptions.skipoffset = player.convertTimeStringToSeconds(creativeLinear.getAttribute('skipoffset'));
@@ -862,6 +863,10 @@ var fluidPlayerClass = {
                     tmpOptions.mediaFileList = player.getMediaFileListFromLinear(creativeLinear);
                     tmpOptions.adParameters = player.getAdParametersFromLinear(creativeLinear);
                     tmpOptions.iconClick = player.getIconClickThroughFromLinear(creativeLinear);
+
+                    if (tmpOptions.adParameters) {
+                        tmpOptions.vpaid = true;
+                    }
                 }
             }
 
@@ -1121,66 +1126,79 @@ var fluidPlayerClass = {
         }
 
             return false;
-    },   
-
+    },
+    
     // Callback for AdPaused 
     onVpaidAdPaused: function() {
         var player = this;
+
+        player.vpaidTimeoutTimerClear();
         console.log("onAdPaused");
     },
 
     // Callback for AdPlaying
     onVpaidAdPlaying: function() {
         var player = this;
+
+        player.vpaidTimeoutTimerClear();
         console.log("onAdPlaying");
     },
 
     // Callback for AdError
     onVpaidAdError: function(message) {
         var player = this;
+
         console.log("onAdError: " + message);
+        player.vpaidTimeoutTimerClear();
         player.onVpaidEnded();
     },
 
     // Callback for AdLog
     onVpaidAdLog: function(message) {
         var player = this;
+
         console.log("onAdLog: " + message);
     },
 
     // Callback for AdUserAcceptInvitation
     onVpaidAdUserAcceptInvitation: function() {
         var player = this;
+
         console.log("onAdUserAcceptInvitation");
     },
 
     // Callback for AdUserMinimize
     onVpaidAdUserMinimize: function() {
         var player = this;
+
         console.log("onAdUserMinimize");
     },
 
     // Callback for AdUserClose
     onVpaidAdUserClose: function() {
         var player = this;
+
         console.log("onAdUserClose");
     },
 
     // Callback for AdUserClose
     onVpaidAdSkippableStateChange: function() {
         var player = this;
+
         console.log("Ad Skippable State Changed to: " + player.vpaidAdUnit.getAdSkippableState());
     },
 
     // Callback for AdUserClose
     onVpaidAdExpandedChange: function() {
         var player = this;
+
         console.log("Ad Expanded Changed to: " + player.vpaidAdUnit.getAdExpanded());
     },
 
     // Pass through for getAdExpanded
     getVpaidAdExpanded: function() {
         var player = this;
+
         console.log("getAdExpanded");
         return player.vpaidAdUnit.getAdExpanded();
     },
@@ -1188,6 +1206,7 @@ var fluidPlayerClass = {
     // Pass through for getAdSkippableState
     getVpaidAdSkippableState: function() {
         var player = this;
+
         console.log("getAdSkippableState");
         return player.vpaidAdUnit.getAdSkippableState();
     },
@@ -1195,30 +1214,36 @@ var fluidPlayerClass = {
     // Callback for AdSizeChange
     onVpaidAdSizeChange: function() {
         var player = this;
+
         console.log("Ad size changed to: w=" + player.vpaidAdUnit.getAdWidth() + " h=" + player.vpaidAdUnit.getAdHeight());
     },
 
     // Callback for AdDurationChange
     onVpaidAdDurationChange: function() {
         var player = this;
+
         console.log("Ad Duration Changed to: " + player.vpaidAdUnit.getAdDuration());
     },
 
     // Callback for AdRemainingTimeChange
     onVpaidAdRemainingTimeChange: function() {
         var player = this;
+
         console.log("Ad Remaining Time Changed to: " + player.vpaidAdUnit.getAdRemainingTime());
     },
 
     // Pass through for getAdRemainingTime
     getVpaidAdRemainingTime: function() {
         var player = this;
+
         console.log("getAdRemainingTime");
         return player.vpaidAdUnit.getAdRemainingTime();
     },
 
     // Callback for AdImpression
     onVpaidAdImpression: function() {
+        var player = this;
+
         console.log("Ad Impression");
     },
 
@@ -1240,12 +1265,15 @@ var fluidPlayerClass = {
 
     // Callback for AdInteraction
     onVpaidAdInteraction: function(id) {
+        var player = this;
+
         console.log("A non-clickthrough event has occured");
     },
 
     // Callback for AdUserClose
     onVpaidAdVideoStart: function() {
         var player = this;
+
         console.log("Video 0% completed");
         player.trackSingleEvent('start');
     },
@@ -1253,6 +1281,7 @@ var fluidPlayerClass = {
     // Callback for AdUserClose
     onVpaidAdVideoFirstQuartile: function() {
         var player = this;
+
         console.log("Video 25% completed");
         player.trackSingleEvent('firstQuartile');
     },
@@ -1260,6 +1289,7 @@ var fluidPlayerClass = {
     // Callback for AdUserClose
     onVpaidAdVideoMidpoint: function() {
         var player = this;
+
         console.log("Video 50% completed");
         player.trackSingleEvent('midpoint');
     },
@@ -1267,6 +1297,7 @@ var fluidPlayerClass = {
     // Callback for AdUserClose
     onVpaidAdVideoThirdQuartile: function() {
         var player = this;
+
         console.log("Video 75% completed");
         player.trackSingleEvent('thirdQuartile');
     },
@@ -1274,6 +1305,7 @@ var fluidPlayerClass = {
     // Callback for AdVideoComplete
     onVpaidAdVideoComplete: function() {
         var player = this;
+
         console.log("Video 100% completed");
         player.trackSingleEvent('complete');
     },
@@ -1281,12 +1313,14 @@ var fluidPlayerClass = {
     // Callback for AdLinearChange
     onVpaidAdLinearChange: function() {
         var player = this;
+
         console.log("Ad linear has changed: " + player.vpaidAdUnit.getAdLinear());
     },
 
     // Pass through for getAdLinear
     getVpaidAdLinear: function() {
         var player = this;
+
         console.log("getAdLinear");
         return player.vpaidAdUnit.getAdLinear();
     },
@@ -1294,7 +1328,9 @@ var fluidPlayerClass = {
     // Pass through for startAd()
     startVpaidAd: function() {
         var player = this;
+
         console.log("startAd");
+        player.vpaidTimeoutTimerStart();
         player.vpaidAdUnit.startAd();
     },
 
@@ -1304,17 +1340,24 @@ var fluidPlayerClass = {
         console.log("ad has been loaded");
 
         // start the video play as vpaid is loaded successfully
+        player.vpaidTimeoutTimerClear();
         player.startVpaidAd();
+
     },
 
     // Callback for StartAd()
     onStartVpaidAd: function() {
+        var player = this;
+
         console.log("Ad has started");
+        player.vpaidTimeoutTimerClear();
     },
 
     // Pass through for stopAd()
     stopVpaidAd: function() {
         var player = this;
+
+        player.vpaidTimeoutTimerStart();
         player.vpaidAdUnit.stopAd();
     },
        
@@ -1323,67 +1366,89 @@ var fluidPlayerClass = {
         var player = this;
 
         console.log("Ad has stopped");
+        player.vpaidTimeoutTimerClear();
         player.onVpaidEnded();
     },
        
     // Callback for AdUserClose
     onSkipVpaidAd: function() {
+        var player = this;
         console.log("Ad was skipped");
+
+        player.vpaidTimeoutTimerClear();
         player.onVpaidEnded();
     },
-    
+
+    // Passthrough for skipAd
+    skipVpaidAd: function() {
+        var player = this;
+
+        player.vpaidTimeoutTimerStart();
+        player.vpaidAdUnit.skipAd();
+    },
+
     // Passthrough for setAdVolume
     setVpaidAdVolume: function(val) {
         var player = this;
+
         player.vpaidAdUnit.setAdVolume(val);
     },
        
     // Passthrough for getAdVolume
     getVpaidAdVolume: function() {
         var player = this;
+
         return player.vpaidAdUnit.getAdVolume();
     },
 
     // Callback for AdVolumeChange
     onVpaidAdVolumeChange: function() {
         var player = this;
+
         console.log("Ad Volume has changed to - " + player.vpaidAdUnit.getAdVolume());
     },
 
     //Passthrough for resizeAd
     resizeVpaidAd: function(width, height, viewMode) {
         var player = this;
+
         player.vpaidAdUnit.resizeAd(width, height, viewMode);
     },
 
     // Passthrough for pauseAd()
     pauseVpaidAd: function() {
         var player = this;
+
+        player.vpaidTimeoutTimerStart();
         player.vpaidAdUnit.pauseAd();
     },
 
     // Passthrough for resumeAd()
     resumeVpaidAd: function() {
         var player = this;
+
+        player.vpaidTimeoutTimerStart();
         player.vpaidAdUnit.resumeAd();
     },
 
     //Passthrough for expandAd()
     expandVpaidAd: function() {
         var player = this;
+
         player.vpaidAdUnit.expandAd();
     },
 
     //Passthrough for collapseAd()
     collapseVpaidAd: function() {
         var player = this;
+
         player.vpaidAdUnit.collapseAd();
     }, 
 
-
-    vpaidTimeoutTimerEnd: function () {
+    vpaidTimeoutTimerClear: function () {
         var player = this;
-        if (player.vpaidTimer){
+
+        if (player.vpaidTimer) {
             clearTimeout(player.vpaidTimer);
         }
     },
@@ -1393,7 +1458,7 @@ var fluidPlayerClass = {
         var player = this;
 
         // clear previous timer if any
-        player.vpaidTimeoutTimerEnd();
+        player.vpaidTimeoutTimerClear();
         player.vpaidTimer = setTimeout(function() {
             player.reportError('901');
             player.onVpaidEnded();
@@ -1536,6 +1601,13 @@ var fluidPlayerClass = {
                     // calls this functions after ad unit is loaded in iframe
                     // our video player support version 2.0 and 1.0 VPAID
                     if (player.vpaidAdUnit.handshakeVersion('2.0') === '2.0' || player.vpaidAdUnit.handshakeVersion('2.0') === '1.0') {
+
+                        if (player.vastOptions.skipoffset !== false) {
+                            player.addSkipButton();
+                        }
+    
+                        videoPlayerTag.loop = false;
+                        videoPlayerTag.removeAttribute('controls'); //Remove the default Controls
 
                         player.vpaidCallbackListenersAttach();
                         player.vpaidAdUnit.initAd('100%', '100%', 'normal', 0, creativeData, environmentVars);
@@ -2849,6 +2921,12 @@ var fluidPlayerClass = {
         var event = document.createEvent('Event');
         event.initEvent('ended', false, true);
         document.getElementById(this.videoPlayerId).dispatchEvent(event);
+
+        var player = fluidPlayerClass.getInstanceById(this.videoPlayerId);
+        if (player.vastOptions.vpaid) {
+            player.skipVpaidAd();
+        }
+
     },
 
     removeSkipButton: function () {
@@ -3834,14 +3912,31 @@ var fluidPlayerClass = {
 
 
             if (videoPlayerTag.paused) {
-                if (player.dashPlayer) {
-                    player.dashPlayer.play();
+
+                if (player.isCurrentlyPlayingAd && player.vastOptions.vpaid) {
+                    // resume the vpaid linear ad
+                    player.resumeVpaidAd();
                 } else {
-                    videoPlayerTag.play();
+                    // resume the regular linear vast or content video player
+                    if (player.dashPlayer) {
+                        player.dashPlayer.play();
+                    } else {
+                        videoPlayerTag.play();
+                    }
                 }
+
                 this.playPauseAnimationToggle(true);
+
             } else if (!isFirstStart) {
-                videoPlayerTag.pause();
+
+                if (player.isCurrentlyPlayingAd && player.vastOptions.vpaid){
+                    // pause the vpaid linear ad
+                    player.pauseVpaidAd();
+                } else {
+                    // pause the regular linear vast or content video player
+                    videoPlayerTag.pause();
+                }
+
                 this.playPauseAnimationToggle(false);
             }
 
