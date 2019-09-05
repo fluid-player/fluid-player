@@ -1561,9 +1561,9 @@ var fluidPlayerClass = {
 
                         } else {
 
-                            // video player will wait for 1.5s if vpaid is not loaded the it will move ahead
+                            // video player will wait for 2seconds if vpaid is not loaded, then it will declare vast error and move ahead
                             player.tempVpaidCounter++;
-                            if (player.tempVpaidCounter >= 15) {
+                            if (player.tempVpaidCounter >= 20) {
                                 clearInterval(player.getVPAIDAdInterval);
                                 player.adList[adListId].error = true;
                                 player.playMainVideoWhenVpaidFails(403);
@@ -2911,18 +2911,26 @@ var fluidPlayerClass = {
     },
 
     pressSkipButton: function () {
+
         this.removeSkipButton();
         this.removeAdPlayingText();
         this.removeCTAButton();
-        this.displayOptions.vastOptions.vastAdvanced.vastVideoSkippedCallback();
-
-        var event = document.createEvent('Event');
-        event.initEvent('ended', false, true);
-        document.getElementById(this.videoPlayerId).dispatchEvent(event);
 
         var player = fluidPlayerClass.getInstanceById(this.videoPlayerId);
+        
         if (player.vastOptions.vpaid) {
+
+            // skip the linear vpaid ad
             player.skipVpaidAd();
+
+        } else {
+
+            // skip the regular linear vast
+            this.displayOptions.vastOptions.vastAdvanced.vastVideoSkippedCallback();
+            var event = document.createEvent('Event');
+            event.initEvent('ended', false, true);
+            document.getElementById(this.videoPlayerId).dispatchEvent(event);
+
         }
 
     },
