@@ -1270,7 +1270,7 @@ var fluidPlayerClass = {
         console.log("A non-clickthrough event has occured");
     },
 
-    // Callback for AdUserClose
+    // Callback for AdVideoStart
     onVpaidAdVideoStart: function() {
         var player = this;
 
