@@ -1369,6 +1369,30 @@ var fluidPlayerClass = {
         player.vpaidTimeoutTimerStart();
         player.vpaidAdUnit.stopAd();
     },
+
+    // Pass through for stopAd()
+    hardStopVpaidAd: function(deleteOtherVpaidAdsApart) {
+        // this is hard stop of vpaid ads
+        // we delete all the vpaid assets so the new one can be loaded
+        // delete all assets apart from the ad from deleteOtherVpaidAdsApart
+        var player = this;
+        
+        var vpaidIframes = document.getElementsByClassName("fluid_vpaid_iframe");
+        var vpaidSlots = document.getElementsByClassName("fluid_vpaid_slot");
+        
+        for (var i = 0; i< vpaidIframes.length; i++){
+            vpaidIframes[i].remove();
+        }
+
+        for (var j = 0; j< vpaidSlots.length; j++){
+            vpaidSlots[i].remove();
+        }
+
+        if (player.vpaidAdUnit) {
+            player.vpaidAdUnit.stopAd();
+        }
+
+    },
        
     // Callback for AdUserClose
     onStopVpaidAd: function() {
@@ -1542,6 +1566,7 @@ var fluidPlayerClass = {
                     var vpaidIframe = document.createElement('iframe');
                     vpaidIframe.id = player.videoPlayerId +"_fluid_vpaid_iframe";
                     vpaidIframe.className = 'fluid_vpaid_iframe';
+                    vpaidIframe.setAttribute('adListId', adListId);
                     vpaidIframe.setAttribute('frameborder', '0');
 
                     videoPlayerTag.parentNode.insertBefore(vpaidIframe, videoPlayerTag.nextSibling);
@@ -1558,6 +1583,11 @@ var fluidPlayerClass = {
 
                         // check if JS is loaded fully in iframe
                         if (fn && typeof fn == 'function') {
+
+                            if (player.vpaidAdUnit) {
+                                var deleteOtherVpaidAdsApart = adListId;
+                                player.hardStopVpaidAd(deleteOtherVpaidAdsApart);
+                            }
 
                             player.vpaidAdUnit = fn();
                             clearInterval(player.getVPAIDAdInterval);
@@ -1735,6 +1765,7 @@ var fluidPlayerClass = {
              * Sends requests to the tracking URIs
              */
             var videoPlayerTimeUpdate = function () {
+
                 if (player.adFinished) {
                     videoPlayerTag.removeEventListener('timeupdate', videoPlayerTimeUpdate);
                     return;
@@ -1749,6 +1780,7 @@ var fluidPlayerClass = {
                     videoPlayerTag.removeEventListener('timeupdate', videoPlayerTimeUpdate);
                     player.adFinished = true;
                 }
+
             };
 
             playVideoPlayer(adListId);
@@ -2308,6 +2340,7 @@ var fluidPlayerClass = {
                 return;
             }
 
+            //var playerWrapper = document.getElementById('fluid_video_wrapper_' + player.videoPlayerId);
             var nonLinearAdExists = document.getElementsByClassName('fluid_nonLinear_ad')[0];
             if (!nonLinearAdExists) {
                 player.createBoard(adListId);
@@ -3887,6 +3920,12 @@ var fluidPlayerClass = {
         var player = fluidPlayerClass.getInstanceById(videoPlayerTag.id);
 
         videoPlayerTag.addEventListener('playing', function () {
+            player.toggleLoader(false);
+        });
+
+        videoPlayerTag.addEventListener('timeupdate', function () {
+            // some places we are manually displaying toggleLoader
+            // user experience toggleLoader being displayed even when content is playing in background
             player.toggleLoader(false);
         });
 
