@@ -262,6 +262,7 @@
     background-size: 18px 18px;
     cursor: pointer;
     padding: 1px;
+    z-index: 1;
 }
 
 .close_button:hover {
@@ -438,6 +439,7 @@
     width: 100%;
     height: 100%;
     left: 0;
+    z-index: -10;
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .fluid_vpaid_slot {
@@ -978,6 +980,29 @@ _:-ms-lang(x),
 .fluid_nonLinear_bottom {
     bottom: 50px;
     transform: translate(-50%);
+}
+
+.fluid_vpaidNonLinear_top, .fluid_vpaidNonLinear_middle, .fluid_vpaidNonLinear_bottom {
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    vertical-align: middle;
+    align-content: center;
+    position: absolute;
+    z-index: 20;
+}
+
+.fluid_vpaidNonLinear_top {
+    top: 20px;
+}
+
+.fluid_vpaidNonLinear_middle {
+    top: 50%;
+}
+
+.fluid_vpaidNonLinear_bottom {
+    bottom: 50px;
 }
 
 .add_icon_clickthrough {
