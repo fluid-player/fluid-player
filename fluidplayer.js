@@ -2288,7 +2288,7 @@ var fluidPlayerClass = {
         // create nonLinear Vpaid
         // create nonLinear regular
         if (vastSettings.vpaid) {
-
+            player.hardStopVpaidAd('');
             player.createVpaidNonLinearBoard(adListId);
 
         } else {
