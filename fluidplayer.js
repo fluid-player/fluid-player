@@ -1105,6 +1105,12 @@ var fluidPlayerClass = {
                 player.autoplayAfterAd = false;
                 videoPlayerTag.currentTime = player.mainVideoDuration;
                 break;
+            
+            case 'preRoll':
+                if (videoPlayerTag.currentTime > 0) {
+                    videoPlayerTag.mainVideoCurrentTime = videoPlayerTag.currentTime - 1;
+                }
+                break;
         }
     },
 
@@ -1323,7 +1329,33 @@ var fluidPlayerClass = {
     onVpaidAdLinearChange: function() {
         var player = this;
 
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);
+        var vpaidNonLinearSlot = document.getElementsByClassName("fluid_vpaidNonLinear_ad")[0];
+        var closeBtn = document.getElementById('close_button_' + player.videoPlayerId);
+        var adListId = vpaidNonLinearSlot.getAttribute('adlistid');
         console.log("Ad linear has changed: " + player.vpaidAdUnit.getAdLinear());
+
+
+        player.backupMainVideoContentTime(adListId);
+        player.isCurrentlyPlayingAd = true;
+
+        if (closeBtn) {
+            closeBtn.remove();
+        }
+
+        vpaidNonLinearSlot.className = 'fluid_vpaid_slot';
+        vpaidNonLinearSlot.id = player.videoPlayerId +"_fluid_vpaid_slot";
+
+        videoPlayerTag.loop = false;
+        videoPlayerTag.removeAttribute('controls'); //Remove the default Controls
+     
+        var progressbarContainer = document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container');
+        if (progressbarContainer !== null) {
+            document.getElementById(player.videoPlayerId + '_vast_control_currentprogress').style.backgroundColor = player.displayOptions.layoutControls.adProgressColor;
+        }
+
+        player.toggleLoader(false);
+
     },
 
     // Pass through for getAdLinear
