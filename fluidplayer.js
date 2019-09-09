@@ -770,6 +770,7 @@ var fluidPlayerClass = {
         var vpaidIframe = document.getElementById(player.videoPlayerId +"_fluid_vpaid_iframe");
         var vpaidSlot = document.getElementById(player.videoPlayerId +"_fluid_vpaid_slot");
 
+
         if(vpaidIframe){
             vpaidIframe.remove();
         }   
@@ -1335,27 +1336,27 @@ var fluidPlayerClass = {
         var adListId = vpaidNonLinearSlot.getAttribute('adlistid');
         console.log("Ad linear has changed: " + player.vpaidAdUnit.getAdLinear());
 
-
-        player.backupMainVideoContentTime(adListId);
-        player.isCurrentlyPlayingAd = true;
-
-        if (closeBtn) {
-            closeBtn.remove();
+        if (player.vpaidAdUnit.getAdLinear()) {
+            player.backupMainVideoContentTime(adListId);
+            player.isCurrentlyPlayingAd = true;
+    
+            if (closeBtn) {
+                closeBtn.remove();
+            }
+    
+            vpaidNonLinearSlot.className = 'fluid_vpaid_slot';
+            vpaidNonLinearSlot.id = player.videoPlayerId +"_fluid_vpaid_slot";
+    
+            videoPlayerTag.loop = false;
+            videoPlayerTag.removeAttribute('controls'); //Remove the default Controls
+         
+            var progressbarContainer = document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container');
+            if (progressbarContainer !== null) {
+                document.getElementById(player.videoPlayerId + '_vast_control_currentprogress').style.backgroundColor = player.displayOptions.layoutControls.adProgressColor;
+            }
+    
+            player.toggleLoader(false);
         }
-
-        vpaidNonLinearSlot.className = 'fluid_vpaid_slot';
-        vpaidNonLinearSlot.id = player.videoPlayerId +"_fluid_vpaid_slot";
-
-        videoPlayerTag.loop = false;
-        videoPlayerTag.removeAttribute('controls'); //Remove the default Controls
-     
-        var progressbarContainer = document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container');
-        if (progressbarContainer !== null) {
-            document.getElementById(player.videoPlayerId + '_vast_control_currentprogress').style.backgroundColor = player.displayOptions.layoutControls.adProgressColor;
-        }
-
-        player.toggleLoader(false);
-
     },
 
     // Pass through for getAdLinear
@@ -1869,7 +1870,7 @@ var fluidPlayerClass = {
         if (mediaFiles.length) {
             for (var i = 0; i < mediaFiles.length; i++) {
 
-                if (!mediaFiles[i].apiFramework) {
+                if (mediaFiles[i].apiFramework !== 'VPAID') {
                     var supportLevel = this.getMediaFileTypeSupportLevel(mediaFiles[i]['type']);
                 
                     if (supportLevel === "maybe" || supportLevel === "probably") {
