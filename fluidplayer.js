@@ -475,8 +475,6 @@ var fluidPlayerClass = {
 
         if (iconClickThrough.length) {
             return this.extractNodeData(iconClickThrough[0]);
-        } else {
-            this.displayOptions.vastOptions.adCTAText = false;
         }
 
         return '';
@@ -4276,27 +4274,6 @@ var fluidPlayerClass = {
 
         return joystickButton;
     },
-
-    // carboardGetCurrentPosition: function () {
-    //     var player = this;
-
-    //     var intersects, point, panoramaWorldPosition, outputPosition;
-    //     intersects = player.vrViewer.raycaster.intersectObject( player.vrViewer.panorama, true );
-
-    //     if ( intersects.length > 0 ) {
-    //         point = player.vrViewer.getCamera().position;
-    //         panoramaWorldPosition = player.vrViewer.panorama.getWorldPosition();
-
-    //         // Panorama is scaled -1 on X axis
-    //         outputPosition = new THREE.Vector3(
-    //             -parseFloat((point.x - panoramaWorldPosition.x)),
-    //             parseFloat((point.y - panoramaWorldPosition.y)),
-    //             parseFloat((point.z - panoramaWorldPosition.z))
-    //         );
-    //     }
-
-    //     return outputPosition;
-    // },
 
     cardboardRotateLeftRight: function (param /* 0 - right, 1 - left */) {
         var player = this;
