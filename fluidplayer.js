@@ -5474,6 +5474,14 @@ var fluidPlayerClass = {
                     functionCall();
                 });
                 break;
+            case 'timeupdate':
+                videoPlayer.addEventListener('timeupdate', function(){
+                    var currentTime = videoPlayer.currentTime;
+                    var duration = videoPlayer.duration;
+                    var isCurrentlyPlayingAd = player.isCurrentlyPlayingAd;
+                    functionCall(currentTime, duration, isCurrentlyPlayingAd);
+                });
+                break;
             default:
                 console.log('[FP_ERROR] Event not recognised');
                 break;
