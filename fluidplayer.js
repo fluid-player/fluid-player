@@ -105,6 +105,8 @@ var fluidPlayerClass = {
     dashJsScript: '/scripts/dash.min.js',
     vttParserScript: '/scripts/webvtt.min.js',
     subtitlesParseScript: '/scripts/vtt.js',
+    panolensScript: '/scripts/panolens.min.js',
+    threeJsScript: '/scripts/three.min.js',
     instances: [],
     notCloned: ['notCloned', 'vttParserScript', 'instances', 'getInstanceById',
         'requestStylesheet', 'reqiestScript', 'isTouchDevice', 'vastOptions',
@@ -451,9 +453,16 @@ var fluidPlayerClass = {
         var mediaFiles = this.getMediaFilesFromLinear(linear);
         if (mediaFiles.length) {
             for (var n = 0; n < mediaFiles.length; n++) {
+
+                var mediaType = mediaFiles[n].getAttribute('mediaType');
+                if(!mediaType){
+                    mediaType = '2d';
+                }
+
                 mediaFileList.push({
                     'src': this.extractNodeData(mediaFiles[n]),
-                    'type': mediaFiles[n].getAttribute('type')
+                    'type': mediaFiles[n].getAttribute('type'),
+                    'mediaType': mediaType.toLowerCase()
                 });
             }
         }
@@ -466,8 +475,6 @@ var fluidPlayerClass = {
 
         if (iconClickThrough.length) {
             return this.extractNodeData(iconClickThrough[0]);
-        } else {
-            this.displayOptions.vastOptions.adCTAText = false;
         }
 
         return '';
@@ -878,13 +885,20 @@ var fluidPlayerClass = {
                 // ok
 
                 if (tmpOptions.adType === 'linear') {
+
                     if ((typeof tmpOptions.iconClick !== 'undefined') && (tmpOptions.iconClick !== null) && tmpOptions.iconClick.length) {
                         player.adList[adListId].landingPage = tmpOptions.iconClick;
                     }
+
+                    var selectedMediaFile = player.getSupportedMediaFile(tmpOptions.mediaFileList);
+                    if (selectedMediaFile) {
+                        player.adList[adListId].mediaType = selectedMediaFile.mediaType;
+                    }
+
                 }
 
                 player.adList[adListId].adType = tmpOptions.adType ? tmpOptions.adType : 'unknown';
-
+                
                 player.adList[adListId].vastLoaded = true;
                 player.adPool[adListId] = Object.assign({}, tmpOptions);
                 var event = document.createEvent('Event');
@@ -1054,30 +1068,44 @@ var fluidPlayerClass = {
             //get the proper ad
             player.vastOptions = player.adPool[adListId];
 
-            if (backupTheVideoTime) {
+            if ( backupTheVideoTime ) {
                 player.backupMainVideoContentTime(adListId);
             }
 
-
             var playVideoPlayer = function (adListId) {
                 player.switchPlayerToVastMode = function () {
+
                     //Get the actual duration from the video file if it is not present in the VAST XML
                     if (!player.vastOptions.duration) {
                         player.vastOptions.duration = videoPlayerTag.duration;
                     }
 
-                    var addClickthroughLayer = (typeof player.adList[adListId].adClickable != "undefined") ? player.adList[adListId].adClickable: player.displayOptions.vastOptions.adClickable;
-                    if (addClickthroughLayer) {
-                        player.addClickthroughLayer(player.videoPlayerId);
+                    if ( player.displayOptions.layoutControls.showCardBoardView ) {
+                        
+                        if ( !player.adList[adListId].landingPage ) {
+                            player.addCTAButton(player.adPool[adListId].clickthroughUrl);
+                        } else {
+                            player.addCTAButton(player.adList[adListId].landingPage);
+                        }
+
+                    } else {
+
+                        var addClickthroughLayer = (typeof player.adList[adListId].adClickable != "undefined") ? player.adList[adListId].adClickable: player.displayOptions.vastOptions.adClickable;
+
+                        if (addClickthroughLayer) {
+                            player.addClickthroughLayer(player.videoPlayerId);
+                        }
+
+                        player.addCTAButton(player.adList[adListId].landingPage);
+                        
                     }
+
 
                     if (player.vastOptions.skipoffset !== false) {
                         player.addSkipButton();
                     }
 
-                    videoPlayerTag.loop = false;
-
-                    player.addCTAButton(player.adList[adListId].landingPage);
+                    videoPlayerTag.loop = false;                    
 
                     player.addAdCountdown();
 
@@ -1086,11 +1114,10 @@ var fluidPlayerClass = {
                     player.vastLogoBehaviour(true);
 
 
-                    var progressbarContainer = document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container');
-                    if (progressbarContainer !== null) {
-                        document.getElementById(player.videoPlayerId + '_vast_control_currentprogress').style.backgroundColor = player.displayOptions.layoutControls.adProgressColor;
+                    var progressbarContainer = videoPlayerTag.parentNode.getElementsByClassName('fluid_controls_currentprogress');
+                    for (var i = 0; i < progressbarContainer.length; i++) {
+                        progressbarContainer[i].style.backgroundColor = player.displayOptions.layoutControls.adProgressColor;
                     }
-
 
                     if (player.displayOptions.vastOptions.adText || player.adList[adListId].adText) {
                         var adTextToShow = (player.adList[adListId].adText !== null) ? player.adList[adListId].adText : player.displayOptions.vastOptions.adText;
@@ -1108,6 +1135,34 @@ var fluidPlayerClass = {
                     player.trackSingleEvent('impression');
 
                     videoPlayerTag.removeEventListener('loadedmetadata', player.switchPlayerToVastMode);
+                
+
+                    // if in vr mode then do not show 
+                    if ( player.vrMode ) {
+
+                        var adCountDownTimerText = document.getElementById('ad_countdown' + player.videoPlayerId);
+                        var ctaButton = document.getElementById(player.videoPlayerId+'_fluid_cta');
+                        var addAdPlayingTextOverlay = document.getElementById(player.videoPlayerId+'_fluid_ad_playing');
+                        var skipBtn = document.getElementById('skip_button_' + player.videoPlayerId);
+
+                        if ( adCountDownTimerText ) {
+                            adCountDownTimerText.style.display = 'none';
+                        }
+
+                        if ( ctaButton ) {
+                            ctaButton.style.display = 'none';
+                        }
+
+                        if ( addAdPlayingTextOverlay ) {
+                            addAdPlayingTextOverlay.style.display = 'none';
+                        }
+
+                        if ( skipBtn ) {
+                            skipBtn.style.display = 'none';
+                        }                                                                        
+                        
+                    }
+
                 };
 
                 videoPlayerTag.pause();
@@ -1117,22 +1172,29 @@ var fluidPlayerClass = {
                 // Remove the streaming objects to prevent errors on the VAST content
                 player.detachStreamers();
 
-            //Try to load multiple
-            var selectedMediaFile = player.getSupportedMediaFile(player.vastOptions.mediaFileList);
+                //Try to load multiple
+                var selectedMediaFile = player.getSupportedMediaFile(player.vastOptions.mediaFileList);
+                
+                // if player in cardboard mode then, linear ads media type should be a '360' video
+                if ( player.displayOptions.layoutControls.showCardBoardView && player.adList[adListId].mediaType !== '360' ) {
+                    player.adList[adListId].error = true;
+                    player.playMainVideoWhenVastFails(403);
+                    return false;
+                }
 
-            if (selectedMediaFile === false) {
-                //Couldn’t find MediaFile that is supported by this video player, based on the attributes of the MediaFile element.
-                player.adList[adListId].error = true;
-                player.playMainVideoWhenVastFails(403);
-                return false;
-            }
+                if ( selectedMediaFile.src === false ) {
+                    //Couldn’t find MediaFile that is supported by this video player, based on the attributes of the MediaFile element.
+                    player.adList[adListId].error = true;
+                    player.playMainVideoWhenVastFails(403);
+                    return false;
+                }
 
-            videoPlayerTag.src = selectedMediaFile;
-            player.isCurrentlyPlayingAd = true;
-            if (player.displayOptions.vastOptions.showProgressbarMarkers) {
-                player.hideAdMarkers();
-            }
-            videoPlayerTag.load();
+                videoPlayerTag.src = selectedMediaFile.src;
+                player.isCurrentlyPlayingAd = true;
+                if (player.displayOptions.vastOptions.showProgressbarMarkers) {
+                    player.hideAdMarkers();
+                }
+                videoPlayerTag.load();
 
                 //Handle the ending of the Pre-Roll ad
                 videoPlayerTag.addEventListener('ended', player.onVastAdEnded);
@@ -1197,8 +1259,8 @@ var fluidPlayerClass = {
             for (var i = 0; i < mediaFiles.length; i++) {
                 var supportLevel = this.getMediaFileTypeSupportLevel(mediaFiles[i]['type']);
 
-                if (supportLevel === "maybe" || supportLevel === "probably") {
-                    selectedMediaFile = mediaFiles[i]['src'];
+                if (supportLevel === "maybe" || supportLevel === "probably") {                      
+                    selectedMediaFile = mediaFiles[i];
                     adSupportedType = true;
                 }
 
@@ -1846,7 +1908,8 @@ var fluidPlayerClass = {
                 var adListId = player.timerPool[keyTime]['nonLinear'][index].adListId;
                 var vastOptions = player.adPool[adListId];
 
-                if (player.adList[adListId].played === false) {
+                // we are not supporting nonLinear ads in cardBoard mode
+                if (player.adList[adListId].played === false && !player.displayOptions.layoutControls.showCardBoardView) {
                     player.createNonLinearStatic(adListId);
                     if (player.displayOptions.vastOptions.showProgressbarMarkers) {
                         player.hideAdMarker(adListId);
@@ -1942,7 +2005,13 @@ var fluidPlayerClass = {
 
         if (progressbarContainer !== null) {
             var backgroundColor = (player.displayOptions.layoutControls.primaryColor) ? player.displayOptions.layoutControls.primaryColor : "white";
-            document.getElementById(player.videoPlayerId + '_vast_control_currentprogress').style.backgroundColor = backgroundColor;
+            
+            var currentProgressBar = videoPlayerTag.parentNode.getElementsByClassName('fluid_controls_currentprogress');
+
+            for (var i = 0; i < currentProgressBar.length; i++) {
+                currentProgressBar[i].style.backgroundColor = backgroundColor;
+            }
+
         }
 
         videoPlayerTag.removeEventListener('ended', player.onVastAdEnded);
@@ -2073,7 +2142,7 @@ var fluidPlayerClass = {
         var durationText = parseInt(adCountdown);
         divAdCountdown.id = 'ad_countdown' + this.videoPlayerId;
         divAdCountdown.className = 'ad_countdown';
-        divAdCountdown.innerHTML = "Ad - " + durationText;
+        divAdCountdown.innerHTML = "<span class='ad_timer_prefix'>Ad - </span>" + durationText;
 
         videoWrapper.appendChild(divAdCountdown);
 
@@ -2088,7 +2157,7 @@ var fluidPlayerClass = {
         var btn = document.getElementById('ad_countdown' + player.videoPlayerId);
 
         if (btn) {
-            btn.innerHTML = "Ad - " + player.pad(parseInt(sec / 60)) + ':' + player.pad(parseInt(sec % 60));
+            btn.innerHTML = "<span class='ad_timer_prefix'>Ad - </span> " + player.pad(parseInt(sec / 60)) + ':' + player.pad(parseInt(sec % 60));
         } else {
             videoPlayerTag.removeEventListener('timeupdate', player.decreaseAdCountdown);
         }
@@ -2228,10 +2297,13 @@ var fluidPlayerClass = {
     },
 
     addCTAButton: function (landingPage) {
-        if (!this.displayOptions.vastOptions.adCTAText) {
+            
+        var player = this;
+
+        if ( !landingPage ) {
             return;
         }
-        var player = this;
+        
         var videoPlayerTag = document.getElementById(this.videoPlayerId);
 
         var ctaButton = document.createElement('div');
@@ -2455,7 +2527,7 @@ var fluidPlayerClass = {
 
     generateCustomControlTags: function () {
         return '<div class="fluid_controls_left">' +
-            '   <div id="' + this.videoPlayerId + '_fluid_control_playpause" class="fluid_button fluid_button_play"></div>' +
+            '   <div id="' + this.videoPlayerId + '_fluid_control_playpause" class="fluid_button fluid_button_play fluid_control_playpause"></div>' +
             '</div>' +
             '<div id="' + this.videoPlayerId + '_fluid_controls_progress_container" class="fluid_controls_progress_container fluid_slider">' +
             '   <div class="fluid_controls_progress">' +
@@ -2467,8 +2539,9 @@ var fluidPlayerClass = {
             '   <div id="' + this.videoPlayerId + '_ad_markers_holder" class="fluid_controls_ad_markers_holder"></div>' +
             '</div>' +
             '<div class="fluid_controls_right">' +
-            '   <div id="' + this.videoPlayerId + '_fluid_control_fullscreen" class="fluid_button fluid_button_fullscreen"></div>' +
-            '   <div id="' + this.videoPlayerId + '_fluid_control_theatre" class="fluid_button fluid_button_theatre"></div>' +
+            '   <div id="' + this.videoPlayerId + '_fluid_control_fullscreen" class="fluid_button fluid_control_fullscreen fluid_button_fullscreen"></div>' +
+            '   <div id="' + this.videoPlayerId + '_fluid_control_theatre" class="fluid_button fluid_control_theatre fluid_button_theatre"></div>' +
+            '   <div id="' + this.videoPlayerId + '_fluid_control_cardboard" class="fluid_button fluid_control_cardboard fluid_button_cardboard"></div>' +
             '   <div id="' + this.videoPlayerId + '_fluid_control_subtitles" class="fluid_button fluid_button_subtitles"></div>' +
             '   <div id="' + this.videoPlayerId + '_fluid_control_video_source" class="fluid_button fluid_button_video_source"></div>' +
             '   <div id="' + this.videoPlayerId + '_fluid_control_playback_rate" class="fluid_button fluid_button_playback_rate"></div>' +
@@ -2480,16 +2553,17 @@ var fluidPlayerClass = {
             '           </div>' +
             '       </div>' +
             '   </div>' +
-            '   <div id="' + this.videoPlayerId + '_fluid_control_mute" class="fluid_button fluid_button_volume"></div>' +
-            '   <div id="' + this.videoPlayerId + '_fluid_control_duration" class="fluid_fluid_control_duration">00:00 / 00:00</div>' +
+            '   <div id="' + this.videoPlayerId + '_fluid_control_mute" class="fluid_button fluid_button_volume fluid_control_mute"></div>' +
+            '   <div id="' + this.videoPlayerId + '_fluid_control_duration" class="fluid_control_duration fluid_fluid_control_duration">00:00 / 00:00</div>' +
             '</div>';
     },
 
     controlPlayPauseToggle: function (videoPlayerId) {
-        var playPauseButton = document.getElementById(videoPlayerId + '_fluid_control_playpause');
-        var menuOptionPlay = document.getElementById(videoPlayerId + 'context_option_play');
-        var player = fluidPlayerClass.getInstanceById(videoPlayerId);
-        var controlsDisplay = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
+        var player = fluidPlayerClass.getInstanceById(videoPlayerId);        
+        var videoPlayer = document.getElementById(player.videoPlayerId);
+        var playPauseButton = videoPlayer.parentNode.getElementsByClassName('fluid_control_playpause');
+        var menuOptionPlay = document.getElementById(videoPlayerId + 'context_option_play');        
+        var controlsDisplay = videoPlayer.parentNode.getElementsByClassName('fluid_controls_container');
         var fpLogo = document.getElementById(player.videoPlayerId + '_logo');
         var videoPlayer = document.getElementById(player.videoPlayerId);
 
@@ -2500,8 +2574,15 @@ var fluidPlayerClass = {
         }
 
         if (!videoPlayer.paused) {
-            playPauseButton.className = playPauseButton.className.replace(/\bfluid_button_play\b/g, 'fluid_button_pause');
-            controlsDisplay.classList.remove('initial_controls_show');
+
+            for ( var i = 0; i < playPauseButton.length; i++ ){
+                playPauseButton[i].className = playPauseButton[i].className.replace(/\bfluid_button_play\b/g, 'fluid_button_pause');
+            }        
+
+            for ( var i = 0; i < controlsDisplay.length; i++ ){
+                controlsDisplay[i].classList.remove('initial_controls_show');    
+            }            
+
             if (fpLogo) {
                 fpLogo.classList.remove('initial_controls_show');
             }
@@ -2511,8 +2592,14 @@ var fluidPlayerClass = {
             }
 
         } else {
-            playPauseButton.className = playPauseButton.className.replace(/\bfluid_button_pause\b/g, 'fluid_button_play');
-            controlsDisplay.classList.add('initial_controls_show');
+            
+            for ( var i = 0; i < playPauseButton.length; i++ ){
+                playPauseButton[i].className = playPauseButton[i].className.replace(/\bfluid_button_pause\b/g, 'fluid_button_play');
+            }                
+
+            for ( var i = 0; i < controlsDisplay.length; i++ ){
+                controlsDisplay[i].classList.add('initial_controls_show');    
+            }
 
             if (this.isCurrentlyPlayingAd && player.displayOptions.vastOptions.showPlayButton) {
                 document.getElementById(videoPlayerId + '_fluid_initial_play').style.display = "block";
@@ -2556,9 +2643,12 @@ var fluidPlayerClass = {
     contolProgressbarUpdate: function (videoPlayerId) {
         var player = fluidPlayerClass.getInstanceById(videoPlayerId);
         var videoPlayerTag = document.getElementById(videoPlayerId);
-        var currentProgressTag = document.getElementById(videoPlayerId + '_vast_control_currentprogress');
+        var currentProgressTag = videoPlayerTag.parentNode.getElementsByClassName('fluid_controls_currentprogress');
 
-        currentProgressTag.style.width = (videoPlayerTag.currentTime / player.currentVideoDuration * 100) + '%';
+        for (var i = 0; i < currentProgressTag.length; i++) {
+            currentProgressTag[i].style.width = (videoPlayerTag.currentTime / player.currentVideoDuration * 100) + '%';
+        }
+        
     },
 
     //Format time to hh:mm:ss
@@ -2586,8 +2676,12 @@ var fluidPlayerClass = {
 
         var durationText = currentPlayTime + ' / ' + totalTime;
 
-        var timePlaceholder = document.getElementById(videoPlayerId + '_fluid_control_duration');
-        timePlaceholder.innerHTML = durationText;
+        var timePlaceholder = videoPlayerTag.parentNode.getElementsByClassName('fluid_control_duration');
+
+        for (var i = 0; i < timePlaceholder.length; i++) {
+            timePlaceholder[i].innerHTML = durationText;
+        }
+        
     },
 
     pad: function (value) {
@@ -2605,7 +2699,7 @@ var fluidPlayerClass = {
         var volumeposTag = document.getElementById(videoPlayerId + '_fluid_control_volume_currentpos');
         var volumebarTotalWidth = document.getElementById(videoPlayerId + '_fluid_control_volume').clientWidth;
         var volumeposTagWidth = volumeposTag.clientWidth;
-        var muteButtonTag = document.getElementById(videoPlayerId + '_fluid_control_mute');
+        var muteButtonTag = videoPlayerTag.parentNode.getElementsByClassName('fluid_control_mute');
         var menuOptionMute = document.getElementById(videoPlayerId + 'context_option_mute');
 
         if (videoPlayerTag.volume) {
@@ -2614,14 +2708,18 @@ var fluidPlayerClass = {
         }
 
         if (videoPlayerTag.volume && !videoPlayerTag.muted) {
-            muteButtonTag.className = muteButtonTag.className.replace(/\bfluid_button_mute\b/g, 'fluid_button_volume');
+            for (var i = 0; i < muteButtonTag.length; i++) {
+                muteButtonTag[i].className = muteButtonTag[i].className.replace(/\bfluid_button_mute\b/g, 'fluid_button_volume');
+            }            
 
             if (menuOptionMute !== null) {
                 menuOptionMute.innerHTML = this.displayOptions.captions.mute;
             }
 
         } else {
-            muteButtonTag.className = muteButtonTag.className.replace(/\bfluid_button_volume\b/g, 'fluid_button_mute');
+            for (var i = 0; i < muteButtonTag.length; i++) {
+                muteButtonTag[i].className = muteButtonTag[i].className.replace(/\bfluid_button_volume\b/g, 'fluid_button_mute');
+            }            
 
             if (menuOptionMute !== null) {
                 menuOptionMute.innerHTML = this.displayOptions.captions.unmute;
@@ -2673,7 +2771,9 @@ var fluidPlayerClass = {
     },
 
     fullscreenOff: function (fullscreenButton, menuOptionFullscreen) {
-        fullscreenButton.className = fullscreenButton.className.replace(/\bfluid_button_fullscreen_exit\b/g, 'fluid_button_fullscreen');
+        for (var i = 0; i < fullscreenButton.length; i++) {
+            fullscreenButton[i].className = fullscreenButton[i].className.replace(/\bfluid_button_fullscreen_exit\b/g, 'fluid_button_fullscreen');
+        }  
         if (menuOptionFullscreen !== null) {
             menuOptionFullscreen.innerHTML = 'Fullscreen';
         }
@@ -2681,7 +2781,11 @@ var fluidPlayerClass = {
     },
 
     fullscreenOn: function (fullscreenButton, menuOptionFullscreen) {
-        fullscreenButton.className = fullscreenButton.className.replace(/\bfluid_button_fullscreen\b/g, 'fluid_button_fullscreen_exit');
+
+        for (var i = 0; i < fullscreenButton.length; i++) {
+            fullscreenButton[i].className = fullscreenButton[i].className.replace(/\bfluid_button_fullscreen\b/g, 'fluid_button_fullscreen_exit');
+        }
+
         if (menuOptionFullscreen !== null) {
             menuOptionFullscreen.innerHTML = this.displayOptions.captions.exitFullscreen;
         }
@@ -2691,11 +2795,12 @@ var fluidPlayerClass = {
     fullscreenToggle: function () {
         fluidPlayerClass.activeVideoPlayerId = this.videoPlayerId;
 
+        var videoPlayerTag = document.getElementById(this.videoPlayerId);
         var fullscreenTag = document.getElementById('fluid_video_wrapper_' + this.videoPlayerId);
         var requestFullscreenFunctionNames = this.checkFullscreenSupport('fluid_video_wrapper_' + this.videoPlayerId);
-        var fullscreenButton = document.getElementById(this.videoPlayerId + '_fluid_control_fullscreen');
+        var fullscreenButton = videoPlayerTag.parentNode.getElementsByClassName('fluid_control_fullscreen');
         var menuOptionFullscreen = document.getElementById(this.videoPlayerId + 'context_option_fullscreen');
-        var videoPlayerTag = document.getElementById(this.videoPlayerId);
+        
 
         // Disable Theatre mode if it's on while we toggle fullscreen
         if (this.theatreMode) {
@@ -2849,10 +2954,17 @@ var fluidPlayerClass = {
     },
 
     onProgressbarMouseDown: function (videoPlayerId, event) {
+
         var player = fluidPlayerClass.getInstanceById(videoPlayerId);
         player.displayOptions.layoutControls.playPauseAnimation = false;
         // we need an initial position for touchstart events, as mouse up has no offset x for iOS
-        var initialPosition = fluidPlayerClass.getEventOffsetX(event, document.getElementById(videoPlayerId + '_fluid_controls_progress_container'));
+        var initialPosition;
+
+        if ( player.displayOptions.layoutControls.showCardBoardView ) { 
+            initialPosition = fluidPlayerClass.getEventOffsetX(event, event.srcElement.parentNode);
+        } else { 
+            initialPosition = fluidPlayerClass.getEventOffsetX(event, document.getElementById(videoPlayerId + '_fluid_controls_progress_container'));
+        }
 
         if (player.isCurrentlyPlayingAd) {
             return;
@@ -2874,7 +2986,7 @@ var fluidPlayerClass = {
         }
 
         function onProgressbarMouseMove (event) {
-            var currentX = fluidPlayerClass.getEventOffsetX(event, document.getElementById(videoPlayerId + '_fluid_controls_progress_container'));
+            var currentX = fluidPlayerClass.getEventOffsetX(event, event.srcElement.parentNode);
             initialPosition = NaN; // mouse up will fire after the move, we don't want to trigger the initial position in the event of iOS
             shiftTime(videoPlayerId, currentX);
             player.contolProgressbarUpdate(player.videoPlayerId);
@@ -2886,7 +2998,7 @@ var fluidPlayerClass = {
             document.removeEventListener('touchmove', onProgressbarMouseMove);
             document.removeEventListener('mouseup', onProgressbarMouseUp);
             document.removeEventListener('touchend', onProgressbarMouseUp);
-            var clickedX = fluidPlayerClass.getEventOffsetX(event, document.getElementById(videoPlayerId + '_fluid_controls_progress_container'));
+            var clickedX = fluidPlayerClass.getEventOffsetX(event, event.srcElement.parentNode);
             if (isNaN(clickedX) && !isNaN(initialPosition)) {
                 clickedX = initialPosition;
             }
@@ -3359,7 +3471,7 @@ var fluidPlayerClass = {
         var videoPlayerTag = document.getElementById(this.videoPlayerId);
 
         //Set the Play/Pause behaviour
-        document.getElementById(this.videoPlayerId + '_fluid_control_playpause').addEventListener('click', function () {
+        fluidPlayerClass.delegate(videoPlayerTag.parentNode, 'click', '.fluid_control_playpause', function() {
 
             if (!player.firstPlayLaunched) {
                 videoPlayerTag.removeEventListener('play', player.initialPlay);
@@ -3385,10 +3497,20 @@ var fluidPlayerClass = {
 
         var isMobileChecks = fluidPlayerClass.getMobileOs();
         var eventOn = (isMobileChecks.userOs) ? 'touchstart' : 'mousedown';
+        
+        if ( player.displayOptions.layoutControls.showCardBoardView ) {
 
-        document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container').addEventListener(eventOn, function (event) {
-            player.onProgressbarMouseDown(player.videoPlayerId, event);
-        }, false);
+            fluidPlayerClass.delegate(videoPlayerTag.parentNode, eventOn, '.fluid_controls_progress_container', function ( event ) {
+                    player.onProgressbarMouseDown(player.videoPlayerId, event);
+                }, false); 
+
+        } else {
+
+            document.getElementById(player.videoPlayerId + '_fluid_controls_progress_container').addEventListener(eventOn, function (event) {
+                player.onProgressbarMouseDown(player.videoPlayerId, event);
+            }, false);
+
+        }
 
         //Set the volume controls
         document.getElementById(player.videoPlayerId + '_fluid_control_volume_container').addEventListener(eventOn, function (event) {
@@ -3399,20 +3521,20 @@ var fluidPlayerClass = {
             player.contolVolumebarUpdate(player.videoPlayerId);
         });
 
-        document.getElementById(player.videoPlayerId + '_fluid_control_mute').addEventListener('click', function () {
+        fluidPlayerClass.delegate(videoPlayerTag.parentNode, 'click', '.fluid_control_mute', function() {
             player.muteToggle(player.videoPlayerId);
         });
 
         player.setBuffering();
 
         //Set the fullscreen control
-        document.getElementById(player.videoPlayerId + '_fluid_control_fullscreen').addEventListener('click', function () {
+        fluidPlayerClass.delegate(videoPlayerTag.parentNode, 'click', '.fluid_control_fullscreen', function() {        
             player.fullscreenToggle();
         });
 
         // Theatre mode
         if (player.displayOptions.layoutControls.allowTheatre && !player.isInIframe) {
-            document.getElementById(player.videoPlayerId + '_fluid_control_theatre').addEventListener('click', function () {
+            fluidPlayerClass.delegate(videoPlayerTag.parentNode, 'click', '.fluid_control_theatre', function() {
                 player.theatreToggle(player.videoPlayerId);
             });
         } else {
@@ -4102,6 +4224,7 @@ var fluidPlayerClass = {
             subtitlesContainer.innerHTML = '';
         }
     },
+
     openCloseSubtitlesSwitch: function () {
         var player = this;
         var subtitleChangeList = document.getElementById(this.videoPlayerId + '_fluid_control_subtitles_list');
@@ -4137,6 +4260,397 @@ var fluidPlayerClass = {
             fluidPlayerScriptLocation + fluidPlayerClass.subtitlesParseScript,
             player.createSubtitlesSwitch.bind(this)
         );
+    },
+
+    createCardboardJoystickButton: function (identity) {
+        var player = this;
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);
+
+        var vrJoystickPanel = document.getElementById(player.videoPlayerId + '_fluid_vr_joystick_panel');
+        var joystickButton = document.createElement('div');
+        joystickButton.id = player.videoPlayerId + '_fluid_vr_joystick_'+identity; 
+        joystickButton.className = 'fluid_vr_button fluid_vr_joystick_'+identity;
+        vrJoystickPanel.appendChild(joystickButton);
+
+        return joystickButton;
+    },
+
+    cardboardRotateLeftRight: function (param /* 0 - right, 1 - left */) {
+        var player = this;
+        var go = player.vrROTATION_POSITION;
+        var back = - player.vrROTATION_POSITION;
+        var pos  = param < 1 ? go : back;
+        var easing = {val : pos};
+        var tween = new TWEEN.Tween(easing) 
+            .to({val: 0}, player.vrROTATION_SPEED) 
+            .easing(TWEEN.Easing.Quadratic.InOut) 
+            .onUpdate(function() { 
+                player.vrViewer.OrbitControls.rotateLeft(easing.val)
+        }).start();
+    },
+
+    cardboardRotateUpDown: function (param /* 0 - down, 1- up */) {
+        var player = this;
+        var go = player.vrROTATION_POSITION;
+        var back = -player.vrROTATION_POSITION;
+        var pos  = param < 1 ? go : back;
+        var easing = {val : pos};
+        var tween = new TWEEN.Tween(easing) 
+            .to({val: 0}, player.vrROTATION_SPEED) 
+            .easing(TWEEN.Easing.Quadratic.InOut) 
+            .onUpdate(function() { 
+                player.vrViewer.OrbitControls.rotateUp(easing.val)
+        }).start();
+    },
+
+    createCardboardJoystick: function () {
+        var player = this;
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);
+        var vrContainer = document.getElementById(player.videoPlayerId + '_fluid_vr_container');
+
+        // Create a JoyStick and append to VR container
+        var vrJoystickPanel = document.createElement('div');
+        vrJoystickPanel.id = player.videoPlayerId + '_fluid_vr_joystick_panel';
+        vrJoystickPanel.className = 'fluid_vr_joystick_panel';
+        vrContainer.appendChild(vrJoystickPanel);
+        
+        // Create Joystick buttons
+        var upButton = player.createCardboardJoystickButton('up');
+        var leftButton = player.createCardboardJoystickButton('left');
+        var rightButton = player.createCardboardJoystickButton('right');
+        var downButton = player.createCardboardJoystickButton('down');
+        var zoomDefaultButton = player.createCardboardJoystickButton('zoomdefault');
+        var zoomInButton = player.createCardboardJoystickButton('zoomin');
+        var zoomOutButton = player.createCardboardJoystickButton('zoomout');
+
+        // Camera movement buttons
+        upButton.addEventListener('click', function () {
+            //player.vrViewer.OrbitControls.rotateUp(-0.1);
+            player.cardboardRotateUpDown(1);
+        });
+
+        downButton.addEventListener('click', function () {
+            //player.vrViewer.OrbitControls.rotateUp(0.1);
+            player.cardboardRotateUpDown(0);
+        });
+
+        rightButton.addEventListener('click', function () {
+            //player.vrViewer.OrbitControls.rotateLeft(0.1);
+            player.cardboardRotateLeftRight(0);
+        });
+
+        leftButton.addEventListener('click', function () {
+            //player.vrViewer.OrbitControls.rotateLeft(-0.1);
+            player.cardboardRotateLeftRight(1);
+        });
+
+        zoomDefaultButton.addEventListener('click', function () {
+            player.vrViewer.camera.fov = 60;
+            player.vrViewer.camera.updateProjectionMatrix();
+        });
+
+        // Camera Zoom buttons
+        zoomOutButton.addEventListener('click', function () {
+            player.vrViewer.camera.fov *= 1.1;
+            player.vrViewer.camera.updateProjectionMatrix();
+        });
+
+        zoomInButton.addEventListener('click', function () {
+            player.vrViewer.camera.fov *= 0.9;
+            player.vrViewer.camera.updateProjectionMatrix();
+        });                
+
+    },
+
+    cardBoardResize: function () {
+        var player = this;
+        var videoPlayerTag = document.getElementById(this.videoPlayerId);
+        videoPlayerTag.addEventListener('theatreModeOn', function () {
+            player.vrViewer.onWindowResize();
+        });
+
+        videoPlayerTag.addEventListener('theatreModeOff', function () {
+            player.vrViewer.onWindowResize();
+        });        
+    },
+
+    cardBoardSwitchToNormal: function () {
+        var player = this;
+        var vrJoystickPanel = document.getElementById(player.videoPlayerId + '_fluid_vr_joystick_panel');
+        var controlBar = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);
+
+        player.vrViewer.enableEffect( PANOLENS.MODES.NORMAL );
+        player.vrViewer.onWindowResize();
+        player.vrMode = false;
+
+        // remove dual control bar
+        var newControlBar = videoPlayerTag.parentNode.getElementsByClassName('fluid_vr2_controls_container')[0];
+        videoPlayerTag.parentNode.removeChild(newControlBar);
+
+        if(player.displayOptions.layoutControls.showCardBoardJoystick && vrJoystickPanel){
+            vrJoystickPanel.style.display = "block";
+        }
+        controlBar.classList.remove("fluid_vr_controls_container");
+
+        // show volume control bar
+        var volumeContainer = document.getElementById(player.videoPlayerId + '_fluid_control_volume_container')
+        volumeContainer.style.display = "block";        
+
+        // show all ads overlays if any
+        var adCountDownTimerText = document.getElementById('ad_countdown' + player.videoPlayerId);
+        var ctaButton = document.getElementById(player.videoPlayerId+'_fluid_cta');
+        var addAdPlayingTextOverlay = document.getElementById(player.videoPlayerId+'_fluid_ad_playing');
+        var skipBtn = document.getElementById('skip_button_' + player.videoPlayerId);
+
+        if ( adCountDownTimerText ) {
+            adCountDownTimerText.style.display = 'block';
+        }
+
+        if ( ctaButton ) {
+            ctaButton.style.display = 'block';
+        }
+
+        if ( addAdPlayingTextOverlay ) {
+            addAdPlayingTextOverlay.style.display = 'block';
+        }
+
+        if ( skipBtn ) {
+            skipBtn.style.display = 'block';
+        }
+    },
+
+
+    cardBoardHideDefaultControls: function () {
+        var player = this;
+        var vrJoystickPanel = document.getElementById(player.videoPlayerId + '_fluid_vr_joystick_panel');
+        var initialPlay = document.getElementById(player.videoPlayerId + '_fluid_initial_play');
+        var volumeContainer = document.getElementById(player.videoPlayerId + '_fluid_control_volume_container');
+        var controlBar = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
+
+        // hide the joystick in VR mode
+        if ( player.displayOptions.layoutControls.showCardBoardJoystick && vrJoystickPanel) {
+            vrJoystickPanel.style.display = "none";
+        }
+
+        // hide big play icon
+        if ( initialPlay ) {
+            document.getElementById(player.videoPlayerId + '_fluid_initial_play').style.display = "none";
+            document.getElementById(player.videoPlayerId + '_fluid_initial_play_button').style.opacity = "1";
+        }
+
+        // hide volume control bar
+        volumeContainer.style.display = "none";
+
+    },
+
+    cardBoardCreateVRControls: function () {
+        var player = this;
+        var controlBar = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);
+
+        // create and append dual control bar
+        var newControlBar = controlBar.cloneNode(true);
+        newControlBar.removeAttribute('id');
+        newControlBar.querySelectorAll('*').forEach(function(node) {
+            node.removeAttribute('id');
+        });
+
+        newControlBar.classList.add("fluid_vr2_controls_container");        
+        videoPlayerTag.parentNode.insertBefore( newControlBar, videoPlayerTag.nextSibling );
+  
+    },
+
+    cardBoardSwitchToVR: function () {
+        var player = this;
+        var vrJoystickPanel = document.getElementById(player.videoPlayerId + '_fluid_vr_joystick_panel');
+        var controlBar = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);
+
+        player.vrViewer.enableEffect( PANOLENS.MODES.CARDBOARD );        
+
+        player.vrViewer.onWindowResize();
+        player.vrViewer.disableReticleControl();
+
+        player.vrMode = true;
+        
+        controlBar.classList.add("fluid_vr_controls_container");
+
+        player.cardBoardHideDefaultControls();
+        player.cardBoardCreateVRControls();
+
+
+        // hide all ads overlays
+        var adCountDownTimerText = document.getElementById('ad_countdown' + player.videoPlayerId);
+        var ctaButton = document.getElementById(player.videoPlayerId+'_fluid_cta');
+        var addAdPlayingTextOverlay = document.getElementById(player.videoPlayerId+'_fluid_ad_playing');
+        var skipBtn = document.getElementById('skip_button_' + player.videoPlayerId);
+
+        if ( adCountDownTimerText ) {
+            adCountDownTimerText.style.display = 'none';
+        }
+
+        if ( ctaButton ) {
+            ctaButton.style.display = 'none';
+        }
+
+        if ( addAdPlayingTextOverlay ) {
+            addAdPlayingTextOverlay.style.display = 'none';
+        }
+
+        if ( skipBtn ) {
+            skipBtn.style.display = 'none';
+        }
+
+    },
+
+    cardBoardMoveTimeInfo: function () {
+        var player = this;        
+        var timePlaceholder = document.getElementById(player.videoPlayerId + '_fluid_control_duration');
+        var controlBar = document.getElementById(player.videoPlayerId + '_fluid_controls_container');
+
+        timePlaceholder.classList.add("cardboard_time");
+        controlBar.appendChild(timePlaceholder);
+
+        // override the time display function for this instance
+        player.contolDurationUpdate = function ( videoPlayerId ) {
+            var player = fluidPlayerClass.getInstanceById(videoPlayerId);
+            var videoPlayerTag = document.getElementById(videoPlayerId);
+
+            var currentPlayTime = player.formatTime(videoPlayerTag.currentTime);
+            var totalTime = player.formatTime(player.currentVideoDuration);
+            var timePlaceholder = videoPlayerTag.parentNode.getElementsByClassName('fluid_control_duration');
+
+            var durationText = '';
+
+            if ( player.isCurrentlyPlayingAd ) {
+
+                durationText = "<span class='ad_timer_prefix'>AD : </span>"+currentPlayTime + ' / ' + totalTime;
+
+                for( var index = 0; index < timePlaceholder.length; index++){
+                    timePlaceholder[index].classList.add("ad_timer_prefix");
+                }
+
+
+            } else {
+
+                durationText = currentPlayTime + ' / ' + totalTime;
+
+                for( var index = 0; index < timePlaceholder.length; index++){
+                    timePlaceholder[index].classList.remove("ad_timer_prefix");
+                }
+
+            }
+
+            
+
+            for (var i = 0; i < timePlaceholder.length; i++) {
+                timePlaceholder[i].innerHTML = durationText;
+            }
+        }
+    },
+
+    cardBoardAlterDefaultControls: function () {
+        var player = this;
+
+        player.cardBoardMoveTimeInfo();
+    },
+
+    createCardboardView: function () {
+
+        var player = this;
+        var videoPlayerTag = document.getElementById(player.videoPlayerId);
+        var vrSwitchButton = videoPlayerTag.parentNode.getElementsByClassName('fluid_control_cardboard');
+
+        // Create a container for 360degree
+        var vrContainer = document.createElement('div');
+        vrContainer.id = player.videoPlayerId + '_fluid_vr_container';
+        vrContainer.className = 'fluid_vr_container';
+        videoPlayerTag.parentNode.insertBefore(vrContainer, videoPlayerTag.nextSibling);
+
+        // OverRide some conflicting functions from panolens
+        PANOLENS.VideoPanorama.prototype.pauseVideo = function () { };
+        PANOLENS.VideoPanorama.prototype.playVideo = function () { };
+        
+        if ( fluidPlayerClass.getMobileOs().userOs === 'Android' || fluidPlayerClass.getMobileOs().userOs === 'iOS' ){
+
+            player.vrPanorama = new PANOLENS.VideoPanorama( '', { videoElement:  videoPlayerTag, autoplay: true } );
+
+        } else {
+        
+            player.vrPanorama = new PANOLENS.VideoPanorama( '', { videoElement:  videoPlayerTag, autoplay: player.displayOptions.layoutControls.autoPlay } );            
+        }
+
+
+        player.vrViewer = new PANOLENS.Viewer( { container: vrContainer, controlBar: true, controlButtons: [], enableReticle: false } );
+        player.vrViewer.add( player.vrPanorama );
+
+        player.vrViewer.enableEffect( PANOLENS.MODES.NORMAL );
+        player.vrViewer.onWindowResize();
+
+        // if Mobile device then enable controls using gyroscope
+        if ( fluidPlayerClass.getMobileOs().userOs === 'Android' || fluidPlayerClass.getMobileOs().userOs === 'iOS' ){
+            player.vrViewer.enableControl(1);
+        }
+
+        // Make Changes for default skin
+        player.cardBoardAlterDefaultControls();
+
+        // resize on toggle theater mode
+        player.cardBoardResize();
+
+        // Store initial camera position
+        player.vrViewer.initialCameraPosition = JSON.parse( JSON.stringify( player.vrViewer.camera.position ) );
+
+        if(player.displayOptions.layoutControls.showCardBoardJoystick){
+            if (!( fluidPlayerClass.getMobileOs().userOs === 'Android' || fluidPlayerClass.getMobileOs().userOs === 'iOS' )){
+                player.createCardboardJoystick();
+            }            
+            // Disable zoom if showing joystick
+            player.vrViewer.OrbitControls.noZoom = true;
+        }
+
+        fluidPlayerClass.delegate(videoPlayerTag.parentNode, 'click', '.fluid_control_cardboard', function() {
+
+            if ( player.vrMode ) {
+
+                player.cardBoardSwitchToNormal();
+
+            } else {
+
+                player.cardBoardSwitchToVR();
+
+            }
+            
+        });
+    },
+
+    createCardboard: function () {
+        var player = this;
+        
+        if(player.displayOptions.layoutControls.showCardBoardView){
+
+            fluidPlayerClass.requestScript(
+                fluidPlayerScriptLocation + fluidPlayerClass.threeJsScript,
+                function () {
+
+                    fluidPlayerClass.requestScript(
+                        fluidPlayerScriptLocation + fluidPlayerClass.panolensScript,
+                        function () {
+
+                            player.createCardboardView();
+                       
+                        })
+
+                }
+            );
+
+        }else{
+            
+            var cardBoardBtn = document.getElementById(player.videoPlayerId + '_fluid_control_cardboard');
+            cardBoardBtn.style.display = 'none';
+
+        } 
     },
 
     createVideoSourceSwitch: function () {
@@ -4565,24 +5079,33 @@ var fluidPlayerClass = {
             videoPlayerInstance.toggleAdCountdown(true);
         }
 
+        // handles both VR and Normal condition
         if (videoPlayerInstance.hasControlBar()) {
-            var divVastControls = document.getElementById(videoPlayerInstance.videoPlayerId + '_fluid_controls_container');
-            var fpLogo = document.getElementById(videoPlayerInstance.videoPlayerId + '_logo');
+            var divVastControls = videoPlayerTag.parentNode.getElementsByClassName('fluid_controls_container');
+            var fpLogo = videoPlayerTag.parentNode.getElementsByClassName('fp_logo');
 
-            if (videoPlayerInstance.displayOptions.layoutControls.controlBar.animated) {
-                divVastControls.classList.remove('fade_in');
-                divVastControls.classList.add('fade_out');
-                if (fpLogo) {
-                    fpLogo.classList.remove('fade_in');
-                    fpLogo.classList.add('fade_out');
-                }
-            } else {
-                divVastControls.style.display = 'none';
-                if (fpLogo) {
-                    fpLogo.style.display = 'none';
-                }
+            for (var i = 0; i < divVastControls.length; i++) {
+                if (videoPlayerInstance.displayOptions.layoutControls.controlBar.animated) {
+                    divVastControls[i].classList.remove('fade_in');
+                    divVastControls[i].classList.add('fade_out');
+                } else {
+                    divVastControls[i].style.display = 'none';
+
+                }                
             }
 
+            for (var i = 0; i < fpLogo.length; i++) {
+                if ( videoPlayerInstance.displayOptions.layoutControls.controlBar.animated ) {
+                    if ( fpLogo[i] ) {
+                        fpLogo[i].classList.remove('fade_in');
+                        fpLogo[i].classList.add('fade_out');
+                    }
+                } else {
+                    if ( fpLogo[i] ) {
+                        fpLogo[i].style.display = 'none';
+                    }                    
+                }
+            }
         }
 
         videoPlayerTag.style.cursor = 'none';
@@ -4598,22 +5121,31 @@ var fluidPlayerClass = {
         }
 
         if (videoPlayerInstance.hasControlBar()) {
-            var divVastControls = document.getElementById(videoPlayerInstance.videoPlayerId + '_fluid_controls_container');
-            var fpLogo = document.getElementById(videoPlayerInstance.videoPlayerId + '_logo');
+            var divVastControls = videoPlayerTag.parentNode.getElementsByClassName('fluid_controls_container');
+            var fpLogo = videoPlayerTag.parentNode.getElementsByClassName('fp_logo');
 
-            if (videoPlayerInstance.displayOptions.layoutControls.controlBar.animated) {
-                divVastControls.classList.remove('fade_out');
-                divVastControls.classList.add('fade_in');
-                if (fpLogo) {
-                    fpLogo.classList.remove('fade_out');
-                    fpLogo.classList.add('fade_in');
-                }
-            } else {
-                divVastControls.style.display = 'block';
-                if (fpLogo) {
-                    fpLogo.style.display = 'block';
+            for (var i = 0; i < divVastControls.length; i++) {
+                if (videoPlayerInstance.displayOptions.layoutControls.controlBar.animated) {
+                    divVastControls[i].classList.remove('fade_out');
+                    divVastControls[i].classList.add('fade_in');
+                } else {
+                    divVastControls[i].style.display = 'block';
+                }    
+            }
+
+            for (var i = 0; i < fpLogo.length; i++) {
+                if (videoPlayerInstance.displayOptions.layoutControls.controlBar.animated) {
+                    if ( fpLogo[i] ) {
+                        fpLogo[i].classList.remove('fade_out');
+                        fpLogo[i].classList.add('fade_in');
+                    }
+                } else {
+                    if ( fpLogo[i] ) {
+                        fpLogo[i].style.display = 'block';
+                    }
                 }
             }
+
         }
 
         if (!fluidPlayerClass.isTouchDevice()) {
@@ -4652,16 +5184,26 @@ var fluidPlayerClass = {
         var player = this;
         var videoPlayer = document.getElementById(player.videoPlayerId);
 
-        var bufferBar = document.getElementById(player.videoPlayerId + "_buffered_amount");
-        bufferBar.style.width = 0;
+        var bufferBar = videoPlayer.parentNode.getElementsByClassName('fluid_controls_buffered');
+
+        for (var j = 0; j < bufferBar.length; j++) {
+            bufferBar[j].style.width = 0;
+        }
+        
 
         // Buffering
         logProgress = function () {
             var duration =  videoPlayer.duration;
             if (duration > 0) {
                 for (var i = 0; i < videoPlayer.buffered.length; i++) {
+
                     if (videoPlayer.buffered.start(videoPlayer.buffered.length - 1 - i) < videoPlayer.currentTime) {
-                        bufferBar.style.width = (videoPlayer.buffered.end(videoPlayer.buffered.length - 1 - i) / duration) * 100 + "%";
+
+                        var newBufferLength = (videoPlayer.buffered.end(videoPlayer.buffered.length - 1 - i) / duration) * 100 + "%";
+
+                        for (var j = 0; j < bufferBar.length; j++) {
+                            bufferBar[j].style.width =  newBufferLength;   
+                        }                        
 
                         // Stop checking for buffering if the video is fully buffered
                         if ((videoPlayer.buffered.end(videoPlayer.buffered.length - 1 - i) / duration) == "1") {
@@ -5003,6 +5545,11 @@ var fluidPlayerClass = {
         videoPlayer.setAttribute('playsinline', '');
         videoPlayer.setAttribute('webkit-playsinline', '');
 
+        player.vrROTATION_POSITION     = 0.1;
+        player.vrROTATION_SPEED        = 80;
+        player.vrMode                  = false;
+        player.vrPanorama              = null;
+        player.vrViewer                = null;
         player.vastOptions             = null;
         player.videoPlayerId           = idVideoPlayer;
         player.originalSrc             = player.getCurrentSrc();
@@ -5078,6 +5625,8 @@ var fluidPlayerClass = {
                 allowDownload:                false,
                 playbackRateEnabled:          false,
                 subtitlesEnabled:             false,
+                showCardBoardView:            false,
+                showCardBoardJoystick:        false,
                 allowTheatre:                 true,
                 doubleclickFullscreen:        true,
                 theatreSettings: {
@@ -5215,6 +5764,8 @@ var fluidPlayerClass = {
         player.createVideoSourceSwitch();
 
         player.createSubtitles();
+
+        player.createCardboard();
 
         player.userActivityChecker();
 
@@ -5501,5 +6052,19 @@ var fluidPlayerClass = {
         }
 
         this.initLogo();
+    },
+
+    // this functions helps in adding event listeners for future dynamic elements
+    //delegate(document, "click", ".some_elem", callBackFunction);
+    delegate: function (el, evt, sel, handler) {
+        el.addEventListener(evt, function(event) {
+            var t = event.target;
+            while (t && t !== this) {
+                if (t.matches(sel)) {
+                    handler.call(t, event);
+                }
+                t = t.parentNode;
+            }
+        });
     }
 };

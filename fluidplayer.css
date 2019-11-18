@@ -396,6 +396,18 @@
     line-height: 21px;
 }
 
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_fluid_control_duration.cardboard_time {
+    left: 13px;
+    top: -15px;    
+}
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_fluid_control_duration.cardboard_time .ad_timer_prefix {
+    color: #F2C94C;    
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .ad_countdown .ad_timer_prefix{
+    color: #F2C94C;
+}
+
 .fluid_video_wrapper.fluid_player_layout_default .ad_countdown {
     display: none;
     position: absolute;
@@ -416,6 +428,130 @@
 .initial_controls_show {
     visibility: visible !important;
     opacity: 1 !important;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container {
+    color: white;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: -moz-linear-gradient(top,  rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top,  rgba(0,0,0,0) 0%,rgba(0,0,0,0.6) 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom,  rgba(0,0,0,0) 0%,rgba(0,0,0,0.6) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#ad000000',GradientType=0 ); /* IE6-9 */
+    height: 100%;
+    width: 100%;
+    z-index: 0;    
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel {
+    height: 96px;
+    width: 72px;
+    left: 10px;
+    top: 10px;
+    position: absolute;
+    background: rgba(0, 0, 0, 0.7);
+    text-align: center;
+    border-radius: 6px;
+    overflow: hidden;
+}
+.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_button {
+    cursor: pointer;
+    display: inline-block;
+    text-align: left;
+    height: 24px;
+    width: 24px;
+    position: relative;
+    background: url(images/fluid_icons.svg) no-repeat;
+    opacity: 0.8;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_button:hover{
+    opacity: 1;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_up{
+    background-position: -336px -55px;
+    -webkit-transform: rotate(270deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+    -ms-transform: rotate(270deg);  /* IE 9 */
+    transform: rotate(270deg);  /* Firefox 16+, IE 10+, Opera  */
+    display: block;
+    left: calc(50% - 12px);
+    top: 0px;
+    position: absolute;    
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_left{
+    background-position: -336px -55px;
+    -webkit-transform: rotate(180deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+    -ms-transform: rotate(1890deg);  /* IE 9 */
+    transform: rotate(180deg);  /* Firefox 16+, IE 10+, Opera  */   
+    display: block;
+    left: 0px;
+    top: 24px;
+    position: absolute;   
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_right{
+    background-position: -336px -55px;
+    -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+    -ms-transform: rotate(0deg);  /* IE 9 */
+    transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera  */  
+    display: block;
+    right: 0px;
+    top: 24px;
+    position: absolute;      
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_down{
+    background-position: -336px -55px;
+    -webkit-transform: rotate(90deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+    -ms-transform: rotate(90deg);  /* IE 9 */
+    transform: rotate(90deg);  /* Firefox 16+, IE 10+, Opera  */  
+    display: block;
+    left: calc(50% - 12px);
+    top: 48px;
+    position: absolute;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_zoomdefault{
+    background-position: -336px -17px;
+    top: 72px;
+    -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+    -ms-transform: rotate(0deg);  /* IE 9 */
+    transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera  */    
+    position: absolute;  
+    left: calc(50% - 12px);
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_zoomin{
+    background-position: -305px -55px;
+    top: 72px;
+    -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+    -ms-transform: rotate(0deg);  /* IE 9 */
+    transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera  */   
+    position: absolute; 
+    right: 0;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_zoomout{
+    background-position: -305px -17px;
+    top: 72px;
+    -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+    -ms-transform: rotate(0deg);  /* IE 9 */
+    transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera  */
+    position: absolute; 
+    left: 0; 
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container.fluid_vr_controls_container{
+    width: 50% !important;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container.fluid_vr2_controls_container{
+    width: 50% !important;
+    left: 50%;
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container {
@@ -544,7 +680,7 @@ _:-ms-lang(x),
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right {
-    left: 78px;
+    left: 60px;
     right: 20px;
 }
 
@@ -593,6 +729,7 @@ _:-ms-lang(x),
     margin-top: -1px;
     height: 5px;
 }
+
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_progress_container:hover .fluid_controls_progress .fluid_controls_currentprogress {
     height: 5px;
 }
@@ -716,7 +853,8 @@ _:-ms-lang(x),
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button_video_source ,
-.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button_subtitles{
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button_subtitles,
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button_cardboard{
     font-size: 13px;
     height: 24px;
     line-height: 24px;
@@ -792,7 +930,8 @@ _:-ms-lang(x),
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_playback_rate,
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_download,
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_theatre,
-.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_subtitles {
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_subtitles,
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_cardboard {
     display: inline-block;
     text-align: left;
     height: 24px;
@@ -810,7 +949,8 @@ _:-ms-lang(x),
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_playback_rate:before,
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_download:before,
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_theatre:before,
-.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_subtitles:before  {
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_subtitles:before,
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_cardboard:before {
     background: url('images/fluid_icons.svg') no-repeat;
     position: absolute;
     height: 24px;
@@ -870,6 +1010,10 @@ _:-ms-lang(x),
     background-position: -269px -19px;
 }
 
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_cardboard:before {
+    background-position: -269px -56px;
+}
+
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_video_source:hover:before,
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_fullscreen_exit:hover:before,
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_fullscreen:hover:before,
@@ -880,7 +1024,8 @@ _:-ms-lang(x),
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_playback_rate:hover:before,
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_download:hover:before,
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_theatre:hover:before,
-.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_subtitles:hover:before {
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_subtitles:hover:before,
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_cardboard:hover:before {
     opacity: 1;
 }
 
@@ -983,7 +1128,8 @@ _:-ms-lang(x),
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_playback_rate,
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_video_source,
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_download,
-.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_subtitles {
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_subtitles,
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_cardboard {
     float:right;
     padding-right:5px;
 }
