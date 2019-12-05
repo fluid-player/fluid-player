@@ -132,7 +132,7 @@ var fluidPlayerClass = {
         'toggleElementText', 'getMobileOs', 'findClosestParent', 'activeVideoPlayerId',
         'getInstanceIdByWrapperId', 'timer', 'timerPool', 'adList', 'adPool',
         'isUserActive', 'isCurrentlyPlayingAd', 'initialAnimationSet'],
-    version: '2.4.8',
+    version: '2.4.9',
     vpaidVer: '2.0',
     homepage: 'https://www.fluidplayer.com/',
     activeVideoPlayerId: null,
@@ -2156,8 +2156,8 @@ var fluidPlayerClass = {
         if (typeof v2 !== 'string') return false;
         v1 = v1.split('.');
         v2 = v2.split('.');
-        const k = Math.min(v1.length, v2.length);
-        for (let i = 0; i < k; ++ i) {
+        var k = Math.min(v1.length, v2.length);
+        for (var i = 0; i < k; ++ i) {
             v1[i] = parseInt(v1[i], 10);
             v2[i] = parseInt(v2[i], 10);
             if (v1[i] > v2[i]) return 1;
