@@ -73,6 +73,26 @@ if (typeof Object.assign != 'function') {
     window.CustomEvent = CustomEvent;
 })();
 
+//remove() polyfill
+(function (arr) {
+    arr.forEach(function (item) {
+        if (item.hasOwnProperty('remove')) {
+            return;
+        }
+        Object.defineProperty(item, 'remove', {
+            configurable: true,
+            enumerable: true,
+            writable: true,
+            value: function remove() {
+                if (this.parentNode === null) {
+                    return;
+                }
+                this.parentNode.removeChild(this);
+            }
+        });
+    });
+})([Element.prototype, CharacterData.prototype, DocumentType.prototype]);
+
 fluidPlayer = function (idVideoPlayer, options) {
     var inArray = function (needle, haystack) {
         var length = haystack.length;
@@ -768,13 +788,7 @@ var fluidPlayerClass = {
     playMainVideoWhenVpaidFails: function (errorCode) {
         var player = this;
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
-        var vpaidIframe = document.getElementById(player.videoPlayerId +"_fluid_vpaid_iframe");
         var vpaidSlot = document.getElementById(player.videoPlayerId +"_fluid_vpaid_slot");
-
-
-        if(vpaidIframe){
-            vpaidIframe.remove();
-        }   
 
         if (vpaidSlot){
             vpaidSlot.remove();
@@ -1213,6 +1227,9 @@ var fluidPlayerClass = {
     onVpaidAdSkippableStateChange: function() {
         var player = this;
 
+        if (!player.vpaidAdUnit) {
+            return;
+        }
         player.debugMessage("Ad Skippable State Changed to: " + player.vpaidAdUnit.getAdSkippableState());
     },
 
@@ -1220,6 +1237,9 @@ var fluidPlayerClass = {
     onVpaidAdExpandedChange: function() {
         var player = this;
 
+        if (!player.vpaidAdUnit) {
+            return;
+        }
         player.debugMessage("Ad Expanded Changed to: " + player.vpaidAdUnit.getAdExpanded());
     },
 
@@ -1228,6 +1248,10 @@ var fluidPlayerClass = {
         var player = this;
 
         player.debugMessage("getAdExpanded");
+
+        if (!player.vpaidAdUnit) {
+            return;
+        }
         return player.vpaidAdUnit.getAdExpanded();
     },
 
@@ -1236,6 +1260,10 @@ var fluidPlayerClass = {
         var player = this;
 
         player.debugMessage("getAdSkippableState");
+
+        if (!player.vpaidAdUnit) {
+            return;
+        }
         return player.vpaidAdUnit.getAdSkippableState();
     },
 
@@ -1243,6 +1271,9 @@ var fluidPlayerClass = {
     onVpaidAdSizeChange: function() {
         var player = this;
 
+        if (!player.vpaidAdUnit) {
+            return;
+        }
         player.debugMessage("Ad size changed to: w=" + player.vpaidAdUnit.getAdWidth() + " h=" + player.vpaidAdUnit.getAdHeight());
     },
 
@@ -1250,6 +1281,9 @@ var fluidPlayerClass = {
     onVpaidAdDurationChange: function() {
         var player = this;
 
+        if (!player.vpaidAdUnit) {
+            return;
+        }
         player.debugMessage("Ad Duration Changed to: " + player.vpaidAdUnit.getAdDuration());
     },
 
@@ -1257,6 +1291,9 @@ var fluidPlayerClass = {
     onVpaidAdRemainingTimeChange: function() {
         var player = this;
 
+        if (!player.vpaidAdUnit) {
+            return;
+        }
         player.debugMessage("Ad Remaining Time Changed to: " + player.vpaidAdUnit.getAdRemainingTime());
     },
 
@@ -1265,6 +1302,9 @@ var fluidPlayerClass = {
         var player = this;
 
         player.debugMessage("getAdRemainingTime");
+        if (!player.vpaidAdUnit) {
+            return;
+        }
         return player.vpaidAdUnit.getAdRemainingTime();
     },
 
@@ -1422,7 +1462,12 @@ var fluidPlayerClass = {
         // we delete all the vpaid assets so the new one can be loaded
         // delete all assets apart from the ad from deleteOtherVpaidAdsApart
         var player = this;
-        
+
+        if (player.vpaidAdUnit) {
+            player.vpaidAdUnit.stopAd();
+            player.vpaidAdUnit = null;
+        }
+
         var vpaidIframes = document.getElementsByClassName("fluid_vpaid_iframe");
         var vpaidSlots = document.getElementsByClassName("fluid_vpaid_slot");
         var vpaidNonLinearSlots = document.getElementsByClassName("fluid_vpaidNonLinear_ad");
@@ -1444,11 +1489,6 @@ var fluidPlayerClass = {
                 vpaidNonLinearSlots[k].remove();
             }
         }        
-
-        if (player.vpaidAdUnit) {
-            player.vpaidAdUnit.stopAd();
-        }
-
     },
        
     // Callback for AdUserClose
@@ -1474,6 +1514,9 @@ var fluidPlayerClass = {
         var player = this;
 
         player.vpaidTimeoutTimerStart();
+        if (!player.vpaidAdUnit) {
+            return;
+        }
         player.vpaidAdUnit.skipAd();
     },
 
@@ -1481,6 +1524,9 @@ var fluidPlayerClass = {
     setVpaidAdVolume: function(val) {
         var player = this;
 
+        if (!player.vpaidAdUnit) {
+            return;
+        }
         player.vpaidAdUnit.setAdVolume(val);
     },
        
@@ -1488,6 +1534,9 @@ var fluidPlayerClass = {
     getVpaidAdVolume: function() {
         var player = this;
 
+        if (!player.vpaidAdUnit) {
+            return;
+        }
         return player.vpaidAdUnit.getAdVolume();
     },
 
@@ -1495,6 +1544,9 @@ var fluidPlayerClass = {
     onVpaidAdVolumeChange: function() {
         var player = this;
 
+        if (!player.vpaidAdUnit) {
+            return;
+        }
         player.debugMessage("Ad Volume has changed to - " + player.vpaidAdUnit.getAdVolume());
     },
 
@@ -1512,6 +1564,9 @@ var fluidPlayerClass = {
     resizeVpaidAd: function(width, height, viewMode) {
         var player = this;
 
+        if (!player.vpaidAdUnit) {
+            return;
+        }
         player.vpaidAdUnit.resizeAd(width, height, viewMode);
     },
 
@@ -1520,6 +1575,9 @@ var fluidPlayerClass = {
         var player = this;
 
         player.vpaidTimeoutTimerStart();
+        if (!player.vpaidAdUnit) {
+            return;
+        }
         player.vpaidAdUnit.pauseAd();
     },
 
@@ -1528,6 +1586,9 @@ var fluidPlayerClass = {
         var player = this;
 
         player.vpaidTimeoutTimerStart();
+        if (!player.vpaidAdUnit) {
+            return;
+        }
         player.vpaidAdUnit.resumeAd();
     },
 
@@ -1535,6 +1596,9 @@ var fluidPlayerClass = {
     expandVpaidAd: function() {
         var player = this;
 
+        if (!player.vpaidAdUnit) {
+            return;
+        }
         player.vpaidAdUnit.expandAd();
     },
 
@@ -1542,6 +1606,9 @@ var fluidPlayerClass = {
     collapseVpaidAd: function() {
         var player = this;
 
+        if (!player.vpaidAdUnit) {
+            return;
+        }
         player.vpaidAdUnit.collapseAd();
     }, 
 
@@ -1614,7 +1681,7 @@ var fluidPlayerClass = {
         var videoPlayerTag = document.getElementById(player.videoPlayerId);
 
         var vpaidIframe = document.createElement('iframe');
-        vpaidIframe.id = player.videoPlayerId +"_fluid_vpaid_iframe";
+        vpaidIframe.id = player.videoPlayerId  + "_" + adListId + "_fluid_vpaid_iframe";
         vpaidIframe.className = 'fluid_vpaid_iframe';
         vpaidIframe.setAttribute('adListId', adListId);
         vpaidIframe.setAttribute('frameborder', '0');
@@ -1690,7 +1757,7 @@ var fluidPlayerClass = {
 
                     var player = this;
                     player.debugMessage('starting function switchPlayerToVpaidMode');
-                    var vpaidIframe = player.videoPlayerId +"_fluid_vpaid_iframe";
+                    var vpaidIframe = player.videoPlayerId + "_" + adListId + "_fluid_vpaid_iframe";
                     var creativeData = {};
                     creativeData.AdParameters = player.adPool[adListId].adParameters;
                     var slotElement = document.createElement('div');
@@ -2114,7 +2181,7 @@ var fluidPlayerClass = {
             var videoPlayerTag = document.getElementById(player.videoPlayerId);
             var vAlign = (player.adList[adListId].vAlign) ? player.adList[adListId].vAlign : player.nonLinearVerticalAlign;
             var showCloseButton = (player.adList[adListId].vpaidNonLinearCloseButton) ? player.adList[adListId].vpaidNonLinearCloseButton : player.vpaidNonLinearCloseButton;
-            var vpaidIframe = player.videoPlayerId +"_fluid_vpaid_iframe";
+            var vpaidIframe = player.videoPlayerId + "_" + adListId + "_fluid_vpaid_iframe";
             var creativeData = {};
             creativeData.AdParameters = player.adPool[adListId].adParameters;
             var slotWrapper = document.createElement('div');
@@ -2865,11 +2932,10 @@ var fluidPlayerClass = {
 
     onVpaidEnded: function () {
         var player = this;
-        var vpaidIframe = document.getElementById(player.videoPlayerId +"_fluid_vpaid_iframe");
         var vpaidSlot = document.getElementById(player.videoPlayerId +"_fluid_vpaid_slot");
 
+        player.vpaidAdUnit = null;
         clearInterval(player.getVPAIDAdInterval);
-        vpaidIframe.remove();
         vpaidSlot.remove();
 
         player.checkForNextAd();
