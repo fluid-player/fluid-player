@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 2.4.9
+* [Pull #398](https://github.com/fluid-player/fluid-player/pull/398) Add support for VPAID (2.0)
+
 ## 2.4.8
 * [Pull #374](https://github.com/fluid-player/fluid-player/pull/374) Skip ad button on VAST preroll opening a new blank tab
 
