@@ -1084,13 +1084,13 @@ var fluidPlayerClass = {
             }
 
             player.processVastXml(xmlResponse, tmpOptions, callBack);
-        }
+        };
 
         if (numberOfRedirects <= player.displayOptions.vastOptions.maxAllowedVastTagRedirects) {
 
             player.sendRequest(
                 vastTag,
-                false,
+                true,
                 player.displayOptions.vastOptions.vastTimeout,
                 handleXmlHttpReq
             );
