@@ -953,7 +953,7 @@ var fluidPlayerClass = {
 
         var handleVastResult = function (pass, tmpOptions) {
 
-            if (tmpOptions.vpaid && !player.displayOptions.vastOptions.allowVPAID) {
+            if (pass && typeof tmpOptions !== 'undefined' &&  tmpOptions.vpaid && !player.displayOptions.vastOptions.allowVPAID) {
                 pass = false;
                 player.announceLocalError('103', 'VPAID not allowed, so skipping this VAST tag.')
             }
