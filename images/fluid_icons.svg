@@ -14,7 +14,7 @@
    viewBox="0 0 311 96"
    id="svg63"
    sodipodi:docname="fluid_icons.svg"
-   inkscape:version="0.92.4 (33fec40, 2019-01-16)">
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)">
   <metadata
      id="metadata67">
     <rdf:RDF>
@@ -36,18 +36,20 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1853"
-     inkscape:window-height="1145"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
      id="namedview65"
      showgrid="false"
      inkscape:pagecheckerboard="true"
-     inkscape:zoom="45.254834"
-     inkscape:cx="281.68711"
-     inkscape:cy="64.992929"
-     inkscape:window-x="67"
-     inkscape:window-y="27"
+     inkscape:zoom="2"
+     inkscape:cx="78.637194"
+     inkscape:cy="9.2104624"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg63" />
+     inkscape:current-layer="svg63"
+     showguides="true"
+     inkscape:guide-bbox="true" />
   <title
      id="title2">fluid-icons</title>
   <desc
@@ -278,4 +280,14 @@
        d="M 9.3333,0 H 4.6666 V 1.5238 H 9.3333 Z M 6.2222,9.9048 H 7.7778 V 5.3334 H 6.2222 Z M 12.4678,4.8686 13.5722,3.7867 C 13.2378,3.39813 12.8722,3.03241 12.4756,2.7124 L 11.3711,3.7943 C 10.1656,2.84953 8.6489,2.2857 7,2.2857 3.1344,2.2857 0,5.3562 0,9.1429 0,12.9295 3.1267,16 7,16 10.8733,16 14,12.9295 14,9.1429 14,7.5277 13.4244,6.0419 12.4678,4.8686 Z M 7,14.4762 C 3.99,14.4762 1.5556,12.0914 1.5556,9.1429 1.5556,6.1943 3.99,3.8096 7,3.8096 c 3.01,0 5.4444,2.3848 5.4444,5.3333 0,2.9485 -2.4344,5.3333 -5.4444,5.3333 z"
        inkscape:connector-curvature="0" />
   </defs>
+  <g
+     transform="matrix(0.0104155,0,0,-0.0104155,269.62268,76.313517)"
+     id="g4"
+     style="fill:#ffffff;fill-opacity:1">
+    <path
+       style="fill:#ffffff;fill-opacity:1"
+       inkscape:connector-curvature="0"
+       d="M 1419,971 H 821 V 523 h 598 z m 298,-598 v 1047 q 0,41 -20,74.5 -20,33.5 -54.5,53.5 -34.5,20 -74.5,20 H 224 q -40,0 -74.5,-20 Q 115,1528 95,1494.5 75,1461 75,1420 V 373 Q 75,333 95,298.5 115,264 149.5,244 184,224 224,224 h 1344 q 40,0 74.5,20 34.5,20 54.5,54.5 20,34.5 20,74.5 z m -149,-1 H 224 v 1049 h 1344 z"
+       id="path2" />
+  </g>
 </svg>

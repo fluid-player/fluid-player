@@ -3444,6 +3444,7 @@ var fluidPlayerClass = {
             '</div>' +
             '<div class="fluid_controls_right">' +
             '   <div id="' + this.videoPlayerId + '_fluid_control_fullscreen" class="fluid_button fluid_button_fullscreen"></div>' +
+            '   <div id="' + this.videoPlayerId + '_fluid_control_pip" class="fluid_button fluid_button_pip"></div>' +
             '   <div id="' + this.videoPlayerId + '_fluid_control_theatre" class="fluid_button fluid_button_theatre"></div>' +
             '   <div id="' + this.videoPlayerId + '_fluid_control_subtitles" class="fluid_button fluid_button_subtitles"></div>' +
             '   <div id="' + this.videoPlayerId + '_fluid_control_video_source" class="fluid_button fluid_button_video_source"></div>' +
@@ -4425,6 +4426,14 @@ var fluidPlayerClass = {
                 this.playbackRate = 1;
             }
         });
+
+        if (document.pictureInPictureEnabled){
+            document.getElementById(player.videoPlayerId + '_fluid_control_pip').addEventListener('click', function () {
+                player.pipToggle(player.videoPlayerId);
+            });
+        }else {
+            document.getElementById(player.videoPlayerId + '_fluid_control_pip').style.display = 'none';
+        }
     },
 
     // Create the time position preview only if the vtt previews aren't enabled
@@ -6509,5 +6518,20 @@ var fluidPlayerClass = {
         }
 
         this.initLogo();
+    },
+
+    pipToggle: function() {
+        if (!document.pictureInPictureElement) {
+            document.getElementById(this.videoPlayerId).requestPictureInPicture()
+                .catch(error => {
+                    console.error("Video failed to enter Picture-in-Picture mode.");
+                });
+        } else {
+            document.exitPictureInPicture()
+                .catch(error => {
+                    console.error("Video failed to leave Picture-in-Picture mode.");
+                });
+        }
     }
+
 };
