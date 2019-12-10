@@ -153,6 +153,10 @@
     z-index : auto;
 }
 
+.fluid_video_wrapper canvas {
+    pointer-events:none;
+}
+
 .fluid_video_wrapper,
 .fluid_video_wrapper * {
     -webkit-box-sizing: content-box;
@@ -443,7 +447,8 @@
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#ad000000',GradientType=0 ); /* IE6-9 */
     height: 100%;
     width: 100%;
-    z-index: 0;    
+    z-index: 0;
+    pointer-events: none;
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel {
@@ -456,6 +461,7 @@
     text-align: center;
     border-radius: 6px;
     overflow: hidden;
+    pointer-events: auto;
 }
 .fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_button {
     cursor: pointer;

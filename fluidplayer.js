@@ -967,7 +967,7 @@ var fluidPlayerClass = {
                         player.adList[adListId].landingPage = tmpOptions.iconClick;
                     }
 
-                    var selectedMediaFile = player.getSupportedMediaFile(tmpOptions.mediaFileList);
+                    var selectedMediaFile = player.getSupportedMediaFileObject(tmpOptions.mediaFileList);
                     if (selectedMediaFile) {
                         player.adList[adListId].mediaType = selectedMediaFile.mediaType;
                     }
@@ -5568,16 +5568,8 @@ var fluidPlayerClass = {
         // OverRide some conflicting functions from panolens
         PANOLENS.VideoPanorama.prototype.pauseVideo = function () { };
         PANOLENS.VideoPanorama.prototype.playVideo = function () { };
-        
-        if ( fluidPlayerClass.getMobileOs().userOs === 'Android' || fluidPlayerClass.getMobileOs().userOs === 'iOS' ){
 
-            player.vrPanorama = new PANOLENS.VideoPanorama( '', { videoElement:  videoPlayerTag, autoplay: true } );
-
-        } else {
-        
-            player.vrPanorama = new PANOLENS.VideoPanorama( '', { videoElement:  videoPlayerTag, autoplay: player.displayOptions.layoutControls.autoPlay } );            
-        }
-
+        player.vrPanorama = new PANOLENS.VideoPanorama( '', { videoElement:  videoPlayerTag, autoplay: player.displayOptions.layoutControls.autoPlay } );
 
         player.vrViewer = new PANOLENS.Viewer( { container: vrContainer, controlBar: true, controlButtons: [], enableReticle: false } );
         player.vrViewer.add( player.vrPanorama );
