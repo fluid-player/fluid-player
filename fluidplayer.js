@@ -6521,16 +6521,12 @@ var fluidPlayerClass = {
     },
 
     pipToggle: function() {
-        if (!document.pictureInPictureElement) {
+        if (typeof document.getElementById(this.videoPlayerId).requestPictureInPicture === "function" && !document.pictureInPictureElement) {
             document.getElementById(this.videoPlayerId).requestPictureInPicture()
-                .catch(error => {
-                    console.error("Video failed to enter Picture-in-Picture mode.");
-                });
-        } else {
+        } else if(typeof document.exitPictureInPicture === "function"){
             document.exitPictureInPicture()
-                .catch(error => {
-                    console.error("Video failed to leave Picture-in-Picture mode.");
-                });
+        }else {
+            console.log('Error on pip toggle');
         }
     }
 
