@@ -151,6 +151,7 @@
     width : auto;
     word-spacing : normal;
     z-index : auto;
+    -webkit-tap-highlight-color:transparent;
 }
 
 .fluid_video_wrapper canvas {

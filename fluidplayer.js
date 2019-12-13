@@ -1129,7 +1129,7 @@ var fluidPlayerClass = {
                 break;
 
             case 'postRoll':
-                videoPlayerTag.mainVideoCurrentTime = 0;
+                videoPlayerTag.mainVideoCurrentTime = player.mainVideoDuration;
                 player.autoplayAfterAd = false;
                 videoPlayerTag.currentTime = player.mainVideoDuration;
                 break;
@@ -2995,7 +2995,11 @@ var fluidPlayerClass = {
     },
 
 
-    onVpaidEnded: function () {
+    onVpaidEnded: function (event) {
+        if (event) {
+            event.stopImmediatePropagation();
+        }
+
         var player = this;
         var vpaidSlot = document.getElementById(player.videoPlayerId +"_fluid_vpaid_slot");
 
@@ -3006,7 +3010,10 @@ var fluidPlayerClass = {
         player.checkForNextAd();
     },
 
-    onVastAdEnded: function () {
+    onVastAdEnded: function (event) {
+        if (event) {
+            event.stopImmediatePropagation();
+        }
         //"this" is the HTML5 video tag, because it disptches the "ended" event
         var player = fluidPlayerClass.getInstanceById(this.id);
 
@@ -3032,9 +3039,15 @@ var fluidPlayerClass = {
         }
     },
 
-    onMainVideoEnded: function () {
+    onMainVideoEnded: function (event) {
+
         var videoPlayerTag = this;
         var player = fluidPlayerClass.getInstanceById(this.id);
+
+        if (event && !player.isCurrentlyPlayingAd) {
+            event.stopImmediatePropagation();
+        }
+
         player.debugMessage('onMainVideoEnded is called');
 
         if (player.isCurrentlyPlayingAd && player.autoplayAfterAd) {  // It may be in-stream ending, and if it's not postroll then we don't execute anything
@@ -5789,6 +5802,9 @@ var fluidPlayerClass = {
 
             if (shouldPlay) {
                 videoPlayerTag.play();
+            } else {
+                videoPlayerTag.pause();
+                player.controlPlayPauseToggle(player.videoPlayerId);
             }
             player.isSwitchingSource = false;
             videoPlayerTag.style.width = "100%";
