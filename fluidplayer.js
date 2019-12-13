@@ -6745,6 +6745,11 @@ var fluidPlayerClass = {
         videoPlayer.addEventListener('error', player.onErrorDetection, false);
         videoPlayer.addEventListener('ended', player.onMainVideoEnded, false);
 
+        if (player.displayOptions.layoutControls.showCardBoardView) {
+            // This fixes cross origin errors on three.js
+            videoPlayer.setAttribute('crossOrigin', 'anonymous');
+        }
+
         //Manually load the video duration if the video was loaded before adding the event listener
         player.currentVideoDuration = player.getCurrentVideoDuration();
 
@@ -6790,6 +6795,19 @@ var fluidPlayerClass = {
             var videoPlayerTag = this;
             var promise = null;
             var player = fluidPlayerClass.getInstanceById(videoPlayerTag.id);
+
+            if (player.displayOptions.layoutControls.showCardBoardView) {
+
+                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    DeviceOrientationEvent.requestPermission()
+                        .then(response => {
+                            if (response === 'granted') {
+                                player.debugMessage('DeviceOrientationEvent permission granted!');
+                            }
+                        })
+                        .catch(console.error);
+                }
+            }
 
             try {
 
