@@ -4392,7 +4392,7 @@ var fluidPlayerClass = {
 
             if (videoPlayerTag.paused) {
 
-                if (player.isCurrentlyPlayingAd && player.vastOptions.vpaid) {
+                if (player.isCurrentlyPlayingAd && player.vastOptions !== null &&  player.vastOptions.vpaid) {
                     // resume the vpaid linear ad
                     player.resumeVpaidAd();
                 } else {
@@ -4408,7 +4408,7 @@ var fluidPlayerClass = {
 
             } else if (!isFirstStart) {
 
-                if (player.isCurrentlyPlayingAd && player.vastOptions.vpaid){
+                if (player.isCurrentlyPlayingAd && player.vastOptions !== null && player.vastOptions.vpaid){
                     // pause the vpaid linear ad
                     player.pauseVpaidAd();
                 } else {
@@ -4481,7 +4481,7 @@ var fluidPlayerClass = {
         var videoPlayerTag = document.getElementById(this.videoPlayerId);
 
         //Set the Play/Pause behaviour
-        fluidPlayerClass.delegate(videoPlayerTag.parentNode, 'click', '.fluid_control_playpause', function() {
+        player.trackEvent(videoPlayerTag.parentNode, 'click', '.fluid_control_playpause', function() {
 
             if (!player.firstPlayLaunched) {
                 videoPlayerTag.removeEventListener('play', player.initialPlay);
@@ -4510,7 +4510,7 @@ var fluidPlayerClass = {
         
         if ( player.displayOptions.layoutControls.showCardBoardView ) {
 
-            fluidPlayerClass.delegate(videoPlayerTag.parentNode, eventOn, '.fluid_controls_progress_container', function ( event ) {
+            player.trackEvent(videoPlayerTag.parentNode, eventOn, '.fluid_controls_progress_container', function ( event ) {
                     player.onProgressbarMouseDown(player.videoPlayerId, event);
                 }, false); 
 
@@ -4531,20 +4531,20 @@ var fluidPlayerClass = {
             player.contolVolumebarUpdate(player.videoPlayerId);
         });
 
-        fluidPlayerClass.delegate(videoPlayerTag.parentNode, 'click', '.fluid_control_mute', function() {
+        player.trackEvent(videoPlayerTag.parentNode, 'click', '.fluid_control_mute', function() {
             player.muteToggle(player.videoPlayerId);
         });
 
         player.setBuffering();
 
         //Set the fullscreen control
-        fluidPlayerClass.delegate(videoPlayerTag.parentNode, 'click', '.fluid_control_fullscreen', function() {        
+        player.trackEvent(videoPlayerTag.parentNode, 'click', '.fluid_control_fullscreen', function() {
             player.fullscreenToggle();
         });
 
         // Theatre mode
         if (player.displayOptions.layoutControls.allowTheatre && !player.isInIframe) {
-            fluidPlayerClass.delegate(videoPlayerTag.parentNode, 'click', '.fluid_control_theatre', function() {
+            player.trackEvent(videoPlayerTag.parentNode, 'click', '.fluid_control_theatre', function() {
                 player.theatreToggle(player.videoPlayerId);
             });
         } else {
@@ -5468,6 +5468,7 @@ var fluidPlayerClass = {
 
         newControlBar.classList.add("fluid_vr2_controls_container");        
         videoPlayerTag.parentNode.insertBefore( newControlBar, videoPlayerTag.nextSibling );
+        player.copyEvents(newControlBar);
   
     },
 
@@ -5612,7 +5613,7 @@ var fluidPlayerClass = {
             player.vrViewer.OrbitControls.noZoom = true;
         }
 
-        fluidPlayerClass.delegate(videoPlayerTag.parentNode, 'click', '.fluid_control_cardboard', function() {
+        player.trackEvent(videoPlayerTag.parentNode, 'click', '.fluid_control_cardboard', function() {
 
             if ( player.vrMode ) {
 
@@ -6613,6 +6614,7 @@ var fluidPlayerClass = {
         player.fluidStorage            = {};
         player.fluidPseudoPause        = false;
         player.mobileInfo              = fluidPlayerClass.getMobileOs();
+        player.events                  = {};
 
         //Default options
         player.displayOptions = {
@@ -6798,7 +6800,7 @@ var fluidPlayerClass = {
 
             if (player.displayOptions.layoutControls.showCardBoardView) {
 
-                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                     DeviceOrientationEvent.requestPermission()
                         .then(response => {
                             if (response === 'granted') {
@@ -7085,16 +7087,45 @@ var fluidPlayerClass = {
     },
 
     // this functions helps in adding event listeners for future dynamic elements
-    //delegate(document, "click", ".some_elem", callBackFunction);
-    delegate: function (el, evt, sel, handler) {
-        el.addEventListener(evt, function(event) {
-            var t = event.target;
-            while (t && t !== this) {
-                if (t.matches(sel)) {
-                    handler.call(t, event);
-                }
-                t = t.parentNode;
+    //trackEvent(document, "click", ".some_elem", callBackFunction);
+    trackEvent: function (el, evt, sel, handler) {
+        var player = this;
+
+        if (typeof player.events[sel] === 'undefined') {
+            player.events[sel] = {};
+        }
+        if (typeof player.events[sel][evt] === 'undefined') {
+            player.events[sel][evt] = [];
+        }
+        player.events[sel][evt].push(handler);
+
+        player.registerListener(el, evt, sel, handler);
+    },
+
+    registerListener: function(el, evt, sel, handler) {
+        var currentElements = el.querySelectorAll(sel);
+        for (var i = 0; i < currentElements.length; i++) {
+            currentElements[i].addEventListener(evt, handler);
+        }
+    },
+
+    copyEvents: function (topLevelEl) {
+        var player = this;
+
+        for (var sel in player.events) {
+            if (!player.events.hasOwnProperty(sel)) {
+                continue;
             }
-        });
+
+            for (var evt in player.events[sel]) {
+                if (!player.events[sel].hasOwnProperty(evt)) {
+                    continue;
+                }
+
+                for (var i = 0; i < player.events[sel][evt].length; i++) {
+                    player.registerListener(topLevelEl, evt, sel, player.events[sel][evt][i]);
+                }
+            }
+        }
     }
 };
