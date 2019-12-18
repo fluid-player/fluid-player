@@ -134,7 +134,7 @@ var fluidPlayerClass = {
         'toggleElementText', 'getMobileOs', 'findClosestParent', 'activeVideoPlayerId',
         'getInstanceIdByWrapperId', 'timer', 'timerPool', 'adList', 'adPool',
         'isUserActive', 'isCurrentlyPlayingAd', 'initialAnimationSet'],
-    version: '2.4.9',
+    version: '2.4.10',
     vpaidVer: '2.0',
     homepage: 'https://www.fluidplayer.com/',
     activeVideoPlayerId: null,
@@ -6802,7 +6802,7 @@ var fluidPlayerClass = {
 
                 if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                     DeviceOrientationEvent.requestPermission()
-                        .then(response => {
+                        .then(function(response) {
                             if (response === 'granted') {
                                 player.debugMessage('DeviceOrientationEvent permission granted!');
                             }
