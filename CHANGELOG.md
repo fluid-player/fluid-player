@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 2.4.10
+* [Pull #399](https://github.com/fluid-player/fluid-player/pull/399) Adding VR Features to player (experimental)
+
 ## 2.4.9
 * [Pull #398](https://github.com/fluid-player/fluid-player/pull/398) Add support for VPAID (2.0)
 
