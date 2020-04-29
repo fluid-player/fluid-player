@@ -1426,6 +1426,7 @@ export default function (playerInstance, options) {
         }
     };
 
+    // TODO: this does not seem to work...?
     playerInstance.pressSkipButton = () => {
         playerInstance.removeSkipButton();
         playerInstance.removeAdPlayingText();
