@@ -1,161 +1,159 @@
-@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400&subset=cyrillic,greek,latin-ext');
-
 .fluid_video_wrapper {
-    animation : none;
-    animation-delay : 0;
-    animation-direction : normal;
-    animation-duration : 0;
-    animation-fill-mode : none;
-    animation-iteration-count : 1;
-    animation-name : none;
-    animation-play-state : running;
-    animation-timing-function : ease;
-    backface-visibility : visible;
-    background : 0;
-    background-attachment : scroll;
-    background-clip : border-box;
-    background-color : transparent;
-    background-image : none;
-    background-origin : padding-box;
-    background-position : 0 0;
-    background-position-x : 0;
-    background-position-y : 0;
-    background-repeat : repeat;
-    background-size : auto auto;
-    border : 0;
-    border-style : none;
-    border-width : medium;
-    border-color : inherit;
-    border-bottom : 0;
-    border-bottom-color : inherit;
-    border-bottom-left-radius : 0;
-    border-bottom-right-radius : 0;
-    border-bottom-style : none;
-    border-bottom-width : medium;
-    border-collapse : separate;
-    border-image : none;
-    border-left : 0;
-    border-left-color : inherit;
-    border-left-style : none;
-    border-left-width : medium;
-    border-radius : 0;
-    border-right : 0;
-    border-right-color : inherit;
-    border-right-style : none;
-    border-right-width : medium;
-    border-spacing : 0;
-    border-top : 0;
-    border-top-color : inherit;
-    border-top-left-radius : 0;
-    border-top-right-radius : 0;
-    border-top-style : none;
-    border-top-width : medium;
-    bottom : auto;
-    box-shadow : none;
+    animation: none;
+    animation-delay: 0;
+    animation-direction: normal;
+    animation-duration: 0;
+    animation-fill-mode: none;
+    animation-iteration-count: 1;
+    animation-name: none;
+    animation-play-state: running;
+    animation-timing-function: ease;
+    backface-visibility: visible;
+    background: 0;
+    background-attachment: scroll;
+    background-clip: border-box;
+    background-color: transparent;
+    background-image: none;
+    background-origin: padding-box;
+    background-position: 0 0;
+    background-position-x: 0;
+    background-position-y: 0;
+    background-repeat: repeat;
+    background-size: auto auto;
+    border: 0;
+    border-style: none;
+    border-width: medium;
+    border-color: inherit;
+    border-bottom: 0;
+    border-bottom-color: inherit;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-style: none;
+    border-bottom-width: medium;
+    border-collapse: separate;
+    border-image: none;
+    border-left: 0;
+    border-left-color: inherit;
+    border-left-style: none;
+    border-left-width: medium;
+    border-radius: 0;
+    border-right: 0;
+    border-right-color: inherit;
+    border-right-style: none;
+    border-right-width: medium;
+    border-spacing: 0;
+    border-top: 0;
+    border-top-color: inherit;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-top-style: none;
+    border-top-width: medium;
+    bottom: auto;
+    box-shadow: none;
     -webkit-box-sizing: content-box;
     -moz-box-sizing: content-box;
-    box-sizing : content-box;
-    caption-side : top;
-    clear : none;
-    clip : auto;
-    color : inherit;
-    columns : auto;
-    column-count : auto;
-    column-fill : balance;
-    column-gap : normal;
-    column-rule : medium none currentColor;
-    column-rule-color : currentColor;
-    column-rule-style : none;
-    column-rule-width : none;
-    column-span : 1;
-    column-width : auto;
-    content : normal;
-    counter-increment : none;
-    counter-reset : none;
-    cursor : auto;
-    direction : ltr;
-    display : inline;
-    empty-cells : show;
-    float : none;
-    font : normal;
-    font-family : inherit;
-    font-size : medium;
-    font-style : normal;
-    font-variant : normal;
-    font-weight : normal;
-    height : auto;
-    hyphens : none;
-    left : auto;
-    letter-spacing : normal;
-    line-height : normal;
-    list-style : none;
-    list-style-image : none;
-    list-style-position : outside;
-    list-style-type : disc;
-    margin : 0;
-    margin-bottom : 0;
-    margin-left : 0;
-    margin-right : 0;
-    margin-top : 0;
-    max-height : none;
-    max-width : none;
-    min-height : 0;
-    min-width : 0;
-    opacity : 1;
-    orphans : 0;
-    outline : 0;
-    outline-color : invert;
-    outline-style : none;
-    outline-width : medium;
-    overflow : visible;
-    overflow-x : visible;
-    overflow-y : visible;
-    padding : 0;
-    padding-bottom : 0;
-    padding-left : 0;
-    padding-right : 0;
-    padding-top : 0;
-    page-break-after : auto;
-    page-break-before : auto;
-    page-break-inside : auto;
-    perspective : none;
-    perspective-origin : 50% 50%;
-    position : static;
+    box-sizing: content-box;
+    caption-side: top;
+    clear: none;
+    clip: auto;
+    color: inherit;
+    columns: auto;
+    column-count: auto;
+    column-fill: balance;
+    column-gap: normal;
+    column-rule: medium none currentColor;
+    column-rule-color: currentColor;
+    column-rule-style: none;
+    column-rule-width: none;
+    column-span: 1;
+    column-width: auto;
+    content: normal;
+    counter-increment: none;
+    counter-reset: none;
+    cursor: auto;
+    direction: ltr;
+    display: inline;
+    empty-cells: show;
+    float: none;
+    font: normal;
+    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    font-size: medium;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: normal;
+    height: auto;
+    hyphens: none;
+    left: auto;
+    letter-spacing: normal;
+    line-height: normal;
+    list-style: none;
+    list-style-image: none;
+    list-style-position: outside;
+    list-style-type: disc;
+    margin: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    max-height: none;
+    max-width: none;
+    min-height: 0;
+    min-width: 0;
+    opacity: 1;
+    orphans: 0;
+    outline: 0;
+    outline-color: invert;
+    outline-style: none;
+    outline-width: medium;
+    overflow: visible;
+    overflow-x: visible;
+    overflow-y: visible;
+    padding: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    page-break-after: auto;
+    page-break-before: auto;
+    page-break-inside: auto;
+    perspective: none;
+    perspective-origin: 50% 50%;
+    position: static;
     /* May need to alter quotes for different locales (e.g fr) */
-    quotes : '\201C' '\201D' '\2018' '\2019';
-    right : auto;
-    tab-size : 8;
-    table-layout : auto;
-    text-align : inherit;
-    text-align-last : auto;
-    text-decoration : none;
-    text-decoration-color : inherit;
-    text-decoration-line : none;
-    text-decoration-style : solid;
-    text-indent : 0;
-    text-shadow : none;
-    text-transform : none;
-    top : auto;
-    transform : none;
-    transform-style : flat;
-    transition : none;
-    transition-delay : 0s;
-    transition-duration : 0s;
-    transition-property : none;
-    transition-timing-function : ease;
-    unicode-bidi : normal;
-    vertical-align : baseline;
-    visibility : visible;
-    white-space : normal;
-    widows : 0;
-    width : auto;
-    word-spacing : normal;
-    z-index : auto;
-    -webkit-tap-highlight-color:transparent;
+    quotes: '\201C' '\201D' '\2018' '\2019';
+    right: auto;
+    tab-size: 8;
+    table-layout: auto;
+    text-align: inherit;
+    text-align-last: auto;
+    text-decoration: none;
+    text-decoration-color: inherit;
+    text-decoration-line: none;
+    text-decoration-style: solid;
+    text-indent: 0;
+    text-shadow: none;
+    text-transform: none;
+    top: auto;
+    transform: none;
+    transform-style: flat;
+    transition: none;
+    transition-delay: 0s;
+    transition-duration: 0s;
+    transition-property: none;
+    transition-timing-function: ease;
+    unicode-bidi: normal;
+    vertical-align: baseline;
+    visibility: visible;
+    white-space: normal;
+    widows: 0;
+    width: auto;
+    word-spacing: normal;
+    z-index: auto;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .fluid_video_wrapper canvas {
-    pointer-events:none;
+    pointer-events: none;
 }
 
 .fluid_video_wrapper,
@@ -166,16 +164,16 @@
 }
 
 .fluid_video_wrapper:after, .fluid_video_wrapper:before {
-    content:none;
+    content: none;
 }
 
 .fluid_video_wrapper {
-    position:relative;
+    position: relative;
     display: inline-block;
 }
 
 .fluid_video_wrapper video {
-    position:relative;
+    position: relative;
     background-color: #000000;
     display: block;
 }
@@ -192,7 +190,7 @@
 }
 
 .fluid_video_wrapper .vast_video_loading:before {
-    background-image: url("images/fluid_spinner.svg");
+    background-image: url("../static/fluid-spinner.svg");
     background-position: center, center;
     background-repeat: no-repeat, repeat;
     background-color: rgba(0, 0, 0, 0.2);
@@ -205,7 +203,7 @@
 }
 
 .skip_button {
-    position:absolute;
+    position: absolute;
     bottom: 50px;
     right: 0;
     background-color: rgba(0, 0, 0, 0.7);
@@ -213,12 +211,12 @@
 }
 
 .skip_button, .skip_button a {
-    color:#ffffff;
+    color: #ffffff;
     text-decoration: none;
     cursor: pointer;
     z-index: 10;
     font-size: 13px;
-    font-family: 'Roboto', sans-serif, Verdana, Arial;
+    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
     font-weight: normal;
     white-space: nowrap;
     text-align: start;
@@ -229,11 +227,11 @@
     text-align: left;
     width: 21px;
     position: relative;
-    bottom:20px;
+    bottom: 20px;
 }
 
 .skip_button a span.skip_button_icon:before {
-    background: url('images/fluid_icons.svg') no-repeat;
+    background: url('../static/fluid-icons.svg') no-repeat;
     position: absolute;
     height: 18px;
     width: 18px;
@@ -259,7 +257,7 @@
 
 .close_button {
     position: absolute;
-    background: #000000 url("images/close-icon.svg") no-repeat scroll center center;
+    background: #000000 url("../static/close-icon.svg") no-repeat scroll center center;
     height: 16px;
     width: 16px;
     top: 0;
@@ -282,13 +280,13 @@
 }
 
 .fluid_ad_playing {
-    position:absolute;
+    position: absolute;
     background-color: black;
     opacity: 0.8;
     border-radius: 1px;
-    color:#ffffff;
+    color: #ffffff;
     font-size: 13px;
-    font-family: 'Roboto', sans-serif, Verdana, Arial;
+    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
     font-weight: normal;
     white-space: nowrap;
     text-align: start;
@@ -298,11 +296,11 @@
 }
 
 .fluid_ad_cta {
-    position:absolute;
+    position: absolute;
     background-color: rgba(0, 0, 0, 0.7);
-    color:#ffffff;
+    color: #ffffff;
     font-size: 13px;
-    font-family: 'Roboto', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
     font-weight: normal;
     text-align: right;
     cursor: pointer;
@@ -343,43 +341,45 @@
 
 /*Mobile Layout*/
 .fluid_video_wrapper.mobile .skip_button {
-        bottom: 75px;
+    bottom: 75px;
 }
+
 /*
 .fluid_video_wrapper.mobile .fluid_ad_cta {
         bottom: 125px;
 }
 */
 .fluid_initial_play {
-    width:60px;
-    height:60px;
-    border-radius:50px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50px;
     cursor: pointer;
 }
 
 .fluid_initial_play_button {
-    margin-top:15px;
-    margin-left:23px;
+    margin-top: 15px;
+    margin-left: 23px;
     border-style: solid;
     border-width: 15px 0 15px 21px;
     border-color: transparent transparent transparent #ffffff;
 }
+
 .fluid_initial_pause_button {
-    margin-top:15px;
-    margin-left:17px;
+    margin-top: 15px;
+    margin-left: 17px;
     width: 8px;
     height: 31px;
     border: 9px solid white;
-    border-top: 0px;
-    border-bottom: 0px;
+    border-top: 0;
+    border-bottom: 0;
 }
 
 .fluid_timeline_preview {
     bottom: 11px;
-    color:#ffffff;
+    color: #ffffff;
     font-size: 13px;
     line-height: 18px;
-    font-family: 'Roboto', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
     font-weight: normal;
     text-align: start;
     padding: 13px 21px 13px 21px;
@@ -393,7 +393,7 @@
     position: absolute;
     left: 32px;
     height: 24px;
-    font-family: 'Roboto', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
     font-size: 13px;
     font-weight: normal;
     font-style: normal;
@@ -404,25 +404,26 @@
 
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_fluid_control_duration.cardboard_time {
     left: 13px;
-    top: -15px;    
-}
-.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_fluid_control_duration.cardboard_time .ad_timer_prefix {
-    color: #F2C94C;    
+    top: -15px;
 }
 
-.fluid_video_wrapper.fluid_player_layout_default .ad_countdown .ad_timer_prefix{
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_fluid_control_duration.cardboard_time .ad_timer_prefix {
+    color: #F2C94C;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .ad_countdown .ad_timer_prefix {
     color: #F2C94C;
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .ad_countdown {
-    display: none;
+    /*display: none;*/
     position: absolute;
-    right: 0px;
+    right: 0;
     width: 75px;
     bottom: 5px;
     height: 24px;
-    color: white;
-    font-family: 'Roboto', sans-serif;
+    color: red;
+    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
     font-size: 13px;
     font-weight: normal;
     font-style: normal;
@@ -442,10 +443,10 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: -moz-linear-gradient(top,  rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(top,  rgba(0,0,0,0) 0%,rgba(0,0,0,0.6) 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(to bottom,  rgba(0,0,0,0) 0%,rgba(0,0,0,0.6) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#ad000000',GradientType=0 ); /* IE6-9 */
+    background: -moz-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.6) 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.6) 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.6) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#ad000000', GradientType=0); /* IE6-9 */
     height: 100%;
     width: 100%;
     z-index: 0;
@@ -464,6 +465,7 @@
     overflow: hidden;
     pointer-events: auto;
 }
+
 .fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_button {
     cursor: pointer;
     display: inline-block;
@@ -471,93 +473,93 @@
     height: 24px;
     width: 24px;
     position: relative;
-    background: url(images/fluid_icons.svg) no-repeat;
+    background: url(../static/fluid-icons.svg) no-repeat;
     opacity: 0.8;
 }
 
-.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_button:hover{
+.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_button:hover {
     opacity: 1;
 }
 
-.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_up{
+.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_up {
     background-position: -336px -55px;
-    -webkit-transform: rotate(270deg);  /* Chrome, Opera 15+, Safari 3.1+ */
-    -ms-transform: rotate(270deg);  /* IE 9 */
-    transform: rotate(270deg);  /* Firefox 16+, IE 10+, Opera  */
+    -webkit-transform: rotate(270deg); /* Chrome, Opera 15+, Safari 3.1+ */
+    -ms-transform: rotate(270deg); /* IE 9 */
+    transform: rotate(270deg); /* Firefox 16+, IE 10+, Opera  */
     display: block;
     left: calc(50% - 12px);
-    top: 0px;
-    position: absolute;    
+    top: 0;
+    position: absolute;
 }
 
-.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_left{
+.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_left {
     background-position: -336px -55px;
-    -webkit-transform: rotate(180deg);  /* Chrome, Opera 15+, Safari 3.1+ */
-    -ms-transform: rotate(1890deg);  /* IE 9 */
-    transform: rotate(180deg);  /* Firefox 16+, IE 10+, Opera  */   
+    -webkit-transform: rotate(180deg); /* Chrome, Opera 15+, Safari 3.1+ */
+    -ms-transform: rotate(1890deg); /* IE 9 */
+    transform: rotate(180deg); /* Firefox 16+, IE 10+, Opera  */
     display: block;
-    left: 0px;
+    left: 0;
     top: 24px;
-    position: absolute;   
+    position: absolute;
 }
 
-.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_right{
+.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_right {
     background-position: -336px -55px;
-    -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
-    -ms-transform: rotate(0deg);  /* IE 9 */
-    transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera  */  
+    -webkit-transform: rotate(0deg); /* Chrome, Opera 15+, Safari 3.1+ */
+    -ms-transform: rotate(0deg); /* IE 9 */
+    transform: rotate(0deg); /* Firefox 16+, IE 10+, Opera  */
     display: block;
-    right: 0px;
+    right: 0;
     top: 24px;
-    position: absolute;      
+    position: absolute;
 }
 
-.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_down{
+.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_down {
     background-position: -336px -55px;
-    -webkit-transform: rotate(90deg);  /* Chrome, Opera 15+, Safari 3.1+ */
-    -ms-transform: rotate(90deg);  /* IE 9 */
-    transform: rotate(90deg);  /* Firefox 16+, IE 10+, Opera  */  
+    -webkit-transform: rotate(90deg); /* Chrome, Opera 15+, Safari 3.1+ */
+    -ms-transform: rotate(90deg); /* IE 9 */
+    transform: rotate(90deg); /* Firefox 16+, IE 10+, Opera  */
     display: block;
     left: calc(50% - 12px);
     top: 48px;
     position: absolute;
 }
 
-.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_zoomdefault{
+.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_zoomdefault {
     background-position: -336px -17px;
     top: 72px;
-    -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
-    -ms-transform: rotate(0deg);  /* IE 9 */
-    transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera  */    
-    position: absolute;  
+    -webkit-transform: rotate(0deg); /* Chrome, Opera 15+, Safari 3.1+ */
+    -ms-transform: rotate(0deg); /* IE 9 */
+    transform: rotate(0deg); /* Firefox 16+, IE 10+, Opera  */
+    position: absolute;
     left: calc(50% - 12px);
 }
 
-.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_zoomin{
+.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_zoomin {
     background-position: -305px -55px;
     top: 72px;
-    -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
-    -ms-transform: rotate(0deg);  /* IE 9 */
-    transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera  */   
-    position: absolute; 
+    -webkit-transform: rotate(0deg); /* Chrome, Opera 15+, Safari 3.1+ */
+    -ms-transform: rotate(0deg); /* IE 9 */
+    transform: rotate(0deg); /* Firefox 16+, IE 10+, Opera  */
+    position: absolute;
     right: 0;
 }
 
-.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_zoomout{
+.fluid_video_wrapper.fluid_player_layout_default .fluid_vr_container .fluid_vr_joystick_panel .fluid_vr_joystick_zoomout {
     background-position: -305px -17px;
     top: 72px;
-    -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
-    -ms-transform: rotate(0deg);  /* IE 9 */
-    transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera  */
-    position: absolute; 
-    left: 0; 
+    -webkit-transform: rotate(0deg); /* Chrome, Opera 15+, Safari 3.1+ */
+    -ms-transform: rotate(0deg); /* IE 9 */
+    transform: rotate(0deg); /* Firefox 16+, IE 10+, Opera  */
+    position: absolute;
+    left: 0;
 }
 
-.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container.fluid_vr_controls_container{
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container.fluid_vr_controls_container {
     width: 50% !important;
 }
 
-.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container.fluid_vr2_controls_container{
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container.fluid_vr2_controls_container {
     width: 50% !important;
     left: 50%;
 }
@@ -568,10 +570,10 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: -moz-linear-gradient(top,  rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(top,  rgba(0,0,0,0) 0%,rgba(0,0,0,0.6) 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(to bottom,  rgba(0,0,0,0) 0%,rgba(0,0,0,0.6) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#ad000000',GradientType=0 ); /* IE6-9 */
+    background: -moz-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.6) 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.6) 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.6) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#ad000000', GradientType=0); /* IE6-9 */
     height: 53px;
     z-index: 1;
 }
@@ -608,14 +610,14 @@
     text-align: center;
 }
 
-.fluid_video_wrapper.fluid_player_layout_default .fluid_subtitles_container div{
+.fluid_video_wrapper.fluid_player_layout_default .fluid_subtitles_container div {
     display: inline;
     background: black;
     color: white;
-    font-size: 1em;  
-    font-family: 'Roboto', sans-serif;
+    font-size: 1em;
+    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
     padding: 0.25em;
-    border-radius: 4px;  
+    border-radius: 4px;
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .fade_out {
@@ -659,7 +661,7 @@
     background-color: #000000;
     color: #ffffff;
     font-size: 13px;
-    font-family: 'Roboto', sans-serif, Verdana, Arial;
+    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
     font-weight: normal;
     white-space: nowrap;
     text-align: start;
@@ -796,6 +798,7 @@ _:-ms-lang(x),
     height: 3px;
     z-index: 2;
 }
+
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_ad_marker {
     position: absolute;
     background-color: #FFCC00;
@@ -809,7 +812,7 @@ _:-ms-lang(x),
     left: 25px;
     top: -1px;
     z-index: 2;
-    opacity:0.8;
+    opacity: 0.8;
     -webkit-transition: opacity 0.3s ease-in-out;
     -moz-transition: opacity 0.3s ease-in-out;
     -ms-transition: opacity 0.3s ease-in-out;
@@ -881,9 +884,9 @@ _:-ms-lang(x),
     float: right;
 }
 
-.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button_video_source ,
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button_video_source,
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button_subtitles,
-.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button_cardboard{
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button_cardboard {
     font-size: 13px;
     height: 24px;
     line-height: 24px;
@@ -899,7 +902,7 @@ _:-ms-lang(x),
     user-select: none;
 }
 
-.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button_video_source .fluid_video_sources_title, 
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button_video_source .fluid_video_sources_title,
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button_subtitles .fluid_subtitles_title {
     width: 80px;
     overflow: hidden;
@@ -916,7 +919,7 @@ _:-ms-lang(x),
     border-radius: 2px;
     color: #ffffff;
     font-size: 13px;
-    font-family: 'Roboto', sans-serif, Verdana, Arial;
+    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
     font-weight: normal;
     white-space: nowrap;
     text-align: start;
@@ -980,7 +983,7 @@ _:-ms-lang(x),
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_theatre:before,
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_subtitles:before,
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_cardboard:before {
-    background: url('images/fluid_icons.svg') no-repeat;
+    background: url('../static/fluid-icons.svg') no-repeat;
     position: absolute;
     height: 24px;
     width: 24px;
@@ -1064,7 +1067,7 @@ _:-ms-lang(x),
     left: 10px;
     color: #ffffff;
     font-size: 15px;
-    font-family: 'Roboto', sans-serif, Verdana, Arial;
+    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
     font-weight: normal;
     white-space: nowrap;
 }
@@ -1073,38 +1076,39 @@ _:-ms-lang(x),
 .transform-active {
     animation: flash 1s infinite;
     display: inline-block !important;
-    opactity: 0;
+    opacity: 0;
 }
 
 @-webkit-keyframes flash {
     0% {
         opacity: 0.6;
-        -webkit-box-shadow: 0 0 0 0 rgba(255,255,255, 0.5);
+        -webkit-box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.5);
     }
     70% {
-        -webkit-box-shadow: 0 0 0 20px rgba(255,255,255, 0);
+        -webkit-box-shadow: 0 0 0 20px rgba(255, 255, 255, 0);
     }
     100% {
         opacity: 0;
         display: none;
-        -webkit-box-shadow: 0 0 0 0 rgba(255,255,255, 0);
+        -webkit-box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
     }
 }
+
 @keyframes flash {
     0% {
         opacity: 0.6;
-        -moz-box-shadow: 0 0 0 0 rgba(255,255,255, 0.5);
-        box-shadow: 0 0 0 0 rgba(255,255,255, 0.6);
+        -moz-box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.5);
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.6);
     }
     70% {
-        -moz-box-shadow: 0 0 0 20px rgba(255,255,255, 0);
-        box-shadow: 0 0 0 20px rgba(255,255,255, 0);
+        -moz-box-shadow: 0 0 0 20px rgba(255, 255, 255, 0);
+        box-shadow: 0 0 0 20px rgba(255, 255, 255, 0);
     }
     100% {
         opacity: 0;
         display: none;
-        -moz-box-shadow: 0 0 0 0 rgba(255,255,255, 0);
-        box-shadow: 0 0 0 0 rgba(255,255,255, 0);
+        -moz-box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
     }
 }
 
@@ -1172,15 +1176,15 @@ _:-ms-lang(x),
 
 .add_icon_clickthrough {
     color: #F2C94C;
-    line-height:18px;
+    line-height: 18px;
 }
 
 .add_icon_clickthrough:before {
-    background: url('images/fluid_icons.svg') no-repeat;
+    background: url('../static/fluid-icons.svg') no-repeat;
     height: 18px;
     width: 18px;
     top: 30px;
-    padding: 1px 22px 0px 0px;
+    padding: 1px 22px 0 0;
     content: "";
     background-position: -162px -57px;
 }
@@ -1191,8 +1195,8 @@ _:-ms-lang(x),
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_download,
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_subtitles,
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_cardboard {
-    float:right;
-    padding-right:5px;
+    float: right;
+    padding-right: 5px;
 }
 
 .fluid_video_playback_rates_item {
@@ -1206,22 +1210,23 @@ _:-ms-lang(x),
     float: left;
     top: 0;
     z-index: 10;
-    box-shadow: 0px 15px 25px rgba(0,0,0,0.8);
+    box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.8);
 }
 
 .source_button_icon {
-    background: url('images/fluid_icons.svg') no-repeat;
+    background: url('../static/fluid-icons.svg') no-repeat;
     float: left;
-    cursor:pointer;
+    cursor: pointer;
     height: 18px;
     width: 18px;
     background-position: -164px -21px;
     opacity: 0;
 }
+
 .subtitle_button_icon {
-    background: url('images/fluid_icons.svg') no-repeat;
+    background: url('../static/fluid-icons.svg') no-repeat;
     float: left;
-    cursor:pointer;
+    cursor: pointer;
     height: 18px;
     width: 18px;
     background-position: -164px -21px;
@@ -1231,6 +1236,7 @@ _:-ms-lang(x),
 .source_selected {
     opacity: 1 !important;
 }
+
 .subtitle_selected {
     opacity: 1 !important;
 }
@@ -1239,9 +1245,11 @@ _:-ms-lang(x),
     .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_fluid_control_duration {
         left: 105px;
     }
+
     .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container.no_volume_bar .fluid_fluid_control_duration {
         left: 32px;
     }
+
     .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_control_volume_container {
         display: block;
     }

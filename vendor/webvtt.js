@@ -698,3 +698,5 @@ var WebVTTSerializer = function() {
     return result
   }
 }
+
+export default WebVTTParser;

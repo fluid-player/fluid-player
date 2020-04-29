@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.0.0-alpha1
+* TBD
+
 ## 2.4.10
 * [Pull #399](https://github.com/fluid-player/fluid-player/pull/399) Adding VR Features to player (experimental)
 
@@ -41,7 +44,7 @@
 * [Pull #235](https://github.com/fluid-player/fluid-player/pull/235) [Pull #236](https://github.com/fluid-player/fluid-player/pull/236) Fix the controls randomly disappearing on scrubbing clicks
 
 ## 2.4.1
-* [Pull #228](https://github.com/fluid-player/fluid-player/pull/228) Persistent volume settings from before mute on page navigation 
+* [Pull #228](https://github.com/fluid-player/fluid-player/pull/228) Persistent volume settings from before mute on page navigation
 * [Pull #229](https://github.com/fluid-player/fluid-player/pull/229) Link to FP on menu button working correctly
 * [Pull #230](https://github.com/fluid-player/fluid-player/pull/230) Fix for right click on initial play button
 * [Pull #227](https://github.com/fluid-player/fluid-player/pull/227) Optional parameter to disable clickthrough layer on instream ads
@@ -49,7 +52,7 @@
 
 ## 2.4.0
 * [Pull #214](https://github.com/fluid-player/fluid-player/pull/241) Avoid looping VAST Ad
-* [Pull #206](https://github.com/fluid-player/fluid-player/pull/206) Fix tracking impression events for nonLinear ads 
+* [Pull #206](https://github.com/fluid-player/fluid-player/pull/206) Fix tracking impression events for nonLinear ads
 * [Pull #221](https://github.com/fluid-player/fluid-player/pull/221) Fix VAST loading issue by AdBlock
 * [Pull #207](https://github.com/fluid-player/fluid-player/pull/207) Add support for HD icon on quality select
 * [Pull #209](https://github.com/fluid-player/fluid-player/pull/209) Advanced theatre mode
@@ -126,8 +129,8 @@
   * Add play button
   * Play pause animations
   * Restructuring of optional parameters
-  * Remove templates 
-  * General fixes 
+  * Remove templates
+  * General fixes
 
 ## 1.2.2
 * [Pull #88](https://github.com/fluid-player/fluid-player/pull/88) Improve nonlinear ads
