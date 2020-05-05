@@ -1,0 +1,43 @@
+<VAST
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast.xsd" version="3.0">
+	<Ad id="1234567">
+		<InLine>
+			<AdSystem></AdSystem>
+			<AdTitle>NonLinear VPAID JS</AdTitle>
+			<Description>Vpaid NonLinear Ad</Description>
+			<Error>http://www.example.com/error</Error>
+			<Impression>http://www.example.com/impression</Impression>
+			<Creatives>
+				<Creative sequence="1">
+					<NonLinearAds>
+						<TrackingEvents>
+							<Tracking event="start">http://www.example.com/start</Tracking>
+							<Tracking event="firstQuartile">http://www.example.com/firstQuartile</Tracking>
+							<Tracking event="midpoint">http://www.example.com/midpoint</Tracking>
+							<Tracking event="thirdQuartile">http://www.example.com/thirdQuartile</Tracking>
+							<Tracking event="complete">http://www.example.com/complete</Tracking>
+							<Tracking event="mute">http://www.example.com/mute</Tracking>
+							<Tracking event="rewind">http://www.example.com/rewind</Tracking>
+							<Tracking event="pause">http://www.example.com/pause</Tracking>
+							<Tracking event="resume">http://www.example.com/resume</Tracking>
+							<Tracking event="fullscreen">http://www.example.com/fullscreen</Tracking>
+							<Tracking event="creativeView">http://www.example.com/creativeView</Tracking>
+							<Tracking event="acceptInvitation">http://www.example.com/acceptInvitation</Tracking>
+						</TrackingEvents>
+						<NonLinear apiFramework="VPAID" width="480" height="90" id="overlay-1">
+							<AdParameters>
+								<![CDATA[{"overlays":["https://googleads.github.io/googleads-ima-html5/media/NonLinearVpaid.png"], "videos":[ {"url":"https://googleads.github.io/googleads-ima-html5/media/LinearVPAIDCreative.mp4","mimetype":"video/mp4"}]} ]]>
+							</AdParameters>
+							<StaticResource creativeType="application/javascript">
+								<![CDATA[https://googleads.github.io/googleads-ima-html5/vpaid/nonlinear/VpaidNonLinear.js]]>
+							</StaticResource>
+							<NonLinearClickThrough id="GDFP">
+								<![CDATA[ http://google.com ]]>
+							</NonLinearClickThrough>
+						</NonLinear>
+					</NonLinearAds>
+				</Creative>
+			</Creatives>
+		</InLine>
+	</Ad>
+</VAST>

@@ -304,7 +304,9 @@ export default function (playerInstance, options) {
         if (!playerInstance.vpaidAdUnit) {
             return;
         }
-        playerInstance.vpaidAdUnit.skipAd();
+        playerInstance.vpaidAdUnit.skipAd()
+        playerInstance.vpaidTimeoutTimerClear();
+        playerInstance.onVpaidEnded();
     };
 
     // Passthrough for setAdVolume

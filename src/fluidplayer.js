@@ -29,74 +29,6 @@ const FP_DEVELOPMENT_MODE = typeof FP_ENV !== 'undefined' && FP_ENV === 'develop
 // noinspection JSUnresolvedVariable
 const FP_RUNTIME_DEBUG = typeof FP_DEBUG !== 'undefined' && FP_DEBUG === true;
 
-// TODO: these polyfills should not be necessary, if they are they should be externalized
-// //Object.assign polyfill
-// if (typeof Object.assign != 'function') {
-//     // Must be writable: true, enumerable: false, configurable: true
-//     Object.defineProperty(Object, "assign", {
-//         value: function assign(target, varArgs) { // .length of function is 2
-//             'use strict';
-//             if (target == null) { // TypeError if undefined or null
-//                 throw new TypeError('Cannot convert undefined or null to object');
-//             }
-//
-//             const to = Object(target);
-//
-//             for (let index = 1; index < arguments.length; index++) {
-//                 const nextSource = arguments[index];
-//
-//                 if (nextSource != null) { // Skip over if undefined or null
-//                     for (let nextKey in nextSource) {
-//                         // Avoid bugs when hasOwnProperty is shadowed
-//                         if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
-//                             to[nextKey] = nextSource[nextKey];
-//                         }
-//                     }
-//                 }
-//             }
-//             return to;
-//         },
-//         writable: true,
-//         configurable: true
-//     });
-// }
-//
-// //CustomEvent polyfill
-// (function () {
-//     if (typeof window.CustomEvent === "function") return false;
-//
-//     function CustomEvent(event, params) {
-//         params = params || {bubbles: false, cancelable: false, detail: undefined};
-//         const evt = document.createEvent('CustomEvent');
-//         evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
-//         return evt;
-//     }
-//
-//     CustomEvent.prototype = window.Event.prototype;
-//
-//     window.CustomEvent = CustomEvent;
-// })();
-
-//remove() polyfill
-// (function (arr) {
-//     arr.forEach(function (item) {
-//         if (item.hasOwnProperty('remove')) {
-//             return;
-//         }
-//         Object.defineProperty(item, 'remove', {
-//             configurable: true,
-//             enumerable: true,
-//             writable: true,
-//             value: function remove() {
-//                 if (this.parentNode === null) {
-//                     return;
-//                 }
-//                 this.parentNode.removeChild(this);
-//             }
-//         });
-//     });
-// })([Element.prototype, CharacterData.prototype, DocumentType.prototype]);
-
 const fluidPlayerClass = function () {
     // "self" always points to current instance of the player within the scope of the instance
     // This should help readability and context awareness slightly...
@@ -127,6 +59,10 @@ const fluidPlayerClass = function () {
         }
 
         const playerNode = document.getElementById(idVideoPlayer); // TODO: accept id OR element
+
+        if (!playerNode) {
+            throw 'Could not find a HTML node to attach to for id "' + idVideoPlayer + '"';
+        }
 
         playerNode.setAttribute('playsinline', '');
         playerNode.setAttribute('webkit-playsinline', '');
@@ -410,13 +346,14 @@ const fluidPlayerClass = function () {
             }
 
             try {
-                promise = _play_videoPlayer.apply(this, arguments);
+                promise = _play_videoPlayer.apply(playerNode, arguments);
 
                 if (promise !== undefined && promise !== null) {
                     promise.then(function () {
                         self.isPlayingMedia = true;
                         clearTimeout(self.promiseTimeout);
                     }).catch(function (error) {
+                        console.error(error);
                         const isAbortError = (typeof error.name !== 'undefined' && error.name === 'AbortError');
                         // Ignore abort errors which caused for example Safari or autoplay functions
                         // (example: interrupted by a new load request)
@@ -438,6 +375,7 @@ const fluidPlayerClass = function () {
                 }
 
             } catch (error) {
+                console.error(error);
                 self.announceLocalError(201, 'Failed to play video.');
             }
         };
@@ -611,7 +549,7 @@ const fluidPlayerClass = function () {
 
         for (let i = 0; i < sources.length; i++) {
             if (sources[i].getAttribute('src') === self.originalSrc) {
-                return sources[i].getAttribute('type');
+                return sources[i].getAttribute('type').toLowerCase();
             }
         }
 
@@ -889,16 +827,27 @@ const fluidPlayerClass = function () {
 
     self.controlDurationUpdate = () => {
         const currentPlayTime = self.formatTime(self.domRef.player.currentTime);
-        const totalTime = self.formatTime(self.currentVideoDuration);
 
-        const durationText = currentPlayTime + ' / ' + totalTime;
+        let isLiveHls = false;
+        if (self.hlsPlayer) {
+            isLiveHls = self.hlsPlayer.levels &&
+                self.hlsPlayer.levels[self.hlsPlayer.currentLevel] &&
+                self.hlsPlayer.levels[self.hlsPlayer.currentLevel].details.live;
+        }
+
+        let durationText;
+        if (isNaN(self.currentVideoDuration) || !isFinite(self.currentVideoDuration) || isLiveHls) {
+            durationText = currentPlayTime;
+        } else {
+            const totalTime = self.formatTime(self.currentVideoDuration);
+            durationText = currentPlayTime + ' / ' + totalTime;
+        }
 
         const timePlaceholder = self.domRef.player.parentNode.getElementsByClassName('fluid_control_duration');
 
         for (let i = 0; i < timePlaceholder.length; i++) {
             timePlaceholder[i].innerHTML = durationText;
         }
-
     };
 
     self.contolVolumebarUpdate = () => {
@@ -1519,7 +1468,6 @@ const fluidPlayerClass = function () {
 
         const preRolls = self.findRoll('preRoll');
         if (!isFirstStart || preRolls.length === 0) {
-
             if (isFirstStart && preRolls.length === 0) {
                 self.firstPlayLaunched = true;
                 self.displayOptions.vastOptions.vastAdvanced.noVastVideoCallback();
@@ -1542,7 +1490,6 @@ const fluidPlayerClass = function () {
                 self.playPauseAnimationToggle(true);
 
             } else if (!isFirstStart) {
-
                 if (self.isCurrentlyPlayingAd && self.vastOptions !== null && self.vastOptions.vpaid) {
                     // pause the vpaid linear ad
                     self.pauseVpaidAd();
@@ -1555,7 +1502,6 @@ const fluidPlayerClass = function () {
             }
 
             self.toggleOnPauseAd();
-
         } else {
             // TODO: verify this
             //Workaround for Safari or Mobile Chrome - otherwise it blocks the subsequent
@@ -1567,7 +1513,7 @@ const fluidPlayerClass = function () {
                 browserVersion.browserName === 'Safari'
                 || (self.mobileInfo.userOs !== false && self.mobileInfo.userOs === 'Android' && browserVersion.browserName === 'Google Chrome')
             ) {
-                // TODO: refactor
+                // TODO: refactor this. Using "blank.mp4" is not an option.
                 self.domRef.player.src = fluidPlayerScriptLocation + 'blank.mp4';
                 self.domRef.player.play();
                 self.playPauseAnimationToggle(true);
@@ -2016,6 +1962,7 @@ const fluidPlayerClass = function () {
         }
     };
 
+    // TODO: show hide bug
     self.openCloseVideoSourceSwitch = () => {
         const sourceChangeList = document.getElementById(self.videoPlayerId + '_fluid_control_video_source_list');
         const sourceChangeListContainer = document.getElementById(self.videoPlayerId + '_fluid_control_video_source');
@@ -2486,7 +2433,7 @@ const fluidPlayerClass = function () {
 
                 sourceChangeDiv.addEventListener('click', function (event) {
                     event.stopPropagation();
-                    let playbackRate = self.innerText.replace('x', '');
+                    let playbackRate = this.innerText.replace('x', '');
                     self.setPlaybackSpeed(playbackRate);
                     self.openCloseVideoPlaybackRate();
 
@@ -2505,6 +2452,7 @@ const fluidPlayerClass = function () {
         }
     };
 
+    // TODO: closes too fast bug
     self.openCloseVideoPlaybackRate = () => {
         const sourceChangeList = document.getElementById(self.videoPlayerId + '_fluid_control_video_playback_rate');
         const sourceChangeListContainer = document.getElementById(self.videoPlayerId + '_fluid_control_playback_rate');
@@ -3024,8 +2972,8 @@ const fluidPlayerInitializer = function (target, options) {
         const debugApi = {
             id: target,
             options: options,
-            instance: instance,
-            internals: publicInstance
+            instance: publicInstance,
+            internals: instance
         };
 
         if (typeof window.fluidPlayerDebug === 'undefined') {

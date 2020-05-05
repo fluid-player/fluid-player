@@ -436,7 +436,6 @@ export default function (playerInstance, options) {
             playerInstance.trackSingleEvent('start');
             const duration = (playerInstance.adList[adListId].nonLinearDuration) ? playerInstance.adList[adListId].nonLinearDuration : playerInstance.vastOptions.duration;
 
-            // TODO: Ensure this is cleared
             playerInstance.nonLinearTracking = setInterval(function () {
                 if (playerInstance.adFinished === true) {
                     return;
@@ -675,7 +674,7 @@ export default function (playerInstance, options) {
         closeBtn.title = playerInstance.displayOptions.layoutControls.closeButtonCaption;
         const tempadListId = adListId;
         closeBtn.onclick = function (event) {
-            this.parentElement.removeChild(this); // TODO: verify
+            this.parentElement.removeChild(this);
             if (typeof event.stopImmediatePropagation !== 'undefined') {
                 event.stopImmediatePropagation();
             }
@@ -1198,7 +1197,6 @@ export default function (playerInstance, options) {
 
     /**
      * Ad Countdown
-     * TODO: rewrite and test. This is completely broken.
      */
     playerInstance.addAdCountdown = () => {
         const videoWrapper = document.getElementById('fluid_video_wrapper_' + playerInstance.videoPlayerId);
@@ -1426,7 +1424,6 @@ export default function (playerInstance, options) {
         }
     };
 
-    // TODO: this does not seem to work...?
     playerInstance.pressSkipButton = () => {
         playerInstance.removeSkipButton();
         playerInstance.removeAdPlayingText();

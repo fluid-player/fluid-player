@@ -5,6 +5,9 @@
 
 import fluidPlayerInitializer from './index';
 
+// Import CSS automatically in browser builds.
+import './css/fluidplayer.css';
+
 if (window) {
     // TODO: all webpack dynamic imports should look here first and all imported vendor modules should load into this object.
     // TODO: webpack dynamic imports should not touch "window" or globals.

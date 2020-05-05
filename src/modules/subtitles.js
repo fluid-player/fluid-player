@@ -175,6 +175,7 @@ export default function (playerInstance, options) {
         }
     };
 
+    // TODO: closes too fast bug
     playerInstance.openCloseSubtitlesSwitch = () => {
         const subtitleChangeList = document.getElementById(playerInstance.videoPlayerId + '_fluid_control_subtitles_list');
         const sourceChangeListContainer = document.getElementById(playerInstance.videoPlayerId + '_fluid_control_subtitles');
@@ -204,7 +205,8 @@ export default function (playerInstance, options) {
         divSubtitlesContainer.className = 'fluid_subtitles_container';
         videoPlayerTag.parentNode.insertBefore(divSubtitlesContainer, videoPlayerTag.nextSibling);
 
-        import(/* webpackChunkName: "vttjs" */ 'vtt.js').then(() => {
+        import(/* webpackChunkName: "vttjs" */ 'vtt.js').then((it) => {
+            window.WebVTT = it.WebVTT; // TODO
             playerInstance.createSubtitlesSwitch();
         });
     };

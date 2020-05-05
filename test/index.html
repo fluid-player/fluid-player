@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Fluid Player E2E test case index listing</title>
+    <style lang="css">
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+            font-size: 1rem;
+        }
+
+        #e2e-listing {
+            max-width: 60%;
+            padding: 2.2rem;
+            margin: auto;
+        }
+
+        #e2e-title h1 {
+            font-size: 1.5rem;
+        }
+
+        #e2e-items ul li:not(:last-child) {
+            padding-bottom: 4px;
+        }
+
+        #e2e-note-restart {
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+<div id="e2e-listing">
+    <div id="e2e-title">
+        <h1>
+            Fluid Player E2E cases
+        </h1>
+        <p id="e2e-note-restart">
+            Note: you need to restart the dev-server for new cases to be listed here.
+        </p>
+    </div>
+    <div id="e2e-items">
+        <ul>
+            <% for(var i=0; i < cases.length; i++) { %>
+            <li>
+                <a href="<%= cases[i].file %>"><%= cases[i].name %></a>
+            </li>
+            <% } %>
+        </ul>
+    </div>
+</div>
+</body>
+</html>

@@ -8,18 +8,18 @@ export default function (playerInstance, options) {
                 if (!playerInstance.dashScriptLoaded && !window.dashjs) {
                     playerInstance.dashScriptLoaded = true;
                     import(/* webpackChunkName: "dashjs" */ 'dashjs').then((it) => {
-                        window.dashjs = it.default;
+                        window.dashjs = it.default; // TODO
                         playerInstance.initialiseDash();
                     });
                 } else {
                     playerInstance.initialiseDash();
                 }
                 break;
-            case 'application/x-mpegURL': // HLS
+            case 'application/x-mpegurl': // HLS
                 if (!playerInstance.hlsScriptLoaded && !window.Hls) {
                     playerInstance.hlsScriptLoaded = true;
                     import(/* webpackChunkName: "hlsjs" */ 'hls.js').then((it) => {
-                        window.Hls = it.default;
+                        window.Hls = it.default; // TODO
                         playerInstance.initialiseHls();
                     });
                 } else {
