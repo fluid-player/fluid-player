@@ -12,10 +12,8 @@ export default function (playerInstance, options) {
             playerInstance.backupMainVideoContentTime(adListId);
         }
 
-        const playVideoPlayer = function (adListId) {
-
-            playerInstance.switchPlayerToVpaidMode = function (adListId) {
-
+        const playVideoPlayer = adListId => {
+            playerInstance.switchPlayerToVpaidMode = adListId => {
                 playerInstance.debugMessage('starting function switchPlayerToVpaidMode');
                 const vpaidIframe = playerInstance.videoPlayerId + "_" + adListId + "_fluid_vpaid_iframe";
                 const creativeData = {};
@@ -66,8 +64,7 @@ export default function (playerInstance, options) {
                 playerInstance.adFinished = false;
             };
 
-            playerInstance.switchPlayerToVastMode = function () {
-
+            playerInstance.switchPlayerToVastMode = () => {
                 //Get the actual duration from the video file if it is not present in the VAST XML
                 if (!playerInstance.vastOptions.duration) {
                     playerInstance.vastOptions.duration = playerInstance.domRef.player.duration;
@@ -203,7 +200,7 @@ export default function (playerInstance, options) {
         /**
          * Sends requests to the tracking URIs
          */
-        const videoPlayerTimeUpdate = function () {
+        const videoPlayerTimeUpdate = () => {
             if (playerInstance.adFinished) {
                 playerInstance.domRef.player.removeEventListener('timeupdate', videoPlayerTimeUpdate);
                 return;
@@ -873,7 +870,7 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.midRoll = (event) => {
-        playerInstance.domRef.player.removeEventListener(event.type, playerInstance.midRoll); //todo pass id?!
+        playerInstance.domRef.player.removeEventListener(event.type, playerInstance.midRoll);
 
         const adListId = event.type.replace('adId_', '');
         if (playerInstance.adList[adListId].played === true) {
@@ -935,7 +932,8 @@ export default function (playerInstance, options) {
      * Check if player has a valid nonLinear onPause Ad
      */
     playerInstance.hasValidOnPauseAd = () => {
-        const onPauseAd = playerInstance.findRoll('onPauseRoll'); //should be only one. todo add validator to allow only one onPause roll
+        // TODO should be only one. Add validator to allow only one onPause roll
+        const onPauseAd = playerInstance.findRoll('onPauseRoll');
 
         return (onPauseAd.length !== 0 && playerInstance.adList[onPauseAd[0]] && playerInstance.adList[onPauseAd[0]].error === false);
     };
@@ -967,9 +965,7 @@ export default function (playerInstance, options) {
                 playerInstance.adFinished = true;
                 playerInstance.trackingOnPauseNonLinearAd(adListId, 'complete');
             }
-
         }
-
     };
 
     /**
@@ -1351,9 +1347,10 @@ export default function (playerInstance, options) {
 
     playerInstance.removeAdPlayingText = () => {
         const div = document.getElementById(playerInstance.videoPlayerId + '_fluid_ad_playing');
-        if (div) {
-            div.parentElement.removeChild(div);
+        if (!div) {
+            return;
         }
+        div.parentElement.removeChild(div);
     };
 
     playerInstance.addCTAButton = (landingPage) => {
@@ -1368,7 +1365,7 @@ export default function (playerInstance, options) {
         const link = document.createElement('span');
         link.innerHTML = playerInstance.displayOptions.vastOptions.adCTAText + "<br/><span class=\"add_icon_clickthrough\">" + landingPage + "</span>";
 
-        ctaButton.addEventListener('click', function () {
+        ctaButton.addEventListener('click', () => {
             if (!playerInstance.domRef.player.paused) {
                 playerInstance.domRef.player.pause();
             }
@@ -1385,43 +1382,46 @@ export default function (playerInstance, options) {
 
     playerInstance.removeCTAButton = () => {
         const btn = document.getElementById(playerInstance.videoPlayerId + '_fluid_cta');
-        if (btn) {
-            btn.parentElement.removeChild(btn);
+        if (!btn) {
+            return;
         }
+
+        btn.parentElement.removeChild(btn);
     };
 
     playerInstance.decreaseSkipOffset = () => {
         let sec = playerInstance.vastOptions.skipoffset - Math.floor(playerInstance.domRef.player.currentTime);
         const btn = document.getElementById('skip_button_' + playerInstance.videoPlayerId);
 
-        if (btn) {
-            if (sec >= 1) {
-                //set the button label with the remaining seconds
-                btn.innerHTML = playerInstance.displayOptions.vastOptions.skipButtonCaption.replace('[seconds]', sec);
-            } else {
-                //make the button clickable
-                // TODO: refactored, but this is still terrible - remove all this and just make the button clickable...
-                const skipLink = document.createElement('a');
-                skipLink.href = '#';
-                skipLink.id = 'skipHref_' + playerInstance.videoPlayerId;
-                skipLink.innerHTML = playerInstance.displayOptions.vastOptions.skipButtonClickCaption;
-                skipLink.onclick = (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    playerInstance.pressSkipButton();
-                };
-
-                btn.innerHTML = '';
-                btn.appendChild(skipLink);
-
-                //removes the CSS class for a disabled button
-                btn.className = btn.className.replace(/\bskip_button_disabled\b/, '');
-
-                playerInstance.domRef.player.removeEventListener('timeupdate', playerInstance.decreaseSkipOffset);
-            }
-        } else {
+        if (!btn) {
             playerInstance.domRef.player.removeEventListener('timeupdate', playerInstance.decreaseSkipOffset);
+            return;
         }
+
+        if (sec >= 1) {
+            //set the button label with the remaining seconds
+            btn.innerHTML = playerInstance.displayOptions.vastOptions.skipButtonCaption.replace('[seconds]', sec);
+            return;
+        }
+
+        // TODO: refactored, but this is still terrible - remove all this and just make the button clickable...
+        const skipLink = document.createElement('a');
+        skipLink.href = '#';
+        skipLink.id = 'skipHref_' + playerInstance.videoPlayerId;
+        skipLink.innerHTML = playerInstance.displayOptions.vastOptions.skipButtonClickCaption;
+        skipLink.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            playerInstance.pressSkipButton();
+        };
+
+        btn.innerHTML = '';
+        btn.appendChild(skipLink);
+
+        //removes the CSS class for a disabled button
+        btn.className = btn.className.replace(/\bskip_button_disabled\b/, '');
+
+        playerInstance.domRef.player.removeEventListener('timeupdate', playerInstance.decreaseSkipOffset);
     };
 
     playerInstance.pressSkipButton = () => {
@@ -1432,13 +1432,14 @@ export default function (playerInstance, options) {
         if (playerInstance.vastOptions.vpaid) {
             // skip the linear vpaid ad
             playerInstance.skipVpaidAd();
-        } else {
-            // skip the regular linear vast
-            playerInstance.displayOptions.vastOptions.vastAdvanced.vastVideoSkippedCallback();
-            const event = document.createEvent('Event');
-            event.initEvent('ended', false, true);
-            playerInstance.domRef.player.dispatchEvent(event);
+            return;
         }
+
+        // skip the regular linear vast
+        playerInstance.displayOptions.vastOptions.vastAdvanced.vastVideoSkippedCallback();
+        const event = document.createEvent('Event');
+        event.initEvent('ended', false, true);
+        playerInstance.domRef.player.dispatchEvent(event);
     };
 
     playerInstance.removeSkipButton = () => {
@@ -1479,7 +1480,7 @@ export default function (playerInstance, options) {
         const clickthroughLayer = document.getElementById('vast_clickthrough_layer_' + playerInstance.videoPlayerId);
         const isIos9orLower = (playerInstance.mobileInfo.device === 'iPhone') && (playerInstance.mobileInfo.userOsMajor !== false) && (playerInstance.mobileInfo.userOsMajor <= 9);
 
-        clickthroughLayer.onclick = function () {
+        clickthroughLayer.onclick = () => {
             if (playerInstance.domRef.player.paused) {
                 //On Mobile Safari on iPhones with iOS 9 or lower open the clickthrough only once
                 if (isIos9orLower && !playerInstance.suppressClickthrough) {

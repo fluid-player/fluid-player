@@ -29,6 +29,8 @@ const FP_DEVELOPMENT_MODE = typeof FP_ENV !== 'undefined' && FP_ENV === 'develop
 // noinspection JSUnresolvedVariable
 const FP_RUNTIME_DEBUG = typeof FP_DEBUG !== 'undefined' && FP_DEBUG === true;
 
+let playerInstances = 0;
+
 const fluidPlayerClass = function () {
     // "self" always points to current instance of the player within the scope of the instance
     // This should help readability and context awareness slightly...
@@ -46,8 +48,7 @@ const fluidPlayerClass = function () {
         : '';
     self.destructors = [];
 
-    // TODO: remove this method. Goes to function body.
-    self.init = (idVideoPlayer, options) => {
+    self.init = (playerTarget, options) => {
         // Install player modules and features
         const moduleOptions = {
             development: FP_DEVELOPMENT_MODE,
@@ -58,10 +59,22 @@ const fluidPlayerClass = function () {
             playerModule(self, moduleOptions);
         }
 
-        const playerNode = document.getElementById(idVideoPlayer); // TODO: accept id OR element
+        let playerNode;
+        if (playerTarget instanceof HTMLVideoElement) {
+            playerNode = playerTarget;
+
+            // Automatically assign ID if none exists
+            if (!playerTarget.id) {
+                playerTarget.id = 'fluid_player_instance_' + (playerInstances++).toString();
+            }
+        } else if (typeof playerTarget === 'string' || playerTarget instanceof String) {
+            playerNode = document.getElementById(playerTarget);
+        } else {
+            throw 'Invalid initializer - player target must be HTMLVideoElement or ID';
+        }
 
         if (!playerNode) {
-            throw 'Could not find a HTML node to attach to for id "' + idVideoPlayer + '"';
+            throw 'Could not find a HTML node to attach to for target ' + playerTarget + '"';
         }
 
         playerNode.setAttribute('playsinline', '');
@@ -81,7 +94,7 @@ const fluidPlayerClass = function () {
          * should be used where absolutely necessary and DOM objects under FP control
          * MUST be referenced in domRef.
          */
-        self.videoPlayerId = idVideoPlayer;
+        self.videoPlayerId = playerNode.id;
         self.originalSrc = self.getCurrentSrc();
         self.isCurrentlyPlayingAd = false;
         self.recentWaiting = false;
@@ -270,8 +283,6 @@ const fluidPlayerClass = function () {
 
         self.domRef.wrapper = self.setupPlayerWrapper();
 
-        self.initialiseStreamers();
-
         playerNode.addEventListener('webkitfullscreenchange', self.recalculateAdDimensions);
         playerNode.addEventListener('fullscreenchange', self.recalculateAdDimensions);
         playerNode.addEventListener('waiting', self.onRecentWaiting);
@@ -291,7 +302,7 @@ const fluidPlayerClass = function () {
         //Manually load the video duration if the video was loaded before adding the event listener
         self.currentVideoDuration = self.getCurrentVideoDuration();
 
-        if (isNaN(self.currentVideoDuration)) {
+        if (isNaN(self.currentVideoDuration) || !isFinite(self.currentVideoDuration)) {
             self.currentVideoDuration = 0;
         }
 
@@ -327,6 +338,13 @@ const fluidPlayerClass = function () {
         self.setVastList();
 
         self.setPersistentSettings();
+
+        // DO NOT initialize streamers if there are pre-rolls. It will break the streamers!
+        // Streamers will re-initialize once ad has been shown.
+        const preRolls = self.findRoll('preRoll');
+        if (!preRolls || 0 === preRolls.length) {
+            self.initialiseStreamers();
+        }
 
         const _play_videoPlayer = playerNode.play;
 
@@ -431,9 +449,8 @@ const fluidPlayerClass = function () {
             self.linkControlBarUserActivity();
         }
 
-        // TODO: what is this supposed to do?
-        // disable showing the captions, if user added subtitles track
-        // we are taking subtitles track kind as metadata
+        // Hide the captions on init if user added subtitles track.
+        // We are taking captions track kind of as metadata
         try {
             if (!!self.domRef.player.textTracks) {
                 for (const textTrack of self.domRef.player.textTracks) {
@@ -508,18 +525,16 @@ const fluidPlayerClass = function () {
             clearInterval(self.timer);
         }
 
-        if (self.displayOptions.layoutControls.loop === true) {
+        if (!!self.displayOptions.layoutControls.loop) {
             self.switchToMainVideo();
             self.playPauseToggle();
         }
     };
 
     self.getCurrentTime = () => {
-        if (self.isCurrentlyPlayingAd) {
-            return self.mainVideoCurrentTime;
-        } else {
-            return self.domRef.player.currentTime;
-        }
+        return self.isCurrentlyPlayingAd
+            ? self.mainVideoCurrentTime
+            : self.domRef.player.currentTime;
     };
 
     /**
@@ -568,9 +583,6 @@ const fluidPlayerClass = function () {
      * Dispatches a custom pause event which is not present when seeking.
      */
     self.onFluidPlayerPause = () => {
-        //"this" is the HTML5 video tag, because it disptches the "ended" event
-        const videoPlayerTag = self.domRef.player;
-
         setTimeout(function () {
             if (self.recentWaiting) {
                 return;
@@ -578,7 +590,7 @@ const fluidPlayerClass = function () {
 
             const event = document.createEvent('CustomEvent');
             event.initEvent('fluidplayerpause', false, true);
-            videoPlayerTag.dispatchEvent(event);
+            self.domRef.player.dispatchEvent(event);
         }, 100);
     };
 
@@ -739,10 +751,9 @@ const fluidPlayerClass = function () {
     };
 
     self.controlPlayPauseToggle = () => {
-        const videoPlayer = self.domRef.player;
-        const playPauseButton = videoPlayer.parentNode.getElementsByClassName('fluid_control_playpause');
+        const playPauseButton = self.domRef.player.parentNode.getElementsByClassName('fluid_control_playpause');
         const menuOptionPlay = document.getElementById(self.videoPlayerId + 'context_option_play');
-        const controlsDisplay = videoPlayer.parentNode.getElementsByClassName('fluid_controls_container');
+        const controlsDisplay = self.domRef.player.parentNode.getElementsByClassName('fluid_controls_container');
         const fpLogo = document.getElementById(self.videoPlayerId + '_logo');
 
         const initialPlay = document.getElementById(self.videoPlayerId + '_fluid_initial_play');
@@ -751,7 +762,7 @@ const fluidPlayerClass = function () {
             document.getElementById(self.videoPlayerId + '_fluid_initial_play_button').style.opacity = "1";
         }
 
-        if (!videoPlayer.paused) {
+        if (!self.domRef.player.paused) {
             for (let i = 0; i < playPauseButton.length; i++) {
                 playPauseButton[i].className = playPauseButton[i].className.replace(/\bfluid_button_play\b/g, 'fluid_button_pause');
             }
@@ -791,7 +802,6 @@ const fluidPlayerClass = function () {
         if (menuOptionPlay !== null) {
             menuOptionPlay.innerHTML = self.displayOptions.captions.play;
         }
-
     };
 
     self.playPauseAnimationToggle = (play) => {
@@ -822,7 +832,6 @@ const fluidPlayerClass = function () {
         for (let i = 0; i < currentProgressTag.length; i++) {
             currentProgressTag[i].style.width = (self.domRef.player.currentTime / self.currentVideoDuration * 100) + '%';
         }
-
     };
 
     self.controlDurationUpdate = () => {
@@ -903,7 +912,6 @@ const fluidPlayerClass = function () {
 
     self.checkFullscreenSupport = (videoPlayerWrapperId) => {
         const videoPlayerWrapper = document.getElementById(videoPlayerWrapperId);
-        const videoPlayer = self.domRef.player;
 
         if (videoPlayerWrapper.mozRequestFullScreen) {
             return {
@@ -933,13 +941,12 @@ const fluidPlayerClass = function () {
                 isFullscreen: 'fullscreenElement'
             };
 
-        } else if (videoPlayer.webkitSupportsFullscreen) {
+        } else if (self.domRef.player.webkitSupportsFullscreen) {
             return {
                 goFullscreen: 'webkitEnterFullscreen',
                 exitFullscreen: 'webkitExitFullscreen',
                 isFullscreen: 'webkitDisplayingFullscreen'
             };
-
         }
 
         return false;
@@ -956,7 +963,6 @@ const fluidPlayerClass = function () {
     };
 
     self.fullscreenOn = (fullscreenButton, menuOptionFullscreen) => {
-
         for (let i = 0; i < fullscreenButton.length; i++) {
             fullscreenButton[i].className = fullscreenButton[i].className.replace(/\bfluid_button_fullscreen\b/g, 'fluid_button_fullscreen_exit');
         }
@@ -1095,7 +1101,6 @@ const fluidPlayerClass = function () {
         return eventX - x;
     };
 
-    // TODO: refactor
     self.getEventOffsetY = (evt, el) => {
         let fullscreenMultiplier = 1;
         const videoWrapper = self.findClosestParent(el, 'div[id^="fluid_video_wrapper_"]');
@@ -1147,27 +1152,29 @@ const fluidPlayerClass = function () {
             self.domRef.player.pause();
         }
 
-        function shiftTime(timeBarX) {
+        const shiftTime = timeBarX => {
             const totalWidth = document.getElementById(self.videoPlayerId + '_fluid_controls_progress_container').clientWidth;
             if (totalWidth) {
                 self.domRef.player.currentTime = self.currentVideoDuration * timeBarX / totalWidth;
             }
-        }
+        };
 
-        function onProgressbarMouseMove(event) {
+        const onProgressbarMouseMove = event => {
             const currentX = self.getEventOffsetX(event, event.target.parentNode);
             initialPosition = NaN; // mouse up will fire after the move, we don't want to trigger the initial position in the event of iOS
             shiftTime(currentX);
             self.contolProgressbarUpdate(self.videoPlayerId);
             self.controlDurationUpdate(self.videoPlayerId);
-        }
+        };
 
-        function onProgressbarMouseUp(event) {
+        const onProgressbarMouseUp = event => {
             document.removeEventListener('mousemove', onProgressbarMouseMove);
             document.removeEventListener('touchmove', onProgressbarMouseMove);
             document.removeEventListener('mouseup', onProgressbarMouseUp);
             document.removeEventListener('touchend', onProgressbarMouseUp);
+
             let clickedX = self.getEventOffsetX(event, event.target.parentNode);
+
             if (isNaN(clickedX) && !isNaN(initialPosition)) {
                 clickedX = initialPosition;
             }
@@ -1180,14 +1187,14 @@ const fluidPlayerClass = function () {
                 self.play();
             }
 
-            // Wait till video played then reenable the animations
+            // Wait till video played then re-enable the animations
             if (self.initialAnimationSet) {
-                setTimeout(function () {
+                setTimeout(() => {
                     self.displayOptions.layoutControls.playPauseAnimation = self.initialAnimationSet;
                 }, 200);
             }
             self.fluidPseudoPause = false;
-        }
+        };
 
         document.addEventListener('mouseup', onProgressbarMouseUp);
         document.addEventListener('touchend', onProgressbarMouseUp);
@@ -1196,7 +1203,7 @@ const fluidPlayerClass = function () {
     };
 
     self.onVolumeBarMouseDown = () => {
-        const shiftVolume = (volumeBarX) => {
+        const shiftVolume = volumeBarX => {
             const totalWidth = self.domRef.controls.volumeContainer.clientWidth;
 
             if (totalWidth) {
@@ -1217,12 +1224,12 @@ const fluidPlayerClass = function () {
             }
         }
 
-        const onVolumeBarMouseMove = (event) => {
+        const onVolumeBarMouseMove = event => {
             const currentX = self.getEventOffsetX(event, self.domRef.controls.volumeContainer);
             shiftVolume(currentX);
         }
 
-        const onVolumeBarMouseUp = (event) => {
+        const onVolumeBarMouseUp = event => {
             document.removeEventListener('mousemove', onVolumeBarMouseMove);
             document.removeEventListener('touchmove', onVolumeBarMouseMove);
             document.removeEventListener('mouseup', onVolumeBarMouseUp);
@@ -1331,7 +1338,8 @@ const fluidPlayerClass = function () {
     };
 
     self.handleMouseleave = (event) => {
-        if (typeof event.clientX !== 'undefined' && self.domRef.wrapper.contains(document.elementFromPoint(event.clientX, event.clientY))) {
+        if (typeof event.clientX !== 'undefined'
+            && self.domRef.wrapper.contains(document.elementFromPoint(event.clientX, event.clientY))) {
             //false positive; we didn't actually leave the player
             return;
         }
@@ -1345,12 +1353,11 @@ const fluidPlayerClass = function () {
             return;
         }
 
-        self.captureKey = function (event) {
+        self.captureKey = event => {
             event.stopPropagation();
-            const keyCode = event.keyCode; // TODO .keyCode is deprecated
+            const keyCode = event.keyCode;
 
             switch (keyCode) {
-
                 case 70://f
                     self.fullscreenToggle();
                     event.preventDefault();
@@ -1394,8 +1401,8 @@ const fluidPlayerClass = function () {
             return false;
 
         };
-        document.addEventListener('keydown', self.captureKey, true);
 
+        document.addEventListener('keydown', self.captureKey, true);
     };
 
     self.keyboardControl = () => {
@@ -1403,9 +1410,11 @@ const fluidPlayerClass = function () {
 
         // When we click outside player, we stop registering keyboard events
         const clickHandler = self.handleWindowClick.bind(self);
-        self.destructors.push(function () {
+
+        self.destructors.push(() => {
             window.removeEventListener('click', clickHandler);
         });
+
         window.addEventListener('click', clickHandler);
     };
 
@@ -1431,17 +1440,17 @@ const fluidPlayerClass = function () {
     };
 
     self.initialPlay = () => {
-        self.domRef.player.addEventListener('playing', function () {
+        self.domRef.player.addEventListener('playing', () => {
             self.toggleLoader(false);
         });
 
-        self.domRef.player.addEventListener('timeupdate', function () {
+        self.domRef.player.addEventListener('timeupdate', () => {
             // some places we are manually displaying toggleLoader
             // user experience toggleLoader being displayed even when content is playing in background
             self.toggleLoader(false);
         });
 
-        self.domRef.player.addEventListener('waiting', function () {
+        self.domRef.player.addEventListener('waiting', () => {
             self.toggleLoader(true);
         });
 
@@ -1458,15 +1467,14 @@ const fluidPlayerClass = function () {
 
         if (!self.firstPlayLaunched) {
             self.playPauseToggle();
-
             self.domRef.player.removeEventListener('play', self.initialPlay);
         }
     };
 
     self.playPauseToggle = () => {
         const isFirstStart = !self.firstPlayLaunched;
-
         const preRolls = self.findRoll('preRoll');
+
         if (!isFirstStart || preRolls.length === 0) {
             if (isFirstStart && preRolls.length === 0) {
                 self.firstPlayLaunched = true;
@@ -1474,7 +1482,6 @@ const fluidPlayerClass = function () {
             }
 
             if (self.domRef.player.paused) {
-
                 if (self.isCurrentlyPlayingAd && self.vastOptions !== null && self.vastOptions.vpaid) {
                     // resume the vpaid linear ad
                     self.resumeVpaidAd();
@@ -1503,20 +1510,22 @@ const fluidPlayerClass = function () {
 
             self.toggleOnPauseAd();
         } else {
-            // TODO: verify this
-            //Workaround for Safari or Mobile Chrome - otherwise it blocks the subsequent
-            //play() command, because it considers it not being triggered by the user.
-            const browserVersion = self.getBrowserVersion();
             self.isCurrentlyPlayingAd = true;
 
-            if (
-                browserVersion.browserName === 'Safari'
-                || (self.mobileInfo.userOs !== false && self.mobileInfo.userOs === 'Android' && browserVersion.browserName === 'Google Chrome')
-            ) {
-                // TODO: refactor this. Using "blank.mp4" is not an option.
-                self.domRef.player.src = fluidPlayerScriptLocation + 'blank.mp4';
-                self.domRef.player.play();
-                self.playPauseAnimationToggle(true);
+            // Workaround for Safari or Mobile Chrome - otherwise it blocks the subsequent
+            // play() command, because it considers it not being triggered by the user.
+            // The URL is hardcoded here to cover widest possible use cases.
+            // If you know of an alternative workaround for this issue - let us know!
+            const browserVersion = self.getBrowserVersion();
+            const isChromeAndroid = self.mobileInfo.userOs !== false
+                && self.mobileInfo.userOs === 'Android'
+                && browserVersion.browserName === 'Google Chrome';
+
+            if ('Safari' === browserVersion.browserName || isChromeAndroid) {
+                // TODO
+                // self.domRef.player.src = 'https://cdn.fluidplayer.com/static/blank.mp4';
+                // self.domRef.player.play();
+                // self.playPauseAnimationToggle(true);
             }
 
             self.firstPlayLaunched = true;
@@ -1526,7 +1535,7 @@ const fluidPlayerClass = function () {
             self.preRollAdPodsLength = preRolls.length;
         }
 
-        const prepareVastAdsThatKnowDuration = function () {
+        const prepareVastAdsThatKnowDuration = () => {
             self.prepareVast('onPauseRoll');
             self.prepareVast('postRoll');
             self.prepareVast('midRoll');
@@ -1549,6 +1558,7 @@ const fluidPlayerClass = function () {
         self.adTimer();
 
         const blockOnPause = document.getElementById(self.videoPlayerId + '_fluid_html_on_pause');
+
         if (blockOnPause && !self.isCurrentlyPlayingAd) {
             if (self.domRef.player.paused) {
                 blockOnPause.style.display = 'flex';
@@ -1560,8 +1570,7 @@ const fluidPlayerClass = function () {
 
     self.setCustomControls = () => {
         //Set the Play/Pause behaviour
-        self.trackEvent(self.domRef.player.parentNode, 'click', '.fluid_control_playpause', function () {
-
+        self.trackEvent(self.domRef.player.parentNode, 'click', '.fluid_control_playpause', () => {
             if (!self.firstPlayLaunched) {
                 self.domRef.player.removeEventListener('play', self.initialPlay);
             }
@@ -1569,17 +1578,17 @@ const fluidPlayerClass = function () {
             self.playPauseToggle();
         }, false);
 
-        self.domRef.player.addEventListener('play', function () {
+        self.domRef.player.addEventListener('play', () => {
             self.controlPlayPauseToggle();
             self.contolVolumebarUpdate();
         }, false);
 
-        self.domRef.player.addEventListener('fluidplayerpause', function () {
+        self.domRef.player.addEventListener('fluidplayerpause', () => {
             self.controlPlayPauseToggle();
         }, false);
 
         //Set the progressbar
-        self.domRef.player.addEventListener('timeupdate', function () {
+        self.domRef.player.addEventListener('timeupdate', () => {
             self.contolProgressbarUpdate();
             self.controlDurationUpdate();
         });
@@ -1588,45 +1597,40 @@ const fluidPlayerClass = function () {
         const eventOn = (isMobileChecks.userOs) ? 'touchstart' : 'mousedown';
 
         if (self.displayOptions.layoutControls.showCardBoardView) {
-            self.trackEvent(self.domRef.player.parentNode, eventOn, '.fluid_controls_progress_container', function (event) {
-                self.onProgressbarMouseDown(event);
-            }, false);
+            self.trackEvent(
+                self.domRef.player.parentNode,
+                eventOn,
+                '.fluid_controls_progress_container',
+                event => self.onProgressbarMouseDown(event),
+                false
+            );
         } else {
-            document.getElementById(self.videoPlayerId + '_fluid_controls_progress_container').addEventListener(eventOn, function (event) {
-                self.onProgressbarMouseDown(event);
-            }, false);
+            document.getElementById(self.videoPlayerId + '_fluid_controls_progress_container')
+                .addEventListener(eventOn, event => self.onProgressbarMouseDown(event), false);
         }
 
         //Set the volume controls
-        document.getElementById(self.videoPlayerId + '_fluid_control_volume_container').addEventListener(eventOn, function (event) {
-            self.onVolumeBarMouseDown();
-        }, false);
+        document.getElementById(self.videoPlayerId + '_fluid_control_volume_container')
+            .addEventListener(eventOn, event => self.onVolumeBarMouseDown(), false);
 
-        self.domRef.player.addEventListener('volumechange', function () {
-            self.contolVolumebarUpdate();
-        });
+        self.domRef.player.addEventListener('volumechange', () => self.contolVolumebarUpdate());
 
-        self.trackEvent(self.domRef.player.parentNode, 'click', '.fluid_control_mute', function () {
-            self.muteToggle();
-        });
+        self.trackEvent(self.domRef.player.parentNode, 'click', '.fluid_control_mute', () => self.muteToggle());
 
         self.setBuffering();
 
         //Set the fullscreen control
-        self.trackEvent(self.domRef.player.parentNode, 'click', '.fluid_control_fullscreen', function () {
-            self.fullscreenToggle();
-        });
+        self.trackEvent(self.domRef.player.parentNode, 'click', '.fluid_control_fullscreen', () => self.fullscreenToggle());
 
         // Theatre mode
         if (self.displayOptions.layoutControls.allowTheatre && !self.isInIframe) {
-            self.trackEvent(self.domRef.player.parentNode, 'click', '.fluid_control_theatre', function () {
-                self.theatreToggle();
-            });
+            document.getElementById(self.videoPlayerId + '_fluid_control_theatre').style.display = 'inline-block';
+            self.trackEvent(self.domRef.player.parentNode, 'click', '.fluid_control_theatre', () => self.theatreToggle());
         } else {
             document.getElementById(self.videoPlayerId + '_fluid_control_theatre').style.display = 'none';
         }
 
-        self.domRef.player.addEventListener('ratechange', function () {
+        self.domRef.player.addEventListener('ratechange', () => {
             if (self.isCurrentlyPlayingAd) {
                 self.playbackRate = 1;
             }
@@ -1650,28 +1654,29 @@ const fluidPlayerClass = function () {
         progressContainer.appendChild(previewContainer);
 
         // Set up hover for time position preview display
-        document.getElementById(self.videoPlayerId + '_fluid_controls_progress_container').addEventListener('mousemove', function (event) {
-            const progressContainer = document.getElementById(self.videoPlayerId + '_fluid_controls_progress_container');
-            const totalWidth = progressContainer.clientWidth;
-            const hoverTimeItem = document.getElementById(self.videoPlayerId + '_fluid_timeline_preview');
-            const hoverQ = self.getEventOffsetX(event, progressContainer);
+        document.getElementById(self.videoPlayerId + '_fluid_controls_progress_container')
+            .addEventListener('mousemove', event => {
+                const progressContainer = document.getElementById(self.videoPlayerId + '_fluid_controls_progress_container');
+                const totalWidth = progressContainer.clientWidth;
+                const hoverTimeItem = document.getElementById(self.videoPlayerId + '_fluid_timeline_preview');
+                const hoverQ = self.getEventOffsetX(event, progressContainer);
 
-            const hoverSecondQ = self.currentVideoDuration * hoverQ / totalWidth;
-            hoverTimeItem.innerText = self.formatTime(hoverSecondQ);
+                const hoverSecondQ = self.currentVideoDuration * hoverQ / totalWidth;
+                hoverTimeItem.innerText = self.formatTime(hoverSecondQ);
 
-            hoverTimeItem.style.display = 'block';
-            hoverTimeItem.style.left = (hoverSecondQ / self.domRef.player.duration * 100) + "%";
-        }, false);
+                hoverTimeItem.style.display = 'block';
+                hoverTimeItem.style.left = (hoverSecondQ / self.domRef.player.duration * 100) + "%";
+            }, false);
 
         // Hide timeline preview on mouseout
-        document.getElementById(self.videoPlayerId + '_fluid_controls_progress_container').addEventListener('mouseout', function () {
-            const hoverTimeItem = document.getElementById(self.videoPlayerId + '_fluid_timeline_preview');
-            hoverTimeItem.style.display = 'none';
-        }, false);
+        document.getElementById(self.videoPlayerId + '_fluid_controls_progress_container')
+            .addEventListener('mouseout', () => {
+                const hoverTimeItem = document.getElementById(self.videoPlayerId + '_fluid_timeline_preview');
+                hoverTimeItem.style.display = 'none';
+            }, false);
     };
 
     self.setCustomContextMenu = () => {
-        const videoPlayerTag = self.domRef.player;
         const playerWrapper = self.domRef.wrapper;
 
         //Create own context menu
@@ -1687,20 +1692,20 @@ const fluidPlayerClass = function () {
             '    <li id="' + self.videoPlayerId + 'context_option_homepage">Fluid Player ' + self.version + '</li>' +
             '</ul>';
 
-        videoPlayerTag.parentNode.insertBefore(divContextMenu, videoPlayerTag.nextSibling);
+        self.domRef.player.parentNode.insertBefore(divContextMenu, self.domRef.player.nextSibling);
 
         //Disable the default context menu
         playerWrapper.addEventListener('contextmenu', function (event) {
             event.preventDefault();
 
-            divContextMenu.style.left = self.getEventOffsetX(event, videoPlayerTag) + 'px';
-            divContextMenu.style.top = self.getEventOffsetY(event, videoPlayerTag) + 'px';
+            divContextMenu.style.left = self.getEventOffsetX(event, self.domRef.player) + 'px';
+            divContextMenu.style.top = self.getEventOffsetY(event, self.domRef.player) + 'px';
             divContextMenu.style.display = 'block';
         }, false);
 
         //Hide the context menu on clicking elsewhere
         document.addEventListener('click', function (event) {
-            if ((event.target !== videoPlayerTag) || event.button !== 2) {
+            if ((event.target !== self.domRef.player) || event.button !== 2) {
                 divContextMenu.style.display = 'none';
             }
 
@@ -1712,19 +1717,11 @@ const fluidPlayerClass = function () {
         const menuOptionFullscreen = document.getElementById(self.videoPlayerId + 'context_option_fullscreen');
         const menuOptionHomepage = document.getElementById(self.videoPlayerId + 'context_option_homepage');
 
-        menuOptionPlay.addEventListener('click', function () {
-            self.playPauseToggle();
-        }, false);
+        menuOptionPlay.addEventListener('click', () => self.playPauseToggle(), false);
+        menuOptionMute.addEventListener('click', () => self.muteToggle(), false);
+        menuOptionFullscreen.addEventListener('click', () => self.fullscreenToggle(), false);
 
-        menuOptionMute.addEventListener('click', function () {
-            self.muteToggle();
-        }, false);
-
-        menuOptionFullscreen.addEventListener('click', function () {
-            self.fullscreenToggle();
-        }, false);
-
-        menuOptionHomepage.addEventListener('click', function () {
+        menuOptionHomepage.addEventListener('click', () => {
             const win = window.open(self.homepage, '_blank');
             win.focus();
         }, false);
@@ -1752,13 +1749,11 @@ const fluidPlayerClass = function () {
         // Register controls locally
         self.domRef.controls = controls;
 
-        let remainingAttemptsToInitiateVolumeBar = 100;
-
-        // TODO ->>
-        // TODO: self referencing against local variable. This is not good at all.
         /**
          * Set the volumebar after its elements are properly rendered.
          */
+        let remainingAttemptsToInitiateVolumeBar = 100;
+
         const initiateVolumebar = function () {
             if (!remainingAttemptsToInitiateVolumeBar) {
                 clearInterval(initiateVolumebarTimerId);
@@ -1769,13 +1764,8 @@ const fluidPlayerClass = function () {
                 remainingAttemptsToInitiateVolumeBar--;
             }
         };
-
         let initiateVolumebarTimerId = setInterval(initiateVolumebar, 100);
-        // <<- ENDTODO
 
-        /*
-            Dobule click fullscreen
-        */
         if (self.displayOptions.layoutControls.doubleclickFullscreen) {
             self.domRef.player.addEventListener('dblclick', self.fullscreenToggle);
         }
@@ -1816,30 +1806,26 @@ const fluidPlayerClass = function () {
     self.setLayout = () => {
         //All other browsers
         const listenTo = (self.isTouchDevice()) ? 'touchend' : 'click';
-        self.domRef.player.addEventListener(listenTo, function () {
-            self.playPauseToggle();
-        }, false);
-
+        self.domRef.player.addEventListener(listenTo, () => self.playPauseToggle(), false);
         //Mobile Safari - because it does not emit a click event on initial click of the video
         self.domRef.player.addEventListener('play', self.initialPlay, false);
         self.setDefaultLayout();
     };
 
     self.handleFullscreen = () => {
-        if (typeof document.vastFullsreenChangeEventListenersAdded === 'undefined') {
-            ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'msfullscreenchange'].forEach(
-                function (eventType) {
-
-                    if (typeof (document['on' + eventType]) === 'object') {
-                        document.addEventListener(eventType, function (ev) {
-                            self.recalculateAdDimensions();
-                        }, false);
-                    }
-                }
-            );
-
-            document.vastFullsreenChangeEventListenersAdded = true;
+        if (typeof document.vastFullsreenChangeEventListenersAdded !== 'undefined') {
+            return;
         }
+
+        ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'msfullscreenchange'].forEach(eventType => {
+            if (typeof (document['on' + eventType]) === 'object') {
+                document.addEventListener(eventType, function (ev) {
+                    self.recalculateAdDimensions();
+                }, false);
+            }
+        });
+
+        document.vastFullsreenChangeEventListenersAdded = true;
     };
 
     self.setupPlayerWrapper = () => {
@@ -1850,7 +1836,6 @@ const fluidPlayerClass = function () {
             ? 'fluid_video_wrapper mobile'
             : 'fluid_video_wrapper';
 
-
         //Assign the height/width dimensions to the wrapper
         if (self.displayOptions.layoutControls.fillToContainer) {
             wrapper.style.width = '100%';
@@ -1859,6 +1844,7 @@ const fluidPlayerClass = function () {
             wrapper.style.height = self.domRef.player.clientHeight + 'px';
             wrapper.style.width = self.domRef.player.clientWidth + 'px';
         }
+
         self.domRef.player.style.height = '100%';
         self.domRef.player.style.width = '100%';
 
@@ -1869,20 +1855,16 @@ const fluidPlayerClass = function () {
     };
 
     self.onErrorDetection = () => {
-        const videoPlayerTag = self.domRef.player;
-
-        if (videoPlayerTag.networkState === videoPlayerTag.NETWORK_NO_SOURCE && self.isCurrentlyPlayingAd) {
+        if (self.domRef.player.networkState === self.domRef.player.NETWORK_NO_SOURCE && self.isCurrentlyPlayingAd) {
             //Probably the video ad file was not loaded successfully
             self.playMainVideoWhenVastFails(401);
         }
     };
 
     self.createVideoSourceSwitch = () => {
-        const videoPlayer = self.domRef.player;
-
         const sources = [];
-        const sourcesList = videoPlayer.querySelectorAll('source');
-        [].forEach.call(sourcesList, function (source) {
+        const sourcesList = self.domRef.player.querySelectorAll('source');
+        [].forEach.call(sourcesList, source => {
             if (source.title && source.src) {
                 sources.push({
                     'title': source.title,
@@ -1893,100 +1875,97 @@ const fluidPlayerClass = function () {
         });
 
         self.videoSources = sources;
-        if (self.videoSources.length > 1) {
-            const sourceChangeButton = document.getElementById(self.videoPlayerId + '_fluid_control_video_source');
-            let appendSourceChange = false;
+        if (self.videoSources.length <= 1) {
+            return;
+        }
 
-            const sourceChangeList = document.createElement('div');
-            sourceChangeList.id = self.videoPlayerId + '_fluid_control_video_source_list';
-            sourceChangeList.className = 'fluid_video_sources_list';
-            sourceChangeList.style.display = 'none';
+        const sourceChangeButton = document.getElementById(self.videoPlayerId + '_fluid_control_video_source');
+        sourceChangeButton.style.display = 'inline-block';
 
-            let firstSource = true;
-            self.videoSources.forEach(function (source) {
-                // Fix for issues occurring on iOS with mkv files
-                const getTheType = source.url.split(".").pop();
-                if (self.mobileInfo.userOs === 'iOS' && getTheType === 'mkv') {
-                    return;
-                }
+        let appendSourceChange = false;
 
-                const sourceSelected = (firstSource) ? "source_selected" : "";
-                const hdElement = (source.isHD) ? '<sup style="color:' + self.displayOptions.layoutControls.primaryColor + '" class="fp_hd_source"></sup>' : '';
-                firstSource = false;
-                const sourceChangeDiv = document.createElement('div');
-                sourceChangeDiv.id = 'source_' + self.videoPlayerId + '_' + source.title;
-                sourceChangeDiv.className = 'fluid_video_source_list_item';
-                sourceChangeDiv.innerHTML = '<span class="source_button_icon ' + sourceSelected + '"></span>' + source.title + hdElement;
+        const sourceChangeList = document.createElement('div');
+        sourceChangeList.id = self.videoPlayerId + '_fluid_control_video_source_list';
+        sourceChangeList.className = 'fluid_video_sources_list';
+        sourceChangeList.style.display = 'none';
 
-                sourceChangeDiv.addEventListener('click', function (event) {
-                    // While changing source the player size can flash, we want to set the pixel dimensions then back to 100% afterwards
-                    videoPlayer.style.width = videoPlayer.clientWidth + "px";
-                    videoPlayer.style.height = videoPlayer.clientHeight + "px";
-
-                    event.stopPropagation();
-                    const videoChangedTo = this;
-                    const sourceIcons = document.getElementsByClassName('source_button_icon');
-                    for (let i = 0; i < sourceIcons.length; i++) {
-                        sourceIcons[i].className = sourceIcons[i].className.replace("source_selected", "");
-                    }
-                    videoChangedTo.firstChild.className += ' source_selected';
-
-                    self.videoSources.forEach(function (source) {
-                        if (source.title === videoChangedTo.innerText.replace(/(\r\n\t|\n|\r\t)/gm, '')) {
-                            self.setBuffering();
-                            self.setVideoSource(source.url);
-                            self.fluidStorage.fluidQuality = source.title;
-                        }
-                    });
-
-                    self.openCloseVideoSourceSwitch();
-
-                });
-                sourceChangeList.appendChild(sourceChangeDiv);
-                appendSourceChange = true;
-            });
-
-            if (appendSourceChange) {
-                sourceChangeButton.appendChild(sourceChangeList);
-                sourceChangeButton.addEventListener('click', function () {
-                    self.openCloseVideoSourceSwitch();
-                });
-            } else {
-                // Didn't give any source options
-                document.getElementById(self.videoPlayerId + '_fluid_control_video_source').style.display = 'none';
+        let firstSource = true;
+        for (const source of self.videoSources) {
+            // Fix for issues occurring on iOS with mkv files
+            const getTheType = source.url.split(".").pop();
+            if (self.mobileInfo.userOs === 'iOS' && getTheType === 'mkv') {
+                continue;
             }
 
+            const sourceSelected = (firstSource) ? "source_selected" : "";
+            const hdElement = (source.isHD) ? '<sup style="color:' + self.displayOptions.layoutControls.primaryColor + '" class="fp_hd_source"></sup>' : '';
+            firstSource = false;
+            const sourceChangeDiv = document.createElement('div');
+            sourceChangeDiv.id = 'source_' + self.videoPlayerId + '_' + source.title;
+            sourceChangeDiv.className = 'fluid_video_source_list_item';
+            sourceChangeDiv.innerHTML = '<span class="source_button_icon ' + sourceSelected + '"></span>' + source.title + hdElement;
+
+            sourceChangeDiv.addEventListener('click', function (event) {
+                event.stopPropagation();
+                // While changing source the player size can flash, we want to set the pixel dimensions then back to 100% afterwards
+                self.domRef.player.style.width = self.domRef.player.clientWidth + 'px';
+                self.domRef.player.style.height = self.domRef.player.clientHeight + 'px';
+
+                const videoChangedTo = this;
+                const sourceIcons = document.getElementsByClassName('source_button_icon');
+                for (let i = 0; i < sourceIcons.length; i++) {
+                    sourceIcons[i].className = sourceIcons[i].className.replace('source_selected', '');
+                }
+                videoChangedTo.firstChild.className += ' source_selected';
+
+                self.videoSources.forEach(source => {
+                    if (source.title === videoChangedTo.innerText.replace(/(\r\n\t|\n|\r\t)/gm, '')) {
+                        self.setBuffering();
+                        self.setVideoSource(source.url);
+                        self.fluidStorage.fluidQuality = source.title;
+                    }
+                });
+
+                self.openCloseVideoSourceSwitch();
+            });
+
+            sourceChangeList.appendChild(sourceChangeDiv);
+            appendSourceChange = true;
+        }
+
+        if (appendSourceChange) {
+            sourceChangeButton.appendChild(sourceChangeList);
+            sourceChangeButton.addEventListener('click', () => {
+                self.openCloseVideoSourceSwitch();
+            });
         } else {
-            // No other video sources
+            // Didn't give any source options
             document.getElementById(self.videoPlayerId + '_fluid_control_video_source').style.display = 'none';
         }
     };
 
-    // TODO: show hide bug
     self.openCloseVideoSourceSwitch = () => {
         const sourceChangeList = document.getElementById(self.videoPlayerId + '_fluid_control_video_source_list');
-        const sourceChangeListContainer = document.getElementById(self.videoPlayerId + '_fluid_control_video_source');
 
         if (self.isCurrentlyPlayingAd) {
             sourceChangeList.style.display = 'none';
             return;
         }
 
-        if (sourceChangeList.style.display === 'none') {
-            sourceChangeList.style.display = 'block';
-            const mouseOut = function (event) {
-                sourceChangeListContainer.removeEventListener('mouseleave', mouseOut);
-                sourceChangeList.style.display = 'none';
-            };
-            sourceChangeListContainer.addEventListener('mouseleave', mouseOut);
-        } else {
+        if (sourceChangeList.style.display !== 'none') {
             sourceChangeList.style.display = 'none';
+            return;
         }
+
+        sourceChangeList.style.display = 'block';
+        const mouseOut = () => {
+            sourceChangeList.removeEventListener('mouseleave', mouseOut);
+            sourceChangeList.style.display = 'none';
+        };
+        sourceChangeList.addEventListener('mouseleave', mouseOut);
     };
 
     self.setVideoSource = (url) => {
-        const videoPlayerTag = self.domRef.player;
-
         if (self.mobileInfo.userOs === 'iOS' && url.indexOf('.mkv') > 0) {
             console.log('[FP_ERROR] .mkv files not supported by iOS devices.');
             return false;
@@ -1994,64 +1973,65 @@ const fluidPlayerClass = function () {
 
         if (self.isCurrentlyPlayingAd) {
             self.originalSrc = url;
-        } else {
-            self.isSwitchingSource = true;
-            let play = false;
-            if (!videoPlayerTag.paused) {
-                videoPlayerTag.pause();
-                play = true;
-            }
-
-            const currentTime = videoPlayerTag.currentTime;
-            self.setCurrentTimeAndPlay(currentTime, play);
-
-            videoPlayerTag.src = url;
-            self.originalSrc = url;
-            self.displayOptions.layoutControls.mediaType = self.getCurrentSrcType();
-            self.initialiseStreamers();
+            return;
         }
+
+        self.isSwitchingSource = true;
+        let play = false;
+        if (!self.domRef.player.paused) {
+            self.domRef.player.pause();
+            play = true;
+        }
+
+        const currentTime = self.domRef.player.currentTime;
+        self.setCurrentTimeAndPlay(currentTime, play);
+
+        self.domRef.player.src = url;
+        self.originalSrc = url;
+        self.displayOptions.layoutControls.mediaType = self.getCurrentSrcType();
+        self.initialiseStreamers();
     };
 
-    // TODO: referencing local variable in callback.
     self.setCurrentTimeAndPlay = (newCurrentTime, shouldPlay) => {
-        const videoPlayerTag = self.domRef.player;
-        const loadedMetadata = function () {
-            videoPlayerTag.currentTime = newCurrentTime;
-            videoPlayerTag.removeEventListener('loadedmetadata', loadedMetadata);
+        const loadedMetadata = () => {
+            self.domRef.player.currentTime = newCurrentTime;
+            self.domRef.player.removeEventListener('loadedmetadata', loadedMetadata);
             // Safari ios and mac fix to set currentTime
             if (self.mobileInfo.userOs === 'iOS' || self.getBrowserVersion().browserName.toLowerCase() === 'safari') {
-                videoPlayerTag.addEventListener('playing', videoPlayStart);
+                self.domRef.player.addEventListener('playing', videoPlayStart);
             }
 
             if (shouldPlay) {
-                videoPlayerTag.play();
+                self.domRef.player.play();
             } else {
-                videoPlayerTag.pause();
+                self.domRef.player.pause();
                 self.controlPlayPauseToggle(self.videoPlayerId);
             }
+
             self.isSwitchingSource = false;
-            videoPlayerTag.style.width = '100%';
-            videoPlayerTag.style.height = '100%';
+            self.domRef.player.style.width = '100%';
+            self.domRef.player.style.height = '100%';
         };
-        let videoPlayStart = function () {
+
+        let videoPlayStart = () => {
             self.currentTime = newCurrentTime;
-            videoPlayerTag.removeEventListener('playing', videoPlayStart);
+            self.domRef.player.removeEventListener('playing', videoPlayStart);
         };
 
-        videoPlayerTag.addEventListener('loadedmetadata', loadedMetadata, false);
-
-        videoPlayerTag.load();
+        self.domRef.player.addEventListener('loadedmetadata', loadedMetadata, false);
+        self.domRef.player.load();
     };
 
     self.initTitle = () => {
-        const videoPlayer = self.domRef.player;
-        if (self.displayOptions.layoutControls.title) {
-            const titleHolder = document.createElement('div');
-            titleHolder.id = self.videoPlayerId + '_title';
-            videoPlayer.parentNode.insertBefore(titleHolder, null);
-            titleHolder.innerHTML += self.displayOptions.layoutControls.title;
-            titleHolder.classList.add('fp_title');
+        if (!self.displayOptions.layoutControls.title) {
+            return;
         }
+
+        const titleHolder = document.createElement('div');
+        titleHolder.id = self.videoPlayerId + '_title';
+        self.domRef.player.parentNode.insertBefore(titleHolder, null);
+        titleHolder.innerHTML += self.displayOptions.layoutControls.title;
+        titleHolder.classList.add('fp_title');
     };
 
     self.hasTitle = () => {
@@ -2063,21 +2043,24 @@ const fluidPlayerClass = function () {
     self.hideTitle = () => {
         const titleHolder = document.getElementById(self.videoPlayerId + '_title');
 
-        if (self.hasTitle()) {
-            titleHolder.classList.add('fade_out');
+        if (!self.hasTitle()) {
+            return;
         }
+
+        titleHolder.classList.add('fade_out');
     };
 
     self.showTitle = () => {
         const titleHolder = document.getElementById(self.videoPlayerId + '_title');
 
-        if (self.hasTitle()) {
-            titleHolder.classList.remove('fade_out');
+        if (!self.hasTitle()) {
+            return;
         }
+
+        titleHolder.classList.remove('fade_out');
     };
 
     self.initLogo = () => {
-        const videoPlayer = self.domRef.player;
         if (!self.displayOptions.layoutControls.logo.imageUrl) {
             return;
         }
@@ -2098,9 +2081,11 @@ const fluidPlayerClass = function () {
         if (self.displayOptions.layoutControls.logo.imageUrl) {
             logoImage.src = self.displayOptions.layoutControls.logo.imageUrl;
         }
+
         logoImage.style.position = 'absolute';
         logoImage.style.margin = self.displayOptions.layoutControls.logo.imageMargin;
         const logoPosition = self.displayOptions.layoutControls.logo.position.toLowerCase();
+
         if (logoPosition.indexOf('bottom') !== -1) {
             logoImage.style.bottom = 0;
         } else {
@@ -2133,7 +2118,7 @@ const fluidPlayerClass = function () {
             }, false);
         }
 
-        videoPlayer.parentNode.insertBefore(logoHolder, null);
+        self.domRef.player.parentNode.insertBefore(logoHolder, null);
         logoHolder.appendChild(logoImage, null);
     };
 
@@ -2147,7 +2132,6 @@ const fluidPlayerClass = function () {
             return;
         }
 
-        const videoPlayer = self.domRef.player;
         const containerDiv = document.createElement('div');
         containerDiv.id = self.videoPlayerId + '_fluid_html_on_pause';
         containerDiv.className = 'fluid_html_on_pause';
@@ -2165,7 +2149,7 @@ const fluidPlayerClass = function () {
             containerDiv.style.height = self.displayOptions.layoutControls.htmlOnPauseBlock.height + 'px';
         }
 
-        videoPlayer.parentNode.insertBefore(containerDiv, null);
+        self.domRef.player.parentNode.insertBefore(containerDiv, null);
     };
 
     /**
@@ -2199,24 +2183,24 @@ const fluidPlayerClass = function () {
      * Set the mainVideoDuration property one the video is loaded
      */
     self.mainVideoReady = () => {
-        if (self.mainVideoDuration === 0 && !self.isCurrentlyPlayingAd && self.mainVideoReadyState === false) {
-            self.mainVideoDuration = self.domRef.player.duration;
-            self.mainVideoReadyState = true;
-            const event = new CustomEvent("mainVideoDurationSet");
-            self.domRef.player.dispatchEvent(event);
-            self.domRef.player.removeEventListener('loadedmetadata', self.mainVideoReady);
+        if (!(self.mainVideoDuration === 0 && !self.isCurrentlyPlayingAd && self.mainVideoReadyState === false)) {
+            return;
         }
+        const event = new CustomEvent('mainVideoDurationSet');
 
+        self.mainVideoDuration = self.domRef.player.duration;
+        self.mainVideoReadyState = true;
+        self.domRef.player.dispatchEvent(event);
+        self.domRef.player.removeEventListener('loadedmetadata', self.mainVideoReady);
     };
 
     self.userActivityChecker = () => {
         const videoPlayer = self.domRef.wrapper;
-        const videoPlayerTag = self.domRef.player;
         self.newActivity = null;
 
         let isMouseStillDown = false;
 
-        const activity = function (event) {
+        const activity = event => {
             if (event.type === 'touchstart' || event.type === 'mousedown') {
                 isMouseStillDown = true;
             }
@@ -2226,17 +2210,15 @@ const fluidPlayerClass = function () {
             self.newActivity = true;
         };
 
-        // TODO: aaaaand where is this cleared, exactly?
-        const activityCheck = setInterval(function () {
-
+        setInterval(() => {
             if (self.newActivity === true) {
                 if (!isMouseStillDown && !self.isLoading) {
                     self.newActivity = false;
                 }
 
                 if (self.isUserActive === false || !self.isControlBarVisible()) {
-                    let event = new CustomEvent("userActive");
-                    videoPlayerTag.dispatchEvent(event);
+                    let event = new CustomEvent('userActive');
+                    self.domRef.player.dispatchEvent(event);
                     self.isUserActive = true;
                 }
 
@@ -2245,8 +2227,8 @@ const fluidPlayerClass = function () {
                 self.inactivityTimeout = setTimeout(function () {
                     if (self.newActivity !== true) {
                         self.isUserActive = false;
-                        let event = new CustomEvent("userInactive");
-                        videoPlayerTag.dispatchEvent(event);
+                        let event = new CustomEvent('userInactive');
+                        self.domRef.player.dispatchEvent(event);
                     } else {
                         clearTimeout(self.inactivityTimeout);
                     }
@@ -2256,7 +2238,10 @@ const fluidPlayerClass = function () {
             }
         }, 300);
 
-        const listenTo = (self.isTouchDevice()) ? ['touchstart', 'touchmove', 'touchend'] : ['mousemove', 'mousedown', 'mouseup'];
+        const listenTo = (self.isTouchDevice())
+            ? ['touchstart', 'touchmove', 'touchend']
+            : ['mousemove', 'mousedown', 'mouseup'];
+
         for (let i = 0; i < listenTo.length; i++) {
             videoPlayer.addEventListener(listenTo[i], activity);
         }
@@ -2285,35 +2270,37 @@ const fluidPlayerClass = function () {
             self.toggleAdCountdown(true);
         }
 
+        self.domRef.player.style.cursor = 'none';
+
         // handles both VR and Normal condition
-        if (self.hasControlBar()) {
-            const divVastControls = self.domRef.player.parentNode.getElementsByClassName('fluid_controls_container');
-            const fpLogo = self.domRef.player.parentNode.getElementsByClassName('fp_logo');
+        if (!self.hasControlBar()) {
+            return;
+        }
 
-            for (let i = 0; i < divVastControls.length; i++) {
-                if (self.displayOptions.layoutControls.controlBar.animated) {
-                    divVastControls[i].classList.remove('fade_in');
-                    divVastControls[i].classList.add('fade_out');
-                } else {
-                    divVastControls[i].style.display = 'none';
-                }
-            }
+        const divVastControls = self.domRef.player.parentNode.getElementsByClassName('fluid_controls_container');
+        const fpLogo = self.domRef.player.parentNode.getElementsByClassName('fp_logo');
 
-            for (let i = 0; i < fpLogo.length; i++) {
-                if (self.displayOptions.layoutControls.controlBar.animated) {
-                    if (fpLogo[i]) {
-                        fpLogo[i].classList.remove('fade_in');
-                        fpLogo[i].classList.add('fade_out');
-                    }
-                } else {
-                    if (fpLogo[i]) {
-                        fpLogo[i].style.display = 'none';
-                    }
-                }
+        for (let i = 0; i < divVastControls.length; i++) {
+            if (self.displayOptions.layoutControls.controlBar.animated) {
+                divVastControls[i].classList.remove('fade_in');
+                divVastControls[i].classList.add('fade_out');
+            } else {
+                divVastControls[i].style.display = 'none';
             }
         }
 
-        self.domRef.player.style.cursor = 'none';
+        for (let i = 0; i < fpLogo.length; i++) {
+            if (self.displayOptions.layoutControls.controlBar.animated) {
+                if (fpLogo[i]) {
+                    fpLogo[i].classList.remove('fade_in');
+                    fpLogo[i].classList.add('fade_out');
+                }
+            } else {
+                if (fpLogo[i]) {
+                    fpLogo[i].style.display = 'none';
+                }
+            }
+        }
     };
 
     self.showControlBar = () => {
@@ -2321,188 +2308,179 @@ const fluidPlayerClass = function () {
             self.toggleAdCountdown(false);
         }
 
-        if (self.hasControlBar()) {
-            const divVastControls = self.domRef.player.parentNode.getElementsByClassName('fluid_controls_container');
-            const fpLogo = self.domRef.player.parentNode.getElementsByClassName('fp_logo');
-
-            for (let i = 0; i < divVastControls.length; i++) {
-                if (self.displayOptions.layoutControls.controlBar.animated) {
-                    divVastControls[i].classList.remove('fade_out');
-                    divVastControls[i].classList.add('fade_in');
-                } else {
-                    divVastControls[i].style.display = 'block';
-                }
-            }
-
-            for (let i = 0; i < fpLogo.length; i++) {
-                if (self.displayOptions.layoutControls.controlBar.animated) {
-                    if (fpLogo[i]) {
-                        fpLogo[i].classList.remove('fade_out');
-                        fpLogo[i].classList.add('fade_in');
-                    }
-                } else {
-                    if (fpLogo[i]) {
-                        fpLogo[i].style.display = 'block';
-                    }
-                }
-            }
-        }
 
         if (!self.isTouchDevice()) {
             self.domRef.player.style.cursor = 'default';
         }
+
+        if (!self.hasControlBar()) {
+            return;
+        }
+
+        const divVastControls = self.domRef.player.parentNode.getElementsByClassName('fluid_controls_container');
+        const fpLogo = self.domRef.player.parentNode.getElementsByClassName('fp_logo');
+        for (let i = 0; i < divVastControls.length; i++) {
+            if (self.displayOptions.layoutControls.controlBar.animated) {
+                divVastControls[i].classList.remove('fade_out');
+                divVastControls[i].classList.add('fade_in');
+            } else {
+                divVastControls[i].style.display = 'block';
+            }
+        }
+
+        for (let i = 0; i < fpLogo.length; i++) {
+            if (self.displayOptions.layoutControls.controlBar.animated) {
+                if (fpLogo[i]) {
+                    fpLogo[i].classList.remove('fade_out');
+                    fpLogo[i].classList.add('fade_in');
+                }
+            } else {
+                if (fpLogo[i]) {
+                    fpLogo[i].style.display = 'block';
+                }
+            }
+        }
     };
 
     self.linkControlBarUserActivity = () => {
-        const videoPlayerTag = self.domRef.player;
-        videoPlayerTag.addEventListener('userInactive', self.hideControlBar);
-        videoPlayerTag.addEventListener('userActive', self.showControlBar);
-        videoPlayerTag.addEventListener('userInactive', self.hideTitle);
-        videoPlayerTag.addEventListener('userActive', self.showTitle);
+        self.domRef.player.addEventListener('userInactive', self.hideControlBar);
+        self.domRef.player.addEventListener('userActive', self.showControlBar);
+        self.domRef.player.addEventListener('userInactive', self.hideTitle);
+        self.domRef.player.addEventListener('userActive', self.showTitle);
     };
 
     self.initMute = () => {
-        if (self.displayOptions.layoutControls.mute === true) {
-            const videoPlayerTag = self.domRef.player;
-            videoPlayerTag.volume = 0;
+        if (self.displayOptions.layoutControls.mute !== true) {
+            return;
         }
+
+        self.domRef.player.volume = 0;
     };
 
     self.initLoop = () => {
-        const videoPlayerTag = self.domRef.player;
-        if (self.displayOptions.layoutControls.loop !== null) {
-            videoPlayerTag.loop = self.displayOptions.layoutControls.loop;
-        } else if (videoPlayerTag.loop) {
-            self.displayOptions.layoutControls.loop = true;
-        }
+        self.domRef.player.loop = !!self.displayOptions.layoutControls.loop;
     };
 
     self.setBuffering = () => {
-        const videoPlayer = self.domRef.player;
-
-        const bufferBar = videoPlayer.parentNode.getElementsByClassName('fluid_controls_buffered');
+        let progressInterval;
+        const bufferBar = self.domRef.player.parentNode.getElementsByClassName('fluid_controls_buffered');
 
         for (let j = 0; j < bufferBar.length; j++) {
             bufferBar[j].style.width = 0;
         }
 
         // Buffering
-        // TODO referencing local value in callback...
-        const logProgress = function () {
-            const duration = videoPlayer.duration;
-            if (duration > 0) {
+        const logProgress = () => {
+            const duration = self.domRef.player.duration;
+            if (duration <= 0) {
+                return;
+            }
 
-                for (let i = 0; i < videoPlayer.buffered.length; i++) {
-                    if (videoPlayer.buffered.start(videoPlayer.buffered.length - 1 - i) < videoPlayer.currentTime) {
-                        const newBufferLength = (videoPlayer.buffered.end(videoPlayer.buffered.length - 1 - i) / duration) * 100 + "%";
-
-                        for (let j = 0; j < bufferBar.length; j++) {
-                            bufferBar[j].style.width = newBufferLength;
-                        }
-
-                        // Stop checking for buffering if the video is fully buffered
-                        // TODO verify this actually does anything
-                        if ((videoPlayer.buffered.end(videoPlayer.buffered.length - 1 - i) / duration) === 1) {
-                            clearInterval(progressInterval);
-                        }
-
-                        break;
-                    }
-
+            for (let i = 0; i < self.domRef.player.buffered.length; i++) {
+                if (self.domRef.player.buffered.start(self.domRef.player.buffered.length - 1 - i) >= self.domRef.player.currentTime) {
+                    continue;
                 }
+
+                const newBufferLength = (self.domRef.player.buffered.end(self.domRef.player.buffered.length - 1 - i) / duration) * 100 + "%";
+
+                for (let j = 0; j < bufferBar.length; j++) {
+                    bufferBar[j].style.width = newBufferLength;
+                }
+
+                // Stop checking for buffering if the video is fully buffered
+                if (!!progressInterval && 1 === (self.domRef.player.buffered.end(self.domRef.player.buffered.length - 1 - i) / duration)) {
+                    clearInterval(progressInterval);
+                }
+
+                break;
             }
         };
-        let progressInterval = setInterval(logProgress, 500);
+        progressInterval = setInterval(logProgress, 500);
     };
 
     self.createPlaybackList = () => {
         const playbackRates = ['x2', 'x1.5', 'x1', 'x0.5'];
 
-        if (self.displayOptions.layoutControls.playbackRateEnabled) {
-            const sourceChangeButton = document.getElementById(self.videoPlayerId + '_fluid_control_playback_rate');
-
-            const sourceChangeList = document.createElement('div');
-            sourceChangeList.id = self.videoPlayerId + '_fluid_control_video_playback_rate';
-            sourceChangeList.className = 'fluid_video_playback_rates';
-            sourceChangeList.style.display = 'none';
-
-            playbackRates.forEach(function (rate) {
-                const sourceChangeDiv = document.createElement('div');
-                sourceChangeDiv.className = 'fluid_video_playback_rates_item';
-                sourceChangeDiv.innerText = rate;
-
-                sourceChangeDiv.addEventListener('click', function (event) {
-                    event.stopPropagation();
-                    let playbackRate = this.innerText.replace('x', '');
-                    self.setPlaybackSpeed(playbackRate);
-                    self.openCloseVideoPlaybackRate();
-
-                });
-                sourceChangeList.appendChild(sourceChangeDiv);
-            });
-
-            sourceChangeButton.appendChild(sourceChangeList);
-            sourceChangeButton.addEventListener('click', function () {
-                self.openCloseVideoPlaybackRate();
-            });
-
-        } else {
-            // No other video sources
-            document.getElementById(self.videoPlayerId + '_fluid_control_playback_rate').style.display = 'none';
+        if (!self.displayOptions.layoutControls.playbackRateEnabled) {
+            return;
         }
+
+        document.getElementById(self.videoPlayerId + '_fluid_control_playback_rate').style.display = 'inline-block';
+
+        const sourceChangeButton = document.getElementById(self.videoPlayerId + '_fluid_control_playback_rate');
+
+        const sourceChangeList = document.createElement('div');
+        sourceChangeList.id = self.videoPlayerId + '_fluid_control_video_playback_rate';
+        sourceChangeList.className = 'fluid_video_playback_rates';
+        sourceChangeList.style.display = 'none';
+
+        playbackRates.forEach(function (rate) {
+            const sourceChangeDiv = document.createElement('div');
+            sourceChangeDiv.className = 'fluid_video_playback_rates_item';
+            sourceChangeDiv.innerText = rate;
+
+            sourceChangeDiv.addEventListener('click', function (event) {
+                event.stopPropagation();
+                let playbackRate = this.innerText.replace('x', '');
+                self.setPlaybackSpeed(playbackRate);
+                self.openCloseVideoPlaybackRate();
+
+            });
+            sourceChangeList.appendChild(sourceChangeDiv);
+        });
+
+        sourceChangeButton.appendChild(sourceChangeList);
+        sourceChangeButton.addEventListener('click', function () {
+            self.openCloseVideoPlaybackRate();
+        });
     };
 
-    // TODO: closes too fast bug
     self.openCloseVideoPlaybackRate = () => {
         const sourceChangeList = document.getElementById(self.videoPlayerId + '_fluid_control_video_playback_rate');
-        const sourceChangeListContainer = document.getElementById(self.videoPlayerId + '_fluid_control_playback_rate');
 
-        if (self.isCurrentlyPlayingAd) {
+        if (self.isCurrentlyPlayingAd || 'none' !== sourceChangeList.style.display) {
             sourceChangeList.style.display = 'none';
             return;
         }
 
-        if (sourceChangeList.style.display === 'none') {
-            sourceChangeList.style.display = 'block';
-            const mouseOut = function () {
-                sourceChangeListContainer.removeEventListener('mouseleave', mouseOut);
-                sourceChangeList.style.display = 'none';
-            };
-            sourceChangeListContainer.addEventListener('mouseleave', mouseOut);
-        } else {
+        sourceChangeList.style.display = 'block';
+        const mouseOut = function () {
+            sourceChangeList.removeEventListener('mouseleave', mouseOut);
             sourceChangeList.style.display = 'none';
-        }
+        };
+        sourceChangeList.addEventListener('mouseleave', mouseOut);
     };
 
     self.createDownload = () => {
         const downloadOption = document.getElementById(self.videoPlayerId + '_fluid_control_download');
-        if (self.displayOptions.layoutControls.allowDownload) {
-            let downloadClick = document.createElement('a');
-            downloadClick.id = self.videoPlayerId + '_download';
-            downloadClick.onclick = function (e) {
-                const linkItem = this;
-
-                if (typeof e.stopImmediatePropagation !== 'undefined') {
-                    e.stopImmediatePropagation();
-                }
-
-                setInterval(function () {
-                    linkItem.download = '';
-                    linkItem.href = '';
-                }, 100);
-            };
-
-            downloadOption.appendChild(downloadClick);
-
-            downloadOption.addEventListener('click', function () {
-                const downloadItem = document.getElementById(self.videoPlayerId + '_download');
-                downloadItem.download = self.originalSrc;
-                downloadItem.href = self.originalSrc;
-                downloadClick.click();
-            });
-        } else {
-            downloadOption.style.display = 'none';
+        if (!self.displayOptions.layoutControls.allowDownload) {
+            return;
         }
+        downloadOption.style.display = 'inline-block';
+
+        let downloadClick = document.createElement('a');
+        downloadClick.id = self.videoPlayerId + '_download';
+        downloadClick.onclick = function (e) {
+            const linkItem = this;
+
+            if (typeof e.stopImmediatePropagation !== 'undefined') {
+                e.stopImmediatePropagation();
+            }
+
+            setInterval(function () {
+                linkItem.download = '';
+                linkItem.href = '';
+            }, 100);
+        };
+
+        downloadOption.appendChild(downloadClick);
+
+        downloadOption.addEventListener('click', function () {
+            const downloadItem = document.getElementById(self.videoPlayerId + '_download');
+            downloadItem.download = self.originalSrc;
+            downloadItem.href = self.originalSrc;
+            downloadClick.click();
+        });
     };
 
     self.theatreToggle = () => {
@@ -2541,11 +2519,10 @@ const fluidPlayerClass = function () {
         self.fluidStorage.fluidTheatre = self.theatreMode;
 
         // Trigger theatre event
-        const videoPlayer = self.domRef.player;
         const theatreEvent = (self.theatreMode) ? 'theatreModeOn' : 'theatreModeOff';
         const event = document.createEvent('CustomEvent');
         event.initEvent(theatreEvent, false, true);
-        videoPlayer.dispatchEvent(event);
+        self.domRef.player.dispatchEvent(event);
 
         self.resizeVpaidAuto();
     };
@@ -2553,42 +2530,13 @@ const fluidPlayerClass = function () {
     self.defaultTheatre = () => {
         const videoWrapper = document.getElementById('fluid_video_wrapper_' + self.videoPlayerId);
 
-        if (!self.theatreMode) {
-            videoWrapper.classList.add('fluid_theatre_mode');
-            const workingWidth = self.displayOptions.layoutControls.theatreSettings.width;
-            let defaultHorizontalMargin = '10px';
-            videoWrapper.style.width = workingWidth;
-            videoWrapper.style.height = self.displayOptions.layoutControls.theatreSettings.height;
-            videoWrapper.style.maxHeight = screen.height + "px";
-            videoWrapper.style.marginTop = self.displayOptions.layoutControls.theatreSettings.marginTop + 'px';
-            switch (self.displayOptions.layoutControls.theatreSettings.horizontalAlign) {
-                case 'center':
-                    // We must calculate the margin differently based on whether they passed % or px
-                    if (typeof (workingWidth) == 'string' && workingWidth.substr(workingWidth.length - 1) === "%") {
-                        defaultHorizontalMargin = ((100 - parseInt(workingWidth.substring(0, workingWidth.length - 1))) / 2) + "%"; // A margin of half the remaining space
-                    } else if (typeof (workingWidth) == 'string' && workingWidth.substr(workingWidth.length - 2) === "px") {
-                        defaultHorizontalMargin = (((screen.width - parseInt(workingWidth.substring(0, workingWidth.length - 2))) / screen.width) * 100 / 2) + "%"; // Half the (Remaining width / fullwidth)
-                    } else {
-                        console.log('[FP_ERROR] Theatre width specified invalid.');
-                    }
-
-                    videoWrapper.style.left = defaultHorizontalMargin;
-                    break;
-                case 'right':
-                    videoWrapper.style.right = defaultHorizontalMargin;
-                    break;
-                case 'left':
-                default:
-                    videoWrapper.style.left = defaultHorizontalMargin;
-                    break;
-            }
-        } else {
+        if (self.theatreMode) {
             videoWrapper.classList.remove('fluid_theatre_mode');
-            videoWrapper.style.maxHeight = "";
-            videoWrapper.style.marginTop = "";
-            videoWrapper.style.left = "";
-            videoWrapper.style.right = "";
-            videoWrapper.style.position = "";
+            videoWrapper.style.maxHeight = '';
+            videoWrapper.style.marginTop = '';
+            videoWrapper.style.left = '';
+            videoWrapper.style.right = '';
+            videoWrapper.style.position = '';
             if (!self.displayOptions.layoutControls.fillToContainer) {
                 videoWrapper.style.width = self.originalWidth + 'px';
                 videoWrapper.style.height = self.originalHeight + 'px';
@@ -2596,42 +2544,74 @@ const fluidPlayerClass = function () {
                 videoWrapper.style.width = '100%';
                 videoWrapper.style.height = '100%';
             }
+            return;
+        }
+
+        videoWrapper.classList.add('fluid_theatre_mode');
+        const workingWidth = self.displayOptions.layoutControls.theatreSettings.width;
+        let defaultHorizontalMargin = '10px';
+        videoWrapper.style.width = workingWidth;
+        videoWrapper.style.height = self.displayOptions.layoutControls.theatreSettings.height;
+        videoWrapper.style.maxHeight = screen.height + "px";
+        videoWrapper.style.marginTop = self.displayOptions.layoutControls.theatreSettings.marginTop + 'px';
+        switch (self.displayOptions.layoutControls.theatreSettings.horizontalAlign) {
+            case 'center':
+                // We must calculate the margin differently based on whether they passed % or px
+                if (typeof (workingWidth) == 'string' && workingWidth.substr(workingWidth.length - 1) === "%") {
+                    // A margin of half the remaining space
+                    defaultHorizontalMargin = ((100 - parseInt(workingWidth.substring(0, workingWidth.length - 1))) / 2) + "%";
+                } else if (typeof (workingWidth) == 'string' && workingWidth.substr(workingWidth.length - 2) === "px") {
+                    // Half the (Remaining width / fullwidth)
+                    defaultHorizontalMargin = (((screen.width - parseInt(workingWidth.substring(0, workingWidth.length - 2))) / screen.width) * 100 / 2) + "%";
+                } else {
+                    console.log('[FP_ERROR] Theatre width specified invalid.');
+                }
+
+                videoWrapper.style.left = defaultHorizontalMargin;
+                break;
+            case 'right':
+                videoWrapper.style.right = defaultHorizontalMargin;
+                break;
+            case 'left':
+            default:
+                videoWrapper.style.left = defaultHorizontalMargin;
+                break;
         }
     };
 
     // Set the poster for the video, taken from custom params
     // Cannot use the standard video tag poster image as it can be removed by the persistent settings
     self.posterImage = () => {
-        if (self.displayOptions.layoutControls.posterImage) {
-            const containerDiv = document.createElement('div');
-            containerDiv.id = self.videoPlayerId + '_fluid_pseudo_poster';
-            containerDiv.className = 'fluid_pseudo_poster';
-
-            if (['auto', 'contain', 'cover'].indexOf(self.displayOptions.layoutControls.posterImageSize) === -1) {
-                console.log('[FP_ERROR] Not allowed value in posterImageSize');
-                return;
-            }
-
-            containerDiv.style.background = "url('" + self.displayOptions.layoutControls.posterImage + "') center center / "
-                + self.displayOptions.layoutControls.posterImageSize + " no-repeat black";
-            self.domRef.player.parentNode.insertBefore(containerDiv, null);
+        if (!self.displayOptions.layoutControls.posterImage) {
+            return;
         }
+
+        const containerDiv = document.createElement('div');
+        containerDiv.id = self.videoPlayerId + '_fluid_pseudo_poster';
+        containerDiv.className = 'fluid_pseudo_poster';
+        if (['auto', 'contain', 'cover'].indexOf(self.displayOptions.layoutControls.posterImageSize) === -1) {
+            console.log('[FP_ERROR] Not allowed value in posterImageSize');
+            return;
+        }
+        containerDiv.style.background = "url('" + self.displayOptions.layoutControls.posterImage + "') center center / "
+            + self.displayOptions.layoutControls.posterImageSize + " no-repeat black";
+        self.domRef.player.parentNode.insertBefore(containerDiv, null);
     };
 
-    // This is called when a media type is unsupported. we'll find the current source and try set the next source if it exists
+    // This is called when a media type is unsupported. We'll find the current source and try set the next source if it exists
     self.nextSource = () => {
         const sources = self.domRef.player.getElementsByTagName('source');
 
-        if (sources.length) {
-            for (let i = 0; i < sources.length - 1; i++) {
-                if (sources[i].getAttribute('src') === self.originalSrc && sources[i + 1].getAttribute('src')) {
-                    self.setVideoSource(sources[i + 1].getAttribute('src'));
-                    return;
-                }
-            }
+        if (!sources.length) {
+            return null;
         }
 
-        return null;
+        for (let i = 0; i < sources.length - 1; i++) {
+            if (sources[i].getAttribute('src') === self.originalSrc && sources[i + 1].getAttribute('src')) {
+                self.setVideoSource(sources[i + 1].getAttribute('src'));
+                return;
+            }
+        }
     };
 
     self.inIframe = () => {
@@ -2643,38 +2623,48 @@ const fluidPlayerClass = function () {
     };
 
     self.setPersistentSettings = () => {
-        if (typeof (Storage) !== 'undefined' && typeof (localStorage) !== 'undefined') {
-            self.fluidStorage = localStorage;
+        if (!(typeof (Storage) !== 'undefined' && typeof (localStorage) !== 'undefined')) {
+            return;
+        }
 
-            if (typeof (self.fluidStorage.fluidVolume) !== 'undefined'
-                && self.displayOptions.layoutControls.persistentSettings.volume) {
-                self.setVolume(self.fluidStorage.fluidVolume);
+        // See https://github.com/fluid-player/fluid-player/issues/271
+        const testKey = '_fp_storage_enabled', storage = localStorage;
+        try {
+            storage.setItem(testKey, '1');
+            storage.removeItem(testKey);
+        } catch (error) {
+            return false;
+        }
 
-                if (typeof (self.fluidStorage.fluidMute) !== 'undefined' && self.fluidStorage.fluidMute === 'true') {
-                    self.muteToggle();
-                }
+        self.fluidStorage = localStorage;
+        if (typeof (self.fluidStorage.fluidVolume) !== 'undefined'
+            && self.displayOptions.layoutControls.persistentSettings.volume) {
+            self.setVolume(self.fluidStorage.fluidVolume);
+
+            if (typeof (self.fluidStorage.fluidMute) !== 'undefined' && self.fluidStorage.fluidMute === 'true') {
+                self.muteToggle();
             }
+        }
 
-            if (typeof (self.fluidStorage.fluidQuality) !== 'undefined'
-                && self.displayOptions.layoutControls.persistentSettings.quality) {
-                const sourceOption = document.getElementById('source_' + self.videoPlayerId + '_' + self.fluidStorage.fluidQuality);
-                const sourceChangeButton = document.getElementById(self.videoPlayerId + '_fluid_control_video_source');
-                if (sourceOption) {
-                    sourceOption.click();
-                    sourceChangeButton.click();
-                }
+        if (typeof (self.fluidStorage.fluidQuality) !== 'undefined'
+            && self.displayOptions.layoutControls.persistentSettings.quality) {
+            const sourceOption = document.getElementById('source_' + self.videoPlayerId + '_' + self.fluidStorage.fluidQuality);
+            const sourceChangeButton = document.getElementById(self.videoPlayerId + '_fluid_control_video_source');
+            if (sourceOption) {
+                sourceOption.click();
+                sourceChangeButton.click();
             }
+        }
 
-            if (typeof (self.fluidStorage.fluidSpeed) !== 'undefined'
-                && self.displayOptions.layoutControls.persistentSettings.speed) {
-                self.setPlaybackSpeed(self.fluidStorage.fluidSpeed);
-            }
+        if (typeof (self.fluidStorage.fluidSpeed) !== 'undefined'
+            && self.displayOptions.layoutControls.persistentSettings.speed) {
+            self.setPlaybackSpeed(self.fluidStorage.fluidSpeed);
+        }
 
-            if (typeof (self.fluidStorage.fluidTheatre) !== 'undefined'
-                && self.fluidStorage.fluidTheatre === "true"
-                && self.displayOptions.layoutControls.persistentSettings.theatre) {
-                self.theatreToggle();
-            }
+        if (typeof (self.fluidStorage.fluidTheatre) !== 'undefined'
+            && self.fluidStorage.fluidTheatre === 'true'
+            && self.displayOptions.layoutControls.persistentSettings.theatre) {
+            self.theatreToggle();
         }
     };
 
@@ -2751,16 +2741,17 @@ const fluidPlayerClass = function () {
             }
 
             self.domRef.player.parentNode.insertBefore(containerDiv, null);
-        } else {
-            htmlBlock.innerHTML = passedHtml.html;
+            return;
+        }
 
-            if (passedHtml.width) {
-                htmlBlock.style.width = passedHtml.width + 'px';
-            }
+        htmlBlock.innerHTML = passedHtml.html;
 
-            if (passedHtml.height) {
-                htmlBlock.style.height = passedHtml.height + 'px';
-            }
+        if (passedHtml.width) {
+            htmlBlock.style.width = passedHtml.width + 'px';
+        }
+
+        if (passedHtml.height) {
+            htmlBlock.style.height = passedHtml.height + 'px';
         }
     };
 
@@ -2769,9 +2760,10 @@ const fluidPlayerClass = function () {
 
         if (show) {
             controlBar.className += ' initial_controls_show';
-        } else {
-            controlBar.className = controlBar.className.replace(' initial_controls_show', '');
+            return;
         }
+
+        controlBar.className = controlBar.className.replace(' initial_controls_show', '');
     };
 
     self.on = (eventCall, functionCall) => {
@@ -2786,25 +2778,24 @@ const fluidPlayerClass = function () {
                 self.domRef.player.onended = functionCall;
                 break;
             case 'pause':
-                self.domRef.player.addEventListener('pause', function () {
+                self.domRef.player.addEventListener('pause', () => {
                     if (!self.fluidPseudoPause) {
                         functionCall();
                     }
                 });
                 break;
             case 'playing':
-                self.domRef.player.addEventListener('playing', function () {
-                    functionCall();
-                });
+                self.domRef.player.addEventListener('playing', functionCall);
                 break;
             case 'theatreModeOn':
-                self.domRef.player.addEventListener('theatreModeOn', function () {
-                    functionCall();
-                });
+                self.domRef.player.addEventListener('theatreModeOn', functionCall);
                 break;
             case 'theatreModeOff':
-                self.domRef.player.addEventListener('theatreModeOff', function () {
-                    functionCall();
+                self.domRef.player.addEventListener('theatreModeOff', functionCall);
+                break;
+            case 'timeupdate':
+                self.domRef.player.addEventListener('timeupdate', () => {
+                    functionCall(self.getCurrentTime())
                 });
                 break;
             default:
@@ -2815,7 +2806,6 @@ const fluidPlayerClass = function () {
 
     self.toggleLogo = (logo) => {
         if (typeof logo != 'object' || !logo.imageUrl) {
-            // TODO: :/
             return false;
         }
 
@@ -2951,15 +2941,24 @@ const fluidPlayerInterface = function (instance) {
         return instance.destroy()
     };
 
+    this.dashInstance = () => {
+        return !!instance.dashPlayer ? instance.dashPlayer : null;
+    }
+
+    this.hlsInstance = () => {
+        return !!instance.hlsPlayer ? instance.hlsPlayer : null;
+    }
+
     this.on = (event, callback) => {
         return instance.on(event, callback)
     };
 }
 
 /**
- * Instance initializer
- * @param target
- * @param options
+ * Initialize and attach Fluid Player to instance of HTMLVideoElement
+ *
+ * @param target ID of HTMLVideoElement or reference to HTMLVideoElement
+ * @param options Fluid Player configuration options
  * @returns {fluidPlayerInterface}
  */
 const fluidPlayerInitializer = function (target, options) {

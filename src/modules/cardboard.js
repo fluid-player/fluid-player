@@ -95,12 +95,11 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.cardBoardResize = () => {
-        const videoPlayerTag = playerInstance.domRef.player;
-        videoPlayerTag.addEventListener('theatreModeOn', function () {
+        playerInstance.domRef.player.addEventListener('theatreModeOn', function () {
             playerInstance.vrViewer.onWindowResize();
         });
 
-        videoPlayerTag.addEventListener('theatreModeOff', function () {
+        playerInstance.domRef.player.addEventListener('theatreModeOff', function () {
             playerInstance.vrViewer.onWindowResize();
         });
     };
@@ -173,7 +172,6 @@ export default function (playerInstance, options) {
 
     playerInstance.cardBoardCreateVRControls = () => {
         const controlBar = document.getElementById(playerInstance.videoPlayerId + '_fluid_controls_container');
-        const videoPlayerTag = playerInstance.domRef.player;
 
         // create and append dual control bar
         const newControlBar = controlBar.cloneNode(true);
@@ -183,9 +181,8 @@ export default function (playerInstance, options) {
         });
 
         newControlBar.classList.add("fluid_vr2_controls_container");
-        videoPlayerTag.parentNode.insertBefore(newControlBar, videoPlayerTag.nextSibling);
+        playerInstance.domRef.player.parentNode.insertBefore(newControlBar, playerInstance.domRef.player.nextSibling);
         playerInstance.copyEvents(newControlBar);
-
     };
 
     playerInstance.cardBoardSwitchToVR = () => {
@@ -329,18 +326,22 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.createCardboard = () => {
-        if (playerInstance.displayOptions.layoutControls.showCardBoardView) {
-            if (!window.PANOLENS) {
-                import(/* webpackChunkName: "panolens" */ 'panolens').then((it) => {
-                    window.PANOLENS = it; // TODO: don't touch window
-                    playerInstance.createCardboardView();
-                });
-            } else {
+        if (!playerInstance.displayOptions.layoutControls.showCardBoardView) {
+            return;
+        }
+
+        document
+            .getElementById(playerInstance.videoPlayerId + '_fluid_control_cardboard')
+            .style
+            .display = 'inline-block';
+
+        if (!window.PANOLENS) {
+            import(/* webpackChunkName: "panolens" */ 'panolens').then((it) => {
+                window.PANOLENS = it;
                 playerInstance.createCardboardView();
-            }
+            });
         } else {
-            const cardBoardBtn = document.getElementById(playerInstance.videoPlayerId + '_fluid_control_cardboard');
-            cardBoardBtn.style.display = 'none';
+            playerInstance.createCardboardView();
         }
     };
 }

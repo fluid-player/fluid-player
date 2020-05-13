@@ -154,21 +154,15 @@ export default function (playerInstance, options) {
         const formatMinutes = playerInstance.pad(formatDateObj.getUTCMinutes());
         const formatSeconds = playerInstance.pad(formatDateObj.getSeconds());
 
-        let result;
-        if (formatHours >= 1) {
-            result = formatHours + ':' + formatMinutes + ':' + formatSeconds;
-        } else {
-            result = formatMinutes + ':' + formatSeconds;
-        }
-
-        return result;
+        return formatHours >= 1
+            ? formatHours + ':' + formatMinutes + ':' + formatSeconds
+            : formatMinutes + ':' + formatSeconds;
     };
 
     playerInstance.pad = (value) => {
         if (value < 10) {
             return '0' + value;
-        } else {
-            return value;
         }
+        return value;
     };
 }

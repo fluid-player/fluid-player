@@ -367,7 +367,6 @@ export default function (playerInstance, options) {
         }
     };
 
-    // TODO: why the argument
     playerInstance.recalculateAdDimensions = () => {
         const videoPlayer = document.getElementById(playerInstance.videoPlayerId);
         const divClickThrough = document.getElementById('vast_clickthrough_layer_' + playerInstance.videoPlayerId);

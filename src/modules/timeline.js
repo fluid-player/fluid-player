@@ -189,7 +189,6 @@ export default function (playerInstance, options) {
                 playerInstance.generateTimelinePreviewTags();
 
                 import(/* webpackChunkName: "webvtt" */ '../../vendor/webvtt').then((it) => {
-                    // TODO - this is beyond not optimal
                     window.WebVTTParser = it.default;
                     playerInstance.setupThumbnailPreviewVtt();
                 });

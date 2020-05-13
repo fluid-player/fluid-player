@@ -1,6 +1,5 @@
 'use strict';
 export default function (playerInstance, options) {
-
     playerInstance.initialiseStreamers = () => {
         playerInstance.detachStreamers();
         switch (playerInstance.displayOptions.layoutControls.mediaType) {
@@ -8,7 +7,7 @@ export default function (playerInstance, options) {
                 if (!playerInstance.dashScriptLoaded && !window.dashjs) {
                     playerInstance.dashScriptLoaded = true;
                     import(/* webpackChunkName: "dashjs" */ 'dashjs').then((it) => {
-                        window.dashjs = it.default; // TODO
+                        window.dashjs = it.default;
                         playerInstance.initialiseDash();
                     });
                 } else {
@@ -19,7 +18,7 @@ export default function (playerInstance, options) {
                 if (!playerInstance.hlsScriptLoaded && !window.Hls) {
                     playerInstance.hlsScriptLoaded = true;
                     import(/* webpackChunkName: "hlsjs" */ 'hls.js').then((it) => {
-                        window.Hls = it.default; // TODO
+                        window.Hls = it.default;
                         playerInstance.initialiseHls();
                     });
                 } else {
@@ -32,17 +31,20 @@ export default function (playerInstance, options) {
     playerInstance.initialiseDash = () => {
         if (typeof (window.MediaSource || window.WebKitMediaSource) === 'function') {
             // If false we want to override the autoPlay, as it comes from postRoll
-            const playVideo = (!playerInstance.autoplayAfterAd)
+            const playVideo = !playerInstance.autoplayAfterAd
                 ? playerInstance.autoplayAfterAd
                 : playerInstance.displayOptions.layoutControls.autoPlay;
 
             const dashPlayer = dashjs.MediaPlayer().create();
+
             dashPlayer.updateSettings({
                 'debug': {
                     'logLevel': options.debug ? dashjs.Debug.LOG_LEVEL_DEBUG : dashjs.Debug.LOG_LEVEL_FATAL
                 }
-            }); // Remove default logging that clogs up the console
+            });
+
             dashPlayer.initialize(playerInstance.domRef.player, playerInstance.originalSrc, playVideo);
+
             playerInstance.dashPlayer = dashPlayer;
         } else {
             playerInstance.nextSource();
@@ -53,9 +55,12 @@ export default function (playerInstance, options) {
     playerInstance.initialiseHls = () => {
         if (Hls.isSupported()) {
             const hls = new Hls(playerInstance.displayOptions.hlsjsConfig);
+
             hls.attachMedia(playerInstance.domRef.player);
             hls.loadSource(playerInstance.originalSrc);
+
             playerInstance.hlsPlayer = hls;
+
             if (!playerInstance.firstPlayLaunched && playerInstance.displayOptions.layoutControls.autoPlay) {
                 playerInstance.domRef.player.play();
             }
