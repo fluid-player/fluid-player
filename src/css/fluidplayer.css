@@ -914,8 +914,9 @@ _:-ms-lang(x),
     position: absolute;
     bottom: 25px;
     right: 3px;
-    z-index: 3;
-    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 888888;
+    opacity: 99%;
+    background-color: rgba(0, 0, 0, 1);
     border-radius: 2px;
     color: #ffffff;
     font-size: 13px;
@@ -1123,7 +1124,6 @@ _:-ms-lang(x),
     position: absolute;
     left: 50%;
     margin-right: -50%;
-    z-index: 20;
     background-color: rgba(0, 0, 0, 0.7);
 }
 
@@ -1150,7 +1150,6 @@ _:-ms-lang(x),
     align-content: center;
     position: absolute;
     display: flex;
-    z-index: 20;
 }
 
 .fluid_vpaidNonLinear_frame {
