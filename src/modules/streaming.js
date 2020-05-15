@@ -48,7 +48,7 @@ export default function (playerInstance, options) {
             playerInstance.dashPlayer = dashPlayer;
         } else {
             playerInstance.nextSource();
-            console.log('[FP_ERROR] Media type not supported by this browser. (application/dash+xml)');
+            console.log('[FP_WARNING] Media type not supported by this browser using DASH.js. (application/dash+xml)');
         }
     };
 
@@ -66,7 +66,7 @@ export default function (playerInstance, options) {
             }
         } else {
             playerInstance.nextSource();
-            console.log('[FP_ERROR] Media type not supported by this browser. (application/x-mpegURL)');
+            console.log('[FP_WARNING] Media type not supported by this browser using HLS.js. (application/x-mpegURL)');
         }
     };
 

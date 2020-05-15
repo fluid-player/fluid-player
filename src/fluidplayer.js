@@ -364,24 +364,25 @@ const fluidPlayerClass = function () {
             }
 
             try {
-                promise = _play_videoPlayer.apply(playerNode, arguments);
+                promise = _play_videoPlayer.apply(this, arguments);
 
                 if (promise !== undefined && promise !== null) {
-                    promise.then(function () {
+                    promise.then(() => {
                         self.isPlayingMedia = true;
                         clearTimeout(self.promiseTimeout);
-                    }).catch(function (error) {
+                    }).catch(error => {
                         console.error(error);
                         const isAbortError = (typeof error.name !== 'undefined' && error.name === 'AbortError');
                         // Ignore abort errors which caused for example Safari or autoplay functions
+                        // (example: interrupted by a new load request)
                         // (example: interrupted by a new load request)
                         if (isAbortError) {
                             // Ignore AbortError error reporting
                         } else {
                             self.announceLocalError(202, 'Failed to play video.');
                         }
-                        clearTimeout(self.promiseTimeout);
 
+                        clearTimeout(self.promiseTimeout);
                     });
 
                     self.promiseTimeout = setTimeout(function () {
@@ -416,11 +417,11 @@ const fluidPlayerClass = function () {
             }
         };
 
-        if (self.displayOptions.layoutControls.autoPlay && !self.dashScriptLoaded && !self.hlsScriptLoaded) {
+        if (!!self.displayOptions.layoutControls.autoPlay && !self.dashScriptLoaded && !self.hlsScriptLoaded) {
             //There is known issue with Safari 11+, will prevent autoPlay, so we wont try
             const browserVersion = self.getBrowserVersion();
 
-            if ('Safari' === browserVersion.browserName && 11 <= browserVersion.majorVersion) {
+            if ('Safari' === browserVersion.browserName) {
                 return;
             }
 
@@ -1523,9 +1524,9 @@ const fluidPlayerClass = function () {
 
             if ('Safari' === browserVersion.browserName || isChromeAndroid) {
                 // TODO
-                // self.domRef.player.src = 'https://cdn.fluidplayer.com/static/blank.mp4';
-                // self.domRef.player.play();
-                // self.playPauseAnimationToggle(true);
+                self.domRef.player.src = 'https://srv-file7.gofile.io/download/zRcRlp/blank.mp4';
+                self.domRef.player.play();
+                self.playPauseAnimationToggle(true);
             }
 
             self.firstPlayLaunched = true;
