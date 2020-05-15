@@ -1523,8 +1523,7 @@ const fluidPlayerClass = function () {
                 && browserVersion.browserName === 'Google Chrome';
 
             if ('Safari' === browserVersion.browserName || isChromeAndroid) {
-                // TODO
-                self.domRef.player.src = 'https://srv-file7.gofile.io/download/zRcRlp/blank.mp4';
+                self.domRef.player.src = 'https://cdn.fluidplayer.com/static/blank.mp4';
                 self.domRef.player.play();
                 self.playPauseAnimationToggle(true);
             }
