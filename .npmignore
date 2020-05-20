@@ -6,3 +6,4 @@ yarn.lock
 webpack.config.js
 dist
 dist-cdn
+.github
