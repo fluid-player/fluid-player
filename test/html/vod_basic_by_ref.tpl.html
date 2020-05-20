@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>VOD using reference</title>
+    <%= htmlWebpackPlugin.tags.headTags %>
+    <style lang="css">
+        video[data-ref="player-by-ref"] {
+            width: 90%;
+        }
+    </style>
+</head>
+<body>
+
+<video data-ref="player-by-ref">
+    <source src='https://cdn.fluidplayer.com/videos/valerian-1080p.mkv' data-fluid-hd title="1080p" type='video/mp4'/>
+    <source src='https://cdn.fluidplayer.com/videos/valerian-720p.mkv' data-fluid-hd title="720p" type='video/mp4'/>
+    <source src='https://cdn.fluidplayer.com/videos/valerian-480p.mkv' title="480p" type='video/mp4'/>
+</video>
+
+<%= htmlWebpackPlugin.tags.bodyTags %>
+
+<script>
+    const target = document.querySelector('video[data-ref="player-by-ref"]');
+    const instance = fluidPlayer(target);
+</script>
+
+</body>
+</html>

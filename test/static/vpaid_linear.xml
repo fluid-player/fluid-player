@@ -1,0 +1,57 @@
+<VAST
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast.xsd" version="3.0">
+	<Ad id="1234567">
+		<InLine>
+			<AdSystem>GDFP</AdSystem>
+			<AdTitle>Linear VPAID Example</AdTitle>
+			<Description>Vpaid Linear Video Ad</Description>
+			<Error>http://www.example.com/error</Error>
+			<Impression>http://www.example.com/impression</Impression>
+			<Creatives>
+				<Creative sequence="1">
+					<Linear skipoffset="00:00:03">
+						<Duration>00:00:10</Duration>
+						<TrackingEvents>
+							<Tracking event="start">http://www.example.com/start</Tracking>
+							<Tracking event="firstQuartile">http://www.example.com/firstQuartile</Tracking>
+							<Tracking event="midpoint">http://www.example.com/midpoint</Tracking>
+							<Tracking event="thirdQuartile">http://www.example.com/thirdQuartile</Tracking>
+							<Tracking event="complete">http://www.example.com/complete</Tracking>
+							<Tracking event="mute">http://www.example.com/mute</Tracking>
+							<Tracking event="unmute">http://www.example.com/unmute</Tracking>
+							<Tracking event="rewind">http://www.example.com/rewind</Tracking>
+							<Tracking event="pause">http://www.example.com/pause</Tracking>
+							<Tracking event="resume">http://www.example.com/resume</Tracking>
+							<Tracking event="fullscreen">http://www.example.com/fullscreen</Tracking>
+							<Tracking event="creativeView">http://www.example.com/creativeView</Tracking>
+							<Tracking event="acceptInvitation">http://www.example.com/acceptInvitation</Tracking>
+						</TrackingEvents>
+						<AdParameters>
+							<![CDATA[
+{"videos":[ {"url":"https://googleads.github.io/googleads-ima-html5/media/LinearVPAIDCreative.mp4","mimetype":"video/mp4"}]}
+]]>
+						</AdParameters>
+						<VideoClicks>
+							<ClickThrough id="123">http://google.com</ClickThrough>
+							<ClickTracking id="123">http://www.example.com/click</ClickTracking>
+						</VideoClicks>
+						<MediaFiles>
+
+						<!--
+						<MediaFile apiFramework="VPAID" type="application/javascript">
+							https://secure-ds.serving-sys.com/BurstingCachedScripts/VPAID/HTML5_1_40_0_0/VPAIDAPI.js
+						</MediaFile>
+						 -->
+
+						<MediaFile apiFramework="VPAID" type="application/javascript">
+							https://googleads.github.io/googleads-ima-html5/vpaid/linear/VpaidVideoAd.js
+						</MediaFile>
+
+						</MediaFiles>
+					</Linear>
+				</Creative>
+				<Creative sequence="1"/>
+			</Creatives>
+		</InLine>
+	</Ad>
+</VAST>

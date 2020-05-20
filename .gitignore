@@ -1,4 +1,4 @@
-vastxmls/
-html/
-subtitles/
-.DS_Store.DS_Store
+node_modules/
+dist/
+dist-cdn/
+e2e/

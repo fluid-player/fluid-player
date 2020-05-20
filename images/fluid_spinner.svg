@@ -1,5 +1,0 @@
-<svg class="lds-eclipse" width="200px" height="200px" style="background:none" preserveAspectRatio="xMidYMid" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-    <path transform="rotate(202.5 50 51)" d="m30 50a20 20 0 0 0 40 0 20 22 0 0 1 -40 0" fill="#fff" ng-attr-d="{{config.pathCmd}}" ng-attr-fill="{{config.color}}">
-        <animateTransform attributeName="transform" begin="0s" calcMode="linear" dur="0.8s" keyTimes="0;1" repeatCount="indefinite" type="rotate" values="0 50 51;360 50 51"/>
-    </path>
-</svg>
