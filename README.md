@@ -2,6 +2,10 @@
 [![Latest version](https://img.shields.io/github/v/release/fluid-player/fluid-player?include_prereleases&label=latest%20release&sort=semver&style=flat-square&logo=GitHub)](https://github.com/fluid-player/fluid-player/releases/latest)
 [![npm](https://img.shields.io/npm/v/fluid-player?style=flat-square&logo=npm)](https://www.npmjs.com/package/fluid-player)
 
+## Version 3 released
+
+A [new major version](https://github.com/fluid-player/fluid-player/pull/441) of Fluid Player has been released on May 20, 2020. Existing version 2 users are recommended to upgrade.
+
 ## Overview
 
 Fluid Player is a free HTML5 video player. It is lightweight, easy to integrate and has advanced VAST capabilities.
