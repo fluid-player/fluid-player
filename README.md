@@ -4,7 +4,7 @@
 
 ## Version 3 released
 
-A [new major version](https://github.com/fluid-player/fluid-player/pull/441) of Fluid Player has been released on May 20, 2020. Existing version 2 users are recommended to upgrade.
+A [new major version](https://github.com/fluid-player/fluid-player/pull/441) of Fluid Player has been released on May 20, 2020. Existing version 2 users are recommended to upgrade. [See quick setup guide](https://docs.fluidplayer.com/docs/integration/quick-setup/).
 
 ## Overview
 
