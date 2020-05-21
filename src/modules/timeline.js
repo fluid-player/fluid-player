@@ -193,12 +193,10 @@ export default function (playerInstance, options) {
                 window.WebVTTParser = it.default;
                 playerInstance.setupThumbnailPreviewVtt();
             });
-        }
-        else if ('static' === timelinePreview.type && typeof timelinePreview.frames === 'object') {
+        } else if ('static' === timelinePreview.type && typeof timelinePreview.frames === 'object') {
             timelinePreview.spriteImage = true;
             playerInstance.timelinePreviewData = timelinePreview.frames;
-        }
-        else {
+        } else {
             throw 'Invalid thumbnail-preview - type must be VTT or static';
         }
 
