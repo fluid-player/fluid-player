@@ -199,7 +199,7 @@ export default function (playerInstance, options) {
             playerInstance.timelinePreviewData = timelinePreview.frames;
         }
         else {
-            throw 'Invalid thumbnail-preview - type target must be VTT or static';
+            throw 'Invalid thumbnail-preview - type must be VTT or static';
         }
 
         playerInstance.showTimeOnHover = false;
