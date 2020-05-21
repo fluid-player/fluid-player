@@ -1,6 +1,6 @@
 # Fluid Player
 [![Latest version](https://img.shields.io/github/v/release/fluid-player/fluid-player?include_prereleases&label=latest%20release&sort=semver&style=flat-square&logo=GitHub)](https://github.com/fluid-player/fluid-player/releases/latest)
-![npm](https://img.shields.io/npm/v/fluid-player?style=flat-square&logo=npm)
+[![npm](https://img.shields.io/npm/v/fluid-player?style=flat-square&logo=npm)](https://www.npmjs.com/package/fluid-player)
 
 ## Overview
 
