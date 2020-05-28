@@ -1,10 +1,20 @@
 'use strict';
+
+// Prevent DASH.js from automatically attaching to video sources by default.
+// Whoever thought this is a good idea?!
+if(typeof window !== 'undefined' && !window.dashjs) {
+    window.dashjs = {
+        skipAutoCreate: true,
+        isDefaultSubject: true
+    };
+}
+
 export default function (playerInstance, options) {
     playerInstance.initialiseStreamers = () => {
         playerInstance.detachStreamers();
         switch (playerInstance.displayOptions.layoutControls.mediaType) {
             case 'application/dash+xml': // MPEG-DASH
-                if (!playerInstance.dashScriptLoaded && !window.dashjs) {
+                if (!playerInstance.dashScriptLoaded && (!window.dashjs || window.dashjs.isDefaultSubject)) {
                     playerInstance.dashScriptLoaded = true;
                     import(/* webpackChunkName: "dashjs" */ 'dashjs').then((it) => {
                         window.dashjs = it.default;
@@ -44,6 +54,18 @@ export default function (playerInstance, options) {
             });
 
             dashPlayer.initialize(playerInstance.domRef.player, playerInstance.originalSrc, playVideo);
+
+            dashPlayer.on('streamInitializing', () => {
+                playerInstance.toggleLoader(true);
+            });
+
+            dashPlayer.on('canPlay', () => {
+                playerInstance.toggleLoader(false);
+            });
+
+            dashPlayer.on('playbackPlaying', () => {
+                playerInstance.toggleLoader(false);
+            });
 
             playerInstance.dashPlayer = dashPlayer;
         } else {

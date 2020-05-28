@@ -113,6 +113,9 @@ module.exports = (env, argv) => {
         entry: {
             fluidplayer: './src/browser.js'
         },
+        optimization: {
+            minimize: wpMode !== 'development'
+        },
         output: {
             filename: '[name].min.js',
             chunkFilename: '[name].min.js',
