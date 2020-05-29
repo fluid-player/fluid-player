@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 3.0.1
+* [Pull #457](https://github.com/fluid-player/fluid-player/pull/430) Fix ad skip button not showing properly
+* [Pull #450](https://github.com/fluid-player/fluid-player/pull/430) Static thumbnail configuration
+* [Pull #458](https://github.com/fluid-player/fluid-player/pull/430) Fix dash.js initialization and swap Vtt.js to Videojs fork
+
 ## 3.0.0
 * [Pull #441](https://github.com/fluid-player/fluid-player/pull/441) Major release - see pull request for full changelist.
 

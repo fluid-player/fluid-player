@@ -1,6 +1,6 @@
 {
   "name": "fluid-player",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Fluid Player is a free HTML5 video player",
   "main": "src/index.js",
   "scripts": {
