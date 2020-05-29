@@ -163,38 +163,43 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.setupThumbnailPreview = () => {
-        if (playerInstance.displayOptions.layoutControls.timelinePreview &&
-            (typeof playerInstance.displayOptions.layoutControls.timelinePreview.file === 'string') &&
-            (typeof playerInstance.displayOptions.layoutControls.timelinePreview.type === 'string')) {
-
-            if (playerInstance.displayOptions.layoutControls.timelinePreview.type === 'VTT') {
-                let eventOn = 'mousemove';
-                let eventOff = 'mouseleave';
-                if (playerInstance.mobileInfo.userOs) {
-                    eventOn = 'touchmove';
-                    eventOff = 'touchend';
-                }
-                document.getElementById(playerInstance.videoPlayerId + '_fluid_controls_progress_container')
-                    .addEventListener(eventOn, playerInstance.drawTimelinePreview.bind(playerInstance), false);
-                document.getElementById(playerInstance.videoPlayerId + '_fluid_controls_progress_container')
-                    .addEventListener(eventOff, function (event) {
-                        const progress = document.getElementById(playerInstance.videoPlayerId + '_fluid_controls_progress_container');
-                        if (typeof event.clientX !== 'undefined' && progress.contains(document.elementFromPoint(event.clientX, event.clientY))) {
-                            //False positive (Chrome bug when fast click causes leave event)
-                            return;
-                        }
-                        document.getElementById(playerInstance.videoPlayerId + '_fluid_timeline_preview_container').style.display = 'none';
-                        document.getElementById(playerInstance.videoPlayerId + '_fluid_timeline_preview_container_shadow').style.display = 'none';
-                    }, false);
-                playerInstance.generateTimelinePreviewTags();
-
-                import(/* webpackChunkName: "webvtt" */ '../../vendor/webvtt').then((it) => {
-                    window.WebVTTParser = it.default;
-                    playerInstance.setupThumbnailPreviewVtt();
-                });
-            }
-
-            playerInstance.showTimeOnHover = false;
+        let timelinePreview = playerInstance.displayOptions.layoutControls.timelinePreview;
+        if (!timelinePreview || !timelinePreview.type) {
+            return;
         }
+
+        let eventOn = 'mousemove';
+        let eventOff = 'mouseleave';
+        if (playerInstance.mobileInfo.userOs) {
+            eventOn = 'touchmove';
+            eventOff = 'touchend';
+        }
+        document.getElementById(playerInstance.videoPlayerId + '_fluid_controls_progress_container')
+            .addEventListener(eventOn, playerInstance.drawTimelinePreview.bind(playerInstance), false);
+        document.getElementById(playerInstance.videoPlayerId + '_fluid_controls_progress_container')
+            .addEventListener(eventOff, function (event) {
+                const progress = document.getElementById(playerInstance.videoPlayerId + '_fluid_controls_progress_container');
+                if (typeof event.clientX !== 'undefined' && progress.contains(document.elementFromPoint(event.clientX, event.clientY))) {
+                    //False positive (Chrome bug when fast click causes leave event)
+                    return;
+                }
+                document.getElementById(playerInstance.videoPlayerId + '_fluid_timeline_preview_container').style.display = 'none';
+                document.getElementById(playerInstance.videoPlayerId + '_fluid_timeline_preview_container_shadow').style.display = 'none';
+            }, false);
+        playerInstance.generateTimelinePreviewTags();
+
+        if ('VTT' === timelinePreview.type && typeof timelinePreview.file === 'string') {
+            import(/* webpackChunkName: "webvtt" */ '../../vendor/webvtt').then((it) => {
+                window.WebVTTParser = it.default;
+                playerInstance.setupThumbnailPreviewVtt();
+            });
+        } else if ('static' === timelinePreview.type && typeof timelinePreview.frames === 'object') {
+            timelinePreview.spriteImage = true;
+            playerInstance.timelinePreviewData = timelinePreview.frames;
+        } else {
+            throw 'Invalid thumbnail-preview - type must be VTT or static';
+        }
+
+        playerInstance.showTimeOnHover = false;
     };
 }
