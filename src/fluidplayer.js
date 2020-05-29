@@ -371,7 +371,7 @@ const fluidPlayerClass = function () {
                         self.isPlayingMedia = true;
                         clearTimeout(self.promiseTimeout);
                     }).catch(error => {
-                        console.error(error);
+                        console.error('[FP_ERROR] Playback error', error);
                         const isAbortError = (typeof error.name !== 'undefined' && error.name === 'AbortError');
                         // Ignore abort errors which caused for example Safari or autoplay functions
                         // (example: interrupted by a new load request)
@@ -387,14 +387,15 @@ const fluidPlayerClass = function () {
 
                     self.promiseTimeout = setTimeout(function () {
                         if (self.isPlayingMedia === false) {
-                            self.announceLocalError(204, 'Timeout error. Failed to play video.');
+                            self.announceLocalError(204, '[FP_ERROR] Timeout error. Failed to play video?');
                         }
                     }, 5000);
 
                 }
 
+                return promise;
             } catch (error) {
-                console.error(error);
+                console.error('[FP_ERROR] Playback error', error);
                 self.announceLocalError(201, 'Failed to play video.');
             }
         };
