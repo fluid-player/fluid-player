@@ -125,7 +125,7 @@ export default function (playerInstance, options) {
                 playerInstance.domRef.player.removeEventListener('loadedmetadata', playerInstance.switchPlayerToVastMode);
 
                 // if in vr mode then do not show
-                if (!playerInstance.vrMode) {
+                if (playerInstance.vrMode) {
                     const adCountDownTimerText = document.getElementById('ad_countdown' + playerInstance.videoPlayerId);
                     const ctaButton = document.getElementById(playerInstance.videoPlayerId + '_fluid_cta');
                     const addAdPlayingTextOverlay = document.getElementById(playerInstance.videoPlayerId + '_fluid_ad_playing');
