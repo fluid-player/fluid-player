@@ -2,7 +2,7 @@
 
 // Prevent DASH.js from automatically attaching to video sources by default.
 // Whoever thought this is a good idea?!
-if(typeof window !== 'undefined' && !window.dashjs) {
+if (typeof window !== 'undefined' && !window.dashjs) {
     window.dashjs = {
         skipAutoCreate: true,
         isDefaultSubject: true
@@ -45,13 +45,18 @@ export default function (playerInstance, options) {
                 ? playerInstance.autoplayAfterAd
                 : playerInstance.displayOptions.layoutControls.autoPlay;
 
-            const dashPlayer = dashjs.MediaPlayer().create();
-
-            dashPlayer.updateSettings({
+            const defaultOptions = {
                 'debug': {
                     'logLevel': options.debug ? dashjs.Debug.LOG_LEVEL_DEBUG : dashjs.Debug.LOG_LEVEL_FATAL
                 }
-            });
+            };
+
+            const dashPlayer = dashjs.MediaPlayer().create();
+            const options = playerInstance.displayOptions.modules.configureDash(defaultOptions);
+
+            dashPlayer.updateSettings(options);
+
+            playerInstance.displayOptions.modules.onBeforeInitDash(dashPlayer);
 
             dashPlayer.initialize(playerInstance.domRef.player, playerInstance.originalSrc, playVideo);
 
@@ -67,6 +72,8 @@ export default function (playerInstance, options) {
                 playerInstance.toggleLoader(false);
             });
 
+            playerInstance.displayOptions.modules.onAfterInitDash(dashPlayer);
+
             playerInstance.dashPlayer = dashPlayer;
         } else {
             playerInstance.nextSource();
@@ -76,10 +83,24 @@ export default function (playerInstance, options) {
 
     playerInstance.initialiseHls = () => {
         if (Hls.isSupported()) {
-            const hls = new Hls(playerInstance.displayOptions.hlsjsConfig);
+
+            const defaultOptions = {
+                debug: typeof FP_DEBUG !== 'undefined' && FP_DEBUG === true,
+                p2pConfig: {
+                    logLevel: false,
+                },
+                enableWebVTT: false,
+                enableCEA708Captions: false,
+            };
+
+            const options = playerInstance.displayOptions.modules.configureHls(defaultOptions);
+            const hls = new Hls(options);
+            playerInstance.displayOptions.modules.onBeforeInitHls(hls);
 
             hls.attachMedia(playerInstance.domRef.player);
             hls.loadSource(playerInstance.originalSrc);
+
+            playerInstance.displayOptions.modules.onAfterInitHls(hls);
 
             playerInstance.hlsPlayer = hls;
 
