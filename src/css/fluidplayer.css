@@ -1207,6 +1207,13 @@ _:-ms-lang(x),
     display: none;
 }
 
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button_subtitles .fluid_subtitles_list,
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button_video_source .fluid_video_sources_list,
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_video_playback_rates {
+    z-index: 888888 !important;
+    opacity: 0.9 !important;
+}
+
 .fluid_video_playback_rates_item {
     padding: 9px 25px 9px 25px;
     line-height: 15px;
