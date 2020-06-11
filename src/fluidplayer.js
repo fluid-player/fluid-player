@@ -2212,31 +2212,33 @@ const fluidPlayerClass = function () {
         };
 
         setInterval(() => {
-            if (self.newActivity === true) {
-                if (!isMouseStillDown && !self.isLoading) {
-                    self.newActivity = false;
-                }
-
-                if (self.isUserActive === false || !self.isControlBarVisible()) {
-                    let event = new CustomEvent('userActive');
-                    self.domRef.player.dispatchEvent(event);
-                    self.isUserActive = true;
-                }
-
-                clearTimeout(self.inactivityTimeout);
-
-                self.inactivityTimeout = setTimeout(function () {
-                    if (self.newActivity !== true) {
-                        self.isUserActive = false;
-                        let event = new CustomEvent('userInactive');
-                        self.domRef.player.dispatchEvent(event);
-                    } else {
-                        clearTimeout(self.inactivityTimeout);
-                    }
-
-                }, self.displayOptions.layoutControls.controlBar.autoHideTimeout * 1000);
-
+            if (self.newActivity !== true) {
+                return;
             }
+
+            if (!isMouseStillDown && !self.isLoading) {
+                self.newActivity = false;
+            }
+
+            if (self.isUserActive === false || !self.isControlBarVisible()) {
+                let event = new CustomEvent('userActive');
+                self.domRef.player.dispatchEvent(event);
+                self.isUserActive = true;
+            }
+
+            clearTimeout(self.inactivityTimeout);
+
+            self.inactivityTimeout = setTimeout(() => {
+                if (self.newActivity === true) {
+                    clearTimeout(self.inactivityTimeout);
+                    return;
+                }
+
+                self.isUserActive = false;
+
+                let event = new CustomEvent('userInactive');
+                self.domRef.player.dispatchEvent(event);
+            }, self.displayOptions.layoutControls.controlBar.autoHideTimeout * 1000);
         }, 300);
 
         const listenTo = (self.isTouchDevice())
@@ -2344,9 +2346,14 @@ const fluidPlayerClass = function () {
     };
 
     self.linkControlBarUserActivity = () => {
+
+        self.domRef.player.addEventListener('userInactive', () => {
+            console.log('should hide')
+        });
         self.domRef.player.addEventListener('userInactive', self.hideControlBar);
-        self.domRef.player.addEventListener('userActive', self.showControlBar);
         self.domRef.player.addEventListener('userInactive', self.hideTitle);
+
+        self.domRef.player.addEventListener('userActive', self.showControlBar);
         self.domRef.player.addEventListener('userActive', self.showTitle);
     };
 
