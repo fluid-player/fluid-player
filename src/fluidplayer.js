@@ -2346,10 +2346,6 @@ const fluidPlayerClass = function () {
     };
 
     self.linkControlBarUserActivity = () => {
-
-        self.domRef.player.addEventListener('userInactive', () => {
-            console.log('should hide')
-        });
         self.domRef.player.addEventListener('userInactive', self.hideControlBar);
         self.domRef.player.addEventListener('userInactive', self.hideTitle);
 
