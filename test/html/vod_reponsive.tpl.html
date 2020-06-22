@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>VOD responsive</title>
+    <%= htmlWebpackPlugin.tags.headTags %>
+    <style lang="css">
+        #video-container {
+            display: inline-block;
+            width: 70%;
+            position: relative;
+        }
+
+        #video-container.resized {
+            width: 40%;
+        }
+
+        #video-container #spacer {
+            margin-top: 56.25%; // 16:9
+        }
+
+        #video-container #video-wrapper {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: red;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <p>
+        <button id="toggle-size">Toggle size</button>
+    </p>
+</div>
+<div id="video-container">
+    <div id="spacer"></div>
+    <div id="video-wrapper">
+        <video id="fluid-player-e2e-case">
+            <source src='https://cdn.fluidplayer.com/videos/valerian-1080p.mkv' data-fluid-hd title="1080p" type='video/mp4'/>
+            <source src='https://cdn.fluidplayer.com/videos/valerian-720p.mkv' data-fluid-hd title="720p" type='video/mp4'/>
+            <source src='https://cdn.fluidplayer.com/videos/valerian-480p.mkv' title="480p" type='video/mp4'/>
+        </video>
+    </div>
+</div>
+
+<%= htmlWebpackPlugin.tags.bodyTags %>
+
+<script>
+    var videoContainer = document.getElementById('video-container');
+
+    document.getElementById('toggle-size').addEventListener('click', function() {
+        videoContainer.classList.toggle('resized');
+    });
+
+    var instance = fluidPlayer('fluid-player-e2e-case', {
+        layoutControls: {
+            fillToContainer: true
+        }
+    });
+</script>
+
+</body>
+</html>
