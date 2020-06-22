@@ -216,6 +216,9 @@ const fluidPlayerClass = function () {
                     speed: true,
                     theatre: true
                 },
+                controlForwardBackward: {
+                    show: false
+                },
                 contextMenu: {
                     controls: true,
                     links: []
@@ -643,7 +646,11 @@ const fluidPlayerClass = function () {
         controls.root.id = self.videoPlayerId + '_fluid_controls_container';
 
         if (!options.displayVolumeBar) {
-            controls.root.className = 'fluid_controls_container no_volume_bar';
+            controls.root.className = controls.root.className + ' no_volume_bar';
+        }
+
+        if (options.controlForwardBackward) {
+            controls.root.className = controls.root.className + ' skip_controls';
         }
 
         // Left container
@@ -656,6 +663,20 @@ const fluidPlayerClass = function () {
         controls.playPause.className = 'fluid_button fluid_button_play fluid_control_playpause';
         controls.playPause.id = self.videoPlayerId + '_fluid_control_playpause';
         controls.leftContainer.appendChild(controls.playPause);
+
+        if (options.controlForwardBackward) {
+            // Left container -> Skip backwards
+            controls.skipBack = document.createElement('div');
+            controls.skipBack.className = 'fluid_button fluid_button_skip_back';
+            controls.skipBack.id = self.videoPlayerId + '_fluid_control_skip_back';
+            controls.leftContainer.appendChild(controls.skipBack);
+
+            // Left container -> Skip forward
+            controls.skipForward = document.createElement('div');
+            controls.skipForward.className = 'fluid_button fluid_button_skip_forward';
+            controls.skipForward.id = self.videoPlayerId + '_fluid_control_skip_forward';
+            controls.leftContainer.appendChild(controls.skipForward);
+        }
 
         // Progress container
         controls.progressContainer = document.createElement('div');
@@ -1785,7 +1806,8 @@ const fluidPlayerClass = function () {
             displayVolumeBar: self.checkShouldDisplayVolumeBar(),
             primaryColor: self.displayOptions.layoutControls.primaryColor
                 ? self.displayOptions.layoutControls.primaryColor
-                : 'red'
+                : 'red',
+            controlForwardBackward: !!self.displayOptions.layoutControls.controlForwardBackward.show
         });
 
         // Remove the default controls
@@ -1836,6 +1858,27 @@ const fluidPlayerClass = function () {
         self.createPlaybackList();
 
         self.createDownload();
+
+        if (!!self.displayOptions.layoutControls.controlForwardBackward.show) {
+            self.initSkipControls();
+        }
+    };
+
+    self.initSkipControls = () => {
+        const skipFunction = (period) => {
+            if (self.isCurrentlyPlayingAd) {
+                return;
+            }
+
+            let skipTo = self.domRef.player.currentTime + period;
+            if (skipTo < 0) {
+                skipTo = 0;
+            }
+            self.domRef.player.currentTime = skipTo;
+        };
+
+        self.domRef.controls.skipBack.addEventListener('click', skipFunction.bind(this, -10));
+        self.domRef.controls.skipForward.addEventListener('click', skipFunction.bind(this, 10));
     };
 
     /**
