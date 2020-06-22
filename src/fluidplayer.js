@@ -215,7 +215,11 @@ const fluidPlayerClass = function () {
                     quality: true,
                     speed: true,
                     theatre: true
-                }
+                },
+                contextMenu: {
+                    controls: true,
+                    links: []
+                },
             },
             vastOptions: {
                 adList: {},
@@ -1704,51 +1708,71 @@ const fluidPlayerClass = function () {
     self.setCustomContextMenu = () => {
         const playerWrapper = self.domRef.wrapper;
 
+        const showDefaultControls = self.displayOptions.layoutControls.contextMenu.controls;
+        const extraLinks = self.displayOptions.layoutControls.contextMenu.links;
+
         //Create own context menu
         const divContextMenu = document.createElement('div');
         divContextMenu.id = self.videoPlayerId + '_fluid_context_menu';
         divContextMenu.className = 'fluid_context_menu';
         divContextMenu.style.display = 'none';
         divContextMenu.style.position = 'absolute';
-        divContextMenu.innerHTML = '<ul>' +
-            '    <li id="' + self.videoPlayerId + 'context_option_play">' + self.displayOptions.captions.play + '</li>' +
-            '    <li id="' + self.videoPlayerId + 'context_option_mute">' + self.displayOptions.captions.mute + '</li>' +
-            '    <li id="' + self.videoPlayerId + 'context_option_fullscreen">' + self.displayOptions.captions.fullscreen + '</li>' +
-            '    <li id="' + self.videoPlayerId + 'context_option_homepage">Fluid Player ' + self.version + '</li>' +
-            '</ul>';
+
+        const contextMenuList = document.createElement('ul');
+        divContextMenu.appendChild(contextMenuList);
+
+        if(!!extraLinks) {
+            for (const link of extraLinks) {
+                const linkItem = document.createElement('li');
+                linkItem.id = self.videoPlayerId + 'context_option_play';
+                linkItem.innerHTML = link.label;
+                linkItem.addEventListener('click', () => window.open(link.href, '_blank'), false);
+                contextMenuList.appendChild(linkItem);
+            }
+        }
+
+        if (showDefaultControls) {
+            const menuItemPlay = document.createElement('li');
+            menuItemPlay.id = self.videoPlayerId + 'context_option_play';
+            menuItemPlay.innerHTML = self.displayOptions.captions.play;
+            menuItemPlay.addEventListener('click', () => self.playPauseToggle(), false);
+            contextMenuList.appendChild(menuItemPlay);
+
+            const menuItemMute = document.createElement('li');
+            menuItemMute.id = self.videoPlayerId + 'context_option_mute';
+            menuItemMute.innerHTML = self.displayOptions.captions.mute;
+            menuItemMute.addEventListener('click', () => self.muteToggle(), false);
+            contextMenuList.appendChild(menuItemMute);
+
+            const menuItemFullscreen = document.createElement('li');
+            menuItemFullscreen.id = self.videoPlayerId + 'context_option_fullscreen';
+            menuItemFullscreen.innerHTML = self.displayOptions.captions.fullscreen;
+            menuItemFullscreen.addEventListener('click', () => self.fullscreenToggle(), false);
+            contextMenuList.appendChild(menuItemFullscreen);
+        }
+
+        const menuItemVersion = document.createElement('li');
+        menuItemVersion.id = self.videoPlayerId + 'context_option_homepage';
+        menuItemVersion.innerHTML = 'Fluid Player ' + self.version;
+        menuItemVersion.addEventListener('click', () => window.open(self.homepage, '_blank'), false)
+        contextMenuList.appendChild(menuItemVersion);
 
         self.domRef.player.parentNode.insertBefore(divContextMenu, self.domRef.player.nextSibling);
 
         //Disable the default context menu
-        playerWrapper.addEventListener('contextmenu', function (event) {
-            event.preventDefault();
+        playerWrapper.addEventListener('contextmenu', e => {
+            e.preventDefault();
 
-            divContextMenu.style.left = self.getEventOffsetX(event, self.domRef.player) + 'px';
-            divContextMenu.style.top = self.getEventOffsetY(event, self.domRef.player) + 'px';
+            divContextMenu.style.left = self.getEventOffsetX(e, self.domRef.player) + 'px';
+            divContextMenu.style.top = self.getEventOffsetY(e, self.domRef.player) + 'px';
             divContextMenu.style.display = 'block';
         }, false);
 
         //Hide the context menu on clicking elsewhere
-        document.addEventListener('click', function (event) {
-            if ((event.target !== self.domRef.player) || event.button !== 2) {
+        document.addEventListener('click', e => {
+            if ((e.target !== self.domRef.player) || e.button !== 2) {
                 divContextMenu.style.display = 'none';
             }
-
-        }, false);
-
-        //Attach events to the menu elements
-        const menuOptionPlay = document.getElementById(self.videoPlayerId + 'context_option_play');
-        const menuOptionMute = document.getElementById(self.videoPlayerId + 'context_option_mute');
-        const menuOptionFullscreen = document.getElementById(self.videoPlayerId + 'context_option_fullscreen');
-        const menuOptionHomepage = document.getElementById(self.videoPlayerId + 'context_option_homepage');
-
-        menuOptionPlay.addEventListener('click', () => self.playPauseToggle(), false);
-        menuOptionMute.addEventListener('click', () => self.muteToggle(), false);
-        menuOptionFullscreen.addEventListener('click', () => self.fullscreenToggle(), false);
-
-        menuOptionHomepage.addEventListener('click', () => {
-            const win = window.open(self.homepage, '_blank');
-            win.focus();
         }, false);
     };
 
