@@ -244,14 +244,6 @@ const fluidPlayerClass = function () {
                     })
                 }
             },
-            hlsjsConfig: {
-                debug: FP_RUNTIME_DEBUG,
-                p2pConfig: {
-                    logLevel: false,
-                },
-                enableWebVTT: false,
-                enableCEA708Captions: false,
-            },
             captions: {
                 play: 'Play',
                 pause: 'Pause',
@@ -261,8 +253,36 @@ const fluidPlayerClass = function () {
                 subtitles: 'Subtitles',
                 exitFullscreen: 'Exit Fullscreen',
             },
-            debug: FP_RUNTIME_DEBUG
+            debug: FP_RUNTIME_DEBUG,
+            modules: {
+                configureHls: (options) => {
+                    return options;
+                },
+                onBeforeInitHls: (hls) => {
+                },
+                onAfterInitHls: (hls) => {
+                },
+                configureDash: (options) => {
+                    return options;
+                },
+                onBeforeInitDash: (dash) => {
+                },
+                onAfterInitDash: (dash) => {
+                }
+            },
+            onBeforeXMLHttpRequestOpen: (request) => {
+            },
+            onBeforeXMLHttpRequest: (request) => {
+                if (FP_RUNTIME_DEBUG || FP_DEVELOPMENT_MODE) {
+                    console.debug('[FP_DEBUG] Request made', request);
+                }
+            }
         };
+
+        if (!!options.hlsjsConfig) {
+            console.error('[FP_ERROR] player option hlsjsConfig is removed and has no effect. ' +
+                'Use module callbacks instead!')
+        }
 
         // Overriding the default options
         for (let key in options) {
@@ -479,15 +499,19 @@ const fluidPlayerClass = function () {
         loaderDiv.style.display = showLoader ? 'table' : 'none';
     };
 
-    // TODO: with credentials should be configurable
     self.sendRequest = (url, withCredentials, timeout, functionReadyStateChange) => {
         const xmlHttpReq = new XMLHttpRequest();
 
         xmlHttpReq.onreadystatechange = functionReadyStateChange;
 
+        self.displayOptions.onBeforeXMLHttpRequestOpen(xmlHttpReq);
+
         xmlHttpReq.open('GET', url, true);
         xmlHttpReq.withCredentials = withCredentials;
         xmlHttpReq.timeout = timeout;
+
+        self.displayOptions.onBeforeXMLHttpRequest(xmlHttpReq);
+
         xmlHttpReq.send();
     };
 
