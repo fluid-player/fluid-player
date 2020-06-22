@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 3.0.2
+* [Pull #473](https://github.com/fluid-player/fluid-player/pull/473) Responsive test case
+* [Pull #474](https://github.com/fluid-player/fluid-player/pull/474) Fix issues related to missing ended event
+* [Pull #472](https://github.com/fluid-player/fluid-player/pull/472) Small refactor, add auto-hide test case
+* [Pull #471](https://github.com/fluid-player/fluid-player/pull/471) Move X seconds forward/back
+* [Pull #470](https://github.com/fluid-player/fluid-player/pull/470) Custom context
+* [Pull #469](https://github.com/fluid-player/fluid-player/pull/469) Prevent hidden menus after cssmin optimization
+* [Pull #468](https://github.com/fluid-player/fluid-player/pull/468) Config callbacks
+
 ## 3.0.1
 * [Pull #457](https://github.com/fluid-player/fluid-player/pull/430) Fix ad skip button not showing properly
 * [Pull #450](https://github.com/fluid-player/fluid-player/pull/430) Static thumbnail configuration
