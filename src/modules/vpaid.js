@@ -1,6 +1,35 @@
 // VPAID support module
 'use strict';
 export default function (playerInstance, options) {
+    const callbacks = {
+        AdStarted: () => playerInstance.onStartVpaidAd,
+        AdStopped: () => playerInstance.onStopVpaidAd,
+        AdSkipped: () => playerInstance.onSkipVpaidAd,
+        AdLoaded: () => playerInstance.onVpaidAdLoaded,
+        AdLinearChange: () => playerInstance.onVpaidAdLinearChange,
+        AdSizeChange: () => playerInstance.onVpaidAdSizeChange,
+        AdExpandedChange: () => playerInstance.onVpaidAdExpandedChange,
+        AdSkippableStateChange: () => playerInstance.onVpaidAdSkippableStateChange,
+        AdDurationChange: () => playerInstance.onVpaidAdDurationChange,
+        AdRemainingTimeChange: () => playerInstance.onVpaidAdRemainingTimeChange,
+        AdVolumeChange: () => playerInstance.onVpaidAdVolumeChange,
+        AdImpression: () => playerInstance.onVpaidAdImpression,
+        AdClickThru: () => playerInstance.onVpaidAdClickThru,
+        AdInteraction: () => playerInstance.onVpaidAdInteraction,
+        AdVideoStart: () => playerInstance.onVpaidAdVideoStart,
+        AdVideoFirstQuartile: () => playerInstance.onVpaidAdVideoFirstQuartile,
+        AdVideoMidpoint: () => playerInstance.onVpaidAdVideoMidpoint,
+        AdVideoThirdQuartile: () => playerInstance.onVpaidAdVideoThirdQuartile,
+        AdVideoComplete: () => playerInstance.onVpaidAdVideoComplete,
+        AdUserAcceptInvitation: () => playerInstance.onVpaidAdUserAcceptInvitation,
+        AdUserMinimize: () => playerInstance.onVpaidAdUserMinimize,
+        AdUserClose: () => playerInstance.onVpaidAdUserClose,
+        AdPaused: () => playerInstance.onVpaidAdPaused,
+        AdPlaying: () => playerInstance.onVpaidAdPlaying,
+        AdError: () => playerInstance.onVpaidAdError,
+        AdLog: () => playerInstance.onVpaidAdLog
+    };
+
     playerInstance.checkVPAIDInterface = (vpaidAdUnit) => {
         const VPAIDCreative = vpaidAdUnit;
         // checks if all the mandatory params present
@@ -402,40 +431,19 @@ export default function (playerInstance, options) {
 
     playerInstance.vpaidCallbackListenersAttach = () => {
         //The key of the object is the event name and the value is a reference to the callback function that is registered with the creative
-        const callbacks = {
-            AdStarted: playerInstance.onStartVpaidAd,
-            AdStopped: playerInstance.onStopVpaidAd,
-            AdSkipped: playerInstance.onSkipVpaidAd,
-            AdLoaded: playerInstance.onVpaidAdLoaded,
-            AdLinearChange: playerInstance.onVpaidAdLinearChange,
-            AdSizeChange: playerInstance.onVpaidAdSizeChange,
-            AdExpandedChange: playerInstance.onVpaidAdExpandedChange,
-            AdSkippableStateChange: playerInstance.onVpaidAdSkippableStateChange,
-            AdDurationChange: playerInstance.onVpaidAdDurationChange,
-            AdRemainingTimeChange: playerInstance.onVpaidAdRemainingTimeChange,
-            AdVolumeChange: playerInstance.onVpaidAdVolumeChange,
-            AdImpression: playerInstance.onVpaidAdImpression,
-            AdClickThru: playerInstance.onVpaidAdClickThru,
-            AdInteraction: playerInstance.onVpaidAdInteraction,
-            AdVideoStart: playerInstance.onVpaidAdVideoStart,
-            AdVideoFirstQuartile: playerInstance.onVpaidAdVideoFirstQuartile,
-            AdVideoMidpoint: playerInstance.onVpaidAdVideoMidpoint,
-            AdVideoThirdQuartile: playerInstance.onVpaidAdVideoThirdQuartile,
-            AdVideoComplete: playerInstance.onVpaidAdVideoComplete,
-            AdUserAcceptInvitation: playerInstance.onVpaidAdUserAcceptInvitation,
-            AdUserMinimize: playerInstance.onVpaidAdUserMinimize,
-            AdUserClose: playerInstance.onVpaidAdUserClose,
-            AdPaused: playerInstance.onVpaidAdPaused,
-            AdPlaying: playerInstance.onVpaidAdPlaying,
-            AdError: playerInstance.onVpaidAdError,
-            AdLog: playerInstance.onVpaidAdLog
-        };
-
         // Looping through the object and registering each of the callbacks with the creative
         for (let eventName in callbacks) {
-            playerInstance.vpaidAdUnit.subscribe(callbacks[eventName], eventName, playerInstance);
+            playerInstance.vpaidAdUnit.subscribe(callbacks[eventName](), eventName, playerInstance);
         }
+    };
 
+    playerInstance.vpaidCallbackListenersDetach = () => {
+        if (!playerInstance.vpaidAdUnit) {
+            return;
+        }
+        for (let eventName in callbacks) {
+            playerInstance.vpaidAdUnit.unsubscribe(callbacks[eventName](), eventName, playerInstance);
+        }
     };
 
     playerInstance.loadVpaid = (adListId, vpaidJsUrl) => {
@@ -502,9 +510,14 @@ export default function (playerInstance, options) {
 
         const vpaidSlot = document.getElementById(playerInstance.videoPlayerId + "_fluid_vpaid_slot");
 
+        playerInstance.vpaidCallbackListenersDetach();
+
         playerInstance.vpaidAdUnit = null;
         clearInterval(playerInstance.getVPAIDAdInterval);
-        vpaidSlot.remove();
+
+        if (!!vpaidSlot) {
+            vpaidSlot.remove();
+        }
 
         playerInstance.checkForNextAd();
     };

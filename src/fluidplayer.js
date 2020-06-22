@@ -538,10 +538,6 @@ const fluidPlayerClass = function () {
     };
 
     self.onMainVideoEnded = (event) => {
-        if (event && !self.isCurrentlyPlayingAd) {
-            event.stopImmediatePropagation();
-        }
-
         self.debugMessage('onMainVideoEnded is called');
 
         if (self.isCurrentlyPlayingAd && self.autoplayAfterAd) {  // It may be in-stream ending, and if it's not postroll then we don't execute anything

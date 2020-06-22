@@ -280,7 +280,8 @@ export default function (playerInstance, options) {
 
         playerInstance.vrPanorama = new PANOLENS.VideoPanorama('', {
             videoElement: playerInstance.domRef.player,
-            autoplay: playerInstance.displayOptions.layoutControls.autoPlay
+            autoplay: playerInstance.displayOptions.layoutControls.autoPlay,
+            loop: !!playerInstance.displayOptions.layoutControls.loop
         });
 
         playerInstance.vrViewer = new PANOLENS.Viewer({
