@@ -47,7 +47,9 @@ export default function (playerInstance, options) {
 
             const defaultOptions = {
                 'debug': {
-                    'logLevel': options.debug ? dashjs.Debug.LOG_LEVEL_DEBUG : dashjs.Debug.LOG_LEVEL_FATAL
+                    'logLevel': typeof FP_DEBUG !== 'undefined' && FP_DEBUG === true
+                        ? dashjs.Debug.LOG_LEVEL_DEBUG
+                        : dashjs.Debug.LOG_LEVEL_FATAL
                 }
             };
 
