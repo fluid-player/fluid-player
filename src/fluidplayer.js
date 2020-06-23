@@ -1738,7 +1738,7 @@ const fluidPlayerClass = function () {
         const contextMenuList = document.createElement('ul');
         divContextMenu.appendChild(contextMenuList);
 
-        if(!!extraLinks) {
+        if (!!extraLinks) {
             for (const link of extraLinks) {
                 const linkItem = document.createElement('li');
                 linkItem.id = self.videoPlayerId + 'context_option_play';
@@ -3054,6 +3054,11 @@ const fluidPlayerInterface = function (instance) {
  */
 const fluidPlayerInitializer = function (target, options) {
     const instance = new fluidPlayerClass();
+
+    if (!options) {
+        options = {};
+    }
+
     instance.init(target, options);
 
     const publicInstance = new fluidPlayerInterface(instance);
