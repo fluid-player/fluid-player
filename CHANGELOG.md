@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.0.3
+* [Pull #478](https://github.com/fluid-player/fluid-player/pull/478) Ensure options is object, fix dash debug
+
 ## 3.0.2
 * [Pull #473](https://github.com/fluid-player/fluid-player/pull/473) Responsive test case
 * [Pull #474](https://github.com/fluid-player/fluid-player/pull/474) Fix issues related to missing ended event
