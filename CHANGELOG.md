@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.0.4
+* [Pull #489](https://github.com/fluid-player/fluid-player/pull/489) Fix issues with nonLinear ads not closing
+
 ## 3.0.3
 * [Pull #478](https://github.com/fluid-player/fluid-player/pull/478) Ensure options is object, fix dash debug
 
