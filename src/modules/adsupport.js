@@ -431,7 +431,7 @@ export default function (playerInstance, options) {
         let duration;
         if (!playerInstance.vastOptions.vpaid) {
             playerInstance.trackSingleEvent('start');
-            const duration = (playerInstance.adList[adListId].nonLinearDuration) ? playerInstance.adList[adListId].nonLinearDuration : playerInstance.vastOptions.duration;
+            duration = (playerInstance.adList[adListId].nonLinearDuration) ? playerInstance.adList[adListId].nonLinearDuration : playerInstance.vastOptions.duration;
 
             playerInstance.nonLinearTracking = setInterval(function () {
                 if (playerInstance.adFinished === true) {
@@ -1012,7 +1012,6 @@ export default function (playerInstance, options) {
         if (timerPoolKeytimeCloseStaticAdsLength > 0) {
             for (let index = 0; index < timerPoolKeytimeCloseStaticAdsLength; index++) {
                 const adListId = playerInstance.timerPool[keyTime]['closeStaticAd'][index].closeStaticAd;
-
                 if (playerInstance.adList[adListId].played === true) {
                     playerInstance.completeNonLinearStatic(adListId);
                 }
