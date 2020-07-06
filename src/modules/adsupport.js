@@ -671,7 +671,7 @@ export default function (playerInstance, options) {
         closeBtn.title = playerInstance.displayOptions.layoutControls.closeButtonCaption;
         const tempadListId = adListId;
         closeBtn.onclick = function (event) {
-            this.parentElement.removeChild(this);
+            this.parentElement.remove();
             if (typeof event.stopImmediatePropagation !== 'undefined') {
                 event.stopImmediatePropagation();
             }
