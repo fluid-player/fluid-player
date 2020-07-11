@@ -189,7 +189,7 @@ export default function (playerInstance, options) {
         playerInstance.generateTimelinePreviewTags();
 
         if ('VTT' === timelinePreview.type && typeof timelinePreview.file === 'string') {
-            import(/* webpackChunkName: "webvtt" */ '../../vendor/webvtt').then((it) => {
+            import(/* webpackChunkName: "webvtt" */ '../../bundled/webvtt').then((it) => {
                 window.WebVTTParser = it.default;
                 playerInstance.setupThumbnailPreviewVtt();
             });
