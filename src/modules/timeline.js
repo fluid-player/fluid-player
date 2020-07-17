@@ -123,6 +123,7 @@ export default function (playerInstance, options) {
         const timelinePreviewShadow = document.getElementById(playerInstance.videoPlayerId + '_fluid_timeline_preview_container_shadow');
         const progressContainer = document.getElementById(playerInstance.videoPlayerId + '_fluid_controls_progress_container');
         const totalWidth = progressContainer.clientWidth;
+        const asTouchEvents = playerInstance.mobileInfo.userOs;
 
         if (playerInstance.isCurrentlyPlayingAd) {
             if (timelinePreviewTag.style.display !== 'none') {
@@ -130,6 +131,11 @@ export default function (playerInstance, options) {
             }
 
             return;
+        }
+
+        if (asTouchEvents) {
+            event.preventDefault();
+            event.stopPropagation();
         }
 
         //get the hover position
@@ -142,6 +148,7 @@ export default function (playerInstance, options) {
 
         if (totalWidth) {
             hoverSecond = playerInstance.currentVideoDuration * hoverX / totalWidth;
+            self.lastHoverSecond = hoverSecond;
 
             //get the corresponding thumbnail coordinates
             const thumbnailCoordinates = playerInstance.getThumbnailCoordinates(hoverSecond);
@@ -164,6 +171,10 @@ export default function (playerInstance, options) {
                     timelinePreviewTag.style.backgroundSize = 'contain';
                 }
 
+                if (asTouchEvents) {
+                    const progressBar = document.getElementById(playerInstance.videoPlayerId + '_vast_control_currentprogress');
+                    progressBar.style.width = Math.round(hoverX * 100 / totalWidth) + '%';
+                }
             } else {
                 timelinePreviewTag.style.display = 'none';
             }
@@ -176,12 +187,10 @@ export default function (playerInstance, options) {
             return;
         }
 
-        let eventOn = 'mousemove';
-        let eventOff = 'mouseleave';
-        if (playerInstance.mobileInfo.userOs) {
-            eventOn = 'touchmove';
-            eventOff = 'touchend';
-        }
+        const asTouchEvents = playerInstance.mobileInfo.userOs;
+        const eventOn = asTouchEvents ? 'touchmove' : 'mousemove';
+        const eventOff = asTouchEvents ? 'touchend' : 'mouseleave';
+
         document.getElementById(playerInstance.videoPlayerId + '_fluid_controls_progress_container')
             .addEventListener(eventOn, playerInstance.drawTimelinePreview.bind(playerInstance), false);
         document.getElementById(playerInstance.videoPlayerId + '_fluid_controls_progress_container')
@@ -194,6 +203,23 @@ export default function (playerInstance, options) {
                 document.getElementById(playerInstance.videoPlayerId + '_fluid_timeline_preview_container').style.display = 'none';
                 document.getElementById(playerInstance.videoPlayerId + '_fluid_timeline_preview_container_shadow').style.display = 'none';
             }, false);
+
+        // if using touch events, prevent playing behind previews and resume after touch end
+        if (asTouchEvents) {
+            document.getElementById(playerInstance.videoPlayerId + '_fluid_controls_progress_container')
+                .addEventListener('touchstart', function (event) {
+                    // pause player directly so no other functions are called (events, html on pause, ..)
+                    playerInstance.domRef.player.pause();
+                }, false);
+
+            document.addEventListener(eventOff, function (event) {
+                if (self.lastHoverSecond) {
+                    playerInstance.setCurrentTimeAndPlay(self.lastHoverSecond, true);
+                    self.lastHoverSecond = null;
+                }
+            });
+        }
+
         playerInstance.generateTimelinePreviewTags();
 
         if ('VTT' === timelinePreview.type && typeof timelinePreview.file === 'string') {
