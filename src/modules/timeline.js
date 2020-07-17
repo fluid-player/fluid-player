@@ -134,6 +134,10 @@ export default function (playerInstance, options) {
 
         //get the hover position
         const hoverX = playerInstance.getEventOffsetX(event, progressContainer);
+        const clamp = (a, b, c) => {
+            return Math.max(b,Math.min(c,a));
+        };
+
         let hoverSecond = null;
 
         if (totalWidth) {
@@ -150,7 +154,11 @@ export default function (playerInstance, options) {
                 timelinePreviewShadow.style.height = thumbnailCoordinates.h + 'px';
                 timelinePreviewTag.style.background =
                     'url(' + thumbnailCoordinates.image + ') no-repeat scroll -' + thumbnailCoordinates.x + 'px -' + thumbnailCoordinates.y + 'px';
-                timelinePreviewTag.style.left = hoverX - (thumbnailCoordinates.w / 2) + 'px';
+
+                const left = hoverX - thumbnailCoordinates.w / 2 - 3;
+                const leftClamped = clamp(left, 0, totalWidth - thumbnailCoordinates.w);
+
+                timelinePreviewTag.style.left = leftClamped + 'px';
                 timelinePreviewTag.style.display = 'block';
                 if (!playerInstance.displayOptions.layoutControls.timelinePreview.spriteImage) {
                     timelinePreviewTag.style.backgroundSize = 'contain';
