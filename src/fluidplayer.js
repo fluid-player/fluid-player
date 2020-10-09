@@ -129,6 +129,7 @@ const fluidPlayerClass = function () {
         self.vpaidNonLinearCloseButton = true;
         self.showTimeOnHover = true;
         self.initialAnimationSet = true;
+        self.aspectRatio = null;
         self.theatreMode = false;
         self.theatreModeAdvanced = false;
         self.fullscreenMode = false;
@@ -1928,6 +1929,19 @@ const fluidPlayerClass = function () {
         if (self.displayOptions.layoutControls.fillToContainer) {
             wrapper.style.width = '100%';
             wrapper.style.height = '100%';
+        }
+        //Responsive wrapper: width=100%,height=aspect-ratio
+        else if (self.aspectRatio) {
+            const responsiveContainer = document.createElement('div');
+            responsiveContainer.style.paddingTop = (100.0 / self.aspectRatio) + '%';
+            wrapper.appendChild(responsiveContainer);
+            wrapper.style.display = 'block';
+            wrapper.style.width = '100%';
+            self.domRef.player.style.position = 'absolute';
+            self.domRef.player.style.top = 0;
+            self.domRef.player.style.right = 0;
+            self.domRef.player.style.bottom = 0;
+            self.domRef.player.style.left = 0;
         } else {
             wrapper.style.height = self.domRef.player.clientHeight + 'px';
             wrapper.style.width = self.domRef.player.clientWidth + 'px';
