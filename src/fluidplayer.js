@@ -1931,9 +1931,9 @@ const fluidPlayerClass = function () {
             wrapper.style.height = '100%';
         }
         //Responsive wrapper: width=100%,height=aspect-ratio
-        else if (self.aspectRatio) {
+        else if (self.displayOptions.layoutControls.aspectRatio) {
             const responsiveContainer = document.createElement('div');
-            responsiveContainer.style.paddingTop = (100.0 / self.aspectRatio) + '%';
+            responsiveContainer.style.paddingTop = (100.0 / self.displayOptions.layoutControls.aspectRatio) + '%';
             wrapper.appendChild(responsiveContainer);
             wrapper.style.display = 'block';
             wrapper.style.width = '100%';
