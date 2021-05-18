@@ -176,7 +176,14 @@ export default function (playerInstance, options) {
 
                 playerInstance.domRef.player.addEventListener('loadedmetadata', playerInstance.switchPlayerToVastMode);
 
-                playerInstance.domRef.player.src = selectedMediaFile.src;
+                if (String(selectedMediaFile.type).startsWith('application')) {
+                    playerInstance.initialiseStreamers({
+                        mediaType: selectedMediaFile.type,
+                        src: selectedMediaFile.src,
+                    });
+                } else {
+                    playerInstance.domRef.player.src = selectedMediaFile.src;
+                }
                 playerInstance.isCurrentlyPlayingAd = true;
 
                 if (playerInstance.displayOptions.vastOptions.showProgressbarMarkers) {
@@ -275,7 +282,7 @@ export default function (playerInstance, options) {
             for (let i = 0; i < mediaFiles.length; i++) {
 
                 if (mediaFiles[i].apiFramework !== 'VPAID') {
-                    const supportLevel = playerInstance.getMediaFileTypeSupportLevel(mediaFiles[i]['type']);
+                    const supportLevel = playerInstance.getMediaFileTypeSupportLevel(`${mediaFiles[i]['type']}`.toLowerCase());
 
                     if (supportLevel === 'maybe' || supportLevel === 'probably') {
                         selectedMediaFile = mediaFiles[i];
@@ -314,7 +321,15 @@ export default function (playerInstance, options) {
         const tmpVideo = document.createElement('video');
         let response = tmpVideo.canPlayType(mediaType);
 
-        return !response ? "no" : response;
+        if (response) {
+            return response
+        }
+
+        if (mediaType === 'application/dash+xml' || mediaType === 'application/x-mpegurl') {
+            return 'maybe'; // highly likely could be played
+        }
+
+        return 'no'
     };
 
     playerInstance.scheduleTrackingEvent = (currentTime, duration) => {

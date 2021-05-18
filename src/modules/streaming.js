@@ -10,18 +10,21 @@ if (typeof window !== 'undefined' && !window.dashjs) {
 }
 
 export default function (playerInstance, options) {
-    playerInstance.initialiseStreamers = () => {
+    playerInstance.initialiseStreamers = ({
+        mediaType = playerInstance.displayOptions.layoutControls.mediaType,
+        src = playerInstance.originalSrc
+    } = {}) => {
         playerInstance.detachStreamers();
-        switch (playerInstance.displayOptions.layoutControls.mediaType) {
+        switch (mediaType.toLowerCase()) {
             case 'application/dash+xml': // MPEG-DASH
                 if (!playerInstance.dashScriptLoaded && (!window.dashjs || window.dashjs.isDefaultSubject)) {
                     playerInstance.dashScriptLoaded = true;
                     import(/* webpackChunkName: "dashjs" */ 'dashjs').then((it) => {
                         window.dashjs = it.default;
-                        playerInstance.initialiseDash();
+                        playerInstance.initialiseDash(src);
                     });
                 } else {
-                    playerInstance.initialiseDash();
+                    playerInstance.initialiseDash(src);
                 }
                 break;
             case 'application/x-mpegurl': // HLS
@@ -29,16 +32,16 @@ export default function (playerInstance, options) {
                     playerInstance.hlsScriptLoaded = true;
                     import(/* webpackChunkName: "hlsjs" */ 'hls.js').then((it) => {
                         window.Hls = it.default;
-                        playerInstance.initialiseHls();
+                        playerInstance.initialiseHls(src);
                     });
                 } else {
-                    playerInstance.initialiseHls();
+                    playerInstance.initialiseHls(src);
                 }
                 break;
         }
     };
 
-    playerInstance.initialiseDash = () => {
+    playerInstance.initialiseDash = (src) => {
         if (typeof (window.MediaSource || window.WebKitMediaSource) === 'function') {
             // If false we want to override the autoPlay, as it comes from postRoll
             const playVideo = !playerInstance.autoplayAfterAd
@@ -60,7 +63,7 @@ export default function (playerInstance, options) {
 
             playerInstance.displayOptions.modules.onBeforeInitDash(dashPlayer);
 
-            dashPlayer.initialize(playerInstance.domRef.player, playerInstance.originalSrc, playVideo);
+            dashPlayer.initialize(playerInstance.domRef.player, src, playVideo);
 
             dashPlayer.on('streamInitializing', () => {
                 playerInstance.toggleLoader(true);
@@ -83,7 +86,7 @@ export default function (playerInstance, options) {
         }
     };
 
-    playerInstance.initialiseHls = () => {
+    playerInstance.initialiseHls = (src) => {
         if (Hls.isSupported()) {
 
             const defaultOptions = {
@@ -100,7 +103,7 @@ export default function (playerInstance, options) {
             playerInstance.displayOptions.modules.onBeforeInitHls(hls);
 
             hls.attachMedia(playerInstance.domRef.player);
-            hls.loadSource(playerInstance.originalSrc);
+            hls.loadSource(src);
 
             playerInstance.displayOptions.modules.onAfterInitHls(hls);
 

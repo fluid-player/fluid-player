@@ -1,0 +1,28 @@
+<VAST
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast.xsd" version="4.2">
+	<Ad id="1234567">
+		<InLine>
+			<AdSystem></AdSystem>
+			<AdTitle>Linear HLS VAST</AdTitle>
+			<Description>Vast Linear HLS Video Ad</Description>
+			<Error>http://www.example.com/error</Error>
+			<Impression>http://www.example.com/impression</Impression>
+			<Creatives>
+				<Creative sequence="1">
+					<Linear skipoffset="00:00:05">
+						<Duration>00:00:05</Duration>
+						<VideoClicks>
+							<ClickThrough id="123">http://google.com</ClickThrough>
+							<ClickTracking id="123">http://www.example.com/click</ClickTracking>
+						</VideoClicks>
+						<MediaFiles>
+                            <MediaFile type="application/x-mpegURL">
+                                <![CDATA[ https://cph-msl.akamaized.net/hls/live/2000341/test/master.m3u8 ]]>
+                            </MediaFile>
+						</MediaFiles>
+					</Linear>
+				</Creative>
+			</Creatives>
+		</InLine>
+	</Ad>
+</VAST>
