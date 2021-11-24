@@ -508,7 +508,12 @@ export default function (playerInstance, options) {
                 catch (e) { /* do nothing */ }
             })();
 
-            if (parsedEvent.event === 'infoDelivery' && parsedEvent.info.currentTime) {
+            if (
+                parsedEvent &&
+                parsedEvent.event === 'infoDelivery' &&
+                parsedEvent.info &&
+                parsedEvent.info.currentTime
+            ) {
                 timeUpdateHandler(parsedEvent.info.currentTime);
             }
         })
