@@ -446,7 +446,7 @@ export default function (playerInstance, options) {
         }
     };
 
-    playerInstance.loadVpaid = (adListId, vpaidJsUrl) => {
+    playerInstance.loadVpaid = (adListId, vpaidJsUrl, timeUpdateHandler) => {
         const vpaidIframe = document.createElement('iframe');
         vpaidIframe.id = playerInstance.videoPlayerId + "_" + adListId + "_fluid_vpaid_iframe";
         vpaidIframe.className = 'fluid_vpaid_iframe';
@@ -501,6 +501,17 @@ export default function (playerInstance, options) {
 
         }, 100);
 
+        // Handles updates for generic iframes
+        vpaidIframe.contentWindow.addEventListener('message', (event) =>  {
+            const parsedEvent = (() => {
+                try { return JSON.parse(event.data); }
+                catch (e) { /* do nothing */ }
+            })();
+
+            if (parsedEvent.event === 'infoDelivery' && parsedEvent.info.currentTime) {
+                timeUpdateHandler(parsedEvent.info.currentTime);
+            }
+        })
     };
 
     playerInstance.onVpaidEnded = (event) => {

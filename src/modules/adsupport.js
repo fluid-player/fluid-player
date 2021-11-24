@@ -189,7 +189,7 @@ export default function (playerInstance, options) {
                 playerInstance.domRef.player.addEventListener('ended', playerInstance.onVastAdEnded);
 
             } else {
-                playerInstance.loadVpaid(adListId, selectedMediaFile.src);
+                playerInstance.loadVpaid(adListId, selectedMediaFile.src, videoPlayerTimeUpdate);
 
                 if (playerInstance.displayOptions.vastOptions.showProgressbarMarkers) {
                     playerInstance.hideAdMarkers();
@@ -200,13 +200,13 @@ export default function (playerInstance, options) {
         /**
          * Sends requests to the tracking URIs
          */
-        const videoPlayerTimeUpdate = () => {
+        const videoPlayerTimeUpdate = (time) => {
             if (playerInstance.adFinished) {
                 playerInstance.domRef.player.removeEventListener('timeupdate', videoPlayerTimeUpdate);
                 return;
             }
 
-            const currentTime = Math.floor(playerInstance.domRef.player.currentTime);
+            const currentTime = Math.floor(time || playerInstance.domRef.player.currentTime);
             if (playerInstance.vastOptions.duration !== 0) {
                 playerInstance.scheduleTrackingEvent(currentTime, playerInstance.vastOptions.duration);
             }
@@ -221,7 +221,6 @@ export default function (playerInstance, options) {
         playVideoPlayer(adListId);
 
         playerInstance.domRef.player.addEventListener('timeupdate', videoPlayerTimeUpdate);
-
     };
 
     playerInstance.playRoll = (adListId) => {

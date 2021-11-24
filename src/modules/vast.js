@@ -238,7 +238,7 @@ export default function (playerInstance, options) {
                     if (typeof tmpOptions.stopTracking[eventType] === 'undefined') {
                         tmpOptions.stopTracking[eventType] = [];
                     }
-                    tmpOptions.tracking[eventType].push(trackingEvents[i].childNodes[0].nodeValue);
+                    tmpOptions.tracking[eventType].push(trackingEvents[i].childNodes[0].wholeText);
                     tmpOptions.stopTracking[eventType] = false;
 
                     break;
@@ -257,7 +257,7 @@ export default function (playerInstance, options) {
                         };
                     }
 
-                    tmpOptions.tracking[eventType][oneEventOffset].elements.push(trackingEvents[i].childNodes[0].nodeValue);
+                    tmpOptions.tracking[eventType][oneEventOffset].elements.push(trackingEvents[i].childNodes[0].wholeText);
 
                     break;
 
@@ -298,7 +298,7 @@ export default function (playerInstance, options) {
             (errorTags !== null) &&
             (errorTags.length === 1) && //Only 1 Error tag is expected
             (errorTags[0].childNodes.length === 1)) {
-            tmpOptions.errorUrl = errorTags[0].childNodes[0].nodeValue;
+            tmpOptions.errorUrl = errorTags[0].childNodes[0].wholeText;
         }
     };
 
