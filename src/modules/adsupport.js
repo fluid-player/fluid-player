@@ -3,7 +3,7 @@ export default function (playerInstance, options) {
     const VPAID_VERSION = '2.0';
 
     playerInstance.renderLinearAd = (adListId, backupTheVideoTime) => {
-        playerInstance.toggleLoader(true);
+        playerInstance.toggleLoader(false);
 
         //get the proper ad
         playerInstance.vastOptions = playerInstance.adPool[adListId];
@@ -803,7 +803,7 @@ export default function (playerInstance, options) {
         }
 
         if (adsByType.linear.length > 0) {
-            playerInstance.toggleLoader(true);
+            playerInstance.toggleLoader(false);
             playerInstance.playRoll(adsByType.linear);
         } else {
             playerInstance.playMainVideoWhenVastFails(900);
@@ -942,6 +942,7 @@ export default function (playerInstance, options) {
      * Hide/show nonLinear onPause Ad
      */
     playerInstance.toggleOnPauseAd = () => {
+        playerInstance.toggleLoader(false);
         if (playerInstance.hasValidOnPauseAd() && !playerInstance.isCurrentlyPlayingAd) {
             const onPauseRoll = playerInstance.findRoll('onPauseRoll');
             let adListId;
