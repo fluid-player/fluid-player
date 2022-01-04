@@ -1738,7 +1738,7 @@ const fluidPlayerClass = function () {
         const contextMenuList = document.createElement('ul');
         divContextMenu.appendChild(contextMenuList);
 
-        if (!!extraLinks) {
+        if (Array.isArray(extraLinks)) {
             extraLinks.forEach(function appendExtraLinks(link, index) {
                 const linkItem = document.createElement('li');
                 linkItem.id = self.videoPlayerId + '_extra_link_' + index;
