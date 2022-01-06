@@ -31,6 +31,8 @@ const FP_RUNTIME_DEBUG = typeof FP_DEBUG !== 'undefined' && FP_DEBUG === true;
 
 let playerInstances = 0;
 
+let isTouching = false;
+
 const fluidPlayerClass = function () {
     // "self" always points to current instance of the player within the scope of the instance
     // This should help readability and context awareness slightly...
@@ -2395,7 +2397,7 @@ const fluidPlayerClass = function () {
 
     self.showControlBar = () => {
         window.addEventListener('touchstart', function onFirstTouch() {
-            window.USER_IS_TOUCHING = true;
+            isTouching = true;
             window.removeEventListener('touchstart', onFirstTouch, false);
         }, false);
 
@@ -2403,7 +2405,7 @@ const fluidPlayerClass = function () {
             self.toggleAdCountdown(false);
         }
 
-        if (!self.isTouchDevice() || !window.USER_IS_TOUCHING) {
+        if (!self.isTouchDevice() || !isTouching) {
             self.domRef.player.style.cursor = 'default';
         }
 
