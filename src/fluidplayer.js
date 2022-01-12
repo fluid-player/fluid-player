@@ -31,8 +31,6 @@ const FP_RUNTIME_DEBUG = typeof FP_DEBUG !== 'undefined' && FP_DEBUG === true;
 
 let playerInstances = 0;
 
-let isTouching = false;
-
 const fluidPlayerClass = function () {
     // "self" always points to current instance of the player within the scope of the instance
     // This should help readability and context awareness slightly...
