@@ -2395,17 +2395,12 @@ const fluidPlayerClass = function () {
         }
     };
 
-    self.showControlBar = () => {
-        window.addEventListener('touchstart', function onFirstTouch() {
-            isTouching = true;
-            window.removeEventListener('touchstart', onFirstTouch, false);
-        }, false);
-
+    self.showControlBar = (event) => {
         if (self.isCurrentlyPlayingAd && !self.domRef.player.paused) {
             self.toggleAdCountdown(false);
         }
 
-        if (!self.isTouchDevice() || !isTouching) {
+        if (event.type === 'mouseenter') {
             self.domRef.player.style.cursor = 'default';
         }
 
