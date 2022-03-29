@@ -807,7 +807,7 @@ export default function (playerInstance, options) {
         if (event) {
             event.stopImmediatePropagation();
         }
-        //"this" is the HTML5 video tag, because it disptches the "ended" event
+        //"this" is the HTML5 video tag, because it dispatches the "ended" event
         playerInstance.deleteVastAdElements();
         playerInstance.checkForNextAd();
     };

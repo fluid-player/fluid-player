@@ -287,6 +287,29 @@ export default function (playerInstance, options) {
                         break;
                     }
 
+                    if (supportLevel === 'no' && mediaFiles[i]['type'].toLowerCase() === 'application/x-mpegurl') {
+                        mediaFiles[i]['type'] = mediaFiles[i]['type'].toLowerCase();
+                        playerInstance.displayOptions.layoutControls.mediaType = mediaFiles[i]['type'];
+
+                        if (!window.Hls) {
+                            import(/* webpackChunkName: "hlsjs" */ 'hls.js').then((it) => {
+                                if (!window.Hls) {
+                                    window.Hls = it.default;
+                                    playerInstance.hlsScriptLoaded = true;
+                                }
+
+                                playerInstance.initialiseStreamers();
+                                selectedMediaFile = mediaFiles[i];
+                                adSupportedType = true;
+                            });
+                        } else {
+                            playerInstance.initialiseStreamers();
+                            selectedMediaFile = mediaFiles[i];
+                            adSupportedType = true;
+                        }
+                        break;
+                    }
+
                 } else {
                     selectedMediaFile = mediaFiles[i];
                     adSupportedType = true;
