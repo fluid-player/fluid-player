@@ -1,4 +1,6 @@
 'use strict';
+import {is} from "cheerio/lib/api/attributes";
+
 export default function (playerInstance, options) {
     const VPAID_VERSION = '2.0';
 
@@ -154,7 +156,7 @@ export default function (playerInstance, options) {
             // Remove the streaming objects to prevent errors on the VAST content
             playerInstance.detachStreamers();
 
-            //Try to load multiple
+            // Try to load multiple
             const selectedMediaFile = playerInstance.getSupportedMediaFileObject(playerInstance.vastOptions.mediaFileList);
 
             // if player in cardboard mode then, linear ads media type should be a '360' video
@@ -166,7 +168,35 @@ export default function (playerInstance, options) {
 
             const isVpaid = playerInstance.vastOptions.vpaid;
 
-            if (!isVpaid) {
+            if (!isVpaid && selectedMediaFile.isUnsuportedHls) {
+                import(/* webpackChunkName: "hlsjs" */ 'hls.js').then((it) => {
+                    window.Hls = it.default;
+                    const hls = new Hls({
+                        debug: typeof FP_DEBUG !== 'undefined' && FP_DEBUG === true,
+                        p2pConfig: {
+                            logLevel: false,
+                        },
+                        enableWebVTT: false,
+                        enableCEA708Captions: false,
+                    });
+
+                    hls.attachMedia(playerInstance.domRef.player);
+                    hls.loadSource(selectedMediaFile.src);
+                    playerInstance.isCurrentlyPlayingAd = true;
+
+                    playerInstance.hlsPlayer = hls;
+
+                    playerInstance.domRef.player.addEventListener('loadedmetadata', playerInstance.switchPlayerToVastMode);
+                    playerInstance.domRef.player.addEventListener('ended', () => {
+                        hls.detachMedia();
+                        hls.destroy();
+                        playerInstance.hlsPlayer = false;
+                        playerInstance.onVastAdEnded();
+                    });
+
+                    playerInstance.domRef.player.play();
+                });
+            } else if (!isVpaid) {
                 if (selectedMediaFile.src === false) {
                     // Couldn’t find MediaFile that is supported by this video player, based on the attributes of the MediaFile element.
                     playerInstance.adList[adListId].error = true;
@@ -287,27 +317,13 @@ export default function (playerInstance, options) {
                         break;
                     }
 
-                    if (supportLevel === 'no' && mediaFiles[i]['type'].toLowerCase() === 'application/x-mpegurl') {
-                        mediaFiles[i]['type'] = mediaFiles[i]['type'].toLowerCase();
-                        playerInstance.displayOptions.layoutControls.mediaType = mediaFiles[i]['type'];
-
-                        if (!window.Hls) {
-                            import(/* webpackChunkName: "hlsjs" */ 'hls.js').then((it) => {
-                                if (!window.Hls) {
-                                    window.Hls = it.default;
-                                    playerInstance.hlsScriptLoaded = true;
-                                }
-
-                                playerInstance.initialiseStreamers();
-                                selectedMediaFile = mediaFiles[i];
-                                adSupportedType = true;
-                            });
-                        } else {
-                            playerInstance.initialiseStreamers();
-                            selectedMediaFile = mediaFiles[i];
-                            adSupportedType = true;
-                        }
-                        break;
+                    if (
+                        supportLevel === 'no' && mediaFiles[i].delivery === 'streaming' &&
+                        (mediaFiles[i].type === 'application/vnd.apple.mpegurl' || mediaFiles[i].type === 'application/x-mpegURL')
+                    ) {
+                        selectedMediaFile = mediaFiles[i];
+                        selectedMediaFile.isUnsuportedHls = true;
+                        adSupportedType = true;
                     }
 
                 } else {
@@ -1217,6 +1233,10 @@ export default function (playerInstance, options) {
      * Ad Countdown
      */
     playerInstance.addAdCountdown = () => {
+        if (playerInstance.isCurrentlyPlayingAd && playerInstance.hlsPlayer) {
+            return; // Shouldn't show countdown if ad is a video live stream
+        }
+
         const videoWrapper = document.getElementById('fluid_video_wrapper_' + playerInstance.videoPlayerId);
         const divAdCountdown = document.createElement('div');
 
