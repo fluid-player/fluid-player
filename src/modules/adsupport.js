@@ -1232,7 +1232,7 @@ export default function (playerInstance, options) {
      * Ad Countdown
      */
     playerInstance.addAdCountdown = () => {
-        if (playerInstance.isCurrentlyPlayingAd && playerInstance.hlsPlayer) {
+        if ((playerInstance.isCurrentlyPlayingAd && playerInstance.hlsPlayer) || playerInstance.currentVideoDuration === Infinity) {
             return; // Shouldn't show countdown if ad is a video live stream
         }
 
@@ -1257,6 +1257,11 @@ export default function (playerInstance, options) {
     playerInstance.decreaseAdCountdown = function decreaseAdCountdown() {
         const sec = parseInt(playerInstance.currentVideoDuration) - parseInt(playerInstance.domRef.player.currentTime);
         const btn = document.getElementById('ad_countdown' + playerInstance.videoPlayerId);
+
+        if (btn && isNaN(sec)) {
+            btn.parentNode.removeChild(btn);
+            return;
+        }
 
         if (btn) {
             btn.innerHTML = "<span class='ad_timer_prefix'>Ad - </span> " + playerInstance.pad(parseInt(sec / 60)) + ':' + playerInstance.pad(parseInt(sec % 60));

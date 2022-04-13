@@ -6,10 +6,10 @@
             <Creatives>
                 <Creative sequence="1" id="1">
                     <Linear skipoffset="00:00:05">
-                        <Duration>00:00:05</Duration>
+                        <Duration>00:00:30</Duration>
                         <MediaFiles>
                             <MediaFile id="1" delivery="streaming" type="application/vnd.apple.mpegurl" width="480" height="640">
-                                <![CDATA[ https://b-hls-02.doppiocdn.com/hls/39148094/master/39148094.m3u8  ]]>
+                                <![CDATA[ https://b-hls-18.doppiocdn.com/hls/72074659/master/72074659.m3u8 ]]>
                             </MediaFile>
                         </MediaFiles>
                         <VideoClicks>
