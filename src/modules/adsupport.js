@@ -1,5 +1,4 @@
 'use strict';
-import {is} from "cheerio/lib/api/attributes";
 
 export default function (playerInstance, options) {
     const VPAID_VERSION = '2.0';
