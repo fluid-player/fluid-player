@@ -2393,13 +2393,12 @@ const fluidPlayerClass = function () {
         }
     };
 
-    self.showControlBar = () => {
+    self.showControlBar = (event) => {
         if (self.isCurrentlyPlayingAd && !self.domRef.player.paused) {
             self.toggleAdCountdown(false);
         }
 
-
-        if (!self.isTouchDevice()) {
+        if (event.type === 'mouseenter') {
             self.domRef.player.style.cursor = 'default';
         }
 
