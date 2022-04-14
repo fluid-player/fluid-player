@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 3.1.0
+* [Pull #619](https://github.com/fluid-player/fluid-player/pull/619) Looping videos show loading spinner for a split second before looping
+* [Pull #621](https://github.com/fluid-player/fluid-player/pull/621) FluidPlayer> Mouse disappears
+* [Pull #622](https://github.com/fluid-player/fluid-player/pull/622) contextMenu.links labels are not working after play
+* [Pull #628](https://github.com/fluid-player/fluid-player/pull/628) Overlay html over video (also in fullscreen)
+
 ## 3.0.4
 * [Pull #489](https://github.com/fluid-player/fluid-player/pull/489) Fix issues with nonLinear ads not closing
 
