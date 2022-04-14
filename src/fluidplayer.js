@@ -1738,14 +1738,14 @@ const fluidPlayerClass = function () {
         const contextMenuList = document.createElement('ul');
         divContextMenu.appendChild(contextMenuList);
 
-        if (!!extraLinks) {
-            for (const link of extraLinks) {
+        if (Array.isArray(extraLinks)) {
+            extraLinks.forEach(function appendExtraLinks(link, index) {
                 const linkItem = document.createElement('li');
-                linkItem.id = self.videoPlayerId + 'context_option_play';
+                linkItem.id = self.videoPlayerId + '_extra_link_' + index;
                 linkItem.innerHTML = link.label;
                 linkItem.addEventListener('click', () => window.open(link.href, '_blank'), false);
                 contextMenuList.appendChild(linkItem);
-            }
+            });
         }
 
         if (showDefaultControls) {
