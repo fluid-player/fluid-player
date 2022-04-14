@@ -2157,12 +2157,11 @@ const fluidPlayerClass = function () {
         // This is to allow for fade in and out logo_maintain_display
         const logoHolder = document.createElement('div');
         logoHolder.id = self.videoPlayerId + '_logo';
-        let hideClass = 'logo_maintain_display';
         if (self.displayOptions.layoutControls.logo.hideWithControls) {
-            hideClass = 'initial_controls_show';
+            logoHolder.classList.add('initial_controls_show', 'fp_logo');
+        } else {
+            logoHolder.classList.add('logo_maintain_display');
         }
-        logoHolder.classList.add(hideClass, 'fp_logo');
-
         // The logo itself
         const logoImage = document.createElement('img');
         logoImage.id = self.videoPlayerId + '_logo_image';
@@ -2379,15 +2378,17 @@ const fluidPlayerClass = function () {
             }
         }
 
-        for (let i = 0; i < fpLogo.length; i++) {
-            if (self.displayOptions.layoutControls.controlBar.animated) {
-                if (fpLogo[i]) {
-                    fpLogo[i].classList.remove('fade_in');
-                    fpLogo[i].classList.add('fade_out');
-                }
-            } else {
-                if (fpLogo[i]) {
-                    fpLogo[i].style.display = 'none';
+        if (self.displayOptions.layoutControls.logo.hideWithControls) {
+            for (let i = 0; i < fpLogo.length; i++) {
+                if (self.displayOptions.layoutControls.controlBar.animated) {
+                    if (fpLogo[i]) {
+                        fpLogo[i].classList.remove('fade_in');
+                        fpLogo[i].classList.add('fade_out');
+                    }
+                } else {
+                    if (fpLogo[i]) {
+                        fpLogo[i].style.display = 'none';
+                    }
                 }
             }
         }
@@ -2416,16 +2417,17 @@ const fluidPlayerClass = function () {
                 divVastControls[i].style.display = 'block';
             }
         }
-
-        for (let i = 0; i < fpLogo.length; i++) {
-            if (self.displayOptions.layoutControls.controlBar.animated) {
-                if (fpLogo[i]) {
-                    fpLogo[i].classList.remove('fade_out');
-                    fpLogo[i].classList.add('fade_in');
-                }
-            } else {
-                if (fpLogo[i]) {
-                    fpLogo[i].style.display = 'block';
+        if (self.displayOptions.layoutControls.logo.hideWithControls) {
+            for (let i = 0; i < fpLogo.length; i++) {
+                if (self.displayOptions.layoutControls.controlBar.animated) {
+                    if (fpLogo[i]) {
+                        fpLogo[i].classList.remove('fade_out');
+                        fpLogo[i].classList.add('fade_in');
+                    }
+                } else {
+                    if (fpLogo[i]) {
+                        fpLogo[i].style.display = 'block';
+                    }
                 }
             }
         }
