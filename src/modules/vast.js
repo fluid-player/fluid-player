@@ -84,7 +84,7 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.getDimensionFromNonLinear = (tag) => {
-        const result = {'width': null, 'height': null};
+        const result = { 'width': null, 'height': null };
         const nonLinear = tag.getElementsByTagName('NonLinear');
 
         if (nonLinear.length) {
@@ -712,7 +712,7 @@ export default function (playerInstance, options) {
 
     playerInstance.setVastList = () => {
         const ads = {};
-        const adGroupedByRolls = {preRoll: [], postRoll: [], midRoll: [], onPauseRoll: []};
+        const adGroupedByRolls = { preRoll: [], postRoll: [], midRoll: [], onPauseRoll: [] };
         const def = {
             id: null,
             roll: null,
@@ -788,14 +788,22 @@ export default function (playerInstance, options) {
         // group the ads by roll
         // pushing object references and forming json
         Object.keys(ads).map(function (e) {
-            if (ads[e].roll.toLowerCase() === 'preRoll'.toLowerCase()) {
-                adGroupedByRolls.preRoll.push(ads[e]);
-            } else if (ads[e].roll.toLowerCase() === 'midRoll'.toLowerCase()) {
-                adGroupedByRolls.midRoll.push(ads[e]);
-            } else if (ads[e].roll.toLowerCase() === 'postRoll'.toLowerCase()) {
-                adGroupedByRolls.postRoll.push(ads[e]);
-            } else if (ads[e].roll.toLowerCase() === 'onPauseRoll'.toLowerCase()) {
-                adGroupedByRolls.onPauseRoll.push(ads[e]);
+            switch (ads[e].roll.toLowerCase()) {
+                case 'preRoll'.toLowerCase():
+                    adGroupedByRolls.preRoll.push(ads[e]);
+                    break;
+                case 'midRoll'.toLowerCase():
+                    adGroupedByRolls.midRoll.push(ads[e]);
+                    break;
+                case 'postRoll'.toLowerCase():
+                    adGroupedByRolls.postRoll.push(ads[e]);
+                    break;
+                case 'onPauseRoll'.toLowerCase():
+                    adGroupedByRolls.onPauseRoll.push(ads[e]);
+                    break;
+                default:
+                    console.error(`${ads[e].roll.toLowerCase()} is not a recognized roll`);
+                    break;
             }
         });
 

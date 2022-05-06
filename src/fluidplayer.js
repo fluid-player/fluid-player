@@ -314,12 +314,19 @@ const fluidPlayerClass = function () {
         playerNode.addEventListener('fullscreenchange', self.recalculateAdDimensions);
         playerNode.addEventListener('waiting', self.onRecentWaiting);
         playerNode.addEventListener('pause', self.onFluidPlayerPause);
-        playerNode.addEventListener('loadedmetadata', self.mainVideoReady);
         playerNode.addEventListener('error', self.onErrorDetection);
         playerNode.addEventListener('ended', self.onMainVideoEnded);
         playerNode.addEventListener('durationchange', () => {
             self.currentVideoDuration = self.getCurrentVideoDuration();
         });
+
+        // 'loadedmetadata' inconsistently fires because the audio can already be loaded when the listener is added.
+        // Here we use readystate to see if metadata has already loaded
+        if(playerNode.readyState > 0) {
+            self.mainVideoReady()
+        } else {
+            playerNode.addEventListener('loadedmetadata', self.mainVideoReady);
+        }
 
         if (self.displayOptions.layoutControls.showCardBoardView) {
             // This fixes cross origin errors on three.js
