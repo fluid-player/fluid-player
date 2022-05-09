@@ -1105,7 +1105,7 @@ export default function (playerInstance, options) {
         playerInstance.initialiseStreamers();
 
         const newCurrentTime = (typeof playerInstance.domRef.player.mainVideoCurrentTime !== 'undefined')
-            ? playerInstance.domRef.player.mainVideoCurrentTime : 0;
+            ? Math.floor(playerInstance.domRef.player.mainVideoCurrentTime) : 0;
 
         if (playerInstance.domRef.player.hasOwnProperty('currentTime')) {
             playerInstance.domRef.player.currentTime = newCurrentTime;

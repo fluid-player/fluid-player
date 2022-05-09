@@ -1120,7 +1120,7 @@ const fluidPlayerClass = function () {
                     .replace(/\s/g, '')
                     .replace(/px/g, '')
                     .split(',')
-                ;
+                    ;
             }
         } catch (e) {
             coordinates = null;
@@ -1540,6 +1540,12 @@ const fluidPlayerClass = function () {
                     // resume the vpaid linear ad
                     self.resumeVpaidAd();
                 } else {
+                    // Check if video has ended. If so, replay
+                    if (Math.floor(self.currentVideoDuration) === Math.floor(self.domRef.player.currentTime)) {
+                        self.initialiseStreamers();
+                        self.domRef.player.currentTime = 0;
+                    }
+
                     // resume the regular linear vast or content video player
                     if (self.dashPlayer) {
                         self.dashPlayer.play();
