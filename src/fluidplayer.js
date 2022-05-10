@@ -323,7 +323,7 @@ const fluidPlayerClass = function () {
         // 'loadedmetadata' inconsistently fires because the audio can already be loaded when the listener is added.
         // Here we use readystate to see if metadata has already loaded
         if (playerNode.readyState > 0) {
-            self.mainVideoReady()
+            self.mainVideoReady();
         } else {
             playerNode.addEventListener('loadedmetadata', self.mainVideoReady);
         }
