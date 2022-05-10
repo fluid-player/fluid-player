@@ -1738,14 +1738,14 @@ const fluidPlayerClass = function () {
         const contextMenuList = document.createElement('ul');
         divContextMenu.appendChild(contextMenuList);
 
-        if (!!extraLinks) {
-            for (const link of extraLinks) {
+        if (Array.isArray(extraLinks)) {
+            extraLinks.forEach(function appendExtraLinks(link, index) {
                 const linkItem = document.createElement('li');
-                linkItem.id = self.videoPlayerId + 'context_option_play';
+                linkItem.id = self.videoPlayerId + '_extra_link_' + index;
                 linkItem.innerHTML = link.label;
                 linkItem.addEventListener('click', () => window.open(link.href, '_blank'), false);
                 contextMenuList.appendChild(linkItem);
-            }
+            });
         }
 
         if (showDefaultControls) {
@@ -2157,12 +2157,11 @@ const fluidPlayerClass = function () {
         // This is to allow for fade in and out logo_maintain_display
         const logoHolder = document.createElement('div');
         logoHolder.id = self.videoPlayerId + '_logo';
-        let hideClass = 'logo_maintain_display';
         if (self.displayOptions.layoutControls.logo.hideWithControls) {
-            hideClass = 'initial_controls_show';
+            logoHolder.classList.add('initial_controls_show', 'fp_logo');
+        } else {
+            logoHolder.classList.add('logo_maintain_display');
         }
-        logoHolder.classList.add(hideClass, 'fp_logo');
-
         // The logo itself
         const logoImage = document.createElement('img');
         logoImage.id = self.videoPlayerId + '_logo_image';
@@ -2379,27 +2378,28 @@ const fluidPlayerClass = function () {
             }
         }
 
-        for (let i = 0; i < fpLogo.length; i++) {
-            if (self.displayOptions.layoutControls.controlBar.animated) {
-                if (fpLogo[i]) {
-                    fpLogo[i].classList.remove('fade_in');
-                    fpLogo[i].classList.add('fade_out');
-                }
-            } else {
-                if (fpLogo[i]) {
-                    fpLogo[i].style.display = 'none';
+        if (self.displayOptions.layoutControls.logo.hideWithControls) {
+            for (let i = 0; i < fpLogo.length; i++) {
+                if (self.displayOptions.layoutControls.controlBar.animated) {
+                    if (fpLogo[i]) {
+                        fpLogo[i].classList.remove('fade_in');
+                        fpLogo[i].classList.add('fade_out');
+                    }
+                } else {
+                    if (fpLogo[i]) {
+                        fpLogo[i].style.display = 'none';
+                    }
                 }
             }
         }
     };
 
-    self.showControlBar = () => {
+    self.showControlBar = (event) => {
         if (self.isCurrentlyPlayingAd && !self.domRef.player.paused) {
             self.toggleAdCountdown(false);
         }
 
-
-        if (!self.isTouchDevice()) {
+        if (event.type === 'mouseenter') {
             self.domRef.player.style.cursor = 'default';
         }
 
@@ -2417,16 +2417,17 @@ const fluidPlayerClass = function () {
                 divVastControls[i].style.display = 'block';
             }
         }
-
-        for (let i = 0; i < fpLogo.length; i++) {
-            if (self.displayOptions.layoutControls.controlBar.animated) {
-                if (fpLogo[i]) {
-                    fpLogo[i].classList.remove('fade_out');
-                    fpLogo[i].classList.add('fade_in');
-                }
-            } else {
-                if (fpLogo[i]) {
-                    fpLogo[i].style.display = 'block';
+        if (self.displayOptions.layoutControls.logo.hideWithControls) {
+            for (let i = 0; i < fpLogo.length; i++) {
+                if (self.displayOptions.layoutControls.controlBar.animated) {
+                    if (fpLogo[i]) {
+                        fpLogo[i].classList.remove('fade_out');
+                        fpLogo[i].classList.add('fade_in');
+                    }
+                } else {
+                    if (fpLogo[i]) {
+                        fpLogo[i].style.display = 'block';
+                    }
                 }
             }
         }
