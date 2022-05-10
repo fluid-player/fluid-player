@@ -66,9 +66,10 @@ export default function (playerInstance, options) {
             };
 
             playerInstance.switchPlayerToVastMode = () => {
-                //Get the actual duration from the video file if it is not present in the VAST XML
+                // Get the actual duration from the video file if it is not present in the VAST XML
                 if (!playerInstance.vastOptions.duration) {
-                    playerInstance.vastOptions.duration = playerInstance.domRef.player.duration;
+                    playerInstance.vastOptions.duration = selectedMediaFile.delivery === 'streaming' ?
+                        Infinity : playerInstance.domRef.player.duration;
                 }
 
                 if (playerInstance.displayOptions.layoutControls.showCardBoardView) {

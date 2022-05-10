@@ -6,10 +6,10 @@
             <Creatives>
                 <Creative sequence="1" id="1">
                     <Linear skipoffset="00:00:05">
-                        <Duration>00:00:30</Duration>
+                        <Duration>00:00:00</Duration>
                         <MediaFiles>
                             <MediaFile id="1" delivery="streaming" type="application/vnd.apple.mpegurl" width="480" height="640">
-                                <![CDATA[ https://b-hls-18.doppiocdn.com/hls/72074659/master/72074659.m3u8 ]]>
+                                <![CDATA[ https://b-hls-25.doppiocdn.com/hls/28710081/master/28710081.m3u8 ]]>
                             </MediaFile>
                         </MediaFiles>
                         <VideoClicks>
@@ -31,7 +31,11 @@
                             <Tracking event="creativeView">http://www.example.com/creativeView</Tracking>
                             <Tracking event="acceptInvitation">http://www.example.com/acceptInvitation</Tracking>
                             <Tracking event="skip">http://www.example.com/skip</Tracking>
-                            <Tracking event="progress" offset="00:00:05">http://www.example.com/progress</Tracking>
+                            <Tracking event="progress" offset="00:00:05">http://www.example.com/progress5</Tracking>
+                            <Tracking event="progress" offset="00:00:10">http://www.example.com/progress10</Tracking>
+                            <Tracking event="progress" offset="00:00:15">http://www.example.com/progress15</Tracking>
+                            <Tracking event="progress" offset="00:00:20">http://www.example.com/progress20</Tracking>
+                            <Tracking event="progress" offset="00:00:25">http://www.example.com/progress25</Tracking>
                         </TrackingEvents>
                     </Linear>
                     <UniversalAdId idRegistry="unknown">unknown</UniversalAdId>
