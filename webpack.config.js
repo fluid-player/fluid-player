@@ -106,7 +106,8 @@ module.exports = (env, argv) => {
         devServer: {
             contentBase: wpDistOptions.path,
             index: 'index.html',
-            watchContentBase: true
+            watchContentBase: true,
+            // disableHostCheck: true, // To use with remote hosting (ie: ngrok)
         },
         devtool: wpMode === 'development' ? 'source-map' : false,
         plugins,

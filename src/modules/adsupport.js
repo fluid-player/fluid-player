@@ -1,4 +1,5 @@
 'use strict';
+
 export default function (playerInstance, options) {
     const VPAID_VERSION = '2.0';
 
@@ -65,9 +66,10 @@ export default function (playerInstance, options) {
             };
 
             playerInstance.switchPlayerToVastMode = () => {
-                //Get the actual duration from the video file if it is not present in the VAST XML
+                // Get the actual duration from the video file if it is not present in the VAST XML
                 if (!playerInstance.vastOptions.duration) {
-                    playerInstance.vastOptions.duration = playerInstance.domRef.player.duration;
+                    playerInstance.vastOptions.duration = selectedMediaFile.delivery === 'streaming' ?
+                        Infinity : playerInstance.domRef.player.duration;
                 }
 
                 if (playerInstance.displayOptions.layoutControls.showCardBoardView) {
@@ -154,7 +156,7 @@ export default function (playerInstance, options) {
             // Remove the streaming objects to prevent errors on the VAST content
             playerInstance.detachStreamers();
 
-            //Try to load multiple
+            // Try to load multiple
             const selectedMediaFile = playerInstance.getSupportedMediaFileObject(playerInstance.vastOptions.mediaFileList);
 
             // if player in cardboard mode then, linear ads media type should be a '360' video
@@ -166,7 +168,35 @@ export default function (playerInstance, options) {
 
             const isVpaid = playerInstance.vastOptions.vpaid;
 
-            if (!isVpaid) {
+            if (!isVpaid && selectedMediaFile.isUnsuportedHls) {
+                import(/* webpackChunkName: "hlsjs" */ 'hls.js').then((it) => {
+                    window.Hls = it.default;
+                    const hls = new Hls({
+                        debug: typeof FP_DEBUG !== 'undefined' && FP_DEBUG === true,
+                        p2pConfig: {
+                            logLevel: false,
+                        },
+                        enableWebVTT: false,
+                        enableCEA708Captions: false,
+                    });
+
+                    hls.attachMedia(playerInstance.domRef.player);
+                    hls.loadSource(selectedMediaFile.src);
+                    playerInstance.isCurrentlyPlayingAd = true;
+
+                    playerInstance.hlsPlayer = hls;
+
+                    playerInstance.domRef.player.addEventListener('loadedmetadata', playerInstance.switchPlayerToVastMode);
+                    playerInstance.domRef.player.addEventListener('ended', () => {
+                        hls.detachMedia();
+                        hls.destroy();
+                        playerInstance.hlsPlayer = false;
+                        playerInstance.onVastAdEnded();
+                    });
+
+                    playerInstance.domRef.player.play();
+                });
+            } else if (!isVpaid) {
                 if (selectedMediaFile.src === false) {
                     // Couldn’t find MediaFile that is supported by this video player, based on the attributes of the MediaFile element.
                     playerInstance.adList[adListId].error = true;
@@ -285,6 +315,15 @@ export default function (playerInstance, options) {
                     //one of the best(s) option, no need to seek more
                     if (supportLevel === 'probably') {
                         break;
+                    }
+
+                    if (
+                        supportLevel === 'no' && mediaFiles[i].delivery === 'streaming' &&
+                        (mediaFiles[i].type === 'application/vnd.apple.mpegurl' || mediaFiles[i].type === 'application/x-mpegURL')
+                    ) {
+                        selectedMediaFile = mediaFiles[i];
+                        selectedMediaFile.isUnsuportedHls = true;
+                        adSupportedType = true;
                     }
 
                 } else {
@@ -1195,6 +1234,10 @@ export default function (playerInstance, options) {
      * Ad Countdown
      */
     playerInstance.addAdCountdown = () => {
+        if ((playerInstance.isCurrentlyPlayingAd && playerInstance.hlsPlayer) || playerInstance.currentVideoDuration === Infinity) {
+            return; // Shouldn't show countdown if ad is a video live stream
+        }
+
         const videoWrapper = document.getElementById('fluid_video_wrapper_' + playerInstance.videoPlayerId);
         const divAdCountdown = document.createElement('div');
 
@@ -1216,6 +1259,11 @@ export default function (playerInstance, options) {
     playerInstance.decreaseAdCountdown = function decreaseAdCountdown() {
         const sec = parseInt(playerInstance.currentVideoDuration) - parseInt(playerInstance.domRef.player.currentTime);
         const btn = document.getElementById('ad_countdown' + playerInstance.videoPlayerId);
+
+        if (btn && isNaN(sec)) {
+            btn.parentNode.removeChild(btn);
+            return;
+        }
 
         if (btn) {
             btn.innerHTML = "<span class='ad_timer_prefix'>Ad - </span> " + playerInstance.pad(parseInt(sec / 60)) + ':' + playerInstance.pad(parseInt(sec % 60));
