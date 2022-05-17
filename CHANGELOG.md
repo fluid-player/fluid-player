@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.2.1 (2022-05-17)
+* Update dependencies
+
 ## 3.2.0
 * [Pull #641](https://github.com/fluid-player/fluid-player/pull/641) FluidPlayer > Streaming files compatibility
 
