@@ -28,7 +28,7 @@
 						</TrackingEvents>
 						<AdParameters>
 							<![CDATA[
-{"videos":[ {"url":"https://googleads.github.io/googleads-ima-html5/media/LinearVPAIDCreative.mp4","mimetype":"video/mp4"}]}
+{"videos":[ {"url":"https://iab-publicfiles.s3.amazonaws.com/vast/VAST-4.0-Short-Intro.mp4","mimetype":"video/mp4"}]}
 ]]>
 						</AdParameters>
 						<VideoClicks>
