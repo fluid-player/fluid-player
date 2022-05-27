@@ -1,11 +1,27 @@
 // VAST support module
 'use strict';
 export default function (playerInstance, options) {
-    playerInstance.setCTAFromVast = (titleCtaElements, tmpOptions) => {
-        if (playerInstance.displayOptions.vastOptions.adCTATextVast && titleCtaElements.length) {
-            playerInstance.displayOptions.vastOptions.adCTAText = 'TODO SET TITLE';
-            tmpOptions.iconClick = `http://todo.set/url`;
-            console.log(titleCtaElements, tmpOptions)
+    /**
+     * Gets CTA parameters from VAST and sets them on tempOptions
+     *
+     * @param {HTMLElement} titleCtaElement
+     *
+     * @param {any} tmpOptions
+     */
+    playerInstance.setCTAFromVast = (titleCtaElement, tmpOptions) => {
+        if (playerInstance.displayOptions.vastOptions.adCTATextVast && titleCtaElement) {
+            const mobileText = playerInstance.extractNodeDataByTagName(titleCtaElement, 'MobileText');
+            const desktopText = playerInstance.extractNodeDataByTagName(titleCtaElement, 'PCText');
+            const link = playerInstance.extractNodeDataByTagName(titleCtaElement, 'Link');
+            const tracking = playerInstance.extractNodeDataByTagName(titleCtaElement, 'Tracking');
+
+            if (mobileText && desktopText && link && tracking) {
+                tmpOptions.titleCTA = {
+                    text: desktopText, // @TODO: Sets mobile/desktop text dynamically
+                    link,
+                    tracking
+                }
+            }
         }
     }
 
@@ -138,6 +154,23 @@ export default function (playerInstance, options) {
 
         return result;
     };
+
+    /**
+     * Gets the first element found by tag name, and returns the element data
+     *
+     * @param {HTMLElement} parentNode
+     *
+     * @param {string} tagName
+     *
+     * @returns {string}
+     */
+    playerInstance.extractNodeDataByTagName = (parentNode, tagName) => {
+        const element = parentNode.getElementsByTagName(tagName);
+
+        if (element && element.length) {
+            return playerInstance.extractNodeData(element[0]);
+        }
+    }
 
     playerInstance.extractNodeData = (parentNode) => {
         let contentAsString = "";
@@ -477,8 +510,8 @@ export default function (playerInstance, options) {
 
         // Sets CTA from vast
         const titleCta = xmlResponse.getElementsByTagName('TitleCTA');
-        if (titleCta !== null) {
-            playerInstance.setCTAFromVast(titleCta, tmpOptions);
+        if (titleCta !== null && titleCta.length) {
+            playerInstance.setCTAFromVast(titleCta[0], tmpOptions);
         }
 
         //Get Creative

@@ -1401,24 +1401,49 @@ export default function (playerInstance, options) {
         div.parentElement.removeChild(div);
     };
 
+    /**
+     * Adds CTA button from VAST, with fallback to IconClickTrough
+     *
+     * @param {string} landingPage
+     */
     playerInstance.addCTAButton = (landingPage) => {
-        if (!landingPage) {
-            return;
+        if (playerInstance.vastOptions.titleCTA) {
+            const { text, link, tracking } = playerInstance.vastOptions.titleCTA;
+            return playerInstance.createAndAppendCTAButton(text, link, tracking);
         }
 
+        if (landingPage) {
+            return playerInstance.createAndAppendCTAButton(
+                playerInstance.displayOptions.vastOptions.adCTAText,
+                landingPage,
+                playerInstance.vastOptions.clickthroughUrl
+            );
+        }
+    }
+
+    /**
+     * Creates and append CTA button given the input parameters
+     *
+     * @param {string} adCTAText
+     *
+     * @param {string} displayUrl
+     *
+     * @param {string} trackingUrl
+     */
+    playerInstance.createAndAppendCTAButton = (adCTAText, displayUrl, trackingUrl) => {
         const ctaButton = document.createElement('div');
         ctaButton.id = playerInstance.videoPlayerId + '_fluid_cta';
         ctaButton.className = 'fluid_ad_cta';
 
         const link = document.createElement('span');
-        link.innerHTML = playerInstance.displayOptions.vastOptions.adCTAText + "<br/><span class=\"add_icon_clickthrough\">" + landingPage + "</span>";
+        link.innerHTML = adCTAText + "<br/><span class=\"add_icon_clickthrough\">" + displayUrl + "</span>";
 
         ctaButton.addEventListener('click', () => {
             if (!playerInstance.domRef.player.paused) {
                 playerInstance.domRef.player.pause();
             }
 
-            const win = window.open(playerInstance.vastOptions.clickthroughUrl, '_blank');
+            const win = window.open(trackingUrl, '_blank');
             win.focus();
             return true;
         }, false);
@@ -1426,7 +1451,7 @@ export default function (playerInstance, options) {
         ctaButton.appendChild(link);
 
         document.getElementById('fluid_video_wrapper_' + playerInstance.videoPlayerId).appendChild(ctaButton);
-    };
+    }
 
     playerInstance.removeCTAButton = () => {
         const btn = document.getElementById(playerInstance.videoPlayerId + '_fluid_cta');
