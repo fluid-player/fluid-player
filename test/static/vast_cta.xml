@@ -37,6 +37,13 @@
                             <Tracking event="progress" offset="00:00:20">http://www.example.com/progress20</Tracking>
                             <Tracking event="progress" offset="00:00:25">http://www.example.com/progress25</Tracking>
                         </TrackingEvents>
+                        <Icons>
+                            <Icon>
+                                <IconClicks>
+                                    <IconClickThrough>https://www.example.com/IconClickThrough</IconClickThrough>
+                                </IconClicks>
+                            </Icon>
+                        </Icons>
                     </Linear>
                     <UniversalAdId idRegistry="unknown">unknown</UniversalAdId>
                 </Creative>
