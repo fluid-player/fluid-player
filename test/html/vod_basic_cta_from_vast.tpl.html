@@ -26,11 +26,13 @@
 <script>
     var instance = fluidPlayer('fluid-player-e2e-case', {
         vastOptions: {
-            allowVPAID: true, // Default false.
+            adCTATextVast: true,
+            // adCTAText: 'Subscribe now!', // Default "Visit now!",
+            // adCTATextPosition: 'bottom left', //Default 'bottom right'
             adList: [
                 {
                     roll: 'preRoll',
-                    vastTag: '/static/vast_cta.xml'
+                    vastTag: '/static/vast_cta.xml',
                 }
             ]
         }

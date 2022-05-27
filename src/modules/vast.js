@@ -1,6 +1,14 @@
 // VAST support module
 'use strict';
 export default function (playerInstance, options) {
+    playerInstance.setCTAFromVast = (titleCtaElements, tmpOptions) => {
+        if (playerInstance.displayOptions.vastOptions.adCTATextVast && titleCtaElements.length) {
+            playerInstance.displayOptions.vastOptions.adCTAText = 'TODO SET TITLE';
+            tmpOptions.iconClick = `http://todo.set/url`;
+            console.log(titleCtaElements, tmpOptions)
+        }
+    }
+
     playerInstance.getClickThroughUrlFromLinear = (linear) => {
         const videoClicks = linear.getElementsByTagName('VideoClicks');
 
@@ -467,6 +475,12 @@ export default function (playerInstance, options) {
             playerInstance.registerErrorEvents(errorTags, tmpOptions);
         }
 
+        // Sets CTA from vast
+        const titleCta = xmlResponse.getElementsByTagName('TitleCTA');
+        if (titleCta !== null) {
+            playerInstance.setCTAFromVast(titleCta, tmpOptions);
+        }
+
         //Get Creative
         const creative = xmlResponse.getElementsByTagName('Creative');
 
@@ -496,7 +510,7 @@ export default function (playerInstance, options) {
                     tmpOptions.duration = playerInstance.getDurationFromLinear(creativeLinear);
                     tmpOptions.mediaFileList = playerInstance.getMediaFileListFromLinear(creativeLinear);
                     tmpOptions.adParameters = playerInstance.getAdParametersFromLinear(creativeLinear);
-                    tmpOptions.iconClick = playerInstance.getIconClickThroughFromLinear(creativeLinear);
+                    tmpOptions.iconClick = tmpOptions.iconClick || playerInstance.getIconClickThroughFromLinear(creativeLinear);
 
                     if (tmpOptions.adParameters) {
                         tmpOptions.vpaid = true;
