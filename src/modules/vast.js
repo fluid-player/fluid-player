@@ -14,10 +14,11 @@ export default function (playerInstance, options) {
             const desktopText = playerInstance.extractNodeDataByTagName(titleCtaElement, 'PCText');
             const link = playerInstance.extractNodeDataByTagName(titleCtaElement, 'Link');
             const tracking = playerInstance.extractNodeDataByTagName(titleCtaElement, 'Tracking');
+            const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
             if (mobileText && desktopText && link && tracking) {
                 tmpOptions.titleCTA = {
-                    text: desktopText, // @TODO: Sets mobile/desktop text dynamically
+                    text: isMobile ? mobileText : desktopText,
                     link,
                     tracking
                 }

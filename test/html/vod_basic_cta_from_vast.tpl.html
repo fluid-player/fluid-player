@@ -26,13 +26,13 @@
 <script>
     var instance = fluidPlayer('fluid-player-e2e-case', {
         vastOptions: {
-            adCTATextVast: true,
-            // adCTAText: 'Subscribe now!', // Default "Visit now!",
-            // adCTATextPosition: 'bottom left', //Default 'bottom right'
+            adCTATextVast: true, // Enables getting CTA from the VAST tag
+            adCTAText: 'CTA Text from vast options!', // Note: Will only show if VAST tag doesn't have TitleCTA
+            adCTATextPosition: 'bottom left',
             adList: [
                 {
                     roll: 'preRoll',
-                    vastTag: '/static/vast_cta.xml',
+                    vastTag: '/static/vast_cta.xml', // VAST Tag with TitleCTA extension with CTA information
                 }
             ]
         }
