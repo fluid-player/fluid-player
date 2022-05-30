@@ -39,7 +39,7 @@
                         </TrackingEvents>
                         <Icons>
                             <Icon>
-                                <IconClicks>
+                                <IconClicks> <!-- Will fall back to IconClickTrough if no TitleCTA extension found -->
                                     <IconClickThrough>https://www.example.com/IconClickThrough</IconClickThrough>
                                 </IconClicks>
                             </Icon>
@@ -51,6 +51,7 @@
             <Extensions>
                 <Extension>
                     <TitleCTA>
+                        <!-- TitleCTA must have all 4 proprieties to work -->
                         <!-- The MobileText is corresponding to our "CTA text" -->
                         <MobileText>CTA Text Mobile</MobileText>
 
