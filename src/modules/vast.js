@@ -16,9 +16,9 @@ export default function (playerInstance, options) {
             const tracking = playerInstance.extractNodeDataByTagName(titleCtaElement, 'Tracking');
             const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
-            if (mobileText && desktopText && link && tracking) {
+            if (desktopText && link && tracking) {
                 tmpOptions.titleCTA = {
-                    text: isMobile ? mobileText : desktopText,
+                    text: isMobile ? mobileText || desktopText : desktopText,
                     link,
                     tracking
                 }
