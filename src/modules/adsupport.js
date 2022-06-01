@@ -1419,7 +1419,7 @@ export default function (playerInstance, options) {
                 playerInstance.vastOptions.clickthroughUrl
             );
         }
-    }
+    };
 
     /**
      * Creates and append CTA button given the input parameters
@@ -1451,7 +1451,7 @@ export default function (playerInstance, options) {
         ctaButton.appendChild(link);
 
         document.getElementById('fluid_video_wrapper_' + playerInstance.videoPlayerId).appendChild(ctaButton);
-    }
+    };
 
     playerInstance.removeCTAButton = () => {
         const btn = document.getElementById(playerInstance.videoPlayerId + '_fluid_cta');

@@ -51,7 +51,6 @@
             <Extensions>
                 <Extension>
                     <TitleCTA>
-                        <!-- TitleCTA must have all 4 proprieties to work -->
                         <!-- The MobileText is corresponding to our "CTA text" -->
                         <MobileText>CTA Text Mobile</MobileText>
 

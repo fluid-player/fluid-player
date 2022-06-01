@@ -24,7 +24,7 @@ export default function (playerInstance, options) {
                 }
             }
         }
-    }
+    };
 
     playerInstance.getClickThroughUrlFromLinear = (linear) => {
         const videoClicks = linear.getElementsByTagName('VideoClicks');
@@ -163,15 +163,17 @@ export default function (playerInstance, options) {
      *
      * @param {string} tagName
      *
-     * @returns {string}
+     * @returns {string|null}
      */
     playerInstance.extractNodeDataByTagName = (parentNode, tagName) => {
         const element = parentNode.getElementsByTagName(tagName);
 
         if (element && element.length) {
             return playerInstance.extractNodeData(element[0]);
+        } else {
+            return null;
         }
-    }
+    };
 
     playerInstance.extractNodeData = (parentNode) => {
         let contentAsString = "";
@@ -662,7 +664,6 @@ export default function (playerInstance, options) {
 
         playerInstance.processUrl(vastTag, handleVastResult);
     };
-
 
     playerInstance.processUrl = (vastTag, callBack) => {
         const numberOfRedirects = 0;
