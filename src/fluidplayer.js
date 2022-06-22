@@ -232,6 +232,7 @@ const fluidPlayerClass = function () {
                 adTextPosition: 'top left',
                 adCTAText: 'Visit now!',
                 adCTATextPosition: 'bottom right',
+                adCTATextVast: false,
                 adClickable: true,
                 vastTimeout: 5000,
                 showProgressbarMarkers: false,

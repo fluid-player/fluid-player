@@ -1,6 +1,31 @@
 // VAST support module
 'use strict';
 export default function (playerInstance, options) {
+    /**
+     * Gets CTA parameters from VAST and sets them on tempOptions
+     *
+     * @param {HTMLElement} titleCtaElement
+     *
+     * @param {any} tmpOptions
+     */
+    playerInstance.setCTAFromVast = (titleCtaElement, tmpOptions) => {
+        if (playerInstance.displayOptions.vastOptions.adCTATextVast && titleCtaElement) {
+            const mobileText = playerInstance.extractNodeDataByTagName(titleCtaElement, 'MobileText');
+            const desktopText = playerInstance.extractNodeDataByTagName(titleCtaElement, 'PCText');
+            const link = playerInstance.extractNodeDataByTagName(titleCtaElement, 'Link');
+            const tracking = playerInstance.extractNodeDataByTagName(titleCtaElement, 'Tracking');
+            const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
+            if (desktopText && link && tracking) {
+                tmpOptions.titleCTA = {
+                    text: isMobile ? mobileText || desktopText : desktopText,
+                    link,
+                    tracking
+                }
+            }
+        }
+    };
+
     playerInstance.getClickThroughUrlFromLinear = (linear) => {
         const videoClicks = linear.getElementsByTagName('VideoClicks');
 
@@ -129,6 +154,25 @@ export default function (playerInstance, options) {
         }
 
         return result;
+    };
+
+    /**
+     * Gets the first element found by tag name, and returns the element data
+     *
+     * @param {HTMLElement} parentNode
+     *
+     * @param {string} tagName
+     *
+     * @returns {string|null}
+     */
+    playerInstance.extractNodeDataByTagName = (parentNode, tagName) => {
+        const element = parentNode.getElementsByTagName(tagName);
+
+        if (element && element.length) {
+            return playerInstance.extractNodeData(element[0]);
+        } else {
+            return null;
+        }
     };
 
     playerInstance.extractNodeData = (parentNode) => {
@@ -467,6 +511,12 @@ export default function (playerInstance, options) {
             playerInstance.registerErrorEvents(errorTags, tmpOptions);
         }
 
+        // Sets CTA from vast
+        const titleCta = xmlResponse.getElementsByTagName('TitleCTA');
+        if (titleCta !== null && titleCta.length) {
+            playerInstance.setCTAFromVast(titleCta[0], tmpOptions);
+        }
+
         //Get Creative
         const creative = xmlResponse.getElementsByTagName('Creative');
 
@@ -496,7 +546,7 @@ export default function (playerInstance, options) {
                     tmpOptions.duration = playerInstance.getDurationFromLinear(creativeLinear);
                     tmpOptions.mediaFileList = playerInstance.getMediaFileListFromLinear(creativeLinear);
                     tmpOptions.adParameters = playerInstance.getAdParametersFromLinear(creativeLinear);
-                    tmpOptions.iconClick = playerInstance.getIconClickThroughFromLinear(creativeLinear);
+                    tmpOptions.iconClick = tmpOptions.iconClick || playerInstance.getIconClickThroughFromLinear(creativeLinear);
 
                     if (tmpOptions.adParameters) {
                         tmpOptions.vpaid = true;
@@ -614,7 +664,6 @@ export default function (playerInstance, options) {
 
         playerInstance.processUrl(vastTag, handleVastResult);
     };
-
 
     playerInstance.processUrl = (vastTag, callBack) => {
         const numberOfRedirects = 0;
