@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.3.0 (2022-06-22)
+* [Pull #656](https://github.com/fluid-player/fluid-player/pull/656) Video CTA / Fluid Player
+
 ## 3.2.1 (2022-05-17)
 * Update dependencies
 
