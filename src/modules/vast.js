@@ -4,6 +4,8 @@ export default function (playerInstance, options) {
     /**
      * Gets CTA parameters from VAST and sets them on tempOptions
      *
+     * Fallbacks to any value that is filled on the TitleCTA extension, but needs at least an url and a text
+     *
      * @param {HTMLElement} titleCtaElement
      *
      * @param {any} tmpOptions
@@ -16,11 +18,13 @@ export default function (playerInstance, options) {
             const tracking = playerInstance.extractNodeDataByTagName(titleCtaElement, 'Tracking');
             const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
-            if (desktopText && link && tracking) {
+            if ((desktopText || mobileText) && (link || tracking)) {
                 tmpOptions.titleCTA = {
-                    text: isMobile ? mobileText || desktopText : desktopText,
-                    link,
-                    tracking
+                    text: isMobile ?
+                        mobileText || desktopText :
+                        desktopText || mobileText,
+                    link: link || tracking,
+                    tracking: tracking || link
                 }
             }
         }
