@@ -14,7 +14,7 @@ Guidelines for bug reports:
 
 1. Please use the [GitHub issue search](https://github.com/fluid-player/fluid-player/issues) — check if the issue has already been reported.
 1. Check if the issue has already been fixed — try to reproduce it using the uncompressed code from latest `master` branch in the repository.
-1. Create a small demo with the live example (reduced test case). You can possibly use [this codepen template](https://codepen.io/exads/pen/MdgbVj?editors=1010#0) as a starting point -- don't forget to update it to the fluid-player version you use.
+1. Create a small demo with the live example (reduced test case). You can possibly use [this codepen template](https://codepen.io/exadsleroy/pen/QWmWPeo) as a starting point -- don't forget to update it to the fluid-player version you use.
 
 A good bug report should be as detailed as possible, so that others won't have to follow up for the essential details.
 
