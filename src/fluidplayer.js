@@ -315,12 +315,19 @@ const fluidPlayerClass = function () {
         playerNode.addEventListener('fullscreenchange', self.recalculateAdDimensions);
         playerNode.addEventListener('waiting', self.onRecentWaiting);
         playerNode.addEventListener('pause', self.onFluidPlayerPause);
-        playerNode.addEventListener('loadedmetadata', self.mainVideoReady);
         playerNode.addEventListener('error', self.onErrorDetection);
         playerNode.addEventListener('ended', self.onMainVideoEnded);
         playerNode.addEventListener('durationchange', () => {
             self.currentVideoDuration = self.getCurrentVideoDuration();
         });
+
+        // 'loadedmetadata' inconsistently fires because the audio can already be loaded when the listener is added.
+        // Here we use readystate to see if metadata has already loaded
+        if (playerNode.readyState > 0) {
+            self.mainVideoReady();
+        } else {
+            playerNode.addEventListener('loadedmetadata', self.mainVideoReady);
+        }
 
         if (self.displayOptions.layoutControls.showCardBoardView) {
             // This fixes cross origin errors on three.js
@@ -1114,7 +1121,7 @@ const fluidPlayerClass = function () {
                     .replace(/\s/g, '')
                     .replace(/px/g, '')
                     .split(',')
-                ;
+                    ;
             }
         } catch (e) {
             coordinates = null;
@@ -1534,6 +1541,12 @@ const fluidPlayerClass = function () {
                     // resume the vpaid linear ad
                     self.resumeVpaidAd();
                 } else {
+                    // Check if video has ended. If so, replay
+                    if (Math.floor(self.currentVideoDuration) === Math.floor(self.domRef.player.currentTime)) {
+                        self.initialiseStreamers();
+                        self.domRef.player.currentTime = 0;
+                    }
+
                     // resume the regular linear vast or content video player
                     if (self.dashPlayer) {
                         self.dashPlayer.play();

@@ -928,12 +928,17 @@ export default function (playerInstance, options) {
             playerInstance.createAdMarker(adListId, time);
         }
 
-        playerInstance.scheduleTask({time: time, playRoll: 'midRoll', adListId: adListId});
+        playerInstance.scheduleTask({
+            time: time,
+            playRoll: 'midRoll', 
+            adListId: adListId
+        });
     };
 
     playerInstance.postRoll = (event) => {
         playerInstance.domRef.player.removeEventListener(event.type, playerInstance.postRoll);
         const adListId = event.type.replace('adId_', '');
+
         playerInstance.scheduleTask({
             time: Math.floor(playerInstance.mainVideoDuration),
             playRoll: 'postRoll',
@@ -1139,7 +1144,7 @@ export default function (playerInstance, options) {
         playerInstance.initialiseStreamers();
 
         const newCurrentTime = (typeof playerInstance.domRef.player.mainVideoCurrentTime !== 'undefined')
-            ? playerInstance.domRef.player.mainVideoCurrentTime : 0;
+            ? Math.floor(playerInstance.domRef.player.mainVideoCurrentTime) : 0;
 
         if (playerInstance.domRef.player.hasOwnProperty('currentTime')) {
             playerInstance.domRef.player.currentTime = newCurrentTime;
