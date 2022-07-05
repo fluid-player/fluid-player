@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.4.0 (2022-07-05)
+* [Pull #652](https://github.com/fluid-player/fluid-player/pull/652) Video on demand and linear VPAID does not work on iOS Safari
+* [Pull #664](https://github.com/fluid-player/fluid-player/pull/664) Video CTA / Fluid Player
+
 ## 3.3.0 (2022-06-22)
 * [Pull #656](https://github.com/fluid-player/fluid-player/pull/656) Video CTA / Fluid Player
 
