@@ -930,7 +930,7 @@ export default function (playerInstance, options) {
 
         playerInstance.scheduleTask({
             time: time,
-            playRoll: 'midRoll', 
+            playRoll: 'midRoll',
             adListId: adListId
         });
     };
@@ -1441,7 +1441,13 @@ export default function (playerInstance, options) {
         ctaButton.className = 'fluid_ad_cta';
 
         const link = document.createElement('span');
-        link.innerHTML = adCTAText + "<br/><span class=\"add_icon_clickthrough\">" + displayUrl + "</span>";
+        let innerHTML = adCTAText;
+
+        if (displayUrl) {
+            innerHTML += "<br/><span class=\"add_icon_clickthrough\">" + displayUrl + "</span>"
+        }
+
+        link.innerHTML = innerHTML;
 
         ctaButton.addEventListener('click', () => {
             if (!playerInstance.domRef.player.paused) {
