@@ -24,7 +24,7 @@ export default function (playerInstance, options) {
                         mobileText || desktopText :
                         desktopText || mobileText,
                     link: link || null,
-                    tracking: tracking || link,
+                    tracking,
                 }
             }
         }
