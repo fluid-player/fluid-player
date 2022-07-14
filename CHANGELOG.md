@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 3.2.1 (2022-05-17)
+* Update dependencies
+
+## 3.2.0
+* [Pull #641](https://github.com/fluid-player/fluid-player/pull/641) FluidPlayer > Streaming files compatibility
+
 ## 3.1.0
 * [Pull #619](https://github.com/fluid-player/fluid-player/pull/619) Looping videos show loading spinner for a split second before looping
 * [Pull #621](https://github.com/fluid-player/fluid-player/pull/621) FluidPlayer> Mouse disappears
