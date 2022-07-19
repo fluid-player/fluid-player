@@ -509,7 +509,7 @@ export default function (playerInstance, options) {
         }
 
         if (!playerInstance.vpaidAdUnit) {
-            return
+            return;
         }
 
         const vpaidSlot = document.getElementById(playerInstance.videoPlayerId + "_fluid_vpaid_slot");
