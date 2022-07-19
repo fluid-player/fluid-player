@@ -508,7 +508,7 @@ export default function (playerInstance, options) {
             event.stopImmediatePropagation();
         }
 
-        if(!playerInstance.vpaidAdUnit) {
+        if (!playerInstance.vpaidAdUnit) {
             return
         }
 
