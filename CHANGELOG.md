@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.5.0 (2022-07-20)
+* [Pull #669](https://github.com/fluid-player/fluid-player/pull/669) Video CTA / Fluid Player
+* [Pull #671](https://github.com/fluid-player/fluid-player/pull/671) Video CTA - update FP to support new CTA structure from VAST Tag
+
 ## 3.4.0 (2022-07-05)
 * [Pull #652](https://github.com/fluid-player/fluid-player/pull/652) Video on demand and linear VPAID does not work on iOS Safari
 * [Pull #664](https://github.com/fluid-player/fluid-player/pull/664) Video CTA / Fluid Player
