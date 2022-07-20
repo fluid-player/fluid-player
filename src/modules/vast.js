@@ -14,7 +14,9 @@ export default function (playerInstance, options) {
         if (playerInstance.displayOptions.vastOptions.adCTATextVast && titleCtaElement) {
             const mobileText = playerInstance.extractNodeDataByTagName(titleCtaElement, 'MobileText');
             const desktopText = playerInstance.extractNodeDataByTagName(titleCtaElement, 'PCText');
-            const link = playerInstance.extractNodeDataByTagName(titleCtaElement, 'Link');
+            const link =
+                playerInstance.extractNodeDataByTagName(titleCtaElement, 'DisplayUrl') ||
+                playerInstance.extractNodeDataByTagName(titleCtaElement, 'Link');
             const tracking = playerInstance.extractNodeDataByTagName(titleCtaElement, 'Tracking');
             const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
