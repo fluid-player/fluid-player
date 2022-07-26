@@ -1544,9 +1544,7 @@ export default function (playerInstance, options) {
         divClickThrough.id = 'vast_clickthrough_layer_' + playerInstance.videoPlayerId;
         divClickThrough.setAttribute(
             'style',
-            'position: absolute; cursor: pointer; top: 0; left: 0; width: ' +
-            playerInstance.domRef.player.offsetWidth + 'px; height: ' +
-            (playerInstance.domRef.player.offsetHeight) + 'px;'
+            'position: absolute; cursor: pointer; top: 0; left: 0; bottom:0;'
         );
 
         divWrapper.appendChild(divClickThrough);
