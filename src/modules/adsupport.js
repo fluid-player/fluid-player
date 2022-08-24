@@ -1417,7 +1417,7 @@ export default function (playerInstance, options) {
             return playerInstance.createAndAppendCTAButton(text, link, tracking);
         }
 
-        if (landingPage) {
+        if (landingPage && typeof playerInstance.displayOptions.vastOptions.adCTAText === 'string') {
             return playerInstance.createAndAppendCTAButton(
                 playerInstance.displayOptions.vastOptions.adCTAText,
                 landingPage,
