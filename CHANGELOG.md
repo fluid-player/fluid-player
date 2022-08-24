@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.6.0 (2022-08-24)
+* [Pull #666](https://github.com/fluid-player/fluid-player/pull/666) CTA Overlay > cannot be removed by publisher
+
 ## 3.5.0 (2022-07-20)
 * [Pull #669](https://github.com/fluid-player/fluid-player/pull/669) Video CTA / Fluid Player
 * [Pull #671](https://github.com/fluid-player/fluid-player/pull/671) Video CTA - update FP to support new CTA structure from VAST Tag
