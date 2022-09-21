@@ -467,7 +467,9 @@ const fluidPlayerClass = function () {
         const videoWrapper = document.getElementById('fluid_video_wrapper_' + playerNode.id);
 
         if (!self.mobileInfo.userOs) {
-            videoWrapper.addEventListener('mouseleave', self.handleMouseleave, false);
+            if (!self.displayOptions.layoutControls.controlBar.autoHide) {
+                videoWrapper.addEventListener('mouseleave', self.handleMouseleave, false);
+            }
             videoWrapper.addEventListener('mouseenter', self.showControlBar, false);
             videoWrapper.addEventListener('mouseenter', self.showTitle, false);
         } else {
