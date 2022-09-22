@@ -66,12 +66,12 @@ export default function (playerInstance, options) {
             };
 
             playerInstance.switchPlayerToVastMode = () => {
-                // Get the actual duration from the video file if it is not present in the VAST XML
-                if (!playerInstance.vastOptions.duration) {
-                    playerInstance.vastOptions.duration = selectedMediaFile.delivery === 'streaming' ?
-                        Infinity : playerInstance.domRef.player.duration;
+                if (!playerInstance.vastOptions || !playerInstance.vastOptions.duration) {
+                    return;
                 }
-
+                // Get the actual duration from the video file if it is not present in the VAST XML
+                playerInstance.vastOptions.duration = selectedMediaFile.delivery === 'streaming' ?
+                    Infinity : playerInstance.domRef.player.duration;
                 if (playerInstance.displayOptions.layoutControls.showCardBoardView) {
 
                     if (!playerInstance.adList[adListId].landingPage) {
@@ -1474,6 +1474,9 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.decreaseSkipOffset = () => {
+        if (!playerInstance.vastOptions || !playerInstance.vastOptions.skipoffset) {
+            return;
+        }
         let sec = playerInstance.vastOptions.skipoffset - Math.floor(playerInstance.domRef.player.currentTime);
         const btn = document.getElementById('skip_button_' + playerInstance.videoPlayerId);
 
