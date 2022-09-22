@@ -2733,48 +2733,48 @@ const fluidPlayerClass = function () {
             if (!(typeof (Storage) !== 'undefined' && typeof (localStorage) !== 'undefined')) {
                 return;
             }
-
-            // See https://github.com/fluid-player/fluid-player/issues/271
-            const testKey = '_fp_storage_enabled', storage = localStorage;
-            try {
-                storage.setItem(testKey, '1');
-                storage.removeItem(testKey);
-            } catch (error) {
-                return false;
-            }
-
-            self.fluidStorage = localStorage;
-            if (typeof (self.fluidStorage.fluidVolume) !== 'undefined'
-                && self.displayOptions.layoutControls.persistentSettings.volume) {
-                self.setVolume(self.fluidStorage.fluidVolume);
-
-                if (typeof (self.fluidStorage.fluidMute) !== 'undefined' && self.fluidStorage.fluidMute === 'true') {
-                    self.muteToggle();
-                }
-            }
-
-            if (typeof (self.fluidStorage.fluidQuality) !== 'undefined'
-                && self.displayOptions.layoutControls.persistentSettings.quality) {
-                const sourceOption = document.getElementById('source_' + self.videoPlayerId + '_' + self.fluidStorage.fluidQuality);
-                const sourceChangeButton = document.getElementById(self.videoPlayerId + '_fluid_control_video_source');
-                if (sourceOption) {
-                    sourceOption.click();
-                    sourceChangeButton.click();
-                }
-            }
-
-            if (typeof (self.fluidStorage.fluidSpeed) !== 'undefined'
-                && self.displayOptions.layoutControls.persistentSettings.speed) {
-                self.setPlaybackSpeed(self.fluidStorage.fluidSpeed);
-            }
-
-            if (typeof (self.fluidStorage.fluidTheatre) !== 'undefined'
-                && self.fluidStorage.fluidTheatre === 'true'
-                && self.displayOptions.layoutControls.persistentSettings.theatre) {
-                self.theatreToggle();
-            }
         } catch (e) {
             return;
+        }
+
+        // See https://github.com/fluid-player/fluid-player/issues/271
+        const testKey = '_fp_storage_enabled', storage = localStorage;
+        try {
+            storage.setItem(testKey, '1');
+            storage.removeItem(testKey);
+        } catch (error) {
+            return false;
+        }
+
+        self.fluidStorage = localStorage;
+        if (typeof (self.fluidStorage.fluidVolume) !== 'undefined'
+            && self.displayOptions.layoutControls.persistentSettings.volume) {
+            self.setVolume(self.fluidStorage.fluidVolume);
+
+            if (typeof (self.fluidStorage.fluidMute) !== 'undefined' && self.fluidStorage.fluidMute === 'true') {
+                self.muteToggle();
+            }
+        }
+
+        if (typeof (self.fluidStorage.fluidQuality) !== 'undefined'
+            && self.displayOptions.layoutControls.persistentSettings.quality) {
+            const sourceOption = document.getElementById('source_' + self.videoPlayerId + '_' + self.fluidStorage.fluidQuality);
+            const sourceChangeButton = document.getElementById(self.videoPlayerId + '_fluid_control_video_source');
+            if (sourceOption) {
+                sourceOption.click();
+                sourceChangeButton.click();
+            }
+        }
+
+        if (typeof (self.fluidStorage.fluidSpeed) !== 'undefined'
+            && self.displayOptions.layoutControls.persistentSettings.speed) {
+            self.setPlaybackSpeed(self.fluidStorage.fluidSpeed);
+        }
+
+        if (typeof (self.fluidStorage.fluidTheatre) !== 'undefined'
+            && self.fluidStorage.fluidTheatre === 'true'
+            && self.displayOptions.layoutControls.persistentSettings.theatre) {
+            self.theatreToggle();
         }
     };
 
