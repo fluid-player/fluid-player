@@ -91,7 +91,7 @@ export default function (playerInstance, options) {
         subtitlesChangeList.className = 'fluid_subtitles_list';
         subtitlesChangeList.style.display = 'none';
 
-        let subtitleSelected = false;
+        let hasSelectedSubtitle = false;
         const hasDefault = !!playerInstance.subtitlesTracks.find(track => track.default);
         playerInstance.subtitlesTracks.forEach(function (subtitle) {
             let subtitleSelected = ''
@@ -99,13 +99,13 @@ export default function (playerInstance, options) {
             const subtitlesOnByDefault = playerInstance.displayOptions.layoutControls.subtitlesOnByDefault;
 
             if ((subtitlesOnByDefault && subtitle.default ||
-                (!hasDefault && !subtitleSelected && subtitle.label !== subtitlesOff) ||
+                (!hasDefault && !hasSelectedSubtitle && subtitle.label !== subtitlesOff) ||
                 playerInstance.subtitlesTracks.length === 1) ||
                 !subtitlesOnByDefault && subtitle.label === subtitlesOff
             ) {
                 subtitleSelected = 'subtitle_selected';
                 playerInstance.subtitleFetchParse(subtitle);
-                subtitleSelected = true;
+                hasSelectedSubtitle = true;
             }
 
             const subtitlesChangeDiv = document.createElement('div');
