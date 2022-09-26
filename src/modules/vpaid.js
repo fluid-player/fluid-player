@@ -508,6 +508,10 @@ export default function (playerInstance, options) {
             event.stopImmediatePropagation();
         }
 
+        if (!playerInstance.vpaidAdUnit) {
+            return;
+        }
+
         const vpaidSlot = document.getElementById(playerInstance.videoPlayerId + "_fluid_vpaid_slot");
 
         playerInstance.vpaidCallbackListenersDetach();
