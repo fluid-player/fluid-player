@@ -1326,12 +1326,12 @@ export default function (playerInstance, options) {
 
         const defaultPositions = {
             top: {
-                left: {h: 34, v: 34},
-                right: {h: 0, v: 34}
+                left: { h: 34, v: 34 },
+                right: { h: 0, v: 34 },
             },
             bottom: {
-                left: {h: 34, v: 50},
-                right: {h: 0, v: 50}
+                left: { h: 34, v: 50 },
+                right: { h: 0, v: 50 },
             }
         };
 
@@ -1341,8 +1341,14 @@ export default function (playerInstance, options) {
             const wrapperElement = playerInstance.domRef.wrapper;
 
             if (wrapperElement.classList.contains('mobile')) {
-                defaultPositions.bottom.left.v = 75;
-                defaultPositions.bottom.right.v = 75;
+                defaultPositions.top = {
+                    left: { h: 0, v: 8 },
+                    right: { h: 0, v: 8 },
+                }
+                defaultPositions.bottom = {
+                    left: { h: 0, v: 50 },
+                    right: { h: 0, v: 50 },
+                }
             }
         }
 
@@ -1354,6 +1360,8 @@ export default function (playerInstance, options) {
                 console.log('[FP Error] Invalid position for CTAText. Reverting to "bottom right"');
                 CTATextPosition = 'bottom right';
             }
+
+            ctaButton.classList.add.apply(ctaButton.classList, CTATextPosition.split(' '));
 
             positionsCTA = CTATextPosition.split(' ');
 

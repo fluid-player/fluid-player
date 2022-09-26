@@ -9,7 +9,7 @@
     <%= htmlWebpackPlugin.tags.headTags %>
     <style lang="css">
         #fluid-player-e2e-case {
-            width: 90%;
+            width: 100%;
         }
     </style>
 </head>
@@ -25,6 +25,13 @@
 
 <script>
     var instance = fluidPlayer('fluid-player-e2e-case', {
+        layoutControls: {
+            controlBar: {
+                autoHide:           true,
+                autoHideTimeout:    1,
+                animated:           true
+            },
+        },
         vastOptions: {
             adCTATextVast: true, // Enables getting CTA from the VAST tag
             adCTAText: 'CTA Text from fluid player vast options!', // Note: Will only show if VAST tag doesn't have TitleCTA

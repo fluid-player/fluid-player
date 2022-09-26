@@ -306,6 +306,11 @@
     cursor: pointer;
     z-index: 10;
     padding: 13px 21px 13px 13px;
+    max-width: 50%;
+}
+
+.fluid_ad_cta.left {
+    text-align: left;
 }
 
 .fluid_ad_cta a {
@@ -341,7 +346,7 @@
 
 /*Mobile Layout*/
 .fluid_video_wrapper.mobile .skip_button {
-    bottom: 75px;
+    bottom: 50px;
 }
 
 /*
@@ -1205,6 +1210,11 @@ _:-ms-lang(x),
 .add_icon_clickthrough {
     color: #F2C94C;
     line-height: 18px;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    display: inline-block;
 }
 
 .add_icon_clickthrough:before {
@@ -1212,7 +1222,7 @@ _:-ms-lang(x),
     height: 18px;
     width: 18px;
     top: 30px;
-    padding: 1px 22px 0 0;
+    padding: 3px 22px 0 0;
     content: "";
     background-position: -162px -57px;
 }
