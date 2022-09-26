@@ -98,8 +98,8 @@ export default function (playerInstance, options) {
 
             const subtitlesOnByDefault = playerInstance.displayOptions.layoutControls.subtitlesOnByDefault;
 
-            if ((subtitlesOnByDefault && subtitle.default ||
-                (!hasDefault && !hasSelectedSubtitle && subtitle.label !== subtitlesOff) ||
+            if (!hasSelectedSubtitle && (subtitlesOnByDefault && subtitle.default ||
+                (!hasDefault && subtitle.label !== subtitlesOff) ||
                 playerInstance.subtitlesTracks.length === 1) ||
                 !subtitlesOnByDefault && subtitle.label === subtitlesOff
             ) {
