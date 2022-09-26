@@ -170,6 +170,7 @@ const fluidPlayerClass = function () {
                 allowDownload: false,
                 playbackRateEnabled: false,
                 subtitlesEnabled: false,
+                subtitlesOnByDefault: true,
                 showCardBoardView: false,
                 showCardBoardJoystick: false,
                 allowTheatre: true,
