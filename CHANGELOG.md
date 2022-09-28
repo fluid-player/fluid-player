@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.7.0 (2022-09-28)
+* [Pull #650](https://github.com/fluid-player/fluid-player/pull/650) Play main video after preRoll ends not work
+
 ## 3.6.0 (2022-08-24)
 * [Pull #666](https://github.com/fluid-player/fluid-player/pull/666) CTA Overlay > cannot be removed by publisher
 
