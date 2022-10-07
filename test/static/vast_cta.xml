@@ -58,7 +58,7 @@
                         <PCText>CTA Text Desktop</PCText>
 
                         <!-- The link corresponds to our "Display Url" -->
-                        <Link><![CDATA[https://www.example.com]]></Link>
+                        <Link><![CDATA[https://www.example.com/advertisment?ref=1234567890!"#$%&/()=]]></Link>
 
                         <!-- The Tracking is the same as our to ClickTracking -->
                         <Tracking><![CDATA[https://www.example.com/tracking.html]]></Tracking>
