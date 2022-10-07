@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.8.0 (2022-10-07)
+* [Pull #685](https://github.com/fluid-player/fluid-player/pull/685) Fluidplayer > 'autoHide' in Desktop only works when the cursor is on top of the player.
+* [Pull #689](https://github.com/fluid-player/fluid-player/pull/689) Mobile view_ Error in console and wrong positioning of the CTA text
+
 ## 3.7.0 (2022-09-28)
 * [Pull #650](https://github.com/fluid-player/fluid-player/pull/650) Play main video after preRoll ends not work
 
