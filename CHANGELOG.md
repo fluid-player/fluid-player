@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.9.0 (2022-10-18)
+* [Pull #688](https://github.com/fluid-player/fluid-player/pull/688) Selecting subtitle by default
+
 ## 3.8.0 (2022-10-07)
 * [Pull #685](https://github.com/fluid-player/fluid-player/pull/685) Fluidplayer > 'autoHide' in Desktop only works when the cursor is on top of the player.
 * [Pull #689](https://github.com/fluid-player/fluid-player/pull/689) Mobile view_ Error in console and wrong positioning of the CTA text
