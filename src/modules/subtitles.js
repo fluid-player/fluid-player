@@ -77,7 +77,7 @@ export default function (playerInstance, options) {
 
         [].forEach.call(tracksList, function (track) {
             if (track.kind === 'metadata' && track.src) {
-                tracks.push({'label': track.label, 'url': track.src, 'lang': track.srclang});
+                tracks.push({'label': track.label, 'url': track.src, 'lang': track.srclang, 'default': track.default});
             }
         });
 
@@ -91,11 +91,23 @@ export default function (playerInstance, options) {
         subtitlesChangeList.className = 'fluid_subtitles_list';
         subtitlesChangeList.style.display = 'none';
 
-        let firstSubtitle = true;
+        let hasSelectedSubtitle = false;
+        const hasDefault = !!playerInstance.subtitlesTracks.find(track => track.default);
         playerInstance.subtitlesTracks.forEach(function (subtitle) {
+            let subtitleSelected = ''
 
-            const subtitleSelected = (firstSubtitle) ? "subtitle_selected" : "";
-            firstSubtitle = false;
+            const subtitlesOnByDefault = playerInstance.displayOptions.layoutControls.subtitlesOnByDefault;
+
+            if (!hasSelectedSubtitle && (subtitlesOnByDefault && subtitle.default ||
+                (!hasDefault && subtitle.label !== subtitlesOff) ||
+                playerInstance.subtitlesTracks.length === 1) ||
+                !subtitlesOnByDefault && subtitle.label === subtitlesOff
+            ) {
+                subtitleSelected = 'subtitle_selected';
+                playerInstance.subtitleFetchParse(subtitle);
+                hasSelectedSubtitle = true;
+            }
+
             const subtitlesChangeDiv = document.createElement('div');
             subtitlesChangeDiv.id = 'subtitle_' + playerInstance.videoPlayerId + '_' + subtitle.label;
             subtitlesChangeDiv.className = 'fluid_subtitle_list_item';
