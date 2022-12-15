@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.10.0 (2022-12-15)
+* [Pull #687](https://github.com/fluid-player/fluid-player/pull/687) LocalStorage not available in Chrome incognito mode is breaking JS
+* [Pull #704](https://github.com/fluid-player/fluid-player/pull/704) In ad serving, the skip button when is without time delay it should trigger immediately the "skip ad"
+
 ## 3.9.0 (2022-10-18)
 * [Pull #688](https://github.com/fluid-player/fluid-player/pull/688) Selecting subtitle by default
 
