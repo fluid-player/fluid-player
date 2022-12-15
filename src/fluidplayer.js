@@ -2732,7 +2732,11 @@ const fluidPlayerClass = function () {
     };
 
     self.setPersistentSettings = () => {
-        if (!(typeof (Storage) !== 'undefined' && typeof (localStorage) !== 'undefined')) {
+        try {
+            if (!(typeof (Storage) !== 'undefined' && typeof (localStorage) !== 'undefined')) {
+                return;
+            }
+        } catch (e) {
             return;
         }
 
