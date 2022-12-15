@@ -1228,9 +1228,15 @@ export default function (playerInstance, options) {
         const divSkipButton = document.createElement('div');
         divSkipButton.id = 'skip_button_' + playerInstance.videoPlayerId;
         divSkipButton.className = 'skip_button skip_button_disabled';
-        divSkipButton.innerHTML = playerInstance.displayOptions.vastOptions.skipButtonCaption.replace('[seconds]', playerInstance.vastOptions.skipoffset);
+        if (playerInstance.vastOptions.skipoffset > 0) {
+            divSkipButton.innerHTML = playerInstance.displayOptions.vastOptions.skipButtonCaption.replace('[seconds]', playerInstance.vastOptions.skipoffset);
+        }
 
         document.getElementById('fluid_video_wrapper_' + playerInstance.videoPlayerId).appendChild(divSkipButton);
+
+        if (playerInstance.vastOptions.skipoffset === 0) {
+            playerInstance.decreaseSkipOffset();
+        }
 
         playerInstance.domRef.player.addEventListener('timeupdate', playerInstance.decreaseSkipOffset, false);
     };
