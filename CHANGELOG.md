@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.11.1 (2023-01-03)
+* Update dependencies
+
 ## 3.11.0 (2023-01-03)
 * [Pull #614](https://github.com/fluid-player/fluid-player/pull/614) Add check for process being defined
 * [Pull #561](https://github.com/fluid-player/fluid-player/pull/561) Allow customizing playbackRates
