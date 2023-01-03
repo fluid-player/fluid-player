@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.11.0 (2023-01-03)
+* [Pull #614](https://github.com/fluid-player/fluid-player/pull/614) Add check for process being defined
+* [Pull #561](https://github.com/fluid-player/fluid-player/pull/561) Allow customizing playbackRates
+
 ## 3.10.0 (2022-12-15)
 * [Pull #687](https://github.com/fluid-player/fluid-player/pull/687) LocalStorage not available in Chrome incognito mode is breaking JS
 * [Pull #704](https://github.com/fluid-player/fluid-player/pull/704) In ad serving, the skip button when is without time delay it should trigger immediately the "skip ad"
