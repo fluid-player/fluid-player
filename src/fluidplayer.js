@@ -2522,6 +2522,15 @@ const fluidPlayerClass = function () {
         sourceChangeList.className = 'fluid_video_playback_rates';
         sourceChangeList.style.display = 'none';
 
+        if (
+            !Array.isArray(self.displayOptions.layoutControls.controlBar.playbackRates)
+            || self.displayOptions.layoutControls.controlBar.playbackRates.some(
+                rate => typeof rate !== 'string' || Number.isNaN(rate.replace('x', ''))
+            )
+        ) {
+            self.displayOptions.layoutControls.controlBar.playbackRates = ['x2', 'x1.5', 'x1', 'x0.5'];
+        }
+
         self.displayOptions.layoutControls.controlBar.playbackRates.forEach(function (rate) {
             const sourceChangeDiv = document.createElement('div');
             sourceChangeDiv.className = 'fluid_video_playback_rates_item';
