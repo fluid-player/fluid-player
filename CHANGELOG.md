@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.12.0 (2023-01-10)
+* [Pull #707](https://github.com/fluid-player/fluid-player/pull/707) Decrease volumes & revenue on In-stream zones
+
 ## 3.11.1 (2023-01-03)
 * Update dependencies
 
