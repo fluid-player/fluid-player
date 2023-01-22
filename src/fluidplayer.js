@@ -167,7 +167,7 @@ const fluidPlayerClass = function () {
                 mute: false,
                 loop: null,
                 keyboardControl: true,
-                allowDownload: false,
+                allowDownload: true,
                 playbackRateEnabled: false,
                 subtitlesEnabled: false,
                 subtitlesOnByDefault: true,
