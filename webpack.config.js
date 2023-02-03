@@ -75,7 +75,8 @@ module.exports = (env, argv) => {
             plugins.push(new HtmlWebpackPlugin({
                 template: path.resolve(__dirname, 'test/html/', file),
                 inject: false,
-                filename: publicName
+                filename: publicName,
+                scriptLoading: "blocking",
             }));
 
             caseFiles.push({
@@ -96,17 +97,18 @@ module.exports = (env, argv) => {
 
         // Copy static assets for E2E
         plugins.push(new CopyPlugin(
-            [
-                {from: path.resolve(__dirname, 'test/static/'), to: path.resolve(wpDistOptions.path, 'static')}
-            ]
+            {
+                patterns: [
+                    { from: path.resolve(__dirname, 'test/static/'), to: path.resolve(wpDistOptions.path, 'static') }
+                ]
+            }
         ));
     }
 
     return {
         devServer: {
-            contentBase: wpDistOptions.path,
-            index: 'index.html',
-            watchContentBase: true,
+            static: wpDistOptions.path,
+            // index: 'index.html',
             // disableHostCheck: true, // To use with remote hosting (ie: ngrok)
         },
         devtool: wpMode === 'development' ? 'source-map' : false,
@@ -140,9 +142,9 @@ module.exports = (env, argv) => {
                     use: ['style-loader', 'css-loader'],
                 },
                 {
-                    test: /\.svg$/,
-                    loader: 'svg-url-loader'
-                }
+                    test: /\.svg/,
+                    type: 'asset'
+                },
             ],
         }
     };
