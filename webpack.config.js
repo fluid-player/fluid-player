@@ -44,7 +44,7 @@ const getDistOptions = (mode) => {
 // Webpack configuration
 module.exports = (env, argv) => {
     const wpMode = typeof argv.mode !== 'undefined' ? argv.mode : 'development';
-    const wpDebug = wpMode === 'development' && typeof argv.debug !== 'undefined' && !!argv.debug;
+    const wpDebug = wpMode === 'development' && typeof env.debug !== 'undefined' && !!env.debug;
     const wpDist = typeof argv.dist !== 'undefined' ? argv.dist : 'development';
     const wpDistOptions = getDistOptions(wpDist);
 
