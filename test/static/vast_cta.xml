@@ -16,6 +16,9 @@
                             <ClickThrough id="1">
                                 <![CDATA[ http://www.example.com ]]>
                             </ClickThrough>
+                            <ClickTracking>
+                                <![CDATA[ http://www.example.com/click-tracking ]]>
+                            </ClickTracking>
                         </VideoClicks>
                         <TrackingEvents>
                             <Tracking event="start">http://www.example.com/start</Tracking>

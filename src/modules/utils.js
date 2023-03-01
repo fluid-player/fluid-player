@@ -1,4 +1,3 @@
-'use strict';
 export default function (playerInstance, options) {
     playerInstance.isTouchDevice = () => {
         return !!('ontouchstart' in window        // works on most browsers

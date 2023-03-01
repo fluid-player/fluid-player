@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VAST version="3.0">
+  <Ad id="5611946">
+    <InLine>
+      <AdSystem>ExoClick</AdSystem>
+      <AdTitle/>
+      <Impression id="exotr"><![CDATA[https://syndication.realsrv.com/vregister.php?a=vimp&tracking_event=impression&idzone=4889452&79b3903948aa63b85b214ad74c9f335c=tsVuZ8uHLnt4ctvHhq48fXLp65eddlTlK8E.fjzu48em7r33ceHjW1NZLXThmYchrgbjYlesYecz6cddUFbi781VcrEjmdblVe5qaTXA2w3a5TXBU5Tn388.nfprgbnsZjgqfcpz7.efTv01wN1QVuZ.evnn26a4G8ZpXM.njx56deWuBtpitx6anDPrw8a4G2mJJ2IHpc.vbjx89O2uBu1imBiuCaXPv55ee3fn41wNzVZ8euuBtmma6pynPlrgbbctgacz4a4G2mKaYHKc.GuBuCqfPjy88tdVjOfDXaxHY5ny1z2MxwVPuUr0sVuZ8eHDXPYzHBU.5Su1ZTS5K1hmCidraYknYgelXasppclawzBRO1uXtPsSvOL1zLz2MxwVPuU58dbl7T7Erzi9cy8rld01MWfHdw8cvOthtevCdzPj41uzUyMV564G5XK7pqYs.OtqayWunBeamB6CViPMw5DW_XXOveu7NTcxS242u7NTnrgbnpmbsarXaYrcempwz68tc9MDUEry8kzbkefTW_XXPVnx11NUuOSr0uVTR2VwTS567KnKV4G8.3Pg5x4dOfTr46dO27j189OHPp448O_blx8dvPnXZTGu.xU_m304t.Gm_Ph3hwZ5cOjnnxw4efPhxp3x05d3NcEk9LlVUE0q9VbFdlWfHXBJPS5VVBNKvBLaxHA2vS4xVNLnw10uOuUuUr1QVuLvzVVysSOZ62G2Y5mos.GuBuZ11ynPhrgbjYlbgleXnYecz4a3L3GrK4JpV64JHM.G7hx1wNtsVsNOS1uU58tcDbTFNMDlK9U1lLTmfDXLNU1TBPXnw1wStTPSwVzLyTNuZ8NdblVa8kzbmfDXS49BNKu85NKxI4vA3ny78.vnpx1z0zX4L1VsV2VZ7eOuBudimuVynPhragrwXecmlYkcXgbz5d.fXz0565XK2GrIK8F56Zr8F68J3M9crlbDVkFeC89M1.C7blTVME9cE0uethtmOZqJe1ynPXBJPS5VVBNKuxHGvBLaxHA2vS4xVNLVnw11WM8s.Guqxnnnw11NUwT1r14TuZ66mqYJ615WJHM9dTVME9a9rlOetmma6pyle1ynPhrtpz4a4Ja3KZWI8.OuWZd2yVurPhrgbpcqnmlqgtcXjYwmsrz4a4G5LI64MZpXM.GuypyldpieeCV7PhrsqcpXaYnngleXdpcosclawz4a3JGII14Kp8.GupqmCetdtytiCPPtrqapgnrXtcpqgmlz462bKY89dtlkDefHt37cOnbl288fHTzw78OPHl25uduzrLbfHpwb11wSOVVsST58e3ftw6duXbzrammigcamlqclrz4w]]></Impression>
+      <Error><![CDATA[https://syndication.realsrv.com/vregister.php?a=vview&errorcode=[ERRORCODE]&idzone=4889452&dg=5611946-PRT-79296738-2-0-0-InLine]]></Error>
+      <Creatives>
+        <Creative sequence="1" id="79296738">
+          <Linear>
+            <Duration>00:00:05.80</Duration>
+            <TrackingEvents>
+              <Tracking id="prog_1" event="progress" offset="00:00:10.000"><![CDATA[https://syndication.realsrv.com/vregister.php?a=vview&tracking_event=progress&progress=00:00:10.000&idzone=4889452&79b3903948aa63b85b214ad74c9f335c=tsVuZ8uHLnt4ctvHhq48fXLp65eddlTlK8E.fjzu48em7r33ceHjW1NZLXThmYchrgbjYlesYecz6cddUFbi781VcrEjmdblVe5qaTXA2w3a5TXBU5Tn388.nfprgbnsZjgqfcpz7.efTv01wN1QVuZ.evnn26a4G8ZpXM.njx56deWuBtpitx6anDPrw8a4G2mJJ2IHpc.vbjx89O2uBu1imBiuCaXPv55ee3fn41wNzVZ8euuBtmma6pynPlrgbbctgacz4a4G2mKaYHKc.GuBuCqfPjy88tdVjOfDXaxHY5ny1z2MxwVPuUr0sVuZ8eHDXPYzHBU.5Su1ZTS5K1hmCidraYknYgelXasppclawzBRO1uXtPsSvOL1zLz2MxwVPuU58dbl7T7Erzi9cy8rld01MWfHdw8cvOthtevCdzPj41uzUyMV564G5XK7pqYs.OtqayWunBeamB6CViPMw5DW_XXOveu7NTcxS242u7NTnrgbnpmbsarXaYrcempwz68tc9MDUEry8kzbkefTW_XXPVnx11NUuOSr0uVTR2VwTS567KnKV4G8.3Pg5x4dOfTr46dO27j189OHPp448O_blx8dvPnXZTGu.xU_m304t.Gm_Ph3hwZ5cOjnnxw4efPhxp3x05d3NcEk9LlVUE0q9VbFdlWfHXBJPS5VVBNKvBLaxHA2vS4xVNLnw10uOuUuUr1QVuLvzVVysSOZ62G2Y5mos.GuBuZ11ynPhrgbjYlbgleXnYecz4a7YG3Jl3LXJa89blNM1LUzbmeuBttithpyWtynPlrgbaYppgcpXqmspacz4a5ZqmqYJ68.GuCVqZ6WCuZeSZtzPhrrcqrXkmbcz4a6XHoJpV3nJpWJHF4G8.Xfn189OOuema_BeqtiuyrPbx1wNzsU1yuU58NbUFeC7zk0rEji8DefLvz6.enPXK5Ww1ZBXgvPTNfgvXhO5nrlcrYasgrwXnpmvwXbcqapgnrgmlz1sNsxzNRL2uU564JJ6XKqoJpV2I414JbWI4G16XGKppas.Guqxnlnw11WM88.GupqmCetevCdzPXU1TBPWvKxI5nrqapgnrXtcpz1s0zXVOUr2uU58NdtOfDXBLW5TKxHnx1yzLu2St1Z8NcDdLlU80tUFri8bGE1lefDXA3JZHXBjNK5nw1uSMQRrwVT58NdTVME9a7blbEEefbXU1TBPWva5TVBNLnx122WQN58e3ftw6duXbzx79uXXzx58OPbm527Ostt8HWu2uuCRyqtiSfPj279uHTty7edbU00UDjU0tTktefG]]></Tracking>
+            </TrackingEvents>
+            <VideoClicks>
+              <ClickThrough><![CDATA[https://syndication.realsrv.com/click.php?data=H4sIAAAAAAAAAz1OOU4EQQx8zaYt213ttkMSEgLesJpDJAikHRHV4_EsaFSWz3LZw1UTThMRfhzH9.PWX272WnZsj6MtX5.kUH26wM2TVzuyqaKN2VSCMy199iAiEsM4qkkojTpKQUgt0LtsKugYAXjTkZCOUJluGp5JtbSTLHyuVXgWJ2z24uuVdZ6cOvY_r0eJi.1_IvwB39.4me2br8vcZYfIDLmXW1bEeh_o.gtoURdHCgEAAA--]]></ClickThrough>
+            </VideoClicks>
+            <MediaFiles>
+              <MediaFile delivery="progressive" type="video/mp4"><![CDATA[https://u3y8v8u4.aucdn.net/library/793474/33477efa0fef0a341a69d8b5da0e797d5cc9614f.mp4]]></MediaFile>
+            </MediaFiles>
+            <Icons>
+              <Icon>
+                <IconClicks>
+                  <IconClickThrough>test.com</IconClickThrough>
+                </IconClicks>
+              </Icon>
+            </Icons>
+          </Linear>
+        </Creative>
+      </Creatives>
+      <Extensions>
+        <Extension>
+          <TitleCTA>
+            <MobileText>View More</MobileText>
+            <PCText>View More</PCText>
+            <DisplayUrl><![CDATA[]]></DisplayUrl>
+            <Tracking><![CDATA[https://syndication.realsrv.com/click.php?data=H4sIAAAAAAAAAz1OOU4EQQx8zaYt213ttkMSEgLesJpDJAikHRHV4_EsaFSWz3LZw1UTThMRfhzH9.PWX272WnZsj6MtX5.kUH26wM2TVzuyqaKN2VSCMy199iAiEsM4qkkojTpKQUgt0LtsKugYAXjTkZCOUJluGp5JtbSTLHyuVXgWJ2z24uuVdZ6cOvY_r0eJi.1_IvwB39.4me2br8vcZYfIDLmXW1bEeh_o.gtoURdHCgEAAA--]]></Tracking>
+          </TitleCTA>
+        </Extension>
+      </Extensions>
+    </InLine>
+  </Ad>
+  <Ad id="5562582">
+    <Wrapper fallbackOnNoAd="1">
+      <AdSystem>ExoClick</AdSystem>
+      <VASTAdTagURI><![CDATA[https://test.com]]></VASTAdTagURI>
+      <Impression id="exotr"><![CDATA[https://syndication.realsrv.com/vregister.php?a=vimp&tracking_event=impression&idzone=4889452&79b3903948aa63b85b214ad74c9f335c=tsVuZ8uHLnt4ctvHhq48fXLp65eddlTlK8E.fjzu48em7r33ceHjW1NZLXThmYchrgbjYlesYecz6cddUFbi781VcrEjmdblVe5qaTXA2w3a5TXBU5Tn388.nfprgbnsZjgqfcpz7.efTv01wN1QVuZ.evnn26a4G8ZpXM.njx56deWuBtpitx6anDPrw8a4G2mJJ2IHpc.vXty6.OWuBu1imBiuCaXPv46d.vfr01wNzVZ8euuBtmma6pynPlrgbbctgacz4a4G2mKaYHKc.GuBuCqfPjy88tdVjOfDXaxHY5nw3ce3Dt389uvbp37.fGuexmOCp9ylelitzPjw4a57GY4Kn3KV2rKaXJWsMwUTtbTEk7ED0q7VlNLkrWGYKJ2ty9p9iV5xeuZeexmOCp9ynPjrcvafYlecXrmXlcrumpiz47uHjl51sNr14TuZ8fGt2amRivPXA3K5XdNTFnx1tTWS104LzUwPQSsR5mHIa36651713ZqbmKW3G13Zqc9cDc9MzdjVa7TFbj01OGfXlrnpgagleXkmbcjz6a36656s.OupqlxyVelyqaOyuCaXPXZU5SvA3n258HOPDpz6dfHTp23cevnpw59PHHh37cuPjt5867KY132Kn82.nFvw0358O8ODPLh0c8.OHDz58ONO.OnLu5rgknpcqqgmlXqrYrsqz464JJ6XKqoJpV4JbWI4G16XGKppc.Gulx1ylyleqCtxd.aquViRzPWw2zHM1Fnw1wNzOuuU58NcDcbErcEry87DzmfDW5e41ZXBNKvXBI5nw3cOOuBttithpyWtynPlrgbaYppgcpXqmspacz4a5ZqmqYJ68.GuCVqZ6WCuZeSZtzPhrrcqrXkmbcz4a6XHoJpV3nJpWJHF4G8.Xfn189OOuema_BeqtiuyrPbx1wNzsU1yuU58NbUFeC7zk0rEji8DefLvz6.enPXK5Ww1ZBXgvPTNfgvXhO5nrlcrYasgrwXnpmvwXbcqapgnrgmlz1sNsxzNRL2uU564JJ6XKqoJpV2I414JbWI4G16XGKppas.Guqxnlnw11WM88.GupqmCetevCdzPXU1TBPWvKxI5nrqapgnrXtcpz1s0zXVOUr2uU58NdtOfDXBLW5TKxHnx1yzLu2St1Z8NcDdLlU80tUFri8bGE1lefDXA3JZHXBjNK5nw12VOUrtMTzwSvZ8NdlTlK7TE88Ery7tLlFjkrWGfDW5IxBGvBVPnw11NUwT1rtuVsQR59tdTVME9a9rlNUE0ufHWzZTHnrtssgbz49u_bh07cu3nj35eeXjp44ce3Nzt2dZbb4.O7WuuCRyqtiSfPj279uHTty7edbU00UDjU0tTktefGA--]]></Impression>
+      <Error><![CDATA[https://syndication.realsrv.com/vregister.php?a=vview&errorcode=[ERRORCODE]&idzone=4889452&dg=5562582--78475754-2-0-1-Wrapper]]></Error>
+      <Creatives>
+        <Creative sequence="1" id="78475754">
+          <Linear>
+            <TrackingEvents>
+              <Tracking id="prog_1" event="progress" offset="00:00:10.000"><![CDATA[https://syndication.realsrv.com/vregister.php?a=vview&tracking_event=progress&progress=00:00:10.000&idzone=4889452&79b3903948aa63b85b214ad74c9f335c=tsVuZ8uHLnt4ctvHhq48fXLp65eddlTlK8E.fjzu48em7r33ceHjW1NZLXThmYchrgbjYlesYecz6cddUFbi781VcrEjmdblVe5qaTXA2w3a5TXBU5Tn388.nfprgbnsZjgqfcpz7.efTv01wN1QVuZ.evnn26a4G8ZpXM.njx56deWuBtpitx6anDPrw8a4G2mJJ2IHpc.vXty6.OWuBu1imBiuCaXPv46d.vfr01wNzVZ8euuBtmma6pynPlrgbbctgacz4a4G2mKaYHKc.GuBuCqfPjy88tdVjOfDXaxHY5nw3ce3Dt389uvbp37.fGuexmOCp9ylelitzPjw4a57GY4Kn3KV2rKaXJWsMwUTtbTEk7ED0q7VlNLkrWGYKJ2ty9p9iV5xeuZeexmOCp9ynPjrcvafYlecXrmXlcrumpiz47uHjl51sNr14TuZ8fGt2amRivPXA3K5XdNTFnx1tTWS104LzUwPQSsR5mHIa36651713ZqbmKW3G13Zqc9cDc9MzdjVa7TFbj01OGfXlrnpgagleXkmbcjz6a36656s.OupqlxyVelyqaOyuCaXPXZU5SvA3n258HOPDpz6dfHTp23cevnpw59PHHh37cuPjt5867KY132Kn82.nFvw0358O8ODPLh0c8.OHDz58ONO.OnLu5rgknpcqqgmlXqrYrsqz464JJ6XKqoJpV4JbWI4G16XGKppc.Gulx1ylyleqCtxd.aquViRzPWw2zHM1Fnw1wNzOuuU58NcDcbErcEry87DzmfDXbA25Mu5a5LXnrcppmpambcz1wNtsVsNOS1uU58tcDbTFNMDlK9U1lLTmfDXLNU1TBPXnw1wStTPSwVzLyTNuZ8NdblVa8kzbmfDXS49BNKu85NKxI4vA3ny78.vnpx1z0zX4L1VsV2VZ7eOuBudimuVynPhragrwXecmlYkcXgbz5d.fXz0565XK2GrIK8F56Zr8F68J3M9crlbDVkFeC89M1.C7blTVME9cE0uethtmOZqJe1ynPXBJPS5VVBNKuxHGvBLaxHA2vS4xVNLVnw11WM8s.Guqxnnnw11NUwT1r14TuZ66mqYJ615WJHM9dTVME9a9rlOetmma6pyle1ynPhrtpz4a4Ja3KZWI8.OuWZd2yVurPhrgbpcqnmlqgtcXjYwmsrz4a4G5LI64MZpXM.GtyRiCNeCqfPhrqapgnrXbcrYgjz7a6mqYJ617XKaoJpc.Ou2yyBvPj279uHTty7ee_bhy6cuffh25uduzrLbfHs1x11wSOVVsST58e3ftw6duXbzrammigcamlqclrz4wA--]]></Tracking>
+            </TrackingEvents>
+            <VideoClicks>
+              <ClickTracking><![CDATA[https://syndication.realsrv.com/click.php?data=H4sIAAAAAAAAAz1Qy04EQQj8mr12gOZ59OLFg9.gY0.8GE124qk.XmbXbCCBFEUVwczFUsBOw6PcXCMq8XkcP9fLfLrIc.exrsfYvr8AamY4qYsXHnDWYNZhMZgSkRoWptDMUhNYg1BG21grEMAd8EmLSadaqvpgK6WpyRQunF4FlpKTTLitdWmNeycxm8.PbuLktNn_vA.F3lbP8LsIfhWvL9B92Yx8_yDhpbHR6hfEtnIv3zd6.wPZQSJcFQEAAA--&noredirect=1]]></ClickTracking>
+            </VideoClicks>
+          </Linear>
+        </Creative>
+      </Creatives>
+      <Extensions>
+        <Extension type="waterfall" fallback_index="1">
+          <Extension/>
+        </Extension>
+      </Extensions>
+    </Wrapper>
+  </Ad>
+</VAST>

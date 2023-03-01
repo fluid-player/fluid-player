@@ -108,7 +108,7 @@ const fluidPlayerClass = function () {
         self.isTimer = false;
         self.timer = null;
         self.timerPool = {};
-        self.adList = {};
+        self.rollsById = {};
         self.adPool = {};
         self.adGroupedByRolls = {};
         self.onPauseRollAdPods = [];
@@ -532,6 +532,39 @@ const fluidPlayerClass = function () {
         self.displayOptions.onBeforeXMLHttpRequest(xmlHttpReq);
 
         xmlHttpReq.send();
+    };
+
+    /**
+     *
+     * @param url
+     * @param withCredentials
+     * @param timeout
+     * @returns {Promise<unknown>}
+     */
+    self.sendRequestAsync = async (url, withCredentials, timeout) => {
+        return await new Promise((resolve, reject) => {
+            const xmlHttpReq = new XMLHttpRequest();
+
+            xmlHttpReq.onreadystatechange = (event) => {
+                const response = event.target;
+
+                if (response.readyState === 4 && response.status >= 200 && response.status < 300) {
+                    resolve(response);
+                } else if (response.readyState === 4) {
+                    reject(response);
+                }
+            };
+
+            self.displayOptions.onBeforeXMLHttpRequestOpen(xmlHttpReq);
+
+            xmlHttpReq.open('GET', url, true);
+            xmlHttpReq.withCredentials = withCredentials;
+            xmlHttpReq.timeout = timeout;
+
+            self.displayOptions.onBeforeXMLHttpRequest(xmlHttpReq);
+
+            xmlHttpReq.send();
+        })
     };
 
     // TODO: rename
@@ -1311,16 +1344,16 @@ const fluidPlayerClass = function () {
         const ids = [];
         ids.length = 0;
 
-        if (!roll || !self.hasOwnProperty('adList')) {
+        if (!roll || !self.hasOwnProperty('rollsById')) {
             return;
         }
 
-        for (let key in self.adList) {
-            if (!self.adList.hasOwnProperty(key)) {
+        for (let key in self.rollsById) {
+            if (!self.rollsById.hasOwnProperty(key)) {
                 continue;
             }
 
-            if (self.adList[key].roll === roll) {
+            if (self.rollsById[key].roll === roll) {
                 ids.push(key);
             }
         }
