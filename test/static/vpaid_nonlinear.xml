@@ -26,7 +26,7 @@
 						</TrackingEvents>
 						<NonLinear apiFramework="VPAID" width="480" height="90" id="overlay-1">
 							<AdParameters>
-								<![CDATA[{"overlays":["https://googleads.github.io/googleads-ima-html5/media/NonLinearVpaid.png"], "videos":[ {"url":"https://googleads.github.io/googleads-ima-html5/media/LinearVPAIDCreative.mp4","mimetype":"video/mp4"}]} ]]>
+								<![CDATA[{"overlays":["https://googleads.github.io/googleads-ima-html5/media/NonLinearVpaid.png"], "videos":[ {"url":"https://iab-publicfiles.s3.amazonaws.com/vast/VAST-4.0-Short-Intro.mp4","mimetype":"video/mp4"}]} ]]>
 							</AdParameters>
 							<StaticResource creativeType="application/javascript">
 								<![CDATA[https://googleads.github.io/googleads-ima-html5/vpaid/nonlinear/VpaidNonLinear.js]]>

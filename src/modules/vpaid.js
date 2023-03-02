@@ -224,7 +224,7 @@ export default function (playerInstance, options) {
             return;
         }
 
-        playerInstance.backupMainVideoContentTime(adListId);
+        playerInstance.backupMainVideoContentTime(adListId.split('_')[0]);
         playerInstance.isCurrentlyPlayingAd = true;
 
         if (closeBtn) {
