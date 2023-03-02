@@ -535,21 +535,20 @@ export default function (playerInstance, options) {
             return;
         }
 
-        const creativeElements = Array.from(adElement.getElementsByTagName('Creative'));
+        // Current support is for one creative element
+        const creativeElements = Array.from(adElement.getElementsByTagName('Creative')).splice(0, 1);
 
-        if ((typeof creativeElements !== 'undefined') && creativeElements.length) {
+        if (creativeElements.length) {
             creativeElements.forEach(creativeElement => {
-                const linearCreatives = creativeElement.getElementsByTagName('Linear');
 
-                if ((typeof linearCreatives !== 'undefined') && (linearCreatives !== null) && linearCreatives.length) {
-
+                if (ad.adType === 'linear') {
+                    const linearCreatives = creativeElement.getElementsByTagName('Linear');
                     const creativeLinear = linearCreatives[0];
 
                     //Extract the Ad data if it is actually the Ad (!wrapper)
                     if (!playerInstance.hasVastAdTagUri(adElement) && playerInstance.hasInLine(adElement)) {
                         //Set initial values
                         ad.adFinished = false;
-                        ad.adType = 'linear';
                         ad.vpaid = false;
 
                         //Extract the necessary data from the Linear node
@@ -566,16 +565,13 @@ export default function (playerInstance, options) {
                     }
                 }
 
-                const arrayCreativeNonLinears = creativeElement.getElementsByTagName('NonLinearAds');
-
-                if ((typeof arrayCreativeNonLinears !== 'undefined') && (arrayCreativeNonLinears !== null) && arrayCreativeNonLinears.length) {
-
-                    const creativeNonLinear = arrayCreativeNonLinears[0];
+                if (ad.adType === 'nonLinear') {
+                    const nonLinearCreatives = creativeElement.getElementsByTagName('NonLinearAds');
+                    const creativeNonLinear = nonLinearCreatives[0];
 
                     //Extract the Ad data if it is actually the Ad (!wrapper)
                     if (!playerInstance.hasVastAdTagUri(adElement) && playerInstance.hasInLine(adElement)) {
                         //Set initial values
-                        ad.adType = 'nonLinear';
                         ad.vpaid = false;
 
                         //Extract the necessary data from the NonLinear node
@@ -880,6 +876,9 @@ export default function (playerInstance, options) {
     function registerAdProperties(rawAd, options) {
         const ad = { ...rawAd, ...JSON.parse(JSON.stringify(options)) };
 
+        ad.adType = (ad.data.getElementsByTagName('Linear').length && 'linear') ||
+            (ad.data.getElementsByTagName('NonLinearAds').length && 'nonLinear') || 'unknown';
+
         [...(ad.wrappers || []), ad.data].filter(Boolean).forEach(dataSource => {
             // Register impressions
             const impression = dataSource.getElementsByTagName('Impression');
@@ -901,7 +900,9 @@ export default function (playerInstance, options) {
 
             // Register tracking events
             playerInstance.registerTrackingEvents(dataSource, ad);
-            const clickTracks = playerInstance.getClickTrackingEvents(dataSource);
+            const clickTracks = ad.type === 'linear' ?
+                playerInstance.getClickTrackingEvents(dataSource) :
+                playerInstance.getNonLinearClickTrackingEvents(dataSource);
             playerInstance.registerClickTracking(clickTracks, ad);
         });
 
