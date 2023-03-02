@@ -489,7 +489,7 @@ export default function (playerInstance, options) {
                 playerInstance.tempVpaidCounter++;
                 if (playerInstance.tempVpaidCounter >= 20) {
                     clearInterval(playerInstance.getVPAIDAdInterval);
-                    playerInstance.rollsById[rollListId].error = true;
+                    playerInstance.rollsById[ad.rollListId].error = true;
                     playerInstance.playMainVideoWhenVpaidFails(403);
                     return false;
                 } else {

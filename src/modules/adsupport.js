@@ -436,8 +436,8 @@ export default function (playerInstance, options) {
     };
 
     // ADS
-    playerInstance.completeNonLinearStatic = (adListId) => {
-        playerInstance.closeNonLinear(adListId);
+    playerInstance.completeNonLinearStatic = (ad) => {
+        playerInstance.closeNonLinear(ad.id);
         if (playerInstance.adFinished === false) {
             playerInstance.adFinished = true;
             playerInstance.trackSingleEvent('complete');
@@ -449,23 +449,24 @@ export default function (playerInstance, options) {
     /**
      * Show up a nonLinear static creative
      */
-    playerInstance.createNonLinearStatic = (rollListId) => {
-        if (!playerInstance.adPool.hasOwnProperty(rollListId) || playerInstance.adPool[rollListId].error === true) {
-            playerInstance.announceLocalError(101);
-            return;
-        }
+    playerInstance.createNonLinearStatic = (ad) => {
+        // TODO ???? Probably no use for this with the new ad format
+        // if (!playerInstance.adPool.hasOwnProperty(rollListId) || playerInstance.adPool[rollListId].error === true) {
+        //     playerInstance.announceLocalError(101);
+        //     return;
+        // }
 
         //get the proper ad
-        playerInstance.vastOptions = playerInstance.adPool[rollListId];
-        playerInstance.createBoard(rollListId);
-        if (playerInstance.rollsById[rollListId].error === true) {
+        playerInstance.vastOptions = ad;
+        playerInstance.createBoard(ad);
+        if (playerInstance.rollsById[ad.rollListId].error === true || ad.error === true) {
             return;
         }
         playerInstance.adFinished = false;
-        let duration;
+        let duration = (playerInstance.rollsById[ad.rollListId].nonLinearDuration) ? playerInstance.rollsById[ad.rollListId].nonLinearDuration : false;
         if (!playerInstance.vastOptions.vpaid) {
             playerInstance.trackSingleEvent('start');
-            duration = (playerInstance.rollsById[rollListId].nonLinearDuration) ? playerInstance.rollsById[rollListId].nonLinearDuration : playerInstance.vastOptions.duration;
+            duration = duration || playerInstance.vastOptions.duration;
 
             playerInstance.nonLinearTracking = setInterval(function () {
                 if (playerInstance.adFinished === true) {
@@ -481,15 +482,13 @@ export default function (playerInstance, options) {
         }
 
         const time = parseInt(playerInstance.getCurrentTime()) + parseInt(duration);
-        playerInstance.scheduleTask({time: time, closeStaticAd: rollListId});
+        playerInstance.scheduleTask({ time: time, closeStaticAd: ad, rollListId: ad.rollListId }); // TODO check this event
     };
 
     // ADS
-    playerInstance.createVpaidNonLinearBoard = (adListId) => {
+    playerInstance.createVpaidNonLinearBoard = (ad) => {
         // create iframe
         // pass the js
-
-        const vastSettings = playerInstance.adPool[adListId];
 
         playerInstance.loadVpaidNonlinearAssets = function (ad) {
 
@@ -514,9 +513,9 @@ export default function (playerInstance, options) {
                 const dimensions = ad.size.split('x');
                 adWidth = dimensions[0];
                 adHeight = dimensions[1];
-            } else if (vastSettings.dimension.width && vastSettings.dimension.height) {
-                adWidth = vastSettings.dimension.width;
-                adHeight = vastSettings.dimension.height;
+            } else if (ad.dimension.width && ad.dimension.height) {
+                adWidth = ad.dimension.width;
+                adHeight = ad.dimension.height;
             }
 
             slotWrapper.style.width = '100%';
@@ -611,27 +610,25 @@ export default function (playerInstance, options) {
             playerInstance.adFinished = false;
         };
 
-        playerInstance.loadVpaid(adListId, vastSettings.staticResource);
+        playerInstance.loadVpaid(ad, ad.staticResource);
 
         playerInstance.debugMessage('create non linear vpaid');
     };
 
     // ADS
-    playerInstance.createNonLinearBoard = (rollListId) => {
-        const vastSettings = playerInstance.adPool[rollListId];
-
-        playerInstance.rollsById[rollListId].played = true;
+    playerInstance.createNonLinearBoard = (ad) => {
+        ad.played = true;
         const playerWidth = playerInstance.domRef.player.clientWidth;
-        const playerHeight = playerInstance.domRef.player.clientHeight;
+        const playerHeight = playerInstance.domRef.player.clientHeight; // TODO remove this ?
         const board = document.createElement('div');
-        const vAlign = (playerInstance.rollsById[rollListId].vAlign) ? playerInstance.rollsById[rollListId].vAlign : playerInstance.nonLinearVerticalAlign;
+        const vAlign = (playerInstance.rollsById[ad.rollListId].vAlign) ? playerInstance.rollsById[ad.rollListId].vAlign : playerInstance.nonLinearVerticalAlign;
 
         const creative = new Image();
-        creative.src = vastSettings.staticResource;
-        creative.id = 'fluid_nonLinear_imgCreative_' + rollListId + '_' + playerInstance.videoPlayerId;
+        creative.src = ad.staticResource;
+        creative.id = 'fluid_nonLinear_imgCreative_' + ad.id + '_' + playerInstance.videoPlayerId;
 
         creative.onerror = function () {
-            playerInstance.rollsById[rollListId].error = true;
+            playerInstance.rollsById[ad.rollListId].error = true;
             playerInstance.announceError(500);
         };
 
@@ -645,12 +642,12 @@ export default function (playerInstance, options) {
             // 1. adList -> roll -> size
             // 2. VAST XML width/height attriubute (VAST 3.)
             // 3. VAST XML static resource dimension
-            if (typeof playerInstance.rollsById[rollListId].size !== 'undefined') {
-                origWidth = playerInstance.rollsById[rollListId].size.split('x')[0];
-                origHeight = playerInstance.rollsById[rollListId].size.split('x')[1];
-            } else if (vastSettings.dimension.width && vastSettings.dimension.height) {
-                origWidth = vastSettings.dimension.width;
-                origHeight = vastSettings.dimension.height;
+            if (typeof playerInstance.rollsById[ad.rollListId].size !== 'undefined') {
+                origWidth = playerInstance.rollsById[ad.rollListId].size.split('x')[0];
+                origHeight = playerInstance.rollsById[ad.rollListId].size.split('x')[1];
+            } else if (ad.dimension.width && ad.dimension.height) {
+                origWidth = ad.dimension.width;
+                origHeight = ad.dimension.height;
             } else {
                 origWidth = creative.width;
                 origHeight = creative.height;
@@ -664,9 +661,9 @@ export default function (playerInstance, options) {
                 newBannerHeight = origHeight;
             }
 
-            if (playerInstance.rollsById[rollListId].roll !== 'onPauseRoll') {
+            if (playerInstance.rollsById[ad.rollListId].roll !== 'onPauseRoll') {
                 //Show the board only if media loaded
-                document.getElementById('fluid_nonLinear_' + rollListId).style.display = '';
+                document.getElementById('fluid_nonLinear_' + ad.id).style.display = '';
             }
 
             const img = document.getElementById(creative.id);
@@ -676,7 +673,7 @@ export default function (playerInstance, options) {
             playerInstance.trackSingleEvent('impression');
         };
 
-        board.id = 'fluid_nonLinear_' + rollListId;
+        board.id = 'fluid_nonLinear_' + ad.id;
         board.className = 'fluid_nonLinear_' + vAlign;
         board.className += ' fluid_nonLinear_ad';
         board.innerHTML = creative.outerHTML;
@@ -684,17 +681,17 @@ export default function (playerInstance, options) {
 
         //Bind the Onclick event
         board.onclick = function () {
-            if (typeof vastSettings.clickthroughUrl !== 'undefined') {
-                window.open(vastSettings.clickthroughUrl);
+            if (typeof ad.clickthroughUrl !== 'undefined') {
+                window.open(ad.clickthroughUrl);
             }
 
             //Tracking the NonLinearClickTracking events
-            if (typeof vastSettings.clicktracking !== 'undefined') {
-                playerInstance.callUris([vastSettings.clicktracking]);
+            if (typeof ad.clicktracking !== 'undefined') {
+                playerInstance.callUris([ad.clicktracking]);
             }
         };
 
-        if (typeof vastSettings.clickthroughUrl !== 'undefined') {
+        if (typeof ad.clickthroughUrl !== 'undefined') {
             board.style.cursor = 'pointer';
         }
 
@@ -703,7 +700,7 @@ export default function (playerInstance, options) {
         closeBtn.className = 'close_button';
         closeBtn.innerHTML = '';
         closeBtn.title = playerInstance.displayOptions.layoutControls.closeButtonCaption;
-        const tempRollListId = rollListId;
+        const tempRollListId = ad.rollListId;
         closeBtn.onclick = function (event) {
             this.parentElement.remove();
             if (typeof event.stopImmediatePropagation !== 'undefined') {
@@ -733,37 +730,34 @@ export default function (playerInstance, options) {
      *
      * currently only image/gif, image/jpeg, image/png supported
      */
-    playerInstance.createBoard = (rollListId) => {
-        const vastSettings = playerInstance.adPool[rollListId];
-
+    playerInstance.createBoard = (ad) => {
         // create nonLinear Vpaid
         // create nonLinear regular
-        if (vastSettings.vpaid) {
+        if (ad.vpaid) {
             playerInstance.hardStopVpaidAd('');
-            playerInstance.createVpaidNonLinearBoard(rollListId);
-
+            playerInstance.createVpaidNonLinearBoard(ad);
         } else {
+            if (
+                typeof ad.staticResource === 'undefined' ||
+                playerInstance.supportedStaticTypes.indexOf(ad.creativeType) === -1
+            ) {
+                // Couldn’t find NonLinear resource with supported type.
+                ad.error = true;
 
-            if (typeof vastSettings.staticResource === 'undefined'
-                || playerInstance.supportedStaticTypes.indexOf(vastSettings.creativeType) === -1) {
-                //Couldn’t find NonLinear resource with supported type.
-                playerInstance.rollsById[rollListId].error = true;
                 if (!playerInstance.vastOptions || typeof playerInstance.vastOptions.errorUrl === 'undefined') {
                     playerInstance.announceLocalError(503);
                 } else {
                     playerInstance.announceError(503);
                 }
+
                 return;
             }
-
-            playerInstance.createNonLinearBoard(rollListId);
-
+            playerInstance.createNonLinearBoard(ad);
         }
-
     };
 
-    playerInstance.closeNonLinear = (adListId) => {
-        const element = document.getElementById('fluid_nonLinear_' + adListId);
+    playerInstance.closeNonLinear = (adId) => {
+        const element = document.querySelector('#fluid_nonLinear_' + adId + ', #fluid_vpaidNonLinear_' + adId);
         if (element) {
             element.remove();
         }
@@ -833,7 +827,7 @@ export default function (playerInstance, options) {
                 if (ad.adType === 'nonLinear') {
                     adsByType.nonLinear.push(ad);
                     // TODO test this
-                    // playerInstance.scheduleTask({time: time, playRoll: 'midRoll', adListId: adsByType.nonLinear.shift()});
+                    playerInstance.scheduleTask({time: time, playRoll: 'midRoll', rollListId: ad.rollListId });
                 }
             });
 
@@ -842,7 +836,7 @@ export default function (playerInstance, options) {
         if (adsByType.linear.length > 0) {
             playerInstance.toggleLoader(false);
             playerInstance.playRoll(adsByType.linear);
-        } else {
+        } else { // TODO: Check if this error happens on master as well, but it's needed for non linear right now :\
             playerInstance.playMainVideoWhenVastFails(900);
         }
 
@@ -1056,9 +1050,9 @@ export default function (playerInstance, options) {
         // Task: close nonLinear ads TODO check this with the new format
         if (timerPoolKeytimeCloseStaticAdsLength > 0) {
             for (let index = 0; index < timerPoolKeytimeCloseStaticAdsLength; index++) {
-                const rollListId = playerInstance.timerPool[keyTime]['closeStaticAd'][index].closeStaticAd;
-                if (playerInstance.rollsById[rollListId].played === true) {
-                    playerInstance.completeNonLinearStatic(rollListId);
+                const adToClose = playerInstance.timerPool[keyTime]['closeStaticAd'][index];
+                if (adToClose.played === true) {
+                    playerInstance.completeNonLinearStatic(adToClose);
                 }
             }
 
@@ -1083,14 +1077,15 @@ export default function (playerInstance, options) {
         // Task: play nonLinear ads
         if (timerPoolKeytimeNonlinearAdsLength > 0) {
             for (let index = 0; index < timerPoolKeytimeNonlinearAdsLength; index++) {
-                const rollListId = playerInstance.timerPool[keyTime]['nonLinear'][index].adListId;
+                const ad = playerInstance.timerPool[keyTime]['nonLinear'][index];
+                const rollListId = ad.rollListId;
                 const vastOptions = playerInstance.adPool[rollListId];
 
                 // we are not supporting nonLinear ads in cardBoard mode
-                if (playerInstance.rollsById[rollListId].played === false && !playerInstance.displayOptions.layoutControls.showCardBoardView) {
-                    playerInstance.createNonLinearStatic(rollListId);
+                if (ad.played === false && !playerInstance.displayOptions.layoutControls.showCardBoardView) {
+                    playerInstance.createNonLinearStatic(ad);
                     if (playerInstance.displayOptions.vastOptions.showProgressbarMarkers) {
-                        playerInstance.hideAdMarker(rollListId);
+                        playerInstance.hideAdMarker(ad);
                     }
 
                     // delete nonLinear after playing

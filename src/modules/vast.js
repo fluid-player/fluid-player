@@ -27,6 +27,7 @@
  * @property {Array<any>} tracking
  * @property {number|null} sequence
  * @property {number} duration
+ * @property {boolean} played
  */
 
 export default function (playerInstance, options) {
@@ -569,32 +570,25 @@ export default function (playerInstance, options) {
 
                 if ((typeof arrayCreativeNonLinears !== 'undefined') && (arrayCreativeNonLinears !== null) && arrayCreativeNonLinears.length) {
 
-                    // TODO fix this
-                    // const creativeNonLinear = arrayCreativeNonLinears[0];
-                    // playerInstance.registerTrackingEvents(creativeNonLinear, tmpOptions);
-                    //
-                    // clickTracks = playerInstance.getNonLinearClickTrackingEvents(creativeNonLinear);
-                    // playerInstance.registerClickTracking(clickTracks, tmpOptions);
+                    const creativeNonLinear = arrayCreativeNonLinears[0];
 
                     //Extract the Ad data if it is actually the Ad (!wrapper)
                     if (!playerInstance.hasVastAdTagUri(adElement) && playerInstance.hasInLine(adElement)) {
                         //Set initial values
-                        adOptions.adType = 'nonLinear';
-                        adOptions.vpaid = false;
+                        ad.adType = 'nonLinear';
+                        ad.vpaid = false;
 
                         //Extract the necessary data from the NonLinear node
-                        adOptions.clickthroughUrl = playerInstance.getClickThroughUrlFromNonLinear(creativeNonLinear);
-                        adOptions.duration = playerInstance.getDurationFromNonLinear(creativeNonLinear); // VAST version < 4.0
-                        adOptions.dimension = playerInstance.getDimensionFromNonLinear(creativeNonLinear); // VAST version < 4.0
-                        adOptions.staticResource = playerInstance.getStaticResourceFromNonLinear(creativeNonLinear);
-                        adOptions.creativeType = playerInstance.getCreativeTypeFromStaticResources(creativeNonLinear);
-                        adOptions.adParameters = playerInstance.getAdParametersFromLinear(creativeNonLinear);
+                        ad.clickthroughUrl = playerInstance.getClickThroughUrlFromNonLinear(creativeNonLinear);
+                        ad.duration = playerInstance.getDurationFromNonLinear(creativeNonLinear); // VAST version < 4.0
+                        ad.dimension = playerInstance.getDimensionFromNonLinear(creativeNonLinear); // VAST version < 4.0
+                        ad.staticResource = playerInstance.getStaticResourceFromNonLinear(creativeNonLinear);
+                        ad.creativeType = playerInstance.getCreativeTypeFromStaticResources(creativeNonLinear);
+                        ad.adParameters = playerInstance.getAdParametersFromLinear(creativeNonLinear);
 
-                        if (adOptions.adParameters) {
-                            adOptions.vpaid = true;
+                        if (ad.adParameters) {
+                            ad.vpaid = true;
                         }
-
-                        ads.push(adOptions);
                     }
                 }
             });
@@ -879,12 +873,12 @@ export default function (playerInstance, options) {
     /**
      * Register Ad element properties to an Ad based on its data and its wrapper data if available
      *
-     * @param {RawAd} ad
+     * @param {RawAd} rawAd
      * @param {{ tracking: Array, stopTracking: Array, impression: Array, clicktracking: Array }} options
      * @returns {Ad}
      */
-    function registerAdProperties(ad, options) {
-        ad = { ...ad, ...JSON.parse(JSON.stringify(options)) };
+    function registerAdProperties(rawAd, options) {
+        const ad = { ...rawAd, ...JSON.parse(JSON.stringify(options)) };
 
         [...(ad.wrappers || []), ad.data].filter(Boolean).forEach(dataSource => {
             // Register impressions
@@ -913,6 +907,8 @@ export default function (playerInstance, options) {
 
         const dataSource = ad.wrappers.length ? ad.wrappers[0] : ad.data;
         ad['sequence'] = dataSource.attributes.sequence ? Number(dataSource.attributes.sequence.value) : null;
+
+        ad.played = false;
 
         return ad;
     }
