@@ -450,16 +450,11 @@ export default function (playerInstance, options) {
      * Show up a nonLinear static creative
      */
     playerInstance.createNonLinearStatic = (ad) => {
-        // TODO ???? Probably no use for this with the new ad format
-        // if (!playerInstance.adPool.hasOwnProperty(rollListId) || playerInstance.adPool[rollListId].error === true) {
-        //     playerInstance.announceLocalError(101);
-        //     return;
-        // }
-
         //get the proper ad
         playerInstance.vastOptions = ad;
         playerInstance.createBoard(ad);
         if (playerInstance.rollsById[ad.rollListId].error === true || ad.error === true) {
+            playerInstance.announceLocalError(101);
             return;
         }
         playerInstance.adFinished = false;
@@ -944,7 +939,7 @@ export default function (playerInstance, options) {
 
         playerInstance.rollsById[rollListId].ads.forEach(ad => {
             if (ad.adType === 'nonLinear') { // TODO check this once we have non linear support
-                if (!playerInstance.adPool.hasOwnProperty(rollListId) || playerInstance.adPool[rollListId].error === true) {
+                if (playerInstance.rollsById[ad.rollListId].error === true || ad.error === true) {
                     playerInstance.announceLocalError(101);
                     return;
                 }
@@ -952,7 +947,7 @@ export default function (playerInstance, options) {
                 //var playerWrapper = document.getElementById('fluid_video_wrapper_' + playerInstance.videoPlayerId);
                 const nonLinearAdExists = document.getElementsByClassName('fluid_nonLinear_ad')[0];
                 if (!nonLinearAdExists) {
-                    playerInstance.createBoard(rollListId);
+                    playerInstance.createBoard(ad);
                     playerInstance.currentOnPauseRollAd = rollListId;
                     let onPauseAd = document.getElementById('fluid_nonLinear_' + rollListId);
                     if (onPauseAd) {
@@ -973,7 +968,13 @@ export default function (playerInstance, options) {
         // TODO should be only one. Add validator to allow only one onPause roll
         const onPauseAd = playerInstance.findRoll('onPauseRoll');
 
-        return (onPauseAd.length !== 0 && playerInstance.rollsById[onPauseAd[0]] && playerInstance.rollsById[onPauseAd[0]].error === false);
+        return (
+            onPauseAd.length !== 0 &&
+            playerInstance.rollsById[onPauseAd[0]] &&
+            playerInstance.rollsById[onPauseAd[0]].error === false &&
+            playerInstance.rollsById[onPauseAd[0]].ads.length &&
+            playerInstance.rollsById[onPauseAd[0]].ads[0].error !== true
+        );
     };
 
     /**
@@ -983,26 +984,21 @@ export default function (playerInstance, options) {
         playerInstance.toggleLoader(false);
         if (playerInstance.hasValidOnPauseAd() && !playerInstance.isCurrentlyPlayingAd) {
             const onPauseRoll = playerInstance.findRoll('onPauseRoll');
-            let rollListId;
-            if (playerInstance.currentOnPauseRollAd !== '') {
-                rollListId = playerInstance.currentOnPauseRollAd;
-            } else {
-                rollListId = onPauseRoll[0];
-            }
+            const ad = playerInstance.rollsById[onPauseRoll].ads[0];
 
-            playerInstance.vastOptions = playerInstance.adPool[rollListId];
-            const onPauseAd = document.getElementById('fluid_nonLinear_' + rollListId);
+            playerInstance.vastOptions = ad;
+            const onPauseAd = document.getElementById('fluid_nonLinear_' + ad.id);
 
             if (onPauseAd && playerInstance.domRef.player.paused) {
                 setTimeout(function () {
                     onPauseAd.style.display = 'flex';
-                    playerInstance.rollsById[rollListId].played = false;
-                    playerInstance.trackingOnPauseNonLinearAd(rollListId, 'start');
+                    ad.played = false;
+                    playerInstance.trackingOnPauseNonLinearAd(ad, 'start');
                 }, 500);
             } else if (onPauseAd && !playerInstance.domRef.player.paused) {
                 onPauseAd.style.display = 'none';
                 playerInstance.adFinished = true;
-                playerInstance.trackingOnPauseNonLinearAd(rollListId, 'complete');
+                playerInstance.trackingOnPauseNonLinearAd(ad, 'complete');
             }
         }
     };
@@ -1010,13 +1006,13 @@ export default function (playerInstance, options) {
     /**
      * Helper function for tracking onPause Ads
      */
-    playerInstance.trackingOnPauseNonLinearAd = (adListId, status) => {
-        if (!playerInstance.adPool.hasOwnProperty(adListId) || playerInstance.adPool[adListId].error === true) {
+    playerInstance.trackingOnPauseNonLinearAd = (ad, status) => {
+        if (playerInstance.rollsById[ad.rollListId].error === true || ad.error === true) {
             playerInstance.announceLocalError(101);
             return;
         }
 
-        playerInstance.vastOptions = playerInstance.adPool[adListId];
+        playerInstance.vastOptions = ad;
         playerInstance.trackSingleEvent(status);
     };
 
