@@ -477,7 +477,7 @@ export default function (playerInstance, options) {
         }
 
         const time = parseInt(playerInstance.getCurrentTime()) + parseInt(duration);
-        playerInstance.scheduleTask({ time: time, closeStaticAd: ad, rollListId: ad.rollListId }); // TODO check this event
+        playerInstance.scheduleTask({ time: time, closeStaticAd: ad, rollListId: ad.rollListId });
     };
 
     // ADS
@@ -614,7 +614,6 @@ export default function (playerInstance, options) {
     playerInstance.createNonLinearBoard = (ad) => {
         ad.played = true;
         const playerWidth = playerInstance.domRef.player.clientWidth;
-        const playerHeight = playerInstance.domRef.player.clientHeight; // TODO remove this ?
         const board = document.createElement('div');
         const vAlign = (playerInstance.rollsById[ad.rollListId].vAlign) ? playerInstance.rollsById[ad.rollListId].vAlign : playerInstance.nonLinearVerticalAlign;
 
@@ -821,7 +820,6 @@ export default function (playerInstance, options) {
 
                 if (ad.adType === 'nonLinear') {
                     adsByType.nonLinear.push(ad);
-                    // TODO test this
                     playerInstance.scheduleTask({time: time, playRoll: 'midRoll', rollListId: ad.rollListId });
                 }
             });
@@ -831,7 +829,7 @@ export default function (playerInstance, options) {
         if (adsByType.linear.length > 0) {
             playerInstance.toggleLoader(false);
             playerInstance.playRoll(adsByType.linear);
-        } else { // TODO: Check if this error happens on master as well, but it's needed for non linear right now :\
+        } else {
             playerInstance.playMainVideoWhenVastFails(900);
         }
 
@@ -938,7 +936,7 @@ export default function (playerInstance, options) {
         const rollListId = event.type.replace('adId_', '');
 
         playerInstance.rollsById[rollListId].ads.forEach(ad => {
-            if (ad.adType === 'nonLinear') { // TODO check this once we have non linear support
+            if (ad.adType === 'nonLinear') {
                 if (playerInstance.rollsById[ad.rollListId].error === true || ad.error === true) {
                     playerInstance.announceLocalError(101);
                     return;
@@ -1043,7 +1041,7 @@ export default function (playerInstance, options) {
             return;
         }
 
-        // Task: close nonLinear ads TODO check this with the new format
+        // Task: close nonLinear ads
         if (timerPoolKeytimeCloseStaticAdsLength > 0) {
             for (let index = 0; index < timerPoolKeytimeCloseStaticAdsLength; index++) {
                 const adToClose = playerInstance.timerPool[keyTime]['closeStaticAd'][index];

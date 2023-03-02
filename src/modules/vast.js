@@ -590,89 +590,6 @@ export default function (playerInstance, options) {
             });
         }
 
-
-        // TODO: Get tracking events for new ads array
-        // //Get Creative
-        // const creatives = xmlResponse.getElementsByTagName('Creative');
-        //
-        // //Currently only 1 creative and 1 linear is supported
-        // if ((typeof creatives !== 'undefined') && creatives.length) {
-        //     const arrayCreativeLinears = creatives[0].getElementsByTagName('Linear');
-        //
-        //     if ((typeof arrayCreativeLinears !== 'undefined') && (arrayCreativeLinears !== null) && arrayCreativeLinears.length) {
-        //
-        //         const creativeLinear = arrayCreativeLinears[0];
-        //         playerInstance.registerTrackingEvents(creativeLinear, tmpOptions);
-        //
-        //         clickTracks = playerInstance.getClickTrackingEvents(creativeLinear);
-        //         playerInstance.registerClickTracking(clickTracks, tmpOptions);
-        //
-        //         //Extract the Ad data if it is actually the Ad (!wrapper)
-        //         if (!playerInstance.hasVastAdTagUri(xmlResponse) && playerInstance.hasInLine(xmlResponse)) {
-        //
-        //             //Set initial values
-        //             tmpOptions.adFinished = false;
-        //             tmpOptions.adType = 'linear';
-        //             tmpOptions.vpaid = false;
-        //
-        //             //Extract the necessary data from the Linear node
-        //             tmpOptions.skipoffset = playerInstance.convertTimeStringToSeconds(creativeLinear.getAttribute('skipoffset'));
-        //             tmpOptions.clickthroughUrl = playerInstance.getClickThroughUrlFromLinear(creativeLinear);
-        //             tmpOptions.duration = playerInstance.getDurationFromLinear(creativeLinear);
-        //             tmpOptions.mediaFileList = playerInstance.getMediaFileListFromLinear(creativeLinear);
-        //             tmpOptions.adParameters = playerInstance.getAdParametersFromLinear(creativeLinear);
-        //             tmpOptions.iconClick = tmpOptions.iconClick || playerInstance.getIconClickThroughFromLinear(creativeLinear);
-        //
-        //             if (tmpOptions.adParameters) {
-        //                 tmpOptions.vpaid = true;
-        //             }
-        //         }
-        //     }
-        //
-        //     const arrayCreativeNonLinears = creatives[0].getElementsByTagName('NonLinearAds');
-        //
-        //     if ((typeof arrayCreativeNonLinears !== 'undefined') && (arrayCreativeNonLinears !== null) && arrayCreativeNonLinears.length) {
-        //
-        //         const creativeNonLinear = arrayCreativeNonLinears[0];
-        //         playerInstance.registerTrackingEvents(creativeNonLinear, tmpOptions);
-        //
-        //         clickTracks = playerInstance.getNonLinearClickTrackingEvents(creativeNonLinear);
-        //         playerInstance.registerClickTracking(clickTracks, tmpOptions);
-        //
-        //         //Extract the Ad data if it is actually the Ad (!wrapper)
-        //         if (!playerInstance.hasVastAdTagUri(xmlResponse) && playerInstance.hasInLine(xmlResponse)) {
-        //
-        //             //Set initial values
-        //             tmpOptions.adType = 'nonLinear';
-        //             tmpOptions.vpaid = false;
-        //
-        //             //Extract the necessary data from the NonLinear node
-        //             tmpOptions.clickthroughUrl = playerInstance.getClickThroughUrlFromNonLinear(creativeNonLinear);
-        //             tmpOptions.duration = playerInstance.getDurationFromNonLinear(creativeNonLinear); // VAST version < 4.0
-        //             tmpOptions.dimension = playerInstance.getDimensionFromNonLinear(creativeNonLinear); // VAST version < 4.0
-        //             tmpOptions.staticResource = playerInstance.getStaticResourceFromNonLinear(creativeNonLinear);
-        //             tmpOptions.creativeType = playerInstance.getCreativeTypeFromStaticResources(creativeNonLinear);
-        //             tmpOptions.adParameters = playerInstance.getAdParametersFromLinear(creativeNonLinear);
-        //
-        //             if (tmpOptions.adParameters) {
-        //                 tmpOptions.vpaid = true;
-        //             }
-        //
-        //         }
-        //     }
-        //
-        //     //Extract the Ad data if it is actually the Ad (!wrapper)
-        //     if (!playerInstance.hasVastAdTagUri(xmlResponse) && playerInstance.hasInLine(xmlResponse)) {
-        //         if (typeof tmpOptions.mediaFileList !== 'undefined' || typeof tmpOptions.staticResource !== 'undefined') {
-        //             callBack(true, tmpOptions);
-        //         } else {
-        //             callBack(false);
-        //         }
-        //     }
-        // } else {
-        //     callBack(false);
-        // }
-
         return ad;
     }
 
@@ -802,9 +719,6 @@ export default function (playerInstance, options) {
 
     /**
      * Resolves ad requests recursively and returns a tree of "Ad" and "Wrapper" elements
-     *
-     * TODO Adds missing handler for Wrapper (3.19 VAST 4.0). Currently it should be treated as the default values.
-     *  - fallbackOnNoAd (default: ???)
      *
      * @param {string} url vast resource url
      * @param {number} maxDepth depth of recursive calls (wrapper depth)
@@ -993,8 +907,8 @@ export default function (playerInstance, options) {
             roll: null,
             vastLoaded: false,
             error: false,
-            adText: null, // TODO Check for deprecation
-            adTextPosition: null, // TODO Check for deprecation
+            adText: null,
+            adTextPosition: null,
         };
         let idPart = 0;
 
