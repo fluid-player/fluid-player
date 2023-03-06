@@ -942,7 +942,6 @@ export default function (playerInstance, options) {
                     return;
                 }
 
-                //var playerWrapper = document.getElementById('fluid_video_wrapper_' + playerInstance.videoPlayerId);
                 const nonLinearAdExists = document.getElementsByClassName('fluid_nonLinear_ad')[0];
                 if (!nonLinearAdExists) {
                     playerInstance.createBoard(ad);
@@ -1056,7 +1055,6 @@ export default function (playerInstance, options) {
 
         // Task: play linear ads
         if (timerPoolKeytimeLinearAdsLength > 0) {
-            // const adListIds = playerInstance.getLinearAdsFromKeyTime(playerInstance.timerPool[keyTime]['linear']);
             if (playerInstance.timerPool[keyTime]['linear'].length > 0) {
                 playerInstance.playRoll(playerInstance.timerPool[keyTime]['linear']);
 

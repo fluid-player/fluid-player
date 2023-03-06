@@ -496,7 +496,6 @@ export default function (playerInstance, options) {
 
             playerInstance.processVastWithRetries(playerInstance.rollsById[rollListId]);
             playerInstance.domRef.player.addEventListener('adId_' + rollListId, playerInstance[roll]);
-            console.log(playerInstance.rollsById);
         }
     };
 
@@ -605,18 +604,10 @@ export default function (playerInstance, options) {
         const rollListId = vastObj.id;
 
         const handleVastResult = function (pass, adOptionsList) {
-            console.log('handleVastResult', pass, adOptionsList);
-
-            // TODO test this
             if (pass && Array.isArray(adOptionsList) && !playerInstance.displayOptions.vastOptions.allowVPAID && adOptionsList.some(adOptions => adOptions.vpaid)) {
                 adOptionsList = adOptionsList.filter(adOptions => adOptions.vpaid !== true);
                 playerInstance.announceLocalError('103', 'VPAID not allowed, so skipping this VAST tag.')
             }
-
-            // if (pass && typeof adOptionsList !== 'undefined' && tmpOptions.vpaid && !playerInstance.displayOptions.vastOptions.allowVPAID) {
-            //     pass = false;
-            //     playerInstance.announceLocalError('103', 'VPAID not allowed, so skipping this VAST tag.')
-            // }
 
             if (pass && Array.isArray(adOptionsList) && adOptionsList.length) {
 
@@ -657,9 +648,6 @@ export default function (playerInstance, options) {
                 event.initEvent('adId_' + rollListId, false, true);
                 playerInstance.domRef.player.dispatchEvent(event);
                 playerInstance.displayOptions.vastOptions.vastAdvanced.vastLoadedCallback();
-
-                console.log('callback result', playerInstance.rollsById);
-
             } else {
                 // when vast failed
                 playerInstance.announceLocalError('101');
@@ -768,7 +756,6 @@ export default function (playerInstance, options) {
      * @returns {Array<RawAd>}
      */
     function flattenAdTree(root, ads = [], wrappers = []) {
-        console.log('flattening tree', root);
         if (Array.isArray(root.children) && root.children.length) {
             root.children.forEach(child => flattenAdTree(child, ads, [...root.wrappers || [], root.data]))
         }
@@ -850,10 +837,10 @@ export default function (playerInstance, options) {
         const isValidAdPodFormats = adPod.map(ad => ad.adType).slice(0, -1).every(adType => adType === 'linear');
 
         if (adPod.length > 0 && !forceStandAloneAd && isValidAdPodFormats) {
-            console.log('Playing ad pod!');
+            playerInstance.debugMessage('Playing valid adPod', adPod);
             return adPod;
         } else {
-            console.log('Playing stand-alone ad! (If any)');
+            playerInstance.debugMessage('Trying to play single ad, adBuffet:', adBuffet);
             return adBuffet.length > 0 ? [adBuffet[0]] : [];
         }
     }
@@ -889,12 +876,10 @@ export default function (playerInstance, options) {
 
                     (playableAds && playableAds.length) ? callback(true, playableAds) : callback(false);
                 } catch (error) {
-                    console.log('error processing ad', error);
                     callback(false);
                 }
             })
-            .catch((error) => {
-                console.log('error resolving ad tree', error);
+            .catch(() => {
                 return callback(false);
             });
     };

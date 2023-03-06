@@ -535,6 +535,7 @@ const fluidPlayerClass = function () {
     };
 
     /**
+     * Makes a XMLHttpRequest encapsulated by a Promise
      *
      * @param url
      * @param withCredentials
@@ -576,9 +577,11 @@ const fluidPlayerClass = function () {
     };
 
     // TODO: move this somewhere else and refactor
-    self.debugMessage = (msg) => {
+    self.debugMessage = (...msg) => {
+        const style = 'color: #fff; font-weight: bold; background-color: #1a5e87; padding: 3px 6px; border-radius: 3px;';
+
         if (self.displayOptions.debug) {
-            console.log(msg);
+            console.log('%cFP DEBUG MESSAGE', style, ...msg);
         }
     };
 
