@@ -108,8 +108,8 @@ export default function (playerInstance, options) {
                     progressbarContainer[i].style.backgroundColor = playerInstance.displayOptions.layoutControls.adProgressColor;
                 }
 
-                if (playerInstance.displayOptions.vastOptions.adText || ad.adText) {
-                    const adTextToShow = (ad.adText !== null) ? ad.adText : playerInstance.displayOptions.vastOptions.adText;
+                if (playerInstance.rollsById[ad.rollListId].adText || ad.adText) {
+                    const adTextToShow = ad.adText ? ad.adText : playerInstance.rollsById[ad.rollListId].adText;
                     playerInstance.addAdPlayingText(adTextToShow);
                 }
 
@@ -1347,7 +1347,9 @@ export default function (playerInstance, options) {
 
         let CTATextPosition;
         if (ctaButton !== null) {
-            CTATextPosition = playerInstance.displayOptions.vastOptions.adCTATextPosition.toLowerCase();
+            CTATextPosition = playerInstance.rollsById[adListData.rollListId].adCTATextPosition ?
+                playerInstance.rollsById[adListData.rollListId].adCTATextPosition.toLowerCase() :
+                playerInstance.displayOptions.vastOptions.adCTATextPosition;
 
             if (allowedPosition.indexOf(CTATextPosition) === -1) {
                 console.log('[FP Error] Invalid position for CTAText. Reverting to "bottom right"');
@@ -1373,7 +1375,9 @@ export default function (playerInstance, options) {
         let adPlayingDivPosition;
         let positionsAdText;
         if (adPlayingDiv !== null) {
-            adPlayingDivPosition = (adListData.adTextPosition !== null) ? adListData.adTextPosition.toLowerCase() : playerInstance.displayOptions.vastOptions.adTextPosition.toLowerCase();
+            adPlayingDivPosition = playerInstance.rollsById[adListData.rollListId].adTextPosition ?
+                playerInstance.rollsById[adListData.rollListId].adTextPosition.toLowerCase() :
+                playerInstance.displayOptions.vastOptions.adTextPosition;
 
             if (allowedPosition.indexOf(adPlayingDivPosition) === -1) {
                 console.log('[FP Error] Invalid position for adText. Reverting to "top left"');
