@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>VOD with VAST Ad Pod - Truncated by maxTotalQuantity</title>
+    <%= htmlWebpackPlugin.tags.headTags %>
+    <style lang="css">
+        #fluid-player-e2e-case {
+            width: 90%;
+        }
+    </style>
+</head>
+<body>
+
+<p>In this scenario VAST returns an Ad Pod with 3 Ads, but we limit the Ad Pods to play only 2 Ads</p>
+
+<video id="fluid-player-e2e-case">
+    <source src='https://cdn.fluidplayer.com/videos/valerian-1080p.mkv' data-fluid-hd title="1080p" type='video/mp4'/>
+    <source src='https://cdn.fluidplayer.com/videos/valerian-720p.mkv' data-fluid-hd title="720p" type='video/mp4'/>
+    <source src='https://cdn.fluidplayer.com/videos/valerian-480p.mkv' title="480p" type='video/mp4'/>
+</video>
+
+<%= htmlWebpackPlugin.tags.bodyTags %>
+
+<script>
+    var instance = fluidPlayer('fluid-player-e2e-case', {
+        vastOptions: {
+            allowVPAID: true, // Default false.
+            adCTATextVast: true,
+            adList: [
+                {
+                    roll: 'preRoll',
+                    vastTag: '/static/vast_ad_pod.xml',
+                    maxTotalDuration: 30000, // Set this to limit by duration instead of by quantity
+                    maxTotalQuantity: 2,
+                },
+            ]
+        }
+    });
+</script>
+
+</body>
+</html>

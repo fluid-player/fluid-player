@@ -1,5 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <VAST version="3.0">
+    <Ad id="4872550" sequence="1">
+        <Wrapper fallbackOnNoAd="1" allowMultipleAds="0">
+            <AdSystem>ExoClick</AdSystem>
+            <VASTAdTagURI><![CDATA[/static/vast_no_ad.xml]]></VASTAdTagURI>
+            <Impression id="exotr"><![CDATA[/wrapper_impression]]></Impression>
+            <Error><![CDATA[/wrapper_error]]></Error>
+            <Creatives>
+                <Creative sequence="1" id="70160400">
+                    <Linear>
+                        <TrackingEvents>
+                            <Tracking id="prog_1" event="progress" offset="00:00:10.000"><![CDATA[/wrapper_progress]]></Tracking>
+                        </TrackingEvents>
+                        <VideoClicks>
+                            <ClickTracking><![CDATA[/wrapper_click]]></ClickTracking>
+                        </VideoClicks>
+                    </Linear>
+                </Creative>
+            </Creatives>
+            <Extensions>
+                <Extension type="waterfall" fallback_index="0">
+                    <Extension/>
+                </Extension>
+            </Extensions>
+        </Wrapper>
+    </Ad>
     <Ad id="5566276">
         <InLine>
             <AdSystem>ExoClick</AdSystem>
@@ -8,7 +33,7 @@
             <Error><![CDATA[https://syndication.realsrv.com/vregister.php?a=vview&errorcode=[ERRORCODE]&idzone=4890178&dg=5566276-PRT-78544088-2-0-0-InLine]]></Error>
             <Creatives>
                 <Creative sequence="1" id="78544088">
-                    <Linear skipoffset="00:00:03">
+                    <Linear>
                         <Duration>00:00:22.342</Duration>
                         <TrackingEvents>
                             <Tracking id="prog_1" event="progress" offset="00:00:10.000"><![CDATA[https://syndication.realsrv.com/vregister.php?a=vview&tracking_event=progress&progress=00:00:10.000&idzone=4890178&2f619b13242072d9159f66efe8cd218d=tsVuZ8uHLnt4ctvDtq48PXLz64ctdlTlK8E.fjzu48em7r33ceHjW1NZLXThmYchrgbjYlesYecz6cddUFbi781VcrEjmbVXDhuampn3OXzNRwNRbmppNcDbDdrlNcFTlOfbt24dOuuBuexmOCp9ynPpx4.OXXXA3VBW5n25c.HLvrgbxmlcz6ePPDj38a4G2mK3HpqcM.vDxrgbaYknYgelz69O3Dpz4a4G7WKYGK4Jpc._nj27.eHDXA3NVnx664G2aZrqnKc.WuBtty2BpzPhrgbaYppgcpz4a4G4Kp8.PLzy11WM58NdrEdjmfDdw49OmuexmOCp9ylelitzPvw1z2MxwVPuUrtWU0uStYZgona2mJJ2IHpV2rKaXJWsM0TwNbl7T7Erzi9cy89jMcFT7lOfDd54.eWty9p9iV5xeuZeVyu6amLPjrYbXrwncz4.Nbs1MjFeeuBuVyu6amLPjramslrpwXmpgeglYjzMOQ1v11zr3ruzU3MUtuNruzU564G56Zm7Gq12mK3HpqcM.XDXPTA1BK8vJM25Hn01v11z1Z8ddTVLjkq9LlU0dlcE0ueuypyleBvPtz4OceHTn06.OnTtu49fPThz6eOPDv25cfHbz512UxrvsVP5t9OLfhpvz4d4cGeXDo558cOHnz4cad8dOXdzXBJPS5VVBNKvVWxXZVnx1wST0uVVQTSrwS2sRwNr0uMVTS58NdLjrlLlK9UFbi781VcrEjmethtmOZqLPhrgbmddcpz4a4G42JW4JXl52HnM.Gu2BtyZdy1yWvPW5TTNS1M25nrgbbYrYaclrcpz5a4G2mKaYHKV6prKWnM.GuWapqmCevPhrglamelgrmXkmbcz4a63Kq15Jm3M.Gulx6CaVd5yaViRxeBvPl359fPTjrnpmvwXqrYrsqz28dcDc7FNcrlOfDW1BXgu85NKxI4vA3ny78.vnpz1yuVsNWQV4Lz0zX4L14TuZ65XK2GrIK8F56Zr8F23KmqYJ64Jpc9bDbMczUS9rlOeuCSelyqqCaVdiONeCW1iOBtelxiqaWrPhrqsZ5Z8NdVjPPPhrqapgnrXrwncz11NUwT1rysSOZ66mqYJ617XKc9bNM11TlK9rlOfDXbTnw1wS1uUysR58Ncsy7tkrdWfDXA3S5VPNLVBa4vGxhNZXnw1wNyWR1wYzSuZ8NbkjEEa8FU.fDXU1TBPWu25WxBHn211NUwT1r2uU1QTS58ddtlkDefHt369vPfn05cufjr269.fLtzc48WmXOzLTDWuuCRyqtiSfPj279e3nvz6ctbU00UDjU0tTktefGA-]]></Tracking>
@@ -32,8 +57,8 @@
             <Extensions>
                 <Extension>
                     <TitleCTA>
-                        <MobileText>Ad Buffet Ad #1</MobileText>
-                        <PCText>Ad Buffet Ad #1</PCText>
+                        <MobileText>This is a stand alone Ad, from the Ad Buffet</MobileText>
+                        <PCText>This is a stand alone Ad, from the Ad Buffet</PCText>
                         <DisplayUrl><![CDATA[sample.com]]></DisplayUrl>
                         <Tracking><![CDATA[https://syndication.realsrv.com/click.php?data=H4sIAAAAAAAAAz2QS0_DMBCEf02vkddev45IFZciAiWNSi8oiVNRcBI3D0DV_nicBKG15JH3m9HIUirFtSKQCddaMQtWIuP0Po5h2Ii7Db.PZyia4OvhMtZJ1TUbcV_5S_X5NvV.I7ZdV.F.m4Zx8s0wulOZZ9lDWaj8dg3l8XBLW_d4UDnrwzHLRDa1Q3edQuOeTvvcZc9xcwvHl8m7nTotUNp3XjQ.dOE6htB_NBH3XRgbP_RtM_bTVMXwNp0da.wqv8.vRIxAaamsFsipGhiLjfuQ1D_d0nnuT8YmAJhInQAzpI1EZMYQGstAG5LxkRCIx1.JeYwI4pASrAaGAqVBVAlIi0ygAaYVB6OsJeCWzzCjxRavmLEqrkXk4V8JWpm_dWxNuDjnUWsGfSGlu9gWQQIURckqdDy6LYB29uwAzqUTvxoLWB7DAQAA]]></Tracking>
                     </TitleCTA>
@@ -41,7 +66,7 @@
             </Extensions>
         </InLine>
     </Ad>
-    <Ad id="4840678">
+    <Ad id="4840678" sequence="2">
         <InLine>
             <AdSystem>ExoClick</AdSystem>
             <AdTitle/>
@@ -73,8 +98,8 @@
             <Extensions>
                 <Extension>
                     <TitleCTA>
-                        <MobileText>Ad Buffet Ad #2</MobileText>
-                        <PCText>Ad Buffet Ad #2</PCText>
+                        <MobileText>Play Game Now</MobileText>
+                        <PCText>Play Game Now</PCText>
                         <DisplayUrl><![CDATA[]]></DisplayUrl>
                         <Tracking><![CDATA[https://syndication.realsrv.com/click.php?data=H4sIAAAAAAAAAz1O20rDQBD9mjxmmdvOzj4KWgQFH_U1XdOmaNmQBhGZj3dTL5yBOQznMmICmsxRAphP6zpfOr7paNdmKl_1GEo9N34czmO_1HVY6xLmae54t3Z8e_fSP98_9qKm7uCoKWpOLOTlAtC8yxzGz1reT.VtS3LLAVtXTAFbX8oUmQxcLAO2N2I7uqCTY2x54I4NrgwjgrBEE9GAMQuwGEJSQtOcHSnTJga_2tpy_mWUuOnxn7FvmkR_yg1ytW7QnxD_EH968IMh7tUADq8UcyplpH0qmYoNMoxD.QamOBYrPwEAAA--]]></Tracking>
                     </TitleCTA>
@@ -114,8 +139,8 @@
             <Extensions>
                 <Extension>
                     <TitleCTA>
-                        <MobileText>Ad Buffet Ad #3</MobileText>
-                        <PCText>Ad Buffet Ad #3</PCText>
+                        <MobileText>Try for Free</MobileText>
+                        <PCText>Try for Free</PCText>
                         <DisplayUrl><![CDATA[]]></DisplayUrl>
                         <Tracking><![CDATA[https://syndication.realsrv.com/click.php?data=H4sIAAAAAAAAA21RTW_bMAz9NT7GoL6t44CilwxN16VBlpstyVsW21JkuVkD_vjJdtfTQAEmn997lEjBJXAGSHjJ8VdKYSzYl4I.5nO73cq7ty6mWJuLi6XxfYaFqYgRotlYaNsNN4RstGvIBjhXUrIGNOcFezR1H862YA9i7VBQ.VbHBVGaSKVhhkY_ReMyZkaA3CCG0v3xpjuby9pOXtz7zcdZVlCR61T_HJdCjufkFj9JGVCVkbsfVoRXGoiqMmTqtN4ClspPQ4rvuX5.2ee69bGv02pn_DhnUAIAyU9YWmXAe8NfHnYhTV0_JnuyT8eT_bqVh_s1NMfX.26wT6_yADEc93u2n4bRX6fQ2.fTy8Huv.U_93D8PnV2K08LaRd9x_ou.HBNIcTffaZ3PqS.G.PQpzhNJpsPu1mx2K7iw639gZg3JZWQWjFO8f9Dw0qXJO9TqJJAhf.mjR9DwTwKRE6QIhHZDxBJDpQMHMmb4qLiXJZEaA6MVwSUpKSSWiOhms5kwEWWP8g_MqpY5pPPjOHMoZ_MOfginUOuJvjGcbfFxlDiiFVUWlZLrkXbOM2cgrautNH2L.OERq2jAgAA]]></Tracking>
                     </TitleCTA>

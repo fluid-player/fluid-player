@@ -1115,15 +1115,24 @@ export default function (playerInstance, options) {
         }
 
         const roll = playerInstance.rollsById[task.rollListId];
-        roll.ads.forEach(ad => {
-            if (task.hasOwnProperty('playRoll') && ad.adType === 'linear') {
-                playerInstance.timerPool[task.time]['linear'].push(ad);
-            } else if (task.hasOwnProperty('playRoll') && ad.adType === 'nonLinear') {
-                playerInstance.timerPool[task.time]['nonLinear'].push(ad);
-            } else if (task.hasOwnProperty('closeStaticAd')) {
-                playerInstance.timerPool[task.time]['closeStaticAd'].push(ad);
-            }
-        });
+
+        roll.ads
+            .filter(({ adType }) => {
+                if (task.time === 0) { // Only non-linear should be scheduled on "preRoll"
+                    return adType !== 'linear';
+                }
+
+                return true;
+            })
+            .forEach(ad => {
+                if (task.hasOwnProperty('playRoll') && ad.adType === 'linear') {
+                    playerInstance.timerPool[task.time]['linear'].push(ad);
+                } else if (task.hasOwnProperty('playRoll') && ad.adType === 'nonLinear') {
+                    playerInstance.timerPool[task.time]['nonLinear'].push(ad);
+                } else if (task.hasOwnProperty('closeStaticAd')) {
+                    playerInstance.timerPool[task.time]['closeStaticAd'].push(ad);
+                }
+            });
 
     };
 

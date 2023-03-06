@@ -820,9 +820,7 @@ export default function (playerInstance, options) {
             playerInstance.registerClickTracking(clickTracks, ad);
         });
 
-        const dataSource = ad.wrappers.length ? ad.wrappers[0] : ad.data;
-        ad['sequence'] = dataSource.attributes.sequence ? Number(dataSource.attributes.sequence.value) : null;
-
+        ad.sequence = ad.data.attributes.sequence ? Number(ad.data.attributes.sequence.value) : null;
         ad.played = false;
 
         return ad;
@@ -849,7 +847,9 @@ export default function (playerInstance, options) {
             }, { adPod: [], totalDuration: 0 });
         const adBuffet = ads.filter(ad => !Boolean(ad.sequence) && ad.duration < maxDuration);
 
-        if (adPod.length > 0 && !forceStandAloneAd) {
+        const isValidAdPodFormats = adPod.map(ad => ad.adType).slice(0, -1).every(adType => adType === 'linear');
+
+        if (adPod.length > 0 && !forceStandAloneAd && isValidAdPodFormats) {
             console.log('Playing ad pod!');
             return adPod;
         } else {
@@ -1004,6 +1004,7 @@ export default function (playerInstance, options) {
         if (event) {
             event.stopImmediatePropagation();
         }
+        playerInstance.vastOptions.adFinished = true;
         //"this" is the HTML5 video tag, because it dispatches the "ended" event
         playerInstance.deleteVastAdElements();
         playerInstance.checkForNextAd();

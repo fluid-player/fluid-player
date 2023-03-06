@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <VAST version="3.0">
     <Ad id="4872550">
-        <Wrapper>
+        <Wrapper allowMultipleAds="1" followAdditionalWrappers="0">
             <AdSystem>ExoClick</AdSystem>
-            <VASTAdTagURI><![CDATA[/static/vast_wrapper_cyclical.xml]]></VASTAdTagURI>
+            <VASTAdTagURI><![CDATA[/static/vast_ad_pod.xml]]></VASTAdTagURI>
             <Impression id="exotr"><![CDATA[/wrapper_impression]]></Impression>
             <Error><![CDATA[/wrapper_error]]></Error>
             <Creatives>

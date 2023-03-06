@@ -3,7 +3,7 @@
     <Ad id="4872550">
         <Wrapper>
             <AdSystem>ExoClick</AdSystem>
-            <VASTAdTagURI><![CDATA[/static/vast_wrapper.xml]]></VASTAdTagURI>
+            <VASTAdTagURI><![CDATA[/static/vast_linear.xml]]></VASTAdTagURI>
             <Impression id="exotr"><![CDATA[/wrapper_impression]]></Impression>
             <Error><![CDATA[/wrapper_error]]></Error>
             <Creatives>
