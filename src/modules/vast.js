@@ -523,8 +523,6 @@ export default function (playerInstance, options) {
     /**
      * Process the XML response
      *
-     * @todo add support for multiple Creative tags
-     *
      * @param ad
      */
     function processAdCreatives(ad) {
@@ -534,7 +532,7 @@ export default function (playerInstance, options) {
             return;
         }
 
-        // Current support is for one creative element
+        // Current support is for only one creative element
         const creativeElements = Array.from(adElement.getElementsByTagName('Creative')).splice(0, 1);
 
         if (creativeElements.length) {
