@@ -865,6 +865,10 @@ export default function (playerInstance, options) {
                         ad.type === 'wrapper' && ad.fallbackOnNoAd && !/"type":"ad"/.test(JSON.stringify(ad))
                     );
 
+                    if (triggerFallbackOnNoAd) {
+                        playerInstance.debugMessage('No ad return from VAST Wrapper, triggering fallbackOnNoAd. Ad tree:', result);
+                    }
+
                     result = flattenAdTree(result).map(ad => processAdCreatives(registerAdProperties(ad, tmpOptions)));
 
                     const playableAds = getPlayableAds(

@@ -3100,6 +3100,10 @@ const fluidPlayerInterface = function (instance) {
     this.on = (event, callback) => {
         return instance.on(event, callback)
     };
+
+    this.setDebug = (value) => {
+        instance.displayOptions.debug = value;
+    }
 }
 
 /**

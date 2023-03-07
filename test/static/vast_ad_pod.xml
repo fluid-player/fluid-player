@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <VAST version="3.0">
-    <Ad id="5566276" sequence="3">
+    <Ad id="5566276" sequence="2">
         <InLine>
             <AdSystem>ExoClick</AdSystem>
             <AdTitle/>
@@ -32,8 +32,8 @@
             <Extensions>
                 <Extension>
                     <TitleCTA>
-                        <MobileText>AD #3 in an Ad Pod</MobileText>
-                        <PCText>AD #3 in an Ad Pod</PCText>
+                        <MobileText>AD #2 in an Ad Pod</MobileText>
+                        <PCText>AD #2 in an Ad Pod</PCText>
                         <DisplayUrl><![CDATA[sample.com]]></DisplayUrl>
                         <Tracking><![CDATA[https://syndication.realsrv.com/click.php?data=H4sIAAAAAAAAAz2QS0_DMBCEf02vkddev45IFZciAiWNSi8oiVNRcBI3D0DV_nicBKG15JH3m9HIUirFtSKQCddaMQtWIuP0Po5h2Ii7Db.PZyia4OvhMtZJ1TUbcV_5S_X5NvV.I7ZdV.F.m4Zx8s0wulOZZ9lDWaj8dg3l8XBLW_d4UDnrwzHLRDa1Q3edQuOeTvvcZc9xcwvHl8m7nTotUNp3XjQ.dOE6htB_NBH3XRgbP_RtM_bTVMXwNp0da.wqv8.vRIxAaamsFsipGhiLjfuQ1D_d0nnuT8YmAJhInQAzpI1EZMYQGstAG5LxkRCIx1.JeYwI4pASrAaGAqVBVAlIi0ygAaYVB6OsJeCWzzCjxRavmLEqrkXk4V8JWpm_dWxNuDjnUWsGfSGlu9gWQQIURckqdDy6LYB29uwAzqUTvxoLWB7DAQAA]]></Tracking>
                     </TitleCTA>
@@ -41,7 +41,7 @@
             </Extensions>
         </InLine>
     </Ad>
-    <Ad id="4840678" sequence="2">
+    <Ad id="4840678" sequence="1">
         <InLine>
             <AdSystem>ExoClick</AdSystem>
             <AdTitle/>
@@ -73,8 +73,8 @@
             <Extensions>
                 <Extension>
                     <TitleCTA>
-                        <MobileText>AD #2 in an Ad Pod</MobileText>
-                        <PCText>AD #2 in an Ad Pod</PCText>
+                        <MobileText>AD #1 in an Ad Pod</MobileText>
+                        <PCText>AD #1 in an Ad Pod</PCText>
                         <DisplayUrl><![CDATA[]]></DisplayUrl>
                         <Tracking><![CDATA[https://syndication.realsrv.com/click.php?data=H4sIAAAAAAAAAz1O20rDQBD9mjxmmdvOzj4KWgQFH_U1XdOmaNmQBhGZj3dTL5yBOQznMmICmsxRAphP6zpfOr7paNdmKl_1GEo9N34czmO_1HVY6xLmae54t3Z8e_fSP98_9qKm7uCoKWpOLOTlAtC8yxzGz1reT.VtS3LLAVtXTAFbX8oUmQxcLAO2N2I7uqCTY2x54I4NrgwjgrBEE9GAMQuwGEJSQtOcHSnTJga_2tpy_mWUuOnxn7FvmkR_yg1ytW7QnxD_EH968IMh7tUADq8UcyplpH0qmYoNMoxD.QamOBYrPwEAAA--]]></Tracking>
                     </TitleCTA>
@@ -82,7 +82,7 @@
             </Extensions>
         </InLine>
     </Ad>
-    <Ad id="20005" sequence="5">
+    <Ad id="20005" sequence="3">
         <InLine>
             <AdSystem version="4.0">iabtechlab</AdSystem>
             <AdTitle>
