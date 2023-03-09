@@ -1,28 +1,27 @@
-'use strict';
 
 export default function (playerInstance, options) {
     const VPAID_VERSION = '2.0';
 
-    playerInstance.renderLinearAd = (adListId, backupTheVideoTime) => {
+    playerInstance.renderLinearAd = (ad, backupTheVideoTime) => {
         playerInstance.toggleLoader(false);
 
         //get the proper ad
-        playerInstance.vastOptions = playerInstance.adPool[adListId];
+        playerInstance.vastOptions = ad;
 
         if (backupTheVideoTime) {
-            playerInstance.backupMainVideoContentTime(adListId);
+            playerInstance.backupMainVideoContentTime(ad.rollListId);
         }
 
-        const playVideoPlayer = adListId => {
-            playerInstance.switchPlayerToVpaidMode = adListId => {
+        const playVideoPlayer = ad => {
+            playerInstance.switchPlayerToVpaidMode = ad => {
                 playerInstance.debugMessage('starting function switchPlayerToVpaidMode');
-                const vpaidIframe = playerInstance.videoPlayerId + "_" + adListId + "_fluid_vpaid_iframe";
+                const vpaidIframe = playerInstance.videoPlayerId + "_" + ad.id + "_fluid_vpaid_iframe";
                 const creativeData = {};
-                creativeData.AdParameters = playerInstance.adPool[adListId].adParameters;
+                creativeData.AdParameters = ad.adParameters;
                 const slotElement = document.createElement('div');
                 slotElement.id = playerInstance.videoPlayerId + "_fluid_vpaid_slot";
                 slotElement.className = 'fluid_vpaid_slot';
-                slotElement.setAttribute('adListId', adListId);
+                slotElement.setAttribute('adListId', ad.id);
 
                 playerInstance.domRef.player.parentNode.insertBefore(slotElement, vpaidIframe.nextSibling);
 
@@ -37,7 +36,7 @@ export default function (playerInstance, options) {
                 const compare = playerInstance.compareVersion(VPAID_VERSION, ver);
                 if (compare === 1) {
                     //VPAID version of ad is lower than we need
-                    playerInstance.adList[adListId].error = true;
+                    ad.error = true;
                     playerInstance.playMainVideoWhenVpaidFails(403);
                     return false;
                 }
@@ -61,7 +60,7 @@ export default function (playerInstance, options) {
                 }
 
                 playerInstance.toggleLoader(false);
-                playerInstance.adList[adListId].played = true;
+                ad.played = true;
                 playerInstance.adFinished = false;
             };
 
@@ -74,21 +73,21 @@ export default function (playerInstance, options) {
 
                 if (playerInstance.displayOptions.layoutControls.showCardBoardView) {
 
-                    if (!playerInstance.adList[adListId].landingPage) {
-                        playerInstance.addCTAButton(playerInstance.adPool[adListId].clickthroughUrl);
+                    if (!ad.landingPage) {
+                        playerInstance.addCTAButton(ad.clickthroughUrl);
                     } else {
-                        playerInstance.addCTAButton(playerInstance.adList[adListId].landingPage);
+                        playerInstance.addCTAButton(ad.landingPage);
                     }
 
                 } else {
 
-                    const addClickthroughLayer = (typeof playerInstance.adList[adListId].adClickable != "undefined") ? playerInstance.adList[adListId].adClickable : playerInstance.displayOptions.vastOptions.adClickable;
+                    const addClickthroughLayer = (typeof ad.adClickable != "undefined") ? ad.adClickable : playerInstance.displayOptions.vastOptions.adClickable;
 
                     if (addClickthroughLayer) {
                         playerInstance.addClickthroughLayer(playerInstance.videoPlayerId);
                     }
 
-                    playerInstance.addCTAButton(playerInstance.adList[adListId].landingPage);
+                    playerInstance.addCTAButton(ad.landingPage);
 
                 }
 
@@ -109,15 +108,15 @@ export default function (playerInstance, options) {
                     progressbarContainer[i].style.backgroundColor = playerInstance.displayOptions.layoutControls.adProgressColor;
                 }
 
-                if (playerInstance.displayOptions.vastOptions.adText || playerInstance.adList[adListId].adText) {
-                    const adTextToShow = (playerInstance.adList[adListId].adText !== null) ? playerInstance.adList[adListId].adText : playerInstance.displayOptions.vastOptions.adText;
+                if (playerInstance.rollsById[ad.rollListId].adText || ad.adText) {
+                    const adTextToShow = ad.adText ? ad.adText : playerInstance.rollsById[ad.rollListId].adText;
                     playerInstance.addAdPlayingText(adTextToShow);
                 }
 
-                playerInstance.positionTextElements(playerInstance.adList[adListId]);
+                playerInstance.positionTextElements(ad);
 
                 playerInstance.toggleLoader(false);
-                playerInstance.adList[adListId].played = true;
+                ad.played = true;
                 playerInstance.adFinished = false;
                 playerInstance.domRef.player.play();
 
@@ -160,8 +159,8 @@ export default function (playerInstance, options) {
             const selectedMediaFile = playerInstance.getSupportedMediaFileObject(playerInstance.vastOptions.mediaFileList);
 
             // if player in cardboard mode then, linear ads media type should be a '360' video
-            if (playerInstance.displayOptions.layoutControls.showCardBoardView && playerInstance.adList[adListId].mediaType !== '360') {
-                playerInstance.adList[adListId].error = true;
+            if (playerInstance.displayOptions.layoutControls.showCardBoardView && ad.mediaType !== '360') {
+                ad.error = true;
                 playerInstance.playMainVideoWhenVastFails(403);
                 return false;
             }
@@ -199,7 +198,7 @@ export default function (playerInstance, options) {
             } else if (!isVpaid) {
                 if (selectedMediaFile.src === false) {
                     // Couldn’t find MediaFile that is supported by this video player, based on the attributes of the MediaFile element.
-                    playerInstance.adList[adListId].error = true;
+                    ad.error = true;
                     playerInstance.playMainVideoWhenVastFails(403);
                     return false;
                 }
@@ -219,7 +218,7 @@ export default function (playerInstance, options) {
                 playerInstance.domRef.player.addEventListener('ended', playerInstance.onVastAdEnded);
 
             } else {
-                playerInstance.loadVpaid(adListId, selectedMediaFile.src);
+                playerInstance.loadVpaid(ad, selectedMediaFile.src);
 
                 if (playerInstance.displayOptions.vastOptions.showProgressbarMarkers) {
                     playerInstance.hideAdMarkers();
@@ -248,35 +247,31 @@ export default function (playerInstance, options) {
 
         };
 
-        playVideoPlayer(adListId);
+        playVideoPlayer(ad);
 
         playerInstance.domRef.player.addEventListener('timeupdate', videoPlayerTimeUpdate);
 
     };
 
-    playerInstance.playRoll = (adListId) => {
+    playerInstance.playRoll = (adList) => {
         // register all the ad pods
-        for (let i = 0; i < adListId.length; i++) {
-            if (!playerInstance.adPool.hasOwnProperty(adListId[i])) {
-                playerInstance.announceLocalError(101);
-                return;
-            }
-            playerInstance.temporaryAdPods.push(playerInstance.adList[adListId[i]]);
+        for (let i = 0; i < adList.length; i++) {
+            playerInstance.temporaryAdPods.push(adList[i]);
         }
 
         if (playerInstance.vastOptions !== null && playerInstance.vastOptions.adType.toLowerCase() === 'linear') {
             return;
         }
 
-        const adListIdToPlay = playerInstance.getNextAdPod();
+        const adToPlay = playerInstance.getNextAdPod();
 
-        if (adListIdToPlay !== null) {
-            playerInstance.renderLinearAd(adListIdToPlay, true);
+        if (adToPlay !== null) {
+            playerInstance.renderLinearAd(adToPlay, true);
         }
     };
 
-    playerInstance.backupMainVideoContentTime = (adListId) => {
-        const roll = playerInstance.adList[adListId].roll;
+    playerInstance.backupMainVideoContentTime = (rollListId) => {
+        const roll = playerInstance.rollsById[rollListId].roll;
 
         //spec configs by roll
         switch (roll) {
@@ -441,8 +436,8 @@ export default function (playerInstance, options) {
     };
 
     // ADS
-    playerInstance.completeNonLinearStatic = (adListId) => {
-        playerInstance.closeNonLinear(adListId);
+    playerInstance.completeNonLinearStatic = (ad) => {
+        playerInstance.closeNonLinear(ad.id);
         if (playerInstance.adFinished === false) {
             playerInstance.adFinished = true;
             playerInstance.trackSingleEvent('complete');
@@ -454,23 +449,19 @@ export default function (playerInstance, options) {
     /**
      * Show up a nonLinear static creative
      */
-    playerInstance.createNonLinearStatic = (adListId) => {
-        if (!playerInstance.adPool.hasOwnProperty(adListId) || playerInstance.adPool[adListId].error === true) {
+    playerInstance.createNonLinearStatic = (ad) => {
+        //get the proper ad
+        playerInstance.vastOptions = ad;
+        playerInstance.createBoard(ad);
+        if (playerInstance.rollsById[ad.rollListId].error === true || ad.error === true) {
             playerInstance.announceLocalError(101);
             return;
         }
-
-        //get the proper ad
-        playerInstance.vastOptions = playerInstance.adPool[adListId];
-        playerInstance.createBoard(adListId);
-        if (playerInstance.adList[adListId].error === true) {
-            return;
-        }
         playerInstance.adFinished = false;
-        let duration;
+        let duration = (playerInstance.rollsById[ad.rollListId].nonLinearDuration) ? playerInstance.rollsById[ad.rollListId].nonLinearDuration : false;
         if (!playerInstance.vastOptions.vpaid) {
             playerInstance.trackSingleEvent('start');
-            duration = (playerInstance.adList[adListId].nonLinearDuration) ? playerInstance.adList[adListId].nonLinearDuration : playerInstance.vastOptions.duration;
+            duration = duration || playerInstance.vastOptions.duration;
 
             playerInstance.nonLinearTracking = setInterval(function () {
                 if (playerInstance.adFinished === true) {
@@ -486,42 +477,40 @@ export default function (playerInstance, options) {
         }
 
         const time = parseInt(playerInstance.getCurrentTime()) + parseInt(duration);
-        playerInstance.scheduleTask({time: time, closeStaticAd: adListId});
+        playerInstance.scheduleTask({ time: time, closeStaticAd: ad, rollListId: ad.rollListId });
     };
 
     // ADS
-    playerInstance.createVpaidNonLinearBoard = (adListId) => {
+    playerInstance.createVpaidNonLinearBoard = (ad) => {
         // create iframe
         // pass the js
 
-        const vastSettings = playerInstance.adPool[adListId];
-
-        playerInstance.loadVpaidNonlinearAssets = function (adListId) {
+        playerInstance.loadVpaidNonlinearAssets = function (ad) {
 
             playerInstance.debugMessage('starting function switchPlayerToVpaidMode');
 
-            const vAlign = (playerInstance.adList[adListId].vAlign) ? playerInstance.adList[adListId].vAlign : playerInstance.nonLinearVerticalAlign;
-            const showCloseButton = (playerInstance.adList[adListId].vpaidNonLinearCloseButton) ? playerInstance.adList[adListId].vpaidNonLinearCloseButton : playerInstance.vpaidNonLinearCloseButton;
-            const vpaidIframe = playerInstance.videoPlayerId + "_" + adListId + "_fluid_vpaid_iframe";
+            const vAlign = (ad.vAlign) ? ad.vAlign : playerInstance.nonLinearVerticalAlign;
+            const showCloseButton = (ad.vpaidNonLinearCloseButton) ? ad.vpaidNonLinearCloseButton : playerInstance.vpaidNonLinearCloseButton;
+            const vpaidIframe = playerInstance.videoPlayerId + "_" + ad.id + "_fluid_vpaid_iframe";
             const creativeData = {};
-            creativeData.AdParameters = playerInstance.adPool[adListId].adParameters;
+            creativeData.AdParameters = ad.adParameters;
             const slotWrapper = document.createElement('div');
-            slotWrapper.id = 'fluid_vpaidNonLinear_' + adListId;
+            slotWrapper.id = 'fluid_vpaidNonLinear_' + ad.id;
             slotWrapper.className = 'fluid_vpaidNonLinear_' + vAlign;
             slotWrapper.className += ' fluid_vpaidNonLinear_ad';
-            slotWrapper.setAttribute('adListId', adListId);
+            slotWrapper.setAttribute('adListId', ad.id);
 
             // Default values in case nothing defined in VAST data or ad settings
             let adWidth = Math.min(468, playerInstance.domRef.player.offsetWidth);
             let adHeight = Math.min(60, Math.floor(playerInstance.domRef.player.offsetHeight / 4));
 
-            if (typeof playerInstance.adList[adListId].size !== 'undefined') {
-                const dimensions = playerInstance.adList[adListId].size.split('x');
+            if (typeof ad.size !== 'undefined') {
+                const dimensions = ad.size.split('x');
                 adWidth = dimensions[0];
                 adHeight = dimensions[1];
-            } else if (vastSettings.dimension.width && vastSettings.dimension.height) {
-                adWidth = vastSettings.dimension.width;
-                adHeight = vastSettings.dimension.height;
+            } else if (ad.dimension.width && ad.dimension.height) {
+                adWidth = ad.dimension.width;
+                adHeight = ad.dimension.height;
             }
 
             slotWrapper.style.width = '100%';
@@ -540,7 +529,7 @@ export default function (playerInstance, options) {
                 closeBtn.className = 'close_button';
                 closeBtn.innerHTML = '';
                 closeBtn.title = playerInstance.displayOptions.layoutControls.closeButtonCaption;
-                const tempadListId = adListId;
+                const [tempadListId] = ad.id.split('_');
                 closeBtn.onclick = function (event) {
 
                     playerInstance.hardStopVpaidAd('');
@@ -551,7 +540,7 @@ export default function (playerInstance, options) {
                     playerInstance.adFinished = true;
 
                     //if any other onPauseRoll then render it
-                    if (playerInstance.adList[tempadListId].roll === 'onPauseRoll' && playerInstance.onPauseRollAdPods[0]) {
+                    if (playerInstance.rollsById[tempadListId].roll === 'onPauseRoll' && playerInstance.onPauseRollAdPods[0]) {
                         const getNextOnPauseRollAd = playerInstance.onPauseRollAdPods[0];
                         playerInstance.createBoard(getNextOnPauseRollAd);
                         playerInstance.currentOnPauseRollAd = playerInstance.onPauseRollAdPods[0];
@@ -592,14 +581,14 @@ export default function (playerInstance, options) {
                 videoSlotCanAutoPlay: true
             };
 
-            playerInstance.debugMessage(playerInstance.adList[adListId]);
+            playerInstance.debugMessage(ad);
 
             // calls this functions after ad unit is loaded in iframe
             const ver = playerInstance.vpaidAdUnit.handshakeVersion(VPAID_VERSION);
             const compare = playerInstance.compareVersion(VPAID_VERSION, ver);
             if (compare === 1) {
                 //VPAID version of ad is lower than we need
-                playerInstance.adList[adListId].error = true;
+                ad.error = true;
                 playerInstance.playMainVideoWhenVpaidFails(403);
                 return false;
             }
@@ -612,31 +601,28 @@ export default function (playerInstance, options) {
             playerInstance.vpaidAdUnit.initAd(adWidth, adHeight, mode, 3000, creativeData, environmentVars);
 
             playerInstance.toggleLoader(false);
-            playerInstance.adList[adListId].played = true;
+            ad.played = true;
             playerInstance.adFinished = false;
         };
 
-        playerInstance.loadVpaid(adListId, vastSettings.staticResource);
+        playerInstance.loadVpaid(ad, ad.staticResource);
 
         playerInstance.debugMessage('create non linear vpaid');
     };
 
     // ADS
-    playerInstance.createNonLinearBoard = (adListId) => {
-        const vastSettings = playerInstance.adPool[adListId];
-
-        playerInstance.adList[adListId].played = true;
+    playerInstance.createNonLinearBoard = (ad) => {
+        ad.played = true;
         const playerWidth = playerInstance.domRef.player.clientWidth;
-        const playerHeight = playerInstance.domRef.player.clientHeight;
         const board = document.createElement('div');
-        const vAlign = (playerInstance.adList[adListId].vAlign) ? playerInstance.adList[adListId].vAlign : playerInstance.nonLinearVerticalAlign;
+        const vAlign = (playerInstance.rollsById[ad.rollListId].vAlign) ? playerInstance.rollsById[ad.rollListId].vAlign : playerInstance.nonLinearVerticalAlign;
 
         const creative = new Image();
-        creative.src = vastSettings.staticResource;
-        creative.id = 'fluid_nonLinear_imgCreative_' + adListId + '_' + playerInstance.videoPlayerId;
+        creative.src = ad.staticResource;
+        creative.id = 'fluid_nonLinear_imgCreative_' + ad.id + '_' + playerInstance.videoPlayerId;
 
         creative.onerror = function () {
-            playerInstance.adList[adListId].error = true;
+            playerInstance.rollsById[ad.rollListId].error = true;
             playerInstance.announceError(500);
         };
 
@@ -650,12 +636,12 @@ export default function (playerInstance, options) {
             // 1. adList -> roll -> size
             // 2. VAST XML width/height attriubute (VAST 3.)
             // 3. VAST XML static resource dimension
-            if (typeof playerInstance.adList[adListId].size !== 'undefined') {
-                origWidth = playerInstance.adList[adListId].size.split('x')[0];
-                origHeight = playerInstance.adList[adListId].size.split('x')[1];
-            } else if (vastSettings.dimension.width && vastSettings.dimension.height) {
-                origWidth = vastSettings.dimension.width;
-                origHeight = vastSettings.dimension.height;
+            if (typeof playerInstance.rollsById[ad.rollListId].size !== 'undefined') {
+                origWidth = playerInstance.rollsById[ad.rollListId].size.split('x')[0];
+                origHeight = playerInstance.rollsById[ad.rollListId].size.split('x')[1];
+            } else if (ad.dimension.width && ad.dimension.height) {
+                origWidth = ad.dimension.width;
+                origHeight = ad.dimension.height;
             } else {
                 origWidth = creative.width;
                 origHeight = creative.height;
@@ -669,9 +655,9 @@ export default function (playerInstance, options) {
                 newBannerHeight = origHeight;
             }
 
-            if (playerInstance.adList[adListId].roll !== 'onPauseRoll') {
+            if (playerInstance.rollsById[ad.rollListId].roll !== 'onPauseRoll') {
                 //Show the board only if media loaded
-                document.getElementById('fluid_nonLinear_' + adListId).style.display = '';
+                document.getElementById('fluid_nonLinear_' + ad.id).style.display = '';
             }
 
             const img = document.getElementById(creative.id);
@@ -681,7 +667,7 @@ export default function (playerInstance, options) {
             playerInstance.trackSingleEvent('impression');
         };
 
-        board.id = 'fluid_nonLinear_' + adListId;
+        board.id = 'fluid_nonLinear_' + ad.id;
         board.className = 'fluid_nonLinear_' + vAlign;
         board.className += ' fluid_nonLinear_ad';
         board.innerHTML = creative.outerHTML;
@@ -689,17 +675,17 @@ export default function (playerInstance, options) {
 
         //Bind the Onclick event
         board.onclick = function () {
-            if (typeof vastSettings.clickthroughUrl !== 'undefined') {
-                window.open(vastSettings.clickthroughUrl);
+            if (typeof ad.clickthroughUrl !== 'undefined') {
+                window.open(ad.clickthroughUrl);
             }
 
             //Tracking the NonLinearClickTracking events
-            if (typeof vastSettings.clicktracking !== 'undefined') {
-                playerInstance.callUris([vastSettings.clicktracking]);
+            if (typeof ad.clicktracking !== 'undefined') {
+                playerInstance.callUris([ad.clicktracking]);
             }
         };
 
-        if (typeof vastSettings.clickthroughUrl !== 'undefined') {
+        if (typeof ad.clickthroughUrl !== 'undefined') {
             board.style.cursor = 'pointer';
         }
 
@@ -708,7 +694,7 @@ export default function (playerInstance, options) {
         closeBtn.className = 'close_button';
         closeBtn.innerHTML = '';
         closeBtn.title = playerInstance.displayOptions.layoutControls.closeButtonCaption;
-        const tempadListId = adListId;
+        const tempRollListId = ad.rollListId;
         closeBtn.onclick = function (event) {
             this.parentElement.remove();
             if (typeof event.stopImmediatePropagation !== 'undefined') {
@@ -718,7 +704,7 @@ export default function (playerInstance, options) {
             clearInterval(playerInstance.nonLinearTracking);
 
             //if any other onPauseRoll then render it
-            if (playerInstance.adList[tempadListId].roll === 'onPauseRoll' && playerInstance.onPauseRollAdPods[0]) {
+            if (playerInstance.rollsById[tempRollListId].roll === 'onPauseRoll' && playerInstance.onPauseRollAdPods[0]) {
                 const getNextOnPauseRollAd = playerInstance.onPauseRollAdPods[0];
                 playerInstance.createBoard(getNextOnPauseRollAd);
                 playerInstance.currentOnPauseRollAd = playerInstance.onPauseRollAdPods[0];
@@ -738,37 +724,34 @@ export default function (playerInstance, options) {
      *
      * currently only image/gif, image/jpeg, image/png supported
      */
-    playerInstance.createBoard = (adListId) => {
-        const vastSettings = playerInstance.adPool[adListId];
-
+    playerInstance.createBoard = (ad) => {
         // create nonLinear Vpaid
         // create nonLinear regular
-        if (vastSettings.vpaid) {
+        if (ad.vpaid) {
             playerInstance.hardStopVpaidAd('');
-            playerInstance.createVpaidNonLinearBoard(adListId);
-
+            playerInstance.createVpaidNonLinearBoard(ad);
         } else {
+            if (
+                typeof ad.staticResource === 'undefined' ||
+                playerInstance.supportedStaticTypes.indexOf(ad.creativeType) === -1
+            ) {
+                // Couldn’t find NonLinear resource with supported type.
+                ad.error = true;
 
-            if (typeof vastSettings.staticResource === 'undefined'
-                || playerInstance.supportedStaticTypes.indexOf(vastSettings.creativeType) === -1) {
-                //Couldn’t find NonLinear resource with supported type.
-                playerInstance.adList[adListId].error = true;
                 if (!playerInstance.vastOptions || typeof playerInstance.vastOptions.errorUrl === 'undefined') {
                     playerInstance.announceLocalError(503);
                 } else {
                     playerInstance.announceError(503);
                 }
+
                 return;
             }
-
-            playerInstance.createNonLinearBoard(adListId);
-
+            playerInstance.createNonLinearBoard(ad);
         }
-
     };
 
-    playerInstance.closeNonLinear = (adListId) => {
-        const element = document.getElementById('fluid_nonLinear_' + adListId);
+    playerInstance.closeNonLinear = (adId) => {
+        const element = document.querySelector('#fluid_nonLinear_' + adId + ', #fluid_vpaidNonLinear_' + adId);
         if (element) {
             element.remove();
         }
@@ -777,7 +760,7 @@ export default function (playerInstance, options) {
     playerInstance.rollGroupContainsLinear = (groupedRolls) => {
         let found = false;
         for (let i = 0; i < groupedRolls.length; i++) {
-            if (playerInstance.adList[groupedRolls[i].id].adType && playerInstance.adList[groupedRolls[i].id].adType === 'linear') {
+            if (playerInstance.rollsById[groupedRolls[i].id].adType && playerInstance.rollsById[groupedRolls[i].id].adType === 'linear') {
                 found = true;
                 break;
             }
@@ -787,7 +770,7 @@ export default function (playerInstance, options) {
     playerInstance.rollGroupContainsNonlinear = (groupedRolls) => {
         let found = false;
         for (let i = 0; i < groupedRolls.length; i++) {
-            if (playerInstance.adList[groupedRolls[i].id].adType.toLowerCase() === 'nonlinear') {
+            if (playerInstance.rollsById[groupedRolls[i].id].adType.toLowerCase() === 'nonlinear') {
                 found = true;
                 break;
             }
@@ -817,7 +800,7 @@ export default function (playerInstance, options) {
 
     playerInstance.preRollAdsPlay = () => {
         const time = 0;
-        const adListIds = playerInstance.preRollAdPods;
+        const rollListIds = playerInstance.preRollAdPods;
         const adsByType = {
             linear: [],
             nonLinear: []
@@ -825,20 +808,22 @@ export default function (playerInstance, options) {
 
         playerInstance.firstPlayLaunched = true;
 
-        for (let index = 0; index < adListIds.length; index++) {
+        for (let index = 0; index < rollListIds.length; index++) {
+            playerInstance.rollsById[rollListIds[index]].ads.forEach(ad => {
+                if (ad.played === true) {
+                    return;
+                }
 
-            if (playerInstance.adList[adListIds[index]].played === true) {
-                return
-            }
+                if (ad.adType === 'linear') {
+                    adsByType.linear.push(ad);
+                }
 
-            if (playerInstance.adList[adListIds[index]].adType === 'linear') {
-                adsByType.linear.push(adListIds[index]);
-            }
+                if (ad.adType === 'nonLinear') {
+                    adsByType.nonLinear.push(ad);
+                    playerInstance.scheduleTask({time: time, playRoll: 'midRoll', rollListId: ad.rollListId });
+                }
+            });
 
-            if (playerInstance.adList[adListIds[index]].adType === 'nonLinear') {
-                adsByType.nonLinear.push(adListIds[index]);
-                playerInstance.scheduleTask({time: time, playRoll: 'midRoll', adListId: adsByType.nonLinear.shift()});
-            }
         }
 
         if (adsByType.linear.length > 0) {
@@ -854,15 +839,15 @@ export default function (playerInstance, options) {
         const vastObj = event.vastObj;
         playerInstance.domRef.player.removeEventListener(event.type, playerInstance.preRoll);
 
-        const adListId = [];
-        adListId[0] = event.type.replace('adId_', '');
+        const rollListIds = [];
+        rollListIds[0] = event.type.replace('adId_', '');
         const time = 0;
 
-        if (playerInstance.adList[adListId[0]].played === true) {
+        if (playerInstance.rollsById[rollListIds[0]].played === true) {
             return;
         }
 
-        playerInstance.preRollAdPods.push(adListId[0]);
+        playerInstance.preRollAdPods.push(rollListIds[0]);
 
         playerInstance.preRollSuccess(vastObj);
     };
@@ -892,8 +877,8 @@ export default function (playerInstance, options) {
         const idPrefix = 'ad_marker_' + playerInstance.videoPlayerId + "_";
         for (let i = 0; i < adMarkers.length; ++i) {
             const item = adMarkers[i];
-            const adListId = item.id.replace(idPrefix, '');
-            if (playerInstance.adList[adListId].played === false) {
+            const rollListId = item.id.replace(idPrefix, '');
+            if (playerInstance.rollsById[rollListId].played === false) {
                 item.style.display = '';
             }
         }
@@ -911,12 +896,12 @@ export default function (playerInstance, options) {
     playerInstance.midRoll = (event) => {
         playerInstance.domRef.player.removeEventListener(event.type, playerInstance.midRoll);
 
-        const adListId = event.type.replace('adId_', '');
-        if (playerInstance.adList[adListId].played === true) {
+        const rollListId = event.type.replace('adId_', '');
+        if (playerInstance.rollsById[rollListId].played === true) {
             return;
         }
 
-        let time = playerInstance.adList[adListId].timer;
+        let time = playerInstance.rollsById[rollListId].timer;
 
         if (typeof time == 'string' && time.indexOf("%") !== -1) {
             time = time.replace('%', '');
@@ -924,52 +909,53 @@ export default function (playerInstance, options) {
         }
 
         if (playerInstance.displayOptions.vastOptions.showProgressbarMarkers &&
-            playerInstance.adList[adListId].adType === "nonLinear") {
-            playerInstance.createAdMarker(adListId, time);
+            playerInstance.rollsById[rollListId].adType === "nonLinear") {
+            playerInstance.createAdMarker(rollListId, time);
         }
 
         playerInstance.scheduleTask({
             time: time,
             playRoll: 'midRoll',
-            adListId: adListId
+            rollListId
         });
     };
 
     playerInstance.postRoll = (event) => {
         playerInstance.domRef.player.removeEventListener(event.type, playerInstance.postRoll);
-        const adListId = event.type.replace('adId_', '');
+        const rollListId = event.type.replace('adId_', '');
 
         playerInstance.scheduleTask({
             time: Math.floor(playerInstance.mainVideoDuration),
             playRoll: 'postRoll',
-            adListId: adListId
+            rollListId
         });
     };
 
     playerInstance.onPauseRoll = (event) => {
         playerInstance.domRef.player.removeEventListener(event.type, playerInstance.onPauseRoll);
-        const adListId = event.type.replace('adId_', '');
+        const rollListId = event.type.replace('adId_', '');
 
-        if (playerInstance.adList[adListId].adType === 'nonLinear') {
-            if (!playerInstance.adPool.hasOwnProperty(adListId) || playerInstance.adPool[adListId].error === true) {
-                playerInstance.announceLocalError(101);
-                return;
-            }
-
-            //var playerWrapper = document.getElementById('fluid_video_wrapper_' + playerInstance.videoPlayerId);
-            const nonLinearAdExists = document.getElementsByClassName('fluid_nonLinear_ad')[0];
-            if (!nonLinearAdExists) {
-                playerInstance.createBoard(adListId);
-                playerInstance.currentOnPauseRollAd = adListId;
-                let onPauseAd = document.getElementById('fluid_nonLinear_' + adListId);
-                if (onPauseAd) {
-                    onPauseAd.style.display = 'none';
+        playerInstance.rollsById[rollListId].ads.forEach(ad => {
+            if (ad.adType === 'nonLinear') {
+                if (playerInstance.rollsById[ad.rollListId].error === true || ad.error === true) {
+                    playerInstance.announceLocalError(101);
+                    return;
                 }
-            } else {
-                playerInstance.onPauseRollAdPods.push(adListId);
-            }
 
-        }
+                const nonLinearAdExists = document.getElementsByClassName('fluid_nonLinear_ad')[0];
+                if (!nonLinearAdExists) {
+                    playerInstance.createBoard(ad);
+                    playerInstance.currentOnPauseRollAd = rollListId;
+                    let onPauseAd = document.getElementById('fluid_nonLinear_' + rollListId);
+                    if (onPauseAd) {
+                        onPauseAd.style.display = 'none';
+                    }
+                } else {
+                    playerInstance.onPauseRollAdPods.push(rollListId);
+                }
+
+            }
+        });
     };
 
     /**
@@ -979,7 +965,13 @@ export default function (playerInstance, options) {
         // TODO should be only one. Add validator to allow only one onPause roll
         const onPauseAd = playerInstance.findRoll('onPauseRoll');
 
-        return (onPauseAd.length !== 0 && playerInstance.adList[onPauseAd[0]] && playerInstance.adList[onPauseAd[0]].error === false);
+        return (
+            onPauseAd.length !== 0 &&
+            playerInstance.rollsById[onPauseAd[0]] &&
+            playerInstance.rollsById[onPauseAd[0]].error === false &&
+            playerInstance.rollsById[onPauseAd[0]].ads.length &&
+            playerInstance.rollsById[onPauseAd[0]].ads[0].error !== true
+        );
     };
 
     /**
@@ -989,26 +981,21 @@ export default function (playerInstance, options) {
         playerInstance.toggleLoader(false);
         if (playerInstance.hasValidOnPauseAd() && !playerInstance.isCurrentlyPlayingAd) {
             const onPauseRoll = playerInstance.findRoll('onPauseRoll');
-            let adListId;
-            if (playerInstance.currentOnPauseRollAd !== '') {
-                adListId = playerInstance.currentOnPauseRollAd;
-            } else {
-                adListId = onPauseRoll[0];
-            }
+            const ad = playerInstance.rollsById[onPauseRoll].ads[0];
 
-            playerInstance.vastOptions = playerInstance.adPool[adListId];
-            const onPauseAd = document.getElementById('fluid_nonLinear_' + adListId);
+            playerInstance.vastOptions = ad;
+            const onPauseAd = document.getElementById('fluid_nonLinear_' + ad.id);
 
             if (onPauseAd && playerInstance.domRef.player.paused) {
                 setTimeout(function () {
                     onPauseAd.style.display = 'flex';
-                    playerInstance.adList[adListId].played = false;
-                    playerInstance.trackingOnPauseNonLinearAd(adListId, 'start');
+                    ad.played = false;
+                    playerInstance.trackingOnPauseNonLinearAd(ad, 'start');
                 }, 500);
             } else if (onPauseAd && !playerInstance.domRef.player.paused) {
                 onPauseAd.style.display = 'none';
                 playerInstance.adFinished = true;
-                playerInstance.trackingOnPauseNonLinearAd(adListId, 'complete');
+                playerInstance.trackingOnPauseNonLinearAd(ad, 'complete');
             }
         }
     };
@@ -1016,13 +1003,13 @@ export default function (playerInstance, options) {
     /**
      * Helper function for tracking onPause Ads
      */
-    playerInstance.trackingOnPauseNonLinearAd = (adListId, status) => {
-        if (!playerInstance.adPool.hasOwnProperty(adListId) || playerInstance.adPool[adListId].error === true) {
+    playerInstance.trackingOnPauseNonLinearAd = (ad, status) => {
+        if (playerInstance.rollsById[ad.rollListId].error === true || ad.error === true) {
             playerInstance.announceLocalError(101);
             return;
         }
 
-        playerInstance.vastOptions = playerInstance.adPool[adListId];
+        playerInstance.vastOptions = ad;
         playerInstance.trackSingleEvent(status);
     };
 
@@ -1030,7 +1017,7 @@ export default function (playerInstance, options) {
         const adListIds = [];
 
         for (let i = 0; i < keyTimeLinearObj.length; i++) {
-            if (playerInstance.adList[keyTimeLinearObj[i].adListId].played === false) {
+            if (playerInstance.rollsById[keyTimeLinearObj[i].adListId].played === false) {
                 adListIds.push(keyTimeLinearObj[i].adListId);
             }
         }
@@ -1056,9 +1043,9 @@ export default function (playerInstance, options) {
         // Task: close nonLinear ads
         if (timerPoolKeytimeCloseStaticAdsLength > 0) {
             for (let index = 0; index < timerPoolKeytimeCloseStaticAdsLength; index++) {
-                const adListId = playerInstance.timerPool[keyTime]['closeStaticAd'][index].closeStaticAd;
-                if (playerInstance.adList[adListId].played === true) {
-                    playerInstance.completeNonLinearStatic(adListId);
+                const adToClose = playerInstance.timerPool[keyTime]['closeStaticAd'][index];
+                if (adToClose.played === true) {
+                    playerInstance.completeNonLinearStatic(adToClose);
                 }
             }
 
@@ -1068,9 +1055,8 @@ export default function (playerInstance, options) {
 
         // Task: play linear ads
         if (timerPoolKeytimeLinearAdsLength > 0) {
-            const adListIds = playerInstance.getLinearAdsFromKeyTime(playerInstance.timerPool[keyTime]['linear']);
-            if (adListIds.length > 0) {
-                playerInstance.playRoll(adListIds);
+            if (playerInstance.timerPool[keyTime]['linear'].length > 0) {
+                playerInstance.playRoll(playerInstance.timerPool[keyTime]['linear']);
 
                 // empty the linear ads from the timerpool after played
                 playerInstance.timerPool[keyTime]['linear'] = [];
@@ -1083,14 +1069,15 @@ export default function (playerInstance, options) {
         // Task: play nonLinear ads
         if (timerPoolKeytimeNonlinearAdsLength > 0) {
             for (let index = 0; index < timerPoolKeytimeNonlinearAdsLength; index++) {
-                const adListId = playerInstance.timerPool[keyTime]['nonLinear'][index].adListId;
-                const vastOptions = playerInstance.adPool[adListId];
+                const ad = playerInstance.timerPool[keyTime]['nonLinear'][index];
+                const rollListId = ad.rollListId;
+                const vastOptions = playerInstance.adPool[rollListId];
 
                 // we are not supporting nonLinear ads in cardBoard mode
-                if (playerInstance.adList[adListId].played === false && !playerInstance.displayOptions.layoutControls.showCardBoardView) {
-                    playerInstance.createNonLinearStatic(adListId);
+                if (ad.played === false && !playerInstance.displayOptions.layoutControls.showCardBoardView) {
+                    playerInstance.createNonLinearStatic(ad);
                     if (playerInstance.displayOptions.vastOptions.showProgressbarMarkers) {
-                        playerInstance.hideAdMarker(adListId);
+                        playerInstance.hideAdMarker(ad);
                     }
 
                     // delete nonLinear after playing
@@ -1125,13 +1112,25 @@ export default function (playerInstance, options) {
             playerInstance.timerPool[task.time] = {linear: [], nonLinear: [], closeStaticAd: []};
         }
 
-        if (task.hasOwnProperty('playRoll') && playerInstance.adList[task.adListId].adType === 'linear') {
-            playerInstance.timerPool[task.time]['linear'].push(task);
-        } else if (task.hasOwnProperty('playRoll') && playerInstance.adList[task.adListId].adType === 'nonLinear') {
-            playerInstance.timerPool[task.time]['nonLinear'].push(task);
-        } else if (task.hasOwnProperty('closeStaticAd')) {
-            playerInstance.timerPool[task.time]['closeStaticAd'].push(task);
-        }
+        const roll = playerInstance.rollsById[task.rollListId];
+
+        roll.ads
+            .filter(({ adType }) => {
+                if (task.time === 0) { // Only non-linear should be scheduled on "preRoll"
+                    return adType !== 'linear';
+                }
+
+                return true;
+            })
+            .forEach(ad => {
+                if (task.hasOwnProperty('playRoll') && ad.adType === 'linear') {
+                    playerInstance.timerPool[task.time]['linear'].push(ad);
+                } else if (task.hasOwnProperty('playRoll') && ad.adType === 'nonLinear') {
+                    playerInstance.timerPool[task.time]['nonLinear'].push(ad);
+                } else if (task.hasOwnProperty('closeStaticAd')) {
+                    playerInstance.timerPool[task.time]['closeStaticAd'].push(ad);
+                }
+            });
 
     };
 
@@ -1191,16 +1190,11 @@ export default function (playerInstance, options) {
 
     // ADS
     playerInstance.getNextAdPod = () => {
-        const getFirstUnPlayedAd = false;
-        let adListId = null;
-
-        // if temporaryAdPods is not empty
         if (playerInstance.temporaryAdPods.length > 0) {
-            const temporaryAdPods = playerInstance.temporaryAdPods.shift();
-            adListId = temporaryAdPods.id;
+            return playerInstance.temporaryAdPods.shift();
         }
 
-        return adListId;
+        return null;
     };
 
     // ADS
@@ -1360,7 +1354,9 @@ export default function (playerInstance, options) {
 
         let CTATextPosition;
         if (ctaButton !== null) {
-            CTATextPosition = playerInstance.displayOptions.vastOptions.adCTATextPosition.toLowerCase();
+            CTATextPosition = playerInstance.rollsById[adListData.rollListId].adCTATextPosition ?
+                playerInstance.rollsById[adListData.rollListId].adCTATextPosition.toLowerCase() :
+                playerInstance.displayOptions.vastOptions.adCTATextPosition;
 
             if (allowedPosition.indexOf(CTATextPosition) === -1) {
                 console.log('[FP Error] Invalid position for CTAText. Reverting to "bottom right"');
@@ -1386,7 +1382,9 @@ export default function (playerInstance, options) {
         let adPlayingDivPosition;
         let positionsAdText;
         if (adPlayingDiv !== null) {
-            adPlayingDivPosition = (adListData.adTextPosition !== null) ? adListData.adTextPosition.toLowerCase() : playerInstance.displayOptions.vastOptions.adTextPosition.toLowerCase();
+            adPlayingDivPosition = playerInstance.rollsById[adListData.rollListId].adTextPosition ?
+                playerInstance.rollsById[adListData.rollListId].adTextPosition.toLowerCase() :
+                playerInstance.displayOptions.vastOptions.adTextPosition;
 
             if (allowedPosition.indexOf(adPlayingDivPosition) === -1) {
                 console.log('[FP Error] Invalid position for adText. Reverting to "top left"');

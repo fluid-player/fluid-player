@@ -1,11 +1,10 @@
-'use strict';
 
 if ('undefined' === typeof FP_HOMEPAGE) {
-    global.FP_HOMEPAGE = 'https://fluidplayer.com';
+    globalThis.FP_HOMEPAGE = 'https://fluidplayer.com';
 }
 
 if ('undefined' === typeof FP_BUILD_VERSION) {
-    global.FP_BUILD_VERSION = 'v3';
+    globalThis.FP_BUILD_VERSION = 'v3';
 }
 
 if ('undefined' === typeof FP_ENV) {
@@ -16,16 +15,16 @@ if ('undefined' === typeof FP_ENV) {
             || window.location.hostname === '');
 
     if ('undefined' !== typeof process && process && process.env && process.env.NODE_ENV) {
-        global.FP_ENV = process.env.NODE_ENV;
+        globalThis.FP_ENV = process.env.NODE_ENV;
     } else if (window && !isLocalhost) {
-        global.FP_ENV = 'production';
+        globalThis.FP_ENV = 'production';
     } else {
-        global.FP_ENV = 'development';
+        globalThis.FP_ENV = 'development';
     }
 }
 
 if ('undefined' === typeof FP_DEBUG) {
-    global.FP_DEBUG = false;
+    globalThis.FP_DEBUG = false;
 }
 
 import './polyfills';

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VAST version="3.0">
+    <Ad id="5566276">
+        <InLine>
+            <AdSystem>ExoClick</AdSystem>
+            <AdTitle/>
+            <Impression id="exotr"><![CDATA[/impression]]></Impression>
+            <Error><![CDATA[/error]]></Error>
+            <Creatives>
+            </Creatives>
+            <Extensions>
+                <Extension>
+                    <TitleCTA>
+                        <MobileText>Ad Buffet Ad #1</MobileText>
+                        <PCText>Ad Buffet Ad #1</PCText>
+                        <DisplayUrl><![CDATA[sample.com]]></DisplayUrl>
+                        <Tracking><![CDATA[/cta_tracking]]></Tracking>
+                    </TitleCTA>
+                </Extension>
+            </Extensions>
+        </InLine>
+    </Ad>
+    <Ad id="4840678">
+        <InLine>
+            <AdSystem>ExoClick</AdSystem>
+            <AdTitle/>
+            <Impression id="exotr"><![CDATA[/impression]]></Impression>
+            <Error><![CDATA[/error]]></Error>
+            <Creatives>
+                <Creative sequence="1" id="79253280">
+                    <Linear>
+                        <Duration>00:00:30.0</Duration>
+                        <TrackingEvents>
+                            <Tracking id="prog_1" event="progress" offset="00:00:10.000"><![CDATA[/progress_10_seconds]]></Tracking>
+                        </TrackingEvents>
+                        <VideoClicks>
+                            <ClickThrough><![CDATA[/clicktrough]]></ClickThrough>
+                        </VideoClicks>
+                        <MediaFiles>
+                            <MediaFile delivery="progressive" type="video/mp4"><![CDATA[https://cdn.jsdelivr.net/npm/big-buck-bunny-1080p@0.0.6/video.mp4]]></MediaFile>
+                        </MediaFiles>
+                        <Icons>
+                            <Icon>
+                                <IconClicks>
+                                    <IconClickThrough>hczog.com</IconClickThrough>
+                                </IconClicks>
+                            </Icon>
+                        </Icons>
+                    </Linear>
+                </Creative>
+            </Creatives>
+            <Extensions>
+                <Extension>
+                    <TitleCTA>
+                        <MobileText>Ad Buffet Ad #2</MobileText>
+                        <PCText>Ad Buffet Ad #2</PCText>
+                        <DisplayUrl><![CDATA[]]></DisplayUrl>
+                        <Tracking><![CDATA[/cta_tracking]]></Tracking>
+                    </TitleCTA>
+                </Extension>
+            </Extensions>
+        </InLine>
+    </Ad>
+    <Ad id="5460430">
+        <InLine>
+            <AdSystem>ExoClick</AdSystem>
+            <AdTitle/>
+            <Impression id="exotr"><![CDATA[/impression]]></Impression>
+            <Error><![CDATA[/error]]></Error>
+            <Creatives>
+                <Creative sequence="1" id="79167900">
+                    <Linear>
+                        <Duration>00:00:24.799</Duration>
+                        <TrackingEvents>
+                            <Tracking id="prog_1" event="progress" offset="00:00:10.000"><![CDATA[/progress_10_seconds]]></Tracking>
+                        </TrackingEvents>
+                        <VideoClicks>
+                            <ClickThrough><![CDATA[/clicktrough]]></ClickThrough>
+                        </VideoClicks>
+                        <MediaFiles>
+                            <MediaFile delivery="progressive" type="video/mp4"><![CDATA[https://cdn.jsdelivr.net/npm/big-buck-bunny-1080p@0.0.6/video.mp4]]></MediaFile>
+                        </MediaFiles>
+                        <Icons>
+                            <Icon>
+                                <IconClicks>
+                                    <IconClickThrough>www.zodertracker.com</IconClickThrough>
+                                </IconClicks>
+                            </Icon>
+                        </Icons>
+                    </Linear>
+                </Creative>
+            </Creatives>
+            <Extensions>
+                <Extension>
+                    <TitleCTA>
+                        <MobileText>Ad Buffet Ad #3</MobileText>
+                        <PCText>Ad Buffet Ad #3</PCText>
+                        <DisplayUrl><![CDATA[]]></DisplayUrl>
+                        <Tracking><![CDATA[cta_tracking]]></Tracking>
+                    </TitleCTA>
+                </Extension>
+            </Extensions>
+        </InLine>
+    </Ad>
+</VAST>

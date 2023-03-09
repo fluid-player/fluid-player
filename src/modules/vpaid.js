@@ -1,5 +1,4 @@
 // VPAID support module
-'use strict';
 export default function (playerInstance, options) {
     const callbacks = {
         AdStarted: () => playerInstance.onStartVpaidAd,
@@ -225,7 +224,7 @@ export default function (playerInstance, options) {
             return;
         }
 
-        playerInstance.backupMainVideoContentTime(adListId);
+        playerInstance.backupMainVideoContentTime(adListId.split('_')[0]);
         playerInstance.isCurrentlyPlayingAd = true;
 
         if (closeBtn) {
@@ -280,7 +279,7 @@ export default function (playerInstance, options) {
     };
 
     // Hard Pass through for stopAd() excluding deleteOtherVpaidAdsApart
-    playerInstance.hardStopVpaidAd = (deleteOtherVpaidAdsApart) => {
+    playerInstance.hardStopVpaidAd = (ad) => {
         // this is hard stop of vpaid ads
         // we delete all the vpaid assets so the new one can be loaded
         // delete all assets apart from the ad from deleteOtherVpaidAdsApart
@@ -294,19 +293,19 @@ export default function (playerInstance, options) {
         const vpaidNonLinearSlots = document.getElementsByClassName("fluid_vpaidNonLinear_ad");
 
         for (let i = 0; i < vpaidIframes.length; i++) {
-            if (vpaidIframes[i].getAttribute('adListId') !== deleteOtherVpaidAdsApart) {
+            if (vpaidIframes[i].getAttribute('adListId') !== ad.id) {
                 vpaidIframes[i].remove();
             }
         }
 
         for (let j = 0; j < vpaidSlots.length; j++) {
-            if (vpaidSlots[j].getAttribute('adListId') !== deleteOtherVpaidAdsApart) {
+            if (vpaidSlots[j].getAttribute('adListId') !== ad.id) {
                 vpaidSlots[j].remove();
             }
         }
 
         for (let k = 0; k < vpaidNonLinearSlots.length; k++) {
-            if (vpaidNonLinearSlots[k].getAttribute('adListId') !== deleteOtherVpaidAdsApart) {
+            if (vpaidNonLinearSlots[k].getAttribute('adListId') !== ad.id) {
                 vpaidNonLinearSlots[k].remove();
             }
         }
@@ -446,11 +445,11 @@ export default function (playerInstance, options) {
         }
     };
 
-    playerInstance.loadVpaid = (adListId, vpaidJsUrl) => {
+    playerInstance.loadVpaid = (ad, vpaidJsUrl) => {
         const vpaidIframe = document.createElement('iframe');
-        vpaidIframe.id = playerInstance.videoPlayerId + "_" + adListId + "_fluid_vpaid_iframe";
+        vpaidIframe.id = playerInstance.videoPlayerId + "_" + ad.id + "_fluid_vpaid_iframe";
         vpaidIframe.className = 'fluid_vpaid_iframe';
-        vpaidIframe.setAttribute('adListId', adListId);
+        vpaidIframe.setAttribute('adListId', ad.id);
         vpaidIframe.setAttribute('frameborder', '0');
 
         playerInstance.domRef.player.parentNode.insertBefore(vpaidIframe, playerInstance.domRef.player.nextSibling);
@@ -467,7 +466,7 @@ export default function (playerInstance, options) {
             if (fn && typeof fn == 'function') {
 
                 if (playerInstance.vpaidAdUnit) {
-                    playerInstance.hardStopVpaidAd(adListId);
+                    playerInstance.hardStopVpaidAd(ad);
                 }
 
                 playerInstance.vpaidAdUnit = fn();
@@ -476,10 +475,10 @@ export default function (playerInstance, options) {
 
                     if (playerInstance.getVpaidAdLinear()) {
                         playerInstance.isCurrentlyPlayingAd = true;
-                        playerInstance.switchPlayerToVpaidMode(adListId);
+                        playerInstance.switchPlayerToVpaidMode(ad);
                     } else {
                         playerInstance.debugMessage('non linear vpaid ad is loaded');
-                        playerInstance.loadVpaidNonlinearAssets(adListId);
+                        playerInstance.loadVpaidNonlinearAssets(ad);
                     }
 
                 }
@@ -490,7 +489,7 @@ export default function (playerInstance, options) {
                 playerInstance.tempVpaidCounter++;
                 if (playerInstance.tempVpaidCounter >= 20) {
                     clearInterval(playerInstance.getVPAIDAdInterval);
-                    playerInstance.adList[adListId].error = true;
+                    playerInstance.rollsById[ad.rollListId].error = true;
                     playerInstance.playMainVideoWhenVpaidFails(403);
                     return false;
                 } else {
@@ -535,9 +534,5 @@ export default function (playerInstance, options) {
 
         clearInterval(playerInstance.getVPAIDAdInterval);
         playerInstance.playMainVideoWhenVastFails(errorCode);
-    };
-
-    // TODO: ???
-    playerInstance.switchPlayerToVpaidMode = () => {
     };
 }

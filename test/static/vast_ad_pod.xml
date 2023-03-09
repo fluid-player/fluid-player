@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VAST version="3.0">
+    <Ad id="5566276" sequence="2">
+        <InLine>
+            <AdSystem>ExoClick</AdSystem>
+            <AdTitle/>
+            <Impression id="exotr"><![CDATA[/impression]]></Impression>
+            <Error><![CDATA[/error]]></Error>
+            <Creatives>
+                <Creative sequence="1" id="78544088">
+                    <Linear skipoffset="00:00:03">
+                        <Duration>00:00:22.342</Duration>
+                        <TrackingEvents>
+                            <Tracking id="prog_1" event="progress" offset="00:00:10.000"><![CDATA[/progress_10_seconds]]></Tracking>
+                        </TrackingEvents>
+                        <VideoClicks>
+                            <ClickThrough><![CDATA[/clicktrough]]></ClickThrough>
+                        </VideoClicks>
+                        <MediaFiles>
+                            <MediaFile delivery="progressive" type="video/mp4"><![CDATA[https://cdn.jsdelivr.net/npm/big-buck-bunny-1080p@0.0.6/video.mp4]]></MediaFile>
+                        </MediaFiles>
+                        <Icons>
+                            <Icon>
+                                <IconClicks>
+                                    <IconClickThrough>samplesite.com</IconClickThrough>
+                                </IconClicks>
+                            </Icon>
+                        </Icons>
+                    </Linear>
+                </Creative>
+            </Creatives>
+            <Extensions>
+                <Extension>
+                    <TitleCTA>
+                        <MobileText>AD #2 in an Ad Pod</MobileText>
+                        <PCText>AD #2 in an Ad Pod</PCText>
+                        <DisplayUrl><![CDATA[sample.com]]></DisplayUrl>
+                        <Tracking><![CDATA[/cta_tracking]]></Tracking>
+                    </TitleCTA>
+                </Extension>
+            </Extensions>
+        </InLine>
+    </Ad>
+    <Ad id="4840678" sequence="1">
+        <InLine>
+            <AdSystem>ExoClick</AdSystem>
+            <AdTitle/>
+            <Impression id="exotr"><![CDATA[/impression]]></Impression>
+            <Error><![CDATA[/error]]></Error>
+            <Creatives>
+                <Creative sequence="1" id="79253280">
+                    <Linear skipoffset="00:00:03">
+                        <Duration>00:00:30.0</Duration>
+                        <TrackingEvents>
+                            <Tracking id="prog_1" event="progress" offset="00:00:10.000"><![CDATA[/progress_10_seconds]]></Tracking>
+                        </TrackingEvents>
+                        <VideoClicks>
+                            <ClickThrough><![CDATA[/clicktrough]]></ClickThrough>
+                        </VideoClicks>
+                        <MediaFiles>
+                            <MediaFile delivery="progressive" type="video/mp4"><![CDATA[https://cdn.jsdelivr.net/npm/big-buck-bunny-1080p@0.0.6/video.mp4]]></MediaFile>
+                        </MediaFiles>
+                        <Icons>
+                            <Icon>
+                                <IconClicks>
+                                    <IconClickThrough>hczog.com</IconClickThrough>
+                                </IconClicks>
+                            </Icon>
+                        </Icons>
+                    </Linear>
+                </Creative>
+            </Creatives>
+            <Extensions>
+                <Extension>
+                    <TitleCTA>
+                        <MobileText>AD #1 in an Ad Pod</MobileText>
+                        <PCText>AD #1 in an Ad Pod</PCText>
+                        <DisplayUrl><![CDATA[]]></DisplayUrl>
+                        <Tracking><![CDATA[/cta_tracking]]></Tracking>
+                    </TitleCTA>
+                </Extension>
+            </Extensions>
+        </InLine>
+    </Ad>
+    <Ad id="20005" sequence="3">
+        <InLine>
+            <AdSystem version="4.0">iabtechlab</AdSystem>
+            <AdTitle>
+                NonLinear Image
+            </AdTitle>
+            <Description>
+                <![CDATA[VAST 3.0 sample tag for Non Linear ad (i.e Overlay ad). Change the StaticResources to have a tag with your own content. Change NonLinear tag's parameters accordingly to view desired results. ]]>
+            </Description>
+            <Pricing model="cpm" currency="USD">
+                <![CDATA[ 25.00 ]]>
+            </Pricing>
+            <Error>
+                <![CDATA[
+            http://example.com/error
+            ]]>
+            </Error>
+            <Impression id="Impression-ID">
+                <![CDATA[
+            http://example.com/track/impression
+            ]]>
+            </Impression>
+
+            <Creatives>
+                <Creative id="5480" sequence="1">
+                    <NonLinearAds>
+                        <NonLinear width="480" height="150" minSuggestedDuration="00:00:05" scalable="true" maintainAspectRatio="true">
+                            <StaticResource creativeType="image/png">
+                                <![CDATA[ https://placekitten.com/480/150 ]]>
+                            </StaticResource>
+
+                            <NonLinearClickTracking>
+                                <![CDATA[http://example.com/trackingurl/clickTracking]]>
+                            </NonLinearClickTracking>
+                            <NonLinearClickThrough>
+                                <![CDATA[http://iabtechlab.com]]>
+                            </NonLinearClickThrough>
+
+                        </NonLinear>
+                    </NonLinearAds>
+                </Creative>
+            </Creatives>
+        </InLine>
+    </Ad>
+    <Ad id="5460430">
+        <InLine>
+            <AdSystem>ExoClick</AdSystem>
+            <AdTitle/>
+            <Impression id="exotr"><![CDATA[/impression]]></Impression>
+            <Error><![CDATA[/error]]></Error>
+            <Creatives>
+                <Creative sequence="1" id="79167900">
+                    <Linear skipoffset="00:00:02">
+                        <Duration>00:00:24.799</Duration>
+                        <TrackingEvents>
+                            <Tracking id="prog_1" event="progress" offset="00:00:10.000"><![CDATA[/progress_10_seconds]]></Tracking>
+                        </TrackingEvents>
+                        <VideoClicks>
+                            <ClickThrough><![CDATA[/clicktrough]]></ClickThrough>
+                        </VideoClicks>
+                        <MediaFiles>
+                            <MediaFile delivery="progressive" type="video/mp4"><![CDATA[https://cdn.jsdelivr.net/npm/big-buck-bunny-1080p@0.0.6/video.mp4]]></MediaFile>
+                        </MediaFiles>
+                        <Icons>
+                            <Icon>
+                                <IconClicks>
+                                    <IconClickThrough>www.zodertracker.com</IconClickThrough>
+                                </IconClicks>
+                            </Icon>
+                        </Icons>
+                    </Linear>
+                </Creative>
+            </Creatives>
+            <Extensions>
+                <Extension>
+                    <TitleCTA>
+                        <MobileText>Stand Alone Ad - Should Not be Played (BUG!)</MobileText>
+                        <PCText>Stand Alone Ad - Should Not be Played (BUG!)</PCText>
+                        <DisplayUrl><![CDATA[]]></DisplayUrl>
+                        <Tracking><![CDATA[cta_tracking]]></Tracking>
+                    </TitleCTA>
+                </Extension>
+            </Extensions>
+        </InLine>
+    </Ad>
+</VAST>

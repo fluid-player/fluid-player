@@ -5,7 +5,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>VOD with VAST</title>
+    <title>VOD with VAST Wrapper - followAdditionalWrappers: false</title>
     <%= htmlWebpackPlugin.tags.headTags %>
     <style lang="css">
         #fluid-player-e2e-case {
@@ -14,6 +14,8 @@
     </style>
 </head>
 <body>
+
+<p>Expected: No AD should play, as it won't follow the nested VAST Wrappers</p>
 
 <video id="fluid-player-e2e-case">
     <source src='https://cdn.fluidplayer.com/videos/valerian-1080p.mkv' data-fluid-hd title="1080p" type='video/mp4'/>
@@ -26,16 +28,11 @@
 <script>
     var instance = fluidPlayer('fluid-player-e2e-case', {
         vastOptions: {
-            allowVPAID: true, // Default false.
+            allowVPAID: true,
             adList: [
                 {
                     roll: 'preRoll',
-                    vastTag: '/static/vpaid_linear.xml'
-                },
-                {
-                    roll: 'midRoll',
-                    vastTag: '/static/vpaid_nonlinear.xml',
-                    timer: 4
+                    vastTag: '/static/vast_wrapper_followAdditionalWrappers_false.xml',
                 },
             ]
         }

@@ -1,4 +1,3 @@
-'use strict';
 
 import promisePolyfill from 'es6-promise';
 

@@ -1,4 +1,3 @@
-'use strict';
 export default function (playerInstance, options) {
     playerInstance.createCardboardJoystickButton = (identity) => {
         const vrJoystickPanel = document.getElementById(playerInstance.videoPlayerId + '_fluid_vr_joystick_panel');

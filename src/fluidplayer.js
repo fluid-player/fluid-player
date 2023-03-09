@@ -108,7 +108,7 @@ const fluidPlayerClass = function () {
         self.isTimer = false;
         self.timer = null;
         self.timerPool = {};
-        self.adList = {};
+        self.rollsById = {};
         self.adPool = {};
         self.adGroupedByRolls = {};
         self.onPauseRollAdPods = [];
@@ -534,6 +534,40 @@ const fluidPlayerClass = function () {
         xmlHttpReq.send();
     };
 
+    /**
+     * Makes a XMLHttpRequest encapsulated by a Promise
+     *
+     * @param url
+     * @param withCredentials
+     * @param timeout
+     * @returns {Promise<unknown>}
+     */
+    self.sendRequestAsync = async (url, withCredentials, timeout) => {
+        return await new Promise((resolve, reject) => {
+            const xmlHttpReq = new XMLHttpRequest();
+
+            xmlHttpReq.onreadystatechange = (event) => {
+                const response = event.target;
+
+                if (response.readyState === 4 && response.status >= 200 && response.status < 300) {
+                    resolve(response);
+                } else if (response.readyState === 4) {
+                    reject(response);
+                }
+            };
+
+            self.displayOptions.onBeforeXMLHttpRequestOpen(xmlHttpReq);
+
+            xmlHttpReq.open('GET', url, true);
+            xmlHttpReq.withCredentials = withCredentials;
+            xmlHttpReq.timeout = timeout;
+
+            self.displayOptions.onBeforeXMLHttpRequest(xmlHttpReq);
+
+            xmlHttpReq.send();
+        })
+    };
+
     // TODO: rename
     self.announceLocalError = (code, msg) => {
         const parsedCode = typeof (code) !== 'undefined' ? parseInt(code) : 900;
@@ -543,9 +577,11 @@ const fluidPlayerClass = function () {
     };
 
     // TODO: move this somewhere else and refactor
-    self.debugMessage = (msg) => {
+    self.debugMessage = (...msg) => {
+        const style = 'color: #fff; font-weight: bold; background-color: #1a5e87; padding: 3px 6px; border-radius: 3px;';
+
         if (self.displayOptions.debug) {
-            console.log(msg);
+            console.log('%cFP DEBUG MESSAGE', style, ...msg);
         }
     };
 
@@ -1311,16 +1347,16 @@ const fluidPlayerClass = function () {
         const ids = [];
         ids.length = 0;
 
-        if (!roll || !self.hasOwnProperty('adList')) {
+        if (!roll || !self.hasOwnProperty('rollsById')) {
             return;
         }
 
-        for (let key in self.adList) {
-            if (!self.adList.hasOwnProperty(key)) {
+        for (let key in self.rollsById) {
+            if (!self.rollsById.hasOwnProperty(key)) {
                 continue;
             }
 
-            if (self.adList[key].roll === roll) {
+            if (self.rollsById[key].roll === roll) {
                 ids.push(key);
             }
         }
@@ -3073,6 +3109,10 @@ const fluidPlayerInterface = function (instance) {
     this.on = (event, callback) => {
         return instance.on(event, callback)
     };
+
+    this.setDebug = (value) => {
+        instance.displayOptions.debug = value;
+    }
 }
 
 /**

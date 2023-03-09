@@ -1,4 +1,3 @@
-'use strict';
 export default function (playerInstance, options) {
     playerInstance.subtitleFetchParse = (subtitleItem) => {
         playerInstance.sendRequest(

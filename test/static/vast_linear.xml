@@ -2,7 +2,7 @@
     <Ad id="1" adType="video">
         <InLine>
             <AdSystem version="1">Test</AdSystem>
-            <AdTitle>Vast CTA test</AdTitle>
+            <AdTitle>Vast Linear</AdTitle>
             <Creatives>
                 <Creative sequence="1" id="1">
                     <Linear skipoffset="00:00:05">
@@ -52,21 +52,6 @@
                 </Creative>
             </Creatives>
             <Extensions>
-                <Extension>
-                    <TitleCTA>
-                        <!-- The MobileText is corresponding to our "CTA text" -->
-                        <MobileText>CTA Text Mobile</MobileText>
-
-                        <!-- The PCText is identical to MobileText -->
-                        <PCText>CTA Text Desktop</PCText>
-
-                        <!-- The link corresponds to our "Display Url" -->
-                        <Link><![CDATA[https://www.example.com/advertisment?ref=1234567890!"#$%&/()=]]></Link>
-
-                        <!-- The Tracking is the same as our to ClickTracking -->
-                        <Tracking><![CDATA[https://www.example.com/tracking.html]]></Tracking>
-                    </TitleCTA>
-                </Extension>
             </Extensions>
             <Impression id="">
                 <![CDATA[ http://www.example.com/impression ]]>

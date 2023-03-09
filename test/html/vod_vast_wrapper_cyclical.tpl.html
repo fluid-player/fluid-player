@@ -5,15 +5,17 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>VOD with CTA set from VAST</title>
+    <title>VOD with VAST Wrapper - Cyclical reference</title>
     <%= htmlWebpackPlugin.tags.headTags %>
     <style lang="css">
         #fluid-player-e2e-case {
-            width: 100%;
+            width: 90%;
         }
     </style>
 </head>
 <body>
+
+<p>Expected: No AD should play, as it will stop following the cyclical wrapper references</p>
 
 <video id="fluid-player-e2e-case">
     <source src='https://cdn.fluidplayer.com/videos/valerian-1080p.mkv' data-fluid-hd title="1080p" type='video/mp4'/>
@@ -25,21 +27,12 @@
 
 <script>
     var instance = fluidPlayer('fluid-player-e2e-case', {
-        layoutControls: {
-            controlBar: {
-                autoHide:           true,
-                autoHideTimeout:    1,
-                animated:           true
-            },
-        },
         vastOptions: {
-            adCTATextVast: true, // Enables getting CTA from the VAST tag
-            adCTAText: 'CTA Text from fluid player vast options!', // Note: Will only show if VAST tag doesn't have TitleCTA
-            adCTATextPosition: 'bottom left',
+            allowVPAID: true,
             adList: [
                 {
                     roll: 'preRoll',
-                    vastTag: '/static/vast_cta.xml', // VAST Tag with TitleCTA extension with CTA information
+                    vastTag: '/static/vast_wrapper_cyclical.xml',
                 },
             ]
         }

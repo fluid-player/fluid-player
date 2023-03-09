@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VAST version="3.0">
+    <Ad id="4872550">
+        <Wrapper>
+            <AdSystem>ExoClick</AdSystem>
+            <VASTAdTagURI><![CDATA[/static/vast_linear.xml]]></VASTAdTagURI>
+            <Impression id="exotr"><![CDATA[/wrapper_impression]]></Impression>
+            <Error><![CDATA[/wrapper_error]]></Error>
+            <Creatives>
+                <Creative sequence="1" id="70160400">
+                    <Linear>
+                        <TrackingEvents>
+                            <Tracking id="prog_1" event="progress" offset="00:00:10.000"><![CDATA[/wrapper_progress]]></Tracking>
+                        </TrackingEvents>
+                        <VideoClicks>
+                            <ClickTracking><![CDATA[/wrapper_click]]></ClickTracking>
+                        </VideoClicks>
+                    </Linear>
+                </Creative>
+            </Creatives>
+        </Wrapper>
+    </Ad>
+</VAST>
