@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.13.0 (2023-03-09)
+* [Pull #714](https://github.com/fluid-player/fluid-player/pull/714) Support Video Waterfall VAST Response
+
 ## 3.12.0 (2023-01-10)
 * [Pull #707](https://github.com/fluid-player/fluid-player/pull/707) Decrease volumes & revenue on In-stream zones
 

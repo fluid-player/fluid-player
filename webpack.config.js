@@ -45,7 +45,7 @@ const getDistOptions = (mode) => {
 module.exports = (env, argv) => {
     const wpMode = typeof argv.mode !== 'undefined' ? argv.mode : 'development';
     const wpDebug = wpMode === 'development' && typeof env.debug !== 'undefined' && !!env.debug;
-    const wpDist = typeof argv.dist !== 'undefined' ? argv.dist : 'development';
+    const wpDist = typeof env.dist !== 'undefined' ? env.dist : 'development';
     const wpDistOptions = getDistOptions(wpDist);
 
     if ('development' !== wpDist && (wpMode !== 'production' || wpDebug)) {
