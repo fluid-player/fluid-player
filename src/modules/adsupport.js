@@ -1025,6 +1025,11 @@ export default function (playerInstance, options) {
         return adListIds;
     };
 
+    /**
+     * Handle scheduled tasks for a given key time
+     *
+     * @param keyTime key time in seconds
+     */
     playerInstance.adKeytimePlay = (keyTime) => {
         if (!playerInstance.timerPool[keyTime] || playerInstance.isCurrentlyPlayingAd) {
             return;
@@ -1033,9 +1038,15 @@ export default function (playerInstance, options) {
         const timerPoolKeytimeCloseStaticAdsLength = playerInstance.timerPool[keyTime]['closeStaticAd'].length;
         const timerPoolKeytimeLinearAdsLength = playerInstance.timerPool[keyTime]['linear'].length;
         const timerPoolKeytimeNonlinearAdsLength = playerInstance.timerPool[keyTime]['nonLinear'].length;
+        const timerPoolKeytimeLoadVastLength = playerInstance.timerPool[keyTime]['loadVast'].length;
 
         // remove the item from keytime if no ads to play
-        if (timerPoolKeytimeCloseStaticAdsLength === 0 && timerPoolKeytimeLinearAdsLength === 0 && timerPoolKeytimeNonlinearAdsLength === 0) {
+        if ([
+            timerPoolKeytimeCloseStaticAdsLength,
+            timerPoolKeytimeLinearAdsLength,
+            timerPoolKeytimeNonlinearAdsLength,
+            timerPoolKeytimeLoadVastLength
+        ].every(timerPoolLength => timerPoolLength === 0)) {
             delete playerInstance.timerPool[keyTime];
             return;
         }
@@ -1090,6 +1101,23 @@ export default function (playerInstance, options) {
             }
         }
 
+        // Task: Load VAST on demand
+        if (timerPoolKeytimeLoadVastLength > 0) {
+            playerInstance.timerPool[keyTime]['loadVast'].forEach((roll) => {
+                if (roll.roll === `postRoll` && roll.voidPostRollTasks) {
+                    // As postRoll schedules more than one task to cover the last few seconds of the video, we need to
+                    // prevent any other loadVast task from running for that postRoll
+                    return;
+                } else if (roll.roll === `postRoll`) {
+                    roll.voidPostRollTasks = true;
+                }
+
+                playerInstance.debugMessage(`Handling on-demand VAST load for roll ${roll.id}`)
+                playerInstance.processVastWithRetries(roll);
+            });
+
+            playerInstance.timerPool[keyTime]['loadVast'] = [];
+        }
     };
 
     playerInstance.adTimer = () => {
@@ -1106,33 +1134,86 @@ export default function (playerInstance, options) {
             }, 800);
     };
 
-    // ADS
+    /**
+     * Schedule tasks that need to be run with the main video timer
+     *
+     * @param task
+     */
     playerInstance.scheduleTask = (task) => {
+        playerInstance.debugMessage(`Scheduling task`, task);
+
         if (!playerInstance.timerPool.hasOwnProperty(task.time)) {
-            playerInstance.timerPool[task.time] = {linear: [], nonLinear: [], closeStaticAd: []};
+            playerInstance.timerPool[task.time] = {linear: [], nonLinear: [], closeStaticAd: [], loadVast: []};
         }
 
-        const roll = playerInstance.rollsById[task.rollListId];
+        // Handle AD rendering
+        if (task.rollListId) {
+            const roll = playerInstance.rollsById[task.rollListId];
 
-        roll.ads
-            .filter(({ adType }) => {
-                if (task.time === 0) { // Only non-linear should be scheduled on "preRoll"
-                    return adType !== 'linear';
-                }
+            roll.ads
+                .filter(({ adType }) => {
+                    if (task.time === 0) { // Only non-linear should be scheduled on "preRoll"
+                        return adType !== 'linear';
+                    }
 
-                return true;
-            })
-            .forEach(ad => {
-                if (task.hasOwnProperty('playRoll') && ad.adType === 'linear') {
-                    playerInstance.timerPool[task.time]['linear'].push(ad);
-                } else if (task.hasOwnProperty('playRoll') && ad.adType === 'nonLinear') {
-                    playerInstance.timerPool[task.time]['nonLinear'].push(ad);
-                } else if (task.hasOwnProperty('closeStaticAd')) {
-                    playerInstance.timerPool[task.time]['closeStaticAd'].push(ad);
+                    return true;
+                })
+                .forEach(ad => {
+                    if (task.hasOwnProperty('playRoll') && ad.adType === 'linear') {
+                        playerInstance.timerPool[task.time]['linear'].push(ad);
+                    } else if (task.hasOwnProperty('playRoll') && ad.adType === 'nonLinear') {
+                        playerInstance.timerPool[task.time]['nonLinear'].push(ad);
+                    } else if (task.hasOwnProperty('closeStaticAd')) {
+                        playerInstance.timerPool[task.time]['closeStaticAd'].push(ad);
+                    }
+                });
+        }
+
+        // Handle Loading VAST on demand
+        if (task.loadVast) {
+            playerInstance.timerPool[task.time]['loadVast'].push(task.roll)
+        }
+    };
+
+    /**
+     * Adds on demand rolls (midRoll, postRoll) to schedule
+     */
+    playerInstance.scheduleOnDemandRolls = () => {
+        const midRollListIds = playerInstance.findRoll(`midRoll`) || [];
+        const postRollListIds = playerInstance.findRoll(`postRoll`) || [];
+
+        [...midRollListIds, ...postRollListIds]
+            .map(rollListId => playerInstance.rollsById[rollListId])
+            .filter(rollAd => rollAd.vastLoaded !== true && rollAd.error !== true)
+            .forEach(rollAd => {
+                // Request will have the vastTimeout time to load
+                if (rollAd.roll === `midRoll`) {
+                    const time = rollAd.timer - (playerInstance.displayOptions.vastOptions.vastTimeout / 1000);
+
+                    console.log(rollAd, time, playerInstance.getCurrentTime())
+
+                    // Handles cases where the midRoll should be loaded now, skipping the task scheduler
+                    if (time <= Number(playerInstance.getCurrentTime())) {
+                        playerInstance.debugMessage(`Loading Mid Roll VAST immediately as it needs to be played soon`);
+                        playerInstance.processVastWithRetries(rollAd);
+                    } else {
+                        playerInstance.scheduleTask({ loadVast: true, time, roll: rollAd })
+                    }
+                } else {
+                    const backwardScheduleTime = parseInt(playerInstance.mainVideoDuration);
+                    const scheduleTimeAmount = (playerInstance.displayOptions.vastOptions.vastTimeout / 1000);
+
+                    // Used to prevent loading more than one of the tasks bellow
+                    rollAd.voidPostRollTasks = false;
+
+                    for (let i = 1; i <= scheduleTimeAmount; i++) {
+                        // Sets tasks for the last N seconds based on vastTimeout
+                        playerInstance.scheduleTask({ loadVast: true, time: backwardScheduleTime - i, roll: rollAd });
+                    }
+
                 }
             });
-
-    };
+    }
 
     // ADS
     playerInstance.switchToMainVideo = () => {
