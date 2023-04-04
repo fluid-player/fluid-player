@@ -1190,8 +1190,6 @@ export default function (playerInstance, options) {
                 if (rollAd.roll === `midRoll`) {
                     const time = rollAd.timer - (playerInstance.displayOptions.vastOptions.vastTimeout / 1000);
 
-                    console.log(rollAd, time, playerInstance.getCurrentTime())
-
                     // Handles cases where the midRoll should be loaded now, skipping the task scheduler
                     if (time <= Number(playerInstance.getCurrentTime())) {
                         playerInstance.debugMessage(`Loading Mid Roll VAST immediately as it needs to be played soon`);
