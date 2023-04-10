@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>VOD with VAST Wrapper - VAST Waterfall Off (fallbackOnNoAd=false) - Http Error</title>
+    <%= htmlWebpackPlugin.tags.headTags %>
+    <style lang="css">
+        #fluid-player-e2e-case {
+            width: 90%;
+        }
+    </style>
+</head>
+<body>
+
+<b>VOD with VAST Wrapper - VAST Waterfall Off (fallbackOnNoAd=false)</b>
+<p>This scenario represents the following statement from the fallbackOnNoAd description: "(...) instruction for using an available Ad when the requested VAST response returns no ads. (...)  If false and the Wrapper represents an Ad in a Pod, the video player should move on to the next Ad in a Pod;".</p>
+
+<video id="fluid-player-e2e-case">
+    <source src='https://cdn.fluidplayer.com/videos/valerian-1080p.mkv' data-fluid-hd title="1080p" type='video/mp4'/>
+    <source src='https://cdn.fluidplayer.com/videos/valerian-720p.mkv' data-fluid-hd title="720p" type='video/mp4'/>
+    <source src='https://cdn.fluidplayer.com/videos/valerian-480p.mkv' title="480p" type='video/mp4'/>
+</video>
+
+<%= htmlWebpackPlugin.tags.bodyTags %>
+
+<script>
+    var instance = fluidPlayer('fluid-player-e2e-case', {
+        vastOptions: {
+            allowVPAID: true, // Default false.
+            adCTATextVast: true,
+            adList: [
+                {
+                    roll: 'preRoll',
+                    vastTag: '/static/vast_wrapper_fallbackOnNoAd_false_http_error.xml',
+                    maxTotalDuration: 30000,
+                    maxTotalQuantity: 100,
+                },
+            ]
+        }
+    });
+</script>
+
+</body>
+</html>

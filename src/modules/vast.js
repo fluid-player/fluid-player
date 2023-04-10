@@ -729,14 +729,19 @@ export default function (playerInstance, options) {
                 const allowMultipleAds = wrapperElement.attributes.allowMultipleAds && ["true", "1"].includes(wrapperElement.attributes.allowMultipleAds.value); // See VAST Wrapper spec
                 const fallbackOnNoAd = wrapperElement.attributes.fallbackOnNoAd && ["true", "1"].includes(wrapperElement.attributes.fallbackOnNoAd.value);
 
-                const wrapperResponse = await resolveAdTreeRequests(vastAdTagUri, maxDepth, { type: 'wrapper', ...adNode, fallbackOnNoAd }, currentDepth+1, !disableAdditionalWrappers);
-                wrapperResponse.fallbackOnNoAd = fallbackOnNoAd;
+                try {
+                    const wrapperResponse = await resolveAdTreeRequests(vastAdTagUri, maxDepth, { type: 'wrapper', ...adNode, fallbackOnNoAd }, currentDepth+1, !disableAdditionalWrappers);
+                    wrapperResponse.fallbackOnNoAd = fallbackOnNoAd;
 
-                if (!allowMultipleAds || isAdPod) {
-                    wrapperResponse.children = getFirstStandAloneAd(wrapperResponse.children);
+                    if (!allowMultipleAds || isAdPod) {
+                        wrapperResponse.children = getFirstStandAloneAd(wrapperResponse.children);
+                    }
+
+                    adTree.children.push(wrapperResponse);
+                } catch (e) {
+                    adTree.children.push({ type: `wrapper`, fallbackOnNoAd, httpError: true })
+                    playerInstance.debugMessage(`Error when loading Wrapper, will trigger fallback if available`, e);
                 }
-
-                adTree.children.push(wrapperResponse);
             } else if (!vastAdTagUri) {
                 adTree.children.push({ type: 'ad', ...adNode });
             }
@@ -860,11 +865,11 @@ export default function (playerInstance, options) {
                 try {
                     /** @see VAST 4.0 Wrapper.fallbackOnNoAd */
                     const triggerFallbackOnNoAd = result.children.some(ad =>
-                        ad.type === 'wrapper' && ad.fallbackOnNoAd && !/"type":"ad"/.test(JSON.stringify(ad))
+                        ad.type === 'wrapper' && ad.fallbackOnNoAd && (!/"type":"ad"/.test(JSON.stringify(ad)) || ad.httpError)
                     );
 
                     if (triggerFallbackOnNoAd) {
-                        playerInstance.debugMessage('No ad return from VAST Wrapper, triggering fallbackOnNoAd. Ad tree:', result);
+                        playerInstance.debugMessage('Error on VAST Wrapper, triggering fallbackOnNoAd. Ad tree:', result);
                     }
 
                     result = flattenAdTree(result).map(ad => processAdCreatives(registerAdProperties(ad, tmpOptions)));
