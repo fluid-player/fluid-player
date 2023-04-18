@@ -2303,11 +2303,12 @@ const fluidPlayerClass = function () {
         containerDiv.className = 'fluid_html_on_pause';
         const backgroundColor = (self.displayOptions.layoutControls.primaryColor) ? self.displayOptions.layoutControls.primaryColor : "#333333";
         containerDiv.innerHTML = '<div id="' + self.videoPlayerId + '_fluid_initial_play" class="fluid_initial_play" style="background-color:' + backgroundColor + '"><div id="' + self.videoPlayerId + '_fluid_state_button" class="fluid_initial_play_button"></div></div>';
+        const initPlayEventTypes = ['click', 'touchstart'];
         const initPlayFunction = function () {
             self.playPauseToggle();
-            containerDiv.removeEventListener('click', initPlayFunction);
+            initPlayEventTypes.forEach(eventType => containerDiv.removeEventListener(eventType, initPlayFunction))
         };
-        containerDiv.addEventListener('click', initPlayFunction);
+        initPlayEventTypes.forEach(eventType => containerDiv.addEventListener(eventType, initPlayFunction))
 
         // If the user has chosen to not show the play button we'll make it invisible
         // We don't hide altogether because animations might still be used
