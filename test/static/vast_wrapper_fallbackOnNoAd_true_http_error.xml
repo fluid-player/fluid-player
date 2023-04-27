@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VAST version="3.0">
+    <Ad id="4872550" sequence="1">
+        <Wrapper fallbackOnNoAd="1" allowMultipleAds="0">
+            <AdSystem>ExoClick</AdSystem>
+            <VASTAdTagURI><![CDATA[/static/404.xml]]></VASTAdTagURI>
+            <Impression id="exotr"><![CDATA[/wrapper_impression]]></Impression>
+            <Error><![CDATA[/wrapper_error]]></Error>
+            <Creatives>
+                <Creative sequence="1" id="70160400">
+                    <Linear>
+                        <TrackingEvents>
+                            <Tracking id="prog_1" event="progress" offset="00:00:10.000"><![CDATA[/wrapper_progress]]></Tracking>
+                        </TrackingEvents>
+                        <VideoClicks>
+                            <ClickTracking><![CDATA[/wrapper_click]]></ClickTracking>
+                        </VideoClicks>
+                    </Linear>
+                </Creative>
+            </Creatives>
+            <Extensions>
+                <Extension type="waterfall" fallback_index="0">
+                    <Extension/>
+                </Extension>
+            </Extensions>
+        </Wrapper>
+    </Ad>
+    <Ad id="5566276">
+        <InLine>
+            <AdSystem>ExoClick</AdSystem>
+            <AdTitle/>
+            <Impression id="exotr"><![CDATA[/impression]]></Impression>
+            <Error><![CDATA[/error]]></Error>
+            <Creatives>
+                <Creative sequence="1" id="78544088">
+                    <Linear>
+                        <Duration>00:00:22.342</Duration>
+                        <TrackingEvents>
+                            <Tracking id="prog_1" event="progress" offset="00:00:10.000"><![CDATA[/progress_10_seconds]]></Tracking>
+                        </TrackingEvents>
+                        <VideoClicks>
+                            <ClickThrough><![CDATA[/clicktrough]]></ClickThrough>
+                        </VideoClicks>
+                        <MediaFiles>
+                            <MediaFile delivery="progressive" type="video/mp4"><![CDATA[https://cdn.jsdelivr.net/npm/big-buck-bunny-1080p@0.0.6/video.mp4]]></MediaFile>
+                        </MediaFiles>
+                        <Icons>
+                            <Icon>
+                                <IconClicks>
+                                    <IconClickThrough>samplesite.com</IconClickThrough>
+                                </IconClicks>
+                            </Icon>
+                        </Icons>
+                    </Linear>
+                </Creative>
+            </Creatives>
+            <Extensions>
+                <Extension>
+                    <TitleCTA>
+                        <MobileText>This is a stand alone Ad, from the Ad Buffet</MobileText>
+                        <PCText>This is a stand alone Ad, from the Ad Buffet</PCText>
+                        <DisplayUrl><![CDATA[sample.com]]></DisplayUrl>
+                        <Tracking><![CDATA[/cta_tracking]]></Tracking>
+                    </TitleCTA>
+                </Extension>
+            </Extensions>
+        </InLine>
+    </Ad>
+    <Ad id="4840678" sequence="2">
+        <InLine>
+            <AdSystem>ExoClick</AdSystem>
+            <AdTitle/>
+            <Impression id="exotr"><![CDATA[/impression]]></Impression>
+            <Error><![CDATA[/error]]></Error>
+            <Creatives>
+                <Creative sequence="1" id="79253280">
+                    <Linear>
+                        <Duration>00:00:30.0</Duration>
+                        <TrackingEvents>
+                            <Tracking id="prog_1" event="progress" offset="00:00:10.000"><![CDATA[/progress_10_seconds]]></Tracking>
+                        </TrackingEvents>
+                        <VideoClicks>
+                            <ClickThrough><![CDATA[/clicktrough]]></ClickThrough>
+                        </VideoClicks>
+                        <MediaFiles>
+                            <MediaFile delivery="progressive" type="video/mp4"><![CDATA[https://cdn.jsdelivr.net/npm/big-buck-bunny-1080p@0.0.6/video.mp4]]></MediaFile>
+                        </MediaFiles>
+                        <Icons>
+                            <Icon>
+                                <IconClicks>
+                                    <IconClickThrough>hczog.com</IconClickThrough>
+                                </IconClicks>
+                            </Icon>
+                        </Icons>
+                    </Linear>
+                </Creative>
+            </Creatives>
+            <Extensions>
+                <Extension>
+                    <TitleCTA>
+                        <MobileText>Play Game Now</MobileText>
+                        <PCText>Play Game Now</PCText>
+                        <DisplayUrl><![CDATA[]]></DisplayUrl>
+                        <Tracking><![CDATA[/cta_tracking]]></Tracking>
+                    </TitleCTA>
+                </Extension>
+            </Extensions>
+        </InLine>
+    </Ad>
+    <Ad id="5460430">
+        <InLine>
+            <AdSystem>ExoClick</AdSystem>
+            <AdTitle/>
+            <Impression id="exotr"><![CDATA[/impression]]></Impression>
+            <Error><![CDATA[/error]]></Error>
+            <Creatives>
+                <Creative sequence="1" id="79167900">
+                    <Linear>
+                        <Duration>00:00:24.799</Duration>
+                        <TrackingEvents>
+                            <Tracking id="prog_1" event="progress" offset="00:00:10.000"><![CDATA[/progress_10_seconds]]></Tracking>
+                        </TrackingEvents>
+                        <VideoClicks>
+                            <ClickThrough><![CDATA[/clicktrough]]></ClickThrough>
+                        </VideoClicks>
+                        <MediaFiles>
+                            <MediaFile delivery="progressive" type="video/mp4"><![CDATA[https://cdn.jsdelivr.net/npm/big-buck-bunny-1080p@0.0.6/video.mp4]]></MediaFile>
+                        </MediaFiles>
+                        <Icons>
+                            <Icon>
+                                <IconClicks>
+                                    <IconClickThrough>www.zodertracker.com</IconClickThrough>
+                                </IconClicks>
+                            </Icon>
+                        </Icons>
+                    </Linear>
+                </Creative>
+            </Creatives>
+            <Extensions>
+                <Extension>
+                    <TitleCTA>
+                        <MobileText>Try for Free</MobileText>
+                        <PCText>Try for Free</PCText>
+                        <DisplayUrl><![CDATA[]]></DisplayUrl>
+                        <Tracking><![CDATA[cta_tracking]]></Tracking>
+                    </TitleCTA>
+                </Extension>
+            </Extensions>
+        </InLine>
+    </Ad>
+</VAST>
