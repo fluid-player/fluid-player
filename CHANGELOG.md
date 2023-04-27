@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.14.0 (2023-04-27)
+* [Pull #722](https://github.com/fluid-player/fluid-player/pull/722) Support Video Waterfall VAST Response
+
 ## 3.13.0 (2023-03-09)
 * [Pull #714](https://github.com/fluid-player/fluid-player/pull/714) Support Video Waterfall VAST Response
 
