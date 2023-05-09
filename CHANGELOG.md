@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.15.0 (2023-05-09)
+* [Pull #727](https://github.com/fluid-player/fluid-player/pull/727) Player required 2 clicks to play video New Iphone 11 Pro Chrome
+
 ## 3.14.0 (2023-04-27)
 * [Pull #722](https://github.com/fluid-player/fluid-player/pull/722) Support Video Waterfall VAST Response
 
