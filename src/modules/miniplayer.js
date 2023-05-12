@@ -151,6 +151,7 @@ export default function (playerInstance) {
     }
 
     /**
+     * Adapts NonLinear size to fit MiniPlayer view
      *
      * @param {number} [width]
      * @param {number} [height]

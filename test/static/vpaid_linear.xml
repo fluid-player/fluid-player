@@ -1,6 +1,5 @@
-<VAST
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast.xsd" version="3.0">
-	<Ad id="1234567">
+<VAST xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast4.xsd" version="4.2">
+    <Ad id="1234567">
 		<InLine>
 			<AdSystem>GDFP</AdSystem>
 			<AdTitle>Linear VPAID Example</AdTitle>
