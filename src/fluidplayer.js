@@ -9,6 +9,7 @@ import TimelineModule from './modules/timeline';
 import AdSupportModule from './modules/adsupport';
 import StreamingModule from './modules/streaming';
 import UtilsModule from './modules/utils'
+import SuggestedVideosModule from './modules/suggestedVideos'
 
 const FP_MODULES = [
     VPAIDModule,
@@ -18,7 +19,8 @@ const FP_MODULES = [
     TimelineModule,
     AdSupportModule,
     StreamingModule,
-    UtilsModule
+    UtilsModule,
+    SuggestedVideosModule
 ];
 
 // Determine build mode
@@ -226,6 +228,9 @@ const fluidPlayerClass = function () {
                     links: []
                 },
             },
+            suggestedVideos: {
+                configUrl: null
+            },
             vastOptions: {
                 adList: {},
                 skipButtonCaption: 'Skip ad in [seconds]',
@@ -375,6 +380,8 @@ const fluidPlayerClass = function () {
         self.setVastList();
 
         self.setPersistentSettings();
+
+        self.generateSuggestedVideoList();
 
         // DO NOT initialize streamers if there are pre-rolls. It will break the streamers!
         // Streamers will re-initialize once ad has been shown.
@@ -606,6 +613,8 @@ const fluidPlayerClass = function () {
             self.switchToMainVideo();
             self.playPauseToggle();
         }
+
+        self.showSuggestedVideos();
     };
 
     self.getCurrentTime = () => {
@@ -2832,6 +2841,7 @@ const fluidPlayerClass = function () {
             return;
         }
         self.playPauseToggle();
+
         return true;
     };
 

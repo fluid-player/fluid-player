@@ -25,7 +25,9 @@
 
 <script>
     var instance = fluidPlayer('fluid-player-e2e-case', {
-        suggestedVideos: '/static/suggested_videos_example.json'
+        suggestedVideos: {
+            configUrl: '/static/suggested_videos_example.json'
+        }
     });
 </script>
 
