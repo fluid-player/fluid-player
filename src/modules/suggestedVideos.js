@@ -16,6 +16,7 @@ export default function (playerInstance, options) {
 
         for (let i = 0; i < 6; i++) {
             const videoTile = document.createElement('div');
+            videoTile.addEventListener('click', function () { playerInstance.clickSuggestedVideo(config[i].sources, config[i].tags) }, false)
             videoTile.className = 'suggested_tile';
             videoTile.id = 'suggested_tile_' + config[i].id;
             videoTile.style = `background-image: url(${config[i].thumbnailUrl})`;
@@ -23,6 +24,8 @@ export default function (playerInstance, options) {
             const title = document.createElement('p');
             title.className = 'title';
             title.innerText = config[i].title;
+
+
             videoTile.appendChild(title);
 
             suggestedVideosGrid.appendChild(videoTile);
@@ -37,25 +40,61 @@ export default function (playerInstance, options) {
         PlayerDOM.appendChild(playerInstance.suggestedVideosGrid);
     };
 
-    playerInstance.clickSuggestedVideo = () => {
-        console.log('Display new Video');
+    playerInstance.clickSuggestedVideo = (sources, tags) => {
+        playerInstance.saveTagsToLocalStorage(tags);
+        playerInstance.hideSuggestedVideos();
+        const videoDOM = document.getElementsByTagName('video')[0];
+        videoDOM.innerHTML = '';
+
+        let sourcesHTML = ''
+        sources.forEach(source => {
+            sourcesHTML += `<source src='${source.url}' ${source.hd && 'data-fluid-hd'} title="${source.resolution}" type='${source.mimeType}'/>`;
+        });
+        videoDOM.innerHTML = sourcesHTML;
+
+        // TODO: WIP remove previous sources and create the new ones
+        // works on first switch but not on second one
+        const sourcesDOM = document.getElementsByClassName('fluid_video_source_list_item');
+        for (let i = 0; i < sourcesDOM.length; i++) {
+            sourcesDOM[i].remove();
+        }
+        playerInstance.createVideoSourceSwitch();
+
+        playerInstance.createSubtitles();
+        playerInstance.createCardboard();
+        playerInstance.userActivityChecker();
+        playerInstance.setVastList();
+        playerInstance.setPersistentSettings();
+        playerInstance.domRef.player.src = sources[0].url;
+        playerInstance.initialiseStreamers();
+        playerInstance.domRef.player.currentTime = 0;
+        playerInstance.setCurrentTimeAndPlay(playerInstance.domRef.player.currentTime, true);
+        playerInstance.setBuffering();
+
+        console.log('Display new Video', sources);
     };
 
     playerInstance.hideSuggestedVideos = () => {
-        console.log('Hide Suggested Videos');
+        document.getElementsByClassName('suggested_tile_grid')[0].remove();
     };
 
-    // Denisa, code for local storage
-    // playerInstance.trackTag = (tagName) => {
-    //     if (!localStorage.hasOwnProperty("tags"))
-    //         localStorage.setItem("tags", JSON.stringify({}))
-    //     var tags = JSON.parse(localStorage.getItem('tags'))
-    //     if (tags.hasOwnProperty(tagName))
-    //         tags[tagName] = parseInt(tags[tagName]) + 1
-    //     else {
-    //         tags[tagName] = 1
-    //         localStorage.setItem("tags", JSON.stringify(tags))
-    //     }
-    // };
+    playerInstance.saveTagsToLocalStorage = (tags) => {
+        let savedTags = playerInstance.fluidStorage.tags ? JSON.parse(playerInstance.fluidStorage.tags) : [];
+        const tagNames = savedTags.map(tag => tag.name);
+
+        for (let i = 0; i < tags.length; i++) {
+            const tag = tags[i];
+            if (tagNames.includes(tag)) {
+                savedTags.filter(savedTag => savedTag.name === tag)[0].count++;
+            } else {
+                savedTags.push({
+                    name: tag,
+                    count:1,
+                })
+            }
+        }
+
+        playerInstance.fluidStorage.tags = JSON.stringify(savedTags);
+    };
 
 }
