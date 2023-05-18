@@ -12,8 +12,10 @@
         "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg",
         "title": "Big Buck Bunny",
         "tags": [
-            "string",
-            "string"
+            "animals",
+            "bunny",
+            "adorable",
+            "indie"
         ]
     },
     {
@@ -29,8 +31,10 @@
         "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ElephantsDream.jpg",
         "title": "Elephant Dream",
         "tags": [
-            "string",
-            "string"
+            "animals",
+            "elephant",
+            "adorable",
+            "indie"
         ]
     },
     {
@@ -46,8 +50,10 @@
         "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerBlazes.jpg",
         "title": "For Bigger Blazes",
         "tags": [
-            "string",
-            "string"
+            "For bigger",
+            "Blaze",
+            "google",
+            "fire"
         ]
     },
     {
@@ -63,8 +69,9 @@
         "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerEscapes.jpg",
         "title": "For Bigger Escape",
         "tags": [
-            "string",
-            "string"
+            "For bigger",
+            "Escaping",
+            "google"
         ]
     },
     {
@@ -80,8 +87,10 @@
         "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerFun.jpg",
         "title": "For Bigger Fun",
         "tags": [
-            "string",
-            "string"
+            "For bigger",
+            "Fun",
+            "google",
+            "funny"
         ]
     },
     {
@@ -97,8 +106,13 @@
         "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerJoyrides.jpg",
         "title": "For Bigger Joyrides",
         "tags": [
-            "string",
-            "string"
+            "For bigger",
+            "family",
+            "cars",
+            "joyrides",
+            "the fast and the furious",
+            "google",
+            "funny"
         ]
     },
     {
@@ -114,8 +128,11 @@
         "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerMeltdowns.jpg",
         "title": "For Bigger Meltdowns",
         "tags": [
-            "string",
-            "string"
+            "For bigger",
+            "Meltdown",
+            "blaze",
+            "google",
+            "fire"
         ]
     },
     {
@@ -131,8 +148,8 @@
         "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/Sintel.jpg",
         "title": "Sintel",
         "tags": [
-            "string",
-            "string"
+            "Sintel",
+            "robot"
         ]
     },
     {
@@ -148,8 +165,10 @@
         "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/SubaruOutbackOnStreetAndDirt.jpg",
         "title": "Subaru Outback On Street And Dirt",
         "tags": [
-            "string",
-            "string"
+            "cars",
+            "the fast and the furious",
+            "family",
+            "subaru"
         ]
     },
     {
@@ -165,8 +184,8 @@
         "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/TearsOfSteel.jpg",
         "title": "Tears of Steel",
         "tags": [
-            "string",
-            "string"
+            "Steel",
+            "tears"
         ]
     },
     {
@@ -182,8 +201,12 @@
         "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/VolkswagenGTIReview.jpg",
         "title": "Volkswagen GTI Review",
         "tags": [
-            "string",
-            "string"
+            "cars",
+            "the fast and the furious",
+            "family",
+            "gti",
+            "vw",
+            "volkswagen"
         ]
     },
     {
@@ -199,8 +222,9 @@
         "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/WeAreGoingOnBullrun.jpg",
         "title": "We Are Going On Bullrun",
         "tags": [
-            "string",
-            "string"
+            "Bull",
+            "animals",
+            "run"
         ]
     },
     {
@@ -216,8 +240,8 @@
         "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/WhatCarCanYouGetForAGrand.jpg",
         "title": "What care can you get for a grand?",
         "tags": [
-            "string",
-            "string"
+            "money",
+            "info"
         ]
     }
 ]
