@@ -1325,3 +1325,55 @@ _:-ms-lang(x),
     content: 'HD';
     padding-left: 3px;
 }
+
+.suggested_tile_grid {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: calc(100% - 53px);
+    display: grid;
+    grid-template-columns: 200px 200px 200px;
+    grid-template-rows: min-content min-content;
+    column-gap: 10px;
+    row-gap: 10px;
+    z-index: 100;
+    align-content: center;
+    justify-content: center;
+}
+
+.suggested_tile {
+    aspect-ratio: 16 / 9;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.suggested_tile::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.5;
+    transition: opacity .5s;
+    background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.8) 28%, rgba(0,0,0,0) 100%);
+    /* background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 48%, rgba(0,0,0,0.40) 100%); */
+}
+
+.suggested_tile:hover::before {
+    opacity: 1;
+}
+
+.suggested_tile .title {
+    color: whitesmoke;
+    position: absolute;
+    bottom: 0px;
+    left: 10px;
+}
+
+
+.suggested_tile:hover {
+    cursor: pointer;
+}
