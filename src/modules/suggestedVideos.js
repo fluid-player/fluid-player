@@ -15,10 +15,11 @@ export default function (playerInstance, options) {
         const suggestedVideosGrid = document.createElement('div');
         suggestedVideosGrid.className = 'suggested_tile_grid';
 
-        config = config.filter(video => {
-            const url = video.sources[0].url;
-            return !url.startsWith(playerInstance.domRef.player.src);
-        });
+        // TODO: not working sometimes, breaking everything
+        // config = config.filter(video => {
+        //     const url = video.sources[0].url;
+        //     return !url.startsWith(playerInstance.domRef.player.src);
+        // });
 
         for (let i = 0; i < 6; i++) {
             const videoTile = document.createElement('div');
