@@ -1342,6 +1342,56 @@ _:-ms-lang(x),
     justify-content: center;
 }
 
+.suggested_tile_overlay {
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.25s;
+}
+
+.suggested_tile_overlay--blur {
+    backdrop-filter: blur(5px);
+}
+
+.suggested_tile_overlay>* {
+    transform: translateY(20px);
+    transition: transform 0.25s;
+}
+
+.suggested_tile_overlay:hover {
+    opacity: 1;
+}
+
+.suggested_tile_overlay:hover>* {
+    transform: translateY(0);
+}
+
+
+.suggested_tile {
+    aspect-ratio: 16 / 9;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.suggested_tile_overlay .title {
+    position: absolute;
+    bottom: 0px;
+    left: 10px;
+}
+
+.suggested_tile:hover {
+    cursor: pointer;
+}
+
+
+/*
 .suggested_tile {
     aspect-ratio: 16 / 9;
     background-size: cover;
@@ -1359,7 +1409,7 @@ _:-ms-lang(x),
     opacity: 0.5;
     transition: opacity .5s;
     background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.8) 28%, rgba(0,0,0,0) 100%);
-    /* background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 48%, rgba(0,0,0,0.40) 100%); */
+     background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 48%, rgba(0,0,0,0.40) 100%);
 }
 
 .suggested_tile:hover::before {
@@ -1376,4 +1426,4 @@ _:-ms-lang(x),
 
 .suggested_tile:hover {
     cursor: pointer;
-}
+} */
