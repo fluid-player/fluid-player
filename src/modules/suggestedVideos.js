@@ -6,7 +6,8 @@ export default function (playerInstance, options) {
 
         playerInstance.sendRequestAsync(configUrl, false, 5000).then(({response}) => {
             const config = JSON.parse(response);
-            playerInstance.generateSuggestedVideoGrid(config)
+            const personalisedConfig = playerInstance.generatePersonalisedRecommendations(config);
+            playerInstance.generateSuggestedVideoGrid(personalisedConfig);
         });
     };
 
@@ -14,22 +15,10 @@ export default function (playerInstance, options) {
         const suggestedVideosGrid = document.createElement('div');
         suggestedVideosGrid.className = 'suggested_tile_grid';
 
-        // for (let i = 0; i < 6; i++) {
-        //     const videoTile = document.createElement('div');
-        //     videoTile.addEventListener('click', function () { playerInstance.clickSuggestedVideo(config[i].sources, config[i].tags) }, false)
-        //     videoTile.className = 'suggested_tile';
-        //     videoTile.id = 'suggested_tile_' + config[i].id;
-        //     videoTile.style = `background-image: url(${config[i].thumbnailUrl})`;
-
-        //     const title = document.createElement('p');
-        //     title.className = 'title';
-        //     title.innerText = config[i].title;
-
-
-        //     videoTile.appendChild(title);
-
-        //     suggestedVideosGrid.appendChild(videoTile);
-        // }
+        config = config.filter(video => {
+            const url = video.sources[0].url;
+            return !url.startsWith(playerInstance.domRef.player.src);
+        });
 
         for (let i = 0; i < 6; i++) {
             const videoTile = document.createElement('div');
@@ -51,6 +40,31 @@ export default function (playerInstance, options) {
         }
 
         playerInstance.suggestedVideosGrid = suggestedVideosGrid;
+    };
+
+    playerInstance.generatePersonalisedRecommendations = (config) => {
+        // TODO: info: this will work with a scoring system
+        // add score field to each video
+        // each tag in the video that matches with the tags saved in localstorage will add n to the score
+        // where n is the count that is attached to that tag of localstorage
+        const savedTags = playerInstance.fluidStorage.tags ? JSON.parse(playerInstance.fluidStorage.tags) : [];
+        const tagNames = savedTags.map(tag => tag.name);
+        let _config = config;
+
+        _config = _config.map(video => ({ ...video, score: 0 }));
+
+        // TODO: loop hell, clean this up. Disgusting
+        for (let i = 0; i < _config.length; i++) {
+            const video = _config[i];
+
+            video.tags.forEach(tag => {
+                if (tagNames.includes(tag)) {
+                    video.score += Number(savedTags.find(savedTag => savedTag.name === tag).count);
+                }
+            });
+        }
+
+        return _config.sort((a,b) => b.score - a.score);
     };
 
     playerInstance.showSuggestedVideos = () => {
@@ -90,11 +104,14 @@ export default function (playerInstance, options) {
         playerInstance.setCurrentTimeAndPlay(playerInstance.domRef.player.currentTime, true);
         playerInstance.setBuffering();
 
-        console.log('Display new Video', sources);
+        playerInstance.generateSuggestedVideoList();
     };
 
     playerInstance.hideSuggestedVideos = () => {
-        document.getElementsByClassName('suggested_tile_grid')[0].remove();
+        const suggestedVideosDOM = document.getElementsByClassName('suggested_tile_grid')[0];
+        if (suggestedVideosDOM) {
+            suggestedVideosDOM.remove();
+        }
     };
 
     playerInstance.saveTagsToLocalStorage = (tags) => {

@@ -1576,6 +1576,7 @@ const fluidPlayerClass = function () {
     };
 
     self.playPauseToggle = () => {
+        self.hideSuggestedVideos();
         const isFirstStart = !self.firstPlayLaunched;
         const preRolls = self.findRoll('preRoll');
 
