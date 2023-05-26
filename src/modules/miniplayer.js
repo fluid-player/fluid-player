@@ -1,13 +1,20 @@
+import {is} from "cheerio/lib/api/traversing";
+
 export default function (playerInstance) {
     // Module constants
     const MINIMUM_WIDTH = 400;
     const MINIMUM_HEIGHT = 225;
+    const MINIMUM_WIDTH_MOBILE = 100 / 2;
+
+    const TOUCH_STOP_TIMESTAMP_DIFF = 500;
+    const TOUCH_STOP_SCREEN_X_DIFF = 50;
 
     const DESKTOP_ONLY_MEDIA_QUERY = '(max-width: 768px)';
 
     const FLUID_PLAYER_WRAPPER_CLASS = 'fluid_mini_player_mode';
     const CLOSE_BUTTON_WRAPPER_CLASS = 'mini-player-close-button-wrapper';
     const CLOSE_BUTTON_CLASS = 'mini-player-close-button';
+    const DISABLE_MINI_PLAYER_MOBILE_CLASS = 'disable-mini-player-mobile';
 
     const NON_LINEAR_SELECTOR = '.fluid_nonLinear_ad img, .fluid_vpaid_nonlinear_slot_iframe';
     const VPAID_FRAME_SELECTOR = '.fluid_vpaidNonLinear_frame';
@@ -20,6 +27,7 @@ export default function (playerInstance) {
     let originalNonLinearWidth = null
     let originalNonLinearHeight = null;
     let isSetup = false;
+    let isMobile = false;
 
     /**
      * Toggles the MiniPlayer given that it's enabled. Resets all other display modes.
@@ -36,10 +44,8 @@ export default function (playerInstance) {
             return;
         }
 
-        // TODO Create mini player styles for mobile
         if (window.matchMedia(DESKTOP_ONLY_MEDIA_QUERY).matches) {
-            playerInstance.debugMessage(`[MiniPlayer] Prevent toggle MiniPlayer, desktop-only`);
-            return;
+            isMobile = true;
         }
 
         // Important as the player can be in full screen or theater mode
@@ -53,7 +59,7 @@ export default function (playerInstance) {
         if (forceToggle === 'off' || playerInstance.miniPlayerToggledOn) {
             toggleMiniPlayerOff();
         } else if (forceToggle === 'on' || !playerInstance.miniPlayerToggledOn) {
-            toggleMiniPlayerOn(miniPlayerOptions.width, miniPlayerOptions.height);
+            toggleMiniPlayerOn(miniPlayerOptions.width, miniPlayerOptions.height, miniPlayerOptions.widthMobile);
         }
     }
 
@@ -61,7 +67,7 @@ export default function (playerInstance) {
      * Setups custom Mini Player DOM
      */
     function setupMiniPlayer() {
-        const hasCloseButton = Boolean(playerInstance.domRef.player.parentNode.querySelector('.mini-player-close-button'));
+        const hasCloseButton = Boolean(playerInstance.domRef.player.parentNode.querySelector(`.${CLOSE_BUTTON_CLASS}`));
 
         if (!hasCloseButton) {
             const closeButtonWrapper = document.createElement('div');
@@ -79,6 +85,10 @@ export default function (playerInstance) {
 
             closeButtonWrapper.appendChild(closeButton);
             playerInstance.domRef.player.parentNode.append(closeButtonWrapper);
+        }
+
+        if (isMobile) {
+            setupMobile();
         }
 
         isSetup = true;
@@ -107,20 +117,29 @@ export default function (playerInstance) {
      *
      * @param {number} width
      * @param {number} height
+     * @param {number} mobileWidth
      */
-    function toggleMiniPlayerOn(width, height) {
+    function toggleMiniPlayerOn(width, height, mobileWidth) {
         const videoWrapper = playerInstance.domRef.wrapper;
         const targetWidth = width > MINIMUM_WIDTH ? width : MINIMUM_WIDTH;
         const targetHeight = height > MINIMUM_HEIGHT ? height : MINIMUM_HEIGHT;
+        const targetMobileWidth = mobileWidth > MINIMUM_WIDTH_MOBILE ? mobileWidth : MINIMUM_WIDTH_MOBILE;
 
         originalWidth = extractSizeFromElement(videoWrapper, 'width', 'clientWidth');
         originalHeight = extractSizeFromElement(videoWrapper, 'height', 'clientHeight');
 
         videoWrapper.classList.add(FLUID_PLAYER_WRAPPER_CLASS);
-        videoWrapper.style.width = `${targetWidth}px`;
-        videoWrapper.style.height = `${targetHeight}px`;
 
-        adaptNonLinearSize(targetWidth, targetHeight);
+        if (!isMobile) {
+            videoWrapper.style.width = `${targetWidth}px`;
+            videoWrapper.style.height = `${targetHeight}px`;
+        } else {
+            videoWrapper.style.width = `${targetMobileWidth}vw`;
+            videoWrapper.style.height = `auto`;
+            videoWrapper.style.aspectRatio = `16 / 9`;
+        }
+
+        adaptNonLinearSize(targetWidth, targetHeight, targetMobileWidth);
         playerInstance.miniPlayerToggledOn = true;
         emitToggleEvent();
     }
@@ -155,14 +174,19 @@ export default function (playerInstance) {
      *
      * @param {number} [width]
      * @param {number} [height]
+     * @param {number} [mobileWidth]
      */
-    function adaptNonLinearSize(width, height) {
+    function adaptNonLinearSize(width, height, mobileWidth) {
         /** @type HTMLImageElement|HTMLIFrameElement */
         const nonLinear = playerInstance.domRef.wrapper.querySelector(NON_LINEAR_SELECTOR);
         /** @type HTMLElement */
         const vpaidFrame = playerInstance.domRef.wrapper.querySelector(VPAID_FRAME_SELECTOR);
 
         if (!nonLinear) return;
+
+        if (isMobile) {
+            width = window.innerWidth * mobileWidth / 100; // Transforms vw to px
+        }
 
         const nonLinearWidth = extractSizeFromElement(nonLinear, null, 'width');
         const nonLinearHeight = extractSizeFromElement(nonLinear, null, 'height');
@@ -178,7 +202,7 @@ export default function (playerInstance) {
 
             originalNonLinearWidth = originalNonLinearHeight = null;
         } else if (nonLinearWidth > width || nonLinearHeight > height) {
-            const targetRatio = (width - 32) / nonLinearWidth;
+            const targetRatio = (width - (isMobile ? 4 : 32)) / nonLinearWidth;
 
             originalNonLinearWidth = nonLinearWidth;
             originalNonLinearHeight = nonLinearHeight;
@@ -191,6 +215,44 @@ export default function (playerInstance) {
                 vpaidFrame.style.height = `${Math.round(nonLinearHeight * targetRatio)}px`;
             }
         }
+    }
+
+    /**
+     * Setups mobile disable element
+     */
+    function setupMobile() {
+        const disableMiniPlayerMobile = document.createElement('div');
+        let startTimestamp = 0;
+        let startScreenX = 0;
+        disableMiniPlayerMobile.classList.add(DISABLE_MINI_PLAYER_MOBILE_CLASS);
+
+        // Touch behaviour - Disable mini player and scroll player to view
+        disableMiniPlayerMobile.onclick = () => {
+            toggleMiniPlayer('off');
+            playerInstance.domRef.wrapper.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+            });
+        }
+
+        // Scroll X behaviour - Disable mini player and pauses video
+        disableMiniPlayerMobile.ontouchstart = (e) => {
+            startTimestamp = e.timeStamp;
+            startScreenX = e.changedTouches[0].screenX;
+        }
+        disableMiniPlayerMobile.ontouchend = (e) => {
+            const currentTimestamp = e.timeStamp;
+            const currentScreenX = e.changedTouches[0].screenX;
+
+            if (
+                currentTimestamp - startTimestamp < TOUCH_STOP_TIMESTAMP_DIFF &&  // Touch lasted at least X time
+                 Math.abs(startScreenX - currentScreenX) > TOUCH_STOP_SCREEN_X_DIFF // Moved more than X pixels
+            ) {
+                toggleMiniPlayer('off');
+                playerInstance.playPauseToggle();
+            }
+        }
+        playerInstance.domRef.wrapper.insertBefore(disableMiniPlayerMobile, playerInstance.domRef.player.nextSibling);
     }
 
     // Exposes public module functions

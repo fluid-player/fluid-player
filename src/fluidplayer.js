@@ -231,6 +231,7 @@ const fluidPlayerClass = function () {
                     enabled: true,
                     width: 400,
                     height: 225,
+                    widthMobile: 50
                 }
             },
             vastOptions: {

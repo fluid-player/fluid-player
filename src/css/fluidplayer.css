@@ -1390,10 +1390,42 @@ _:-ms-lang(x),
     opacity: 1;
 }
 
-/* TODO Create styles for mobile */
+.fluid_video_wrapper.fluid_mini_player_mode .disable-mini-player-mobile {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+
 @media screen and (max-width: 768px) {
     .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_mini_player {
+        /*display: none;*/
+    }
+
+    .fluid_video_wrapper.fluid_mini_player_mode > *:not(video, .ad_countdown, .fluid_nonLinear_ad, .disable-mini-player-mobile) {
         display: none;
+    }
+
+    .fluid_video_wrapper.fluid_mini_player_mode .fluid_nonLinear_ad {
+        z-index: 100;
+    }
+
+    .fluid_video_wrapper.fluid_mini_player_mode .fluid_nonLinear_bottom {
+        bottom: 16px;
+    }
+
+    .fluid_video_wrapper.fluid_mini_player_mode .fluid_nonLinear_top {
+        top: 16px;
+    }
+
+    .fluid_video_wrapper.fluid_mini_player_mode .ad_countdown {
+        display: inline-block !important;
+    }
+
+    .fluid_video_wrapper.fluid_mini_player_mode .disable-mini-player-mobile {
+        display: block;
     }
 }
 
