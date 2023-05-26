@@ -8,6 +8,7 @@ export default function (playerInstance) {
     const FLUID_PLAYER_WRAPPER_CLASS = 'fluid_mini_player_mode';
     const CLOSE_BUTTON_WRAPPER_CLASS = 'mini-player-close-button-wrapper';
     const CLOSE_BUTTON_CLASS = 'mini-player-close-button';
+    const PLACEHOLDER_CLASS = 'fluidplayer-miniplayer-player-placeholder'
 
     const NON_LINEAR_SELECTOR = '.fluid_nonLinear_ad img, .fluid_vpaid_nonlinear_slot_iframe';
     const VPAID_FRAME_SELECTOR = '.fluid_vpaidNonLinear_frame';
@@ -20,6 +21,8 @@ export default function (playerInstance) {
     let originalNonLinearWidth = null
     let originalNonLinearHeight = null;
     let isSetup = false;
+    /** @type null | Element */
+    let placeholderElement = null;
 
     /**
      * Toggles the MiniPlayer given that it's enabled. Resets all other display modes.
@@ -90,6 +93,8 @@ export default function (playerInstance) {
     function toggleMiniPlayerOff() {
         const videoWrapper = playerInstance.domRef.wrapper;
 
+        removePlayerPlaceholder();
+
         videoWrapper.classList.remove(FLUID_PLAYER_WRAPPER_CLASS);
         videoWrapper.style.width = `${originalWidth}px`;
         videoWrapper.style.height = `${originalHeight}px`;
@@ -120,6 +125,7 @@ export default function (playerInstance) {
         videoWrapper.style.width = `${targetWidth}px`;
         videoWrapper.style.height = `${targetHeight}px`;
 
+        createPlayerPlaceholder(originalWidth, originalHeight);
         adaptNonLinearSize(targetWidth, targetHeight);
         playerInstance.miniPlayerToggledOn = true;
         emitToggleEvent();
@@ -191,6 +197,31 @@ export default function (playerInstance) {
                 vpaidFrame.style.height = `${Math.round(nonLinearHeight * targetRatio)}px`;
             }
         }
+    }
+
+    /**
+     * Creates a placeholder element in place where the video player was
+     *
+     * @param {number} placeholderWidth
+     * @param {number} placeholderHeight
+     */
+    function createPlayerPlaceholder(placeholderWidth, placeholderHeight) {
+        placeholderElement = document.createElement('div');
+        placeholderElement.classList.add(PLACEHOLDER_CLASS);
+        placeholderElement.style.height = `${placeholderHeight}px`;
+        placeholderElement.style.width = `${placeholderWidth}px`;
+        placeholderElement.innerText = playerInstance.displayOptions.layoutControls.miniPlayer.placeholderText || '';
+        placeholderElement.onclick = () => toggleMiniPlayerOff();
+
+        playerInstance.domRef.wrapper.parentElement.insertBefore(placeholderElement, playerInstance.domRef.wrapper);
+    }
+
+    /**
+     * Removes the placeholder that was in place where video player was
+     */
+    function removePlayerPlaceholder() {
+        playerInstance.domRef.wrapper.parentElement.removeChild(placeholderElement);
+        placeholderElement = null;
     }
 
     // Exposes public module functions

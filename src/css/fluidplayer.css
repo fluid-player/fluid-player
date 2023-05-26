@@ -1397,3 +1397,14 @@ _:-ms-lang(x),
     }
 }
 
+.fluidplayer-miniplayer-player-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.5rem;
+    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    background: #000 url('../static/miniplayer-toggle-on.svg') no-repeat 50% calc(50% - 48px);
+    background-size: 48px;
+    cursor: pointer;
+}

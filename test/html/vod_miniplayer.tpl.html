@@ -36,6 +36,9 @@
     <label for="height">Height</label>
     <input type="number" name="height" id="height" value="225">
 
+    <label for="placeholderText">Placeholder Text</label>
+    <input type="text" name="placeholderText" id="placeholderText" value="Playing in Miniplayer">
+
     <button id="setupPlayer">Show Player</button>
 </div>
 
@@ -47,6 +50,7 @@
         const vastad = document.getElementById('vastad').checked;
         const width = document.getElementById('width').value;
         const height = document.getElementById('height').value;
+        const placeholderText = document.getElementById('placeholderText').value;
         const mountingPoint = document.getElementById('mountingPoint');
         mountingPoint.innerHTML = `
             <video id="fluid-player-e2e-case">
@@ -62,6 +66,7 @@
                     enabled,
                     width: Number(width),
                     height: Number(height),
+                    placeholderText
                 }
             },
             ...(vastad ? {
