@@ -14,6 +14,7 @@ export default function (playerInstance) {
     const FLUID_PLAYER_WRAPPER_CLASS = 'fluid_mini_player_mode';
     const CLOSE_BUTTON_WRAPPER_CLASS = 'mini-player-close-button-wrapper';
     const CLOSE_BUTTON_CLASS = 'mini-player-close-button';
+    const PLACEHOLDER_CLASS = 'fluidplayer-miniplayer-player-placeholder'
     const DISABLE_MINI_PLAYER_MOBILE_CLASS = 'disable-mini-player-mobile';
 
     const NON_LINEAR_SELECTOR = '.fluid_nonLinear_ad img, .fluid_vpaid_nonlinear_slot_iframe';
@@ -27,6 +28,8 @@ export default function (playerInstance) {
     let originalNonLinearWidth = null
     let originalNonLinearHeight = null;
     let isSetup = false;
+    /** @type null | Element */
+    let placeholderElement = null;
     let isMobile = false;
 
     /**
@@ -100,6 +103,8 @@ export default function (playerInstance) {
     function toggleMiniPlayerOff() {
         const videoWrapper = playerInstance.domRef.wrapper;
 
+        removePlayerPlaceholder();
+
         videoWrapper.classList.remove(FLUID_PLAYER_WRAPPER_CLASS);
         videoWrapper.style.width = `${originalWidth}px`;
         videoWrapper.style.height = `${originalHeight}px`;
@@ -139,6 +144,7 @@ export default function (playerInstance) {
             videoWrapper.style.aspectRatio = `16 / 9`;
         }
 
+        createPlayerPlaceholder(originalWidth, originalHeight);
         adaptNonLinearSize(targetWidth, targetHeight, targetMobileWidth);
         playerInstance.miniPlayerToggledOn = true;
         emitToggleEvent();
@@ -246,13 +252,38 @@ export default function (playerInstance) {
 
             if (
                 currentTimestamp - startTimestamp < TOUCH_STOP_TIMESTAMP_DIFF &&  // Touch lasted at least X time
-                 Math.abs(startScreenX - currentScreenX) > TOUCH_STOP_SCREEN_X_DIFF // Moved more than X pixels
+                Math.abs(startScreenX - currentScreenX) > TOUCH_STOP_SCREEN_X_DIFF // Moved more than X pixels
             ) {
                 toggleMiniPlayer('off');
                 playerInstance.playPauseToggle();
             }
         }
         playerInstance.domRef.wrapper.insertBefore(disableMiniPlayerMobile, playerInstance.domRef.player.nextSibling);
+    }
+
+    /**
+     * Creates a placeholder element in place where the video player was
+     *
+     * @param {number} placeholderWidth
+     * @param {number} placeholderHeight
+     */
+    function createPlayerPlaceholder(placeholderWidth, placeholderHeight) {
+        placeholderElement = document.createElement('div');
+        placeholderElement.classList.add(PLACEHOLDER_CLASS);
+        placeholderElement.style.height = `${placeholderHeight}px`;
+        placeholderElement.style.width = `${placeholderWidth}px`;
+        placeholderElement.innerText = playerInstance.displayOptions.layoutControls.miniPlayer.placeholderText || '';
+        placeholderElement.onclick = () => toggleMiniPlayerOff();
+
+        playerInstance.domRef.wrapper.parentElement.insertBefore(placeholderElement, playerInstance.domRef.wrapper);
+    }
+
+    /**
+     * Removes the placeholder that was in place where video player was
+     */
+    function removePlayerPlaceholder() {
+        playerInstance.domRef.wrapper.parentElement.removeChild(placeholderElement);
+        placeholderElement = null;
     }
 
     // Exposes public module functions

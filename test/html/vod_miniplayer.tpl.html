@@ -39,6 +39,9 @@
     <label for="widthMobile">Width Mobile</label>
     <input type="number" name="widthMobile" id="widthMobile" value="50">
 
+    <label for="placeholderText">Placeholder Text</label>
+    <input type="text" name="placeholderText" id="placeholderText" value="Playing in Miniplayer">
+
     <button id="setupPlayer">Show Player</button>
 </div>
 
@@ -51,6 +54,7 @@
         const width = document.getElementById('width').value;
         const height = document.getElementById('height').value;
         const widthMobile = document.getElementById('widthMobile').value;
+        const placeholderText = document.getElementById('placeholderText').value;
         const mountingPoint = document.getElementById('mountingPoint');
         mountingPoint.innerHTML = `
             <video id="fluid-player-e2e-case">
@@ -66,7 +70,8 @@
                     enabled,
                     width: Number(width),
                     height: Number(height),
-                    widthMobile: Number(widthMobile)
+                    widthMobile: Number(widthMobile),
+                    placeholderText
                 }
             },
             ...(vastad ? {
