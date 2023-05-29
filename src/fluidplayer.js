@@ -303,22 +303,30 @@ const fluidPlayerClass = function () {
                 'Use module callbacks instead!')
         }
 
-        // Overriding the default options
-        for (let key in options) {
-            if (!options.hasOwnProperty(key)) {
-                continue;
-            }
-            if (typeof options[key] == "object") {
-                for (let subKey in options[key]) {
-                    if (!options[key].hasOwnProperty(subKey)) {
-                        continue;
-                    }
-                    self.displayOptions[key][subKey] = options[key][subKey];
+        /**
+         * Replaces values from objects without replacing the default object
+         *
+         * @param defaults
+         * @param options
+         * @returns {object}
+         */
+        function overrideDefaults(defaults, options) {
+            Object.keys(options).forEach(defaultKey => {
+                if (
+                    typeof options[defaultKey] === 'object' &&
+                    options[defaultKey] !== null &&
+                    !Array.isArray(options[defaultKey])
+                ) {
+                    overrideDefaults(defaults[defaultKey], options[defaultKey]);
+                } else if (options[defaultKey]) {
+                    defaults[defaultKey] = options[defaultKey];
                 }
-            } else {
-                self.displayOptions[key] = options[key];
-            }
+            });
+
+            return defaults;
         }
+
+        overrideDefaults(self.displayOptions, options);
 
         self.domRef.wrapper = self.setupPlayerWrapper();
 

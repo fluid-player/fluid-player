@@ -1427,6 +1427,12 @@ _:-ms-lang(x),
     .fluid_video_wrapper.fluid_mini_player_mode .disable-mini-player-mobile {
         display: block;
     }
+
+    .fluidplayer-miniplayer-player-placeholder {
+        font-size: 1.25rem !important;
+        background-size: 32px !important;
+        background-position-y: calc(50% - 32px) !important;
+    }
 }
 
 .fluidplayer-miniplayer-player-placeholder {

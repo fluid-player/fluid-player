@@ -2,12 +2,12 @@ import {is} from "cheerio/lib/api/traversing";
 
 export default function (playerInstance) {
     // Module constants
-    const MINIMUM_WIDTH = 400;
-    const MINIMUM_HEIGHT = 225;
-    const MINIMUM_WIDTH_MOBILE = 100 / 2;
+    const MINIMUM_WIDTH = 400; // Pixels
+    const MINIMUM_HEIGHT = 225; // Pixels
+    const MINIMUM_WIDTH_MOBILE = 40; // Percentage
 
-    const TOUCH_STOP_TIMESTAMP_DIFF = 500;
-    const TOUCH_STOP_SCREEN_X_DIFF = 50;
+    const TOUCH_STOP_TIMESTAMP_DIFF = 500; // Pixels
+    const TOUCH_STOP_SCREEN_X_DIFF = 50; // Pixels
 
     const DESKTOP_ONLY_MEDIA_QUERY = '(max-width: 768px)';
 
@@ -273,7 +273,7 @@ export default function (playerInstance) {
         placeholderElement.style.height = `${placeholderHeight}px`;
         placeholderElement.style.width = `${placeholderWidth}px`;
         placeholderElement.innerText = playerInstance.displayOptions.layoutControls.miniPlayer.placeholderText || '';
-        placeholderElement.onclick = () => toggleMiniPlayerOff();
+        placeholderElement.onclick = () => toggleMiniPlayer('off');
 
         playerInstance.domRef.wrapper.parentElement.insertBefore(placeholderElement, playerInstance.domRef.wrapper);
     }
