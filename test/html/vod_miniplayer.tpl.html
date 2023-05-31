@@ -8,15 +8,11 @@
     <title>VOD with Mini Player</title>
     <%= htmlWebpackPlugin.tags.headTags %>
     <style lang="css">
-        #fluid-player-e2e-case {
-            width: 90%;
-        }
+        #fluid-player-e2e-case { width: 90%; }
 
-        body {
-            height: 300vh;
-            background: rgb(131,58,180);
-            background: linear-gradient(0deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 50%, rgba(252,176,69,1) 100%);
-        }
+        body { height: 300vh; background: rgb(131,58,180); background: linear-gradient(0deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 50%, rgba(252,176,69,1) 100%); }
+
+        #setupForm { display: flex; align-items: flex-start; flex-direction: column; }
     </style>
 </head>
 <body>
@@ -24,25 +20,21 @@
 <%= htmlWebpackPlugin.tags.bodyTags %>
 
 <div id="setupForm">
-    <label for="enabled">Enabled</label>
-    <input type="checkbox" name="enabled" id="enabled" checked>
+    <div><input type="checkbox" name="enabled" id="enabled" checked><label for="enabled">Enabled</label></div>
 
-    <label for="vastad">VAST Ad</label>
-    <input type="checkbox" name="vastad" id="vastad" checked>
+    <div><input type="checkbox" name="vastad" id="vastad" checked><label for="vastad">VAST Ad</label></div>
 
-    <label for="width">Width</label>
-    <input type="number" name="width" id="width" value="400">
+    <div><input type="number" name="width" id="width" value="400"><label for="width">Width</label></div>
 
-    <label for="height">Height</label>
-    <input type="number" name="height" id="height" value="225">
+    <div><input type="number" name="height" id="height" value="225"><label for="height">Height</label></div>
 
-    <label for="widthMobile">Width Mobile</label>
-    <input type="number" name="widthMobile" id="widthMobile" value="50">
+    <div><input type="number" name="widthMobile" id="widthMobile" value="50"><label for="widthMobile">Width Mobile</label></div>
 
-    <label for="placeholderText">Placeholder Text</label>
-    <input type="text" name="placeholderText" id="placeholderText" value="Playing in Miniplayer">
+    <div><input type="text" name="placeholderText" id="placeholderText" value="Playing in Miniplayer"><label for="placeholderText">Placeholder Text</label></div>
 
-    <button id="setupPlayer">Show Player</button>
+    <div><input type="text" name="position" id="position" value="bottom right"><label for="position">Position (top left, top right, bottom left, bottom right)</label></div>
+
+    <p><button id="setupPlayer">Show Player</button></p>
 </div>
 
 <div id="mountingPoint"></div>
@@ -55,6 +47,7 @@
         const height = document.getElementById('height').value;
         const widthMobile = document.getElementById('widthMobile').value;
         const placeholderText = document.getElementById('placeholderText').value;
+        const position = document.getElementById('position').value;
         const mountingPoint = document.getElementById('mountingPoint');
         mountingPoint.innerHTML = `
             <video id="fluid-player-e2e-case">
@@ -71,7 +64,8 @@
                     width: Number(width),
                     height: Number(height),
                     widthMobile: Number(widthMobile),
-                    placeholderText
+                    placeholderText,
+                    position
                 }
             },
             ...(vastad ? {

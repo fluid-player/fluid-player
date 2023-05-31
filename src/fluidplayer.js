@@ -233,6 +233,7 @@ const fluidPlayerClass = function () {
                     height: 225,
                     widthMobile: 50,
                     placeholderText: 'Playing in Miniplayer',
+                    position: 'bottom right',
                 }
             },
             vastOptions: {

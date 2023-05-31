@@ -1283,8 +1283,6 @@ _:-ms-lang(x),
 
 .fluid_mini_player_mode {
     position: fixed;
-    right: 10px;
-    bottom: 10px;
     z-index: 10;
 }
 
@@ -1399,11 +1397,39 @@ _:-ms-lang(x),
     display: none;
 }
 
-@media screen and (max-width: 768px) {
-    .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_mini_player {
-        /*display: none;*/
-    }
+.fluidplayer-miniplayer-player-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.5rem;
+    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    background: #000 url('../static/miniplayer-toggle-on.svg') no-repeat 50% calc(50% - 48px);
+    background-size: 48px;
+    cursor: pointer;
+}
 
+.fluid_video_wrapper.fluid_mini_player_mode.fluid_video_wrapper.fluid_mini_player_mode--top-left {
+    top: 10px;
+    left: 10px;
+}
+
+.fluid_video_wrapper.fluid_mini_player_mode.fluid_video_wrapper.fluid_mini_player_mode--top-right {
+    top: 10px;
+    right: 10px;
+}
+
+.fluid_video_wrapper.fluid_mini_player_mode.fluid_video_wrapper.fluid_mini_player_mode--bottom-left {
+    bottom: 10px;
+    left: 10px;
+}
+
+.fluid_video_wrapper.fluid_mini_player_mode.fluid_video_wrapper.fluid_mini_player_mode--bottom-right {
+    bottom: 10px;
+    right: 10px;
+}
+
+@media screen and (max-width: 768px) {
     .fluid_video_wrapper.fluid_mini_player_mode > *:not(video, .ad_countdown, .fluid_nonLinear_ad, .disable-mini-player-mobile) {
         display: none;
     }
@@ -1433,16 +1459,4 @@ _:-ms-lang(x),
         background-size: 32px !important;
         background-position-y: calc(50% - 32px) !important;
     }
-}
-
-.fluidplayer-miniplayer-player-placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-size: 1.5rem;
-    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
-    background: #000 url('../static/miniplayer-toggle-on.svg') no-repeat 50% calc(50% - 48px);
-    background-size: 48px;
-    cursor: pointer;
 }

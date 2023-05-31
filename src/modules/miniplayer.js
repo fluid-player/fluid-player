@@ -62,7 +62,7 @@ export default function (playerInstance) {
         if (forceToggle === 'off' || playerInstance.miniPlayerToggledOn) {
             toggleMiniPlayerOff();
         } else if (forceToggle === 'on' || !playerInstance.miniPlayerToggledOn) {
-            toggleMiniPlayerOn(miniPlayerOptions.width, miniPlayerOptions.height, miniPlayerOptions.widthMobile);
+            toggleMiniPlayerOn(miniPlayerOptions.width, miniPlayerOptions.height, miniPlayerOptions.widthMobile, miniPlayerOptions.position);
         }
     }
 
@@ -123,8 +123,9 @@ export default function (playerInstance) {
      * @param {number} width
      * @param {number} height
      * @param {number} mobileWidth
+     * @param {'top left'|'top right'|'bottom left'|'bottom right'} position
      */
-    function toggleMiniPlayerOn(width, height, mobileWidth) {
+    function toggleMiniPlayerOn(width, height, mobileWidth, position) {
         const videoWrapper = playerInstance.domRef.wrapper;
         const targetWidth = width > MINIMUM_WIDTH ? width : MINIMUM_WIDTH;
         const targetHeight = height > MINIMUM_HEIGHT ? height : MINIMUM_HEIGHT;
@@ -133,7 +134,10 @@ export default function (playerInstance) {
         originalWidth = extractSizeFromElement(videoWrapper, 'width', 'clientWidth');
         originalHeight = extractSizeFromElement(videoWrapper, 'height', 'clientHeight');
 
-        videoWrapper.classList.add(FLUID_PLAYER_WRAPPER_CLASS);
+        videoWrapper.classList.add(
+            FLUID_PLAYER_WRAPPER_CLASS,
+            `${FLUID_PLAYER_WRAPPER_CLASS}--${position.replace(/\s/, '-')}`
+        );
 
         if (!isMobile) {
             videoWrapper.style.width = `${targetWidth}px`;
