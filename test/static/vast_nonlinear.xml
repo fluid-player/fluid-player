@@ -1,4 +1,4 @@
-<VAST version="3.0">
+<VAST xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast4.xsd" version="4.2">
     <Ad id="20005">
         <InLine>
             <AdSystem version="4.0">iabtechlab</AdSystem>
@@ -25,9 +25,9 @@
             <Creatives>
                 <Creative id="5480" sequence="1">
                     <NonLinearAds>
-                        <NonLinear width="480" height="150" minSuggestedDuration="00:00:05" scalable="true" maintainAspectRatio="true">
+                        <NonLinear width="480" height="90" minSuggestedDuration="00:00:05" scalable="true" maintainAspectRatio="true">
                             <StaticResource creativeType="image/png">
-                                <![CDATA[ https://placekitten.com/480/150 ]]>
+                                <![CDATA[ https://placekitten.com/480/90 ]]>
                             </StaticResource>
 
                             <NonLinearClickTracking>

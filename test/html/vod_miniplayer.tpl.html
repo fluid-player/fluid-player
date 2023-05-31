@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>VOD with Mini Player</title>
+    <%= htmlWebpackPlugin.tags.headTags %>
+    <style lang="css">
+        #fluid-player-e2e-case {
+            width: 90%;
+        }
+
+        body {
+            height: 300vh;
+            background: rgb(131,58,180);
+            background: linear-gradient(0deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 50%, rgba(252,176,69,1) 100%);
+        }
+    </style>
+</head>
+<body>
+
+<%= htmlWebpackPlugin.tags.bodyTags %>
+
+<div id="setupForm">
+    <label for="enabled">Enabled</label>
+    <input type="checkbox" name="enabled" id="enabled" checked>
+
+    <label for="vastad">VAST Ad</label>
+    <input type="checkbox" name="vastad" id="vastad" checked>
+
+    <label for="width">Width</label>
+    <input type="number" name="width" id="width" value="400">
+
+    <label for="height">Height</label>
+    <input type="number" name="height" id="height" value="225">
+
+    <label for="placeholderText">Placeholder Text</label>
+    <input type="text" name="placeholderText" id="placeholderText" value="Playing in Miniplayer">
+
+    <button id="setupPlayer">Show Player</button>
+</div>
+
+<div id="mountingPoint"></div>
+
+<script>
+    document.getElementById('setupPlayer').addEventListener('click', () => {
+        const enabled = document.getElementById('enabled').checked;
+        const vastad = document.getElementById('vastad').checked;
+        const width = document.getElementById('width').value;
+        const height = document.getElementById('height').value;
+        const placeholderText = document.getElementById('placeholderText').value;
+        const mountingPoint = document.getElementById('mountingPoint');
+        mountingPoint.innerHTML = `
+            <video id="fluid-player-e2e-case">
+                <source src='https://cdn.fluidplayer.com/videos/valerian-1080p.mkv' data-fluid-hd title="1080p" type='video/mp4'/>
+                <source src='https://cdn.fluidplayer.com/videos/valerian-720p.mkv' data-fluid-hd title="720p" type='video/mp4'/>
+                <source src='https://cdn.fluidplayer.com/videos/valerian-480p.mkv' title="480p" type='video/mp4'/>
+            </video>
+        `;
+
+        const instance = fluidPlayer('fluid-player-e2e-case', {
+            layoutControls: {
+                miniPlayer: {
+                    enabled,
+                    width: Number(width),
+                    height: Number(height),
+                    placeholderText
+                }
+            },
+            ...(vastad ? {
+                vastOptions: {
+                    allowVPAID: true,
+                    adText: 'Advertising helps us keep the lights on', // Default null,
+                    adTextPosition: 'top left', // Default 'top left
+                    adCTAText: 'Subscribe now!', // Default "Visit now!",
+                    adCTATextPosition: 'top right', //Default 'bottom right’,
+                    adCTATextVast: true, // Enabled. To use the CTA text as provided in the VAST XML.
+                    adList: [
+                        {
+                            roll: 'preRoll',
+                            vastTag: '/static/vast_linear.xml',
+                        },
+                        {
+                            roll: 'midRoll',
+                            vastTag: '/static/vast_nonlinear.xml',
+                            timer: 0
+                        },
+                        {
+                            roll: 'midRoll',
+                            vastTag: '/static/vpaid_linear.xml',
+                            timer: 10
+                        },
+                        {
+                            roll: 'midRoll',
+                            vastTag: '/static/vpaid_nonlinear.xml',
+                            timer: 15
+                        }
+                    ]
+                },
+            } : {})
+        });
+
+        instance.on('miniPlayerToggle', (event) => console.log(`[Event API] miniPlayerToggle`, event, event.detail.isToggledOn));
+
+        Array.from(document.getElementById('setupForm').children).forEach(child => child.remove());
+        const refreshPage = document.createElement('button');
+        refreshPage.onclick = () => location.reload();
+        refreshPage.innerText = 'Reset';
+        refreshPage.style.marginBottom = '5px';
+        document.getElementById('setupForm').appendChild(refreshPage)
+    });
+</script>
+
+</body>
+</html>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<VAST version="3.0">
+<VAST xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast4.xsd" version="4.2">
     <Ad id="4872550">
         <Wrapper allowMultipleAds="1" followAdditionalWrappers="0">
             <AdSystem>ExoClick</AdSystem>

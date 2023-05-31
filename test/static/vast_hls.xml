@@ -1,4 +1,4 @@
-<VAST xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.iab.com/VAST" version="4.2">
+<VAST xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast4.xsd" version="4.2">
     <Ad id="1" adType="video">
         <InLine>
             <AdSystem version="1">stripcash.com</AdSystem>

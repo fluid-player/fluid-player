@@ -8,7 +8,8 @@ import SubtitleModule from './modules/subtitles';
 import TimelineModule from './modules/timeline';
 import AdSupportModule from './modules/adsupport';
 import StreamingModule from './modules/streaming';
-import UtilsModule from './modules/utils'
+import UtilsModule from './modules/utils';
+import MiniPlayerModule from './modules/miniplayer';
 
 const FP_MODULES = [
     VPAIDModule,
@@ -18,7 +19,8 @@ const FP_MODULES = [
     TimelineModule,
     AdSupportModule,
     StreamingModule,
-    UtilsModule
+    UtilsModule,
+    MiniPlayerModule
 ];
 
 // Determine build mode
@@ -225,6 +227,12 @@ const fluidPlayerClass = function () {
                     controls: true,
                     links: []
                 },
+                miniPlayer: {
+                    enabled: true,
+                    width: 400,
+                    height: 225,
+                    placeholderText: 'Playing in Miniplayer',
+                }
             },
             vastOptions: {
                 adList: {},
@@ -581,7 +589,7 @@ const fluidPlayerClass = function () {
         const style = 'color: #fff; font-weight: bold; background-color: #1a5e87; padding: 3px 6px; border-radius: 3px;';
 
         if (self.displayOptions.debug) {
-            console.log('%cFP DEBUG MESSAGE', style, ...msg);
+            console.log('%cFP DEBUG', style, ...msg);
         }
     };
 
@@ -768,6 +776,14 @@ const fluidPlayerClass = function () {
         controls.fullscreen.id = self.videoPlayerId + '_fluid_control_fullscreen';
         controls.fullscreen.className = 'fluid_button fluid_control_fullscreen fluid_button_fullscreen';
         controls.rightContainer.appendChild(controls.fullscreen);
+
+        if (options.miniPlayer.enabled) {
+            // Right container -> MiniPlayer
+            controls.miniPlayer = document.createElement('div');
+            controls.miniPlayer.id = self.videoPlayerId + '_fluid_control_mini_player';
+            controls.miniPlayer.className = 'fluid_button fluid_control_mini_player fluid_button_mini_player';
+            controls.rightContainer.appendChild(controls.miniPlayer);
+        }
 
         // Right container -> Theatre
         controls.theatre = document.createElement('div');
@@ -1074,11 +1090,7 @@ const fluidPlayerClass = function () {
         const requestFullscreenFunctionNames = self.checkFullscreenSupport('fluid_video_wrapper_' + self.videoPlayerId);
         const fullscreenButton = videoPlayerTag.parentNode.getElementsByClassName('fluid_control_fullscreen');
         const menuOptionFullscreen = document.getElementById(self.videoPlayerId + 'context_option_fullscreen');
-
-        // Disable Theatre mode if it's on while we toggle fullscreen
-        if (self.theatreMode) {
-            self.theatreToggle();
-        }
+        self.resetDisplayMode('fullScreen');
 
         let functionNameToExecute;
 
@@ -1491,6 +1503,9 @@ const fluidPlayerClass = function () {
                     self.onKeyboardSeekPosition(keyCode);
                     event.preventDefault();
                     break;
+                case 73: // i
+                    self.toggleMiniPlayer();
+                    break;
             }
 
             return false;
@@ -1729,6 +1744,11 @@ const fluidPlayerClass = function () {
             document.getElementById(self.videoPlayerId + '_fluid_control_theatre').style.display = 'none';
         }
 
+        // Mini Player
+        if (self.displayOptions.layoutControls.miniPlayer.enabled && !self.isInIframe) {
+            self.trackEvent(self.domRef.player.parentNode, 'click', '.fluid_control_mini_player', () => self.toggleMiniPlayer(undefined));
+        }
+
         self.domRef.player.addEventListener('ratechange', () => {
             if (self.isCurrentlyPlayingAd) {
                 self.playbackRate = 1;
@@ -1856,7 +1876,8 @@ const fluidPlayerClass = function () {
             primaryColor: self.displayOptions.layoutControls.primaryColor
                 ? self.displayOptions.layoutControls.primaryColor
                 : 'red',
-            controlForwardBackward: !!self.displayOptions.layoutControls.controlForwardBackward.show
+            controlForwardBackward: !!self.displayOptions.layoutControls.controlForwardBackward.show,
+            miniPlayer: self.displayOptions.layoutControls.miniPlayer,
         });
 
         // Remove the default controls
@@ -2642,9 +2663,7 @@ const fluidPlayerClass = function () {
         }
 
         // Theatre and fullscreen, it's only one or the other
-        if (self.fullscreenMode) {
-            self.fullscreenToggle();
-        }
+        this.resetDisplayMode('theaterMode');
 
         // Advanced Theatre mode if specified
         if (self.displayOptions.layoutControls.theatreAdvanced) {
@@ -2955,6 +2974,9 @@ const fluidPlayerClass = function () {
                     functionCall(self.getCurrentTime())
                 });
                 break;
+            case 'miniPlayerToggle':
+                self.domRef.player.addEventListener('miniPlayerToggle', functionCall);
+                break;
             default:
                 console.log('[FP_ERROR] Event not recognised');
                 break;
@@ -3024,6 +3046,25 @@ const fluidPlayerClass = function () {
             }
         }
     };
+
+    /**
+     * Resets all display types that are not the target display mode
+     *
+     * @param {'fullScreen'|'theaterMode'|'miniPlayer'} displayTarget
+     */
+    self.resetDisplayMode = (displayTarget) => {
+        if (self.fullscreenMode && displayTarget !== 'fullScreen') {
+            self.fullscreenToggle();
+        }
+
+        if (self.theatreMode && displayTarget !== 'theaterMode') {
+            self.theatreToggle();
+        }
+
+        if (self.miniPlayerToggledOn && displayTarget !== 'miniPlayer') {
+            self.toggleMiniPlayer('off');
+        }
+    }
 
     self.destroy = () => {
         const numDestructors = self.destructors.length;

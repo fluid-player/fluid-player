@@ -893,7 +893,8 @@ _:-ms-lang(x),
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button.fluid_button_fullscreen,
-.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button.fluid_button_fullscreen_exit {
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button.fluid_button_fullscreen_exit,
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button.fluid_button_mini_player {
     float: right;
 }
 
@@ -979,7 +980,8 @@ _:-ms-lang(x),
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_download,
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_theatre,
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_subtitles,
-.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_cardboard {
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_cardboard,
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_mini_player {
     display: inline-block;
     text-align: left;
     height: 24px;
@@ -1000,7 +1002,8 @@ _:-ms-lang(x),
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_download:before,
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_theatre:before,
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_subtitles:before,
-.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_cardboard:before {
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_cardboard:before,
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_mini_player:before{
     background: url('../static/fluid-icons.svg') no-repeat;
     position: absolute;
     height: 24px;
@@ -1075,6 +1078,16 @@ _:-ms-lang(x),
     background-position: -2px -2px;
 }
 
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_mini_player:before {
+    background: url('../static/miniplayer-toggle-on.svg') no-repeat 0 0;
+    background-size: 20px;
+}
+
+.fluid_video_wrapper.fluid_mini_player_mode .fluid_controls_container .fluid_button.fluid_button_mini_player:before {
+    background: url('../static/miniplayer-toggle-off.svg') no-repeat 0 0;
+    background-size: 20px;
+}
+
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_skip_back {
     margin-left: 5px;
 }
@@ -1092,7 +1105,8 @@ _:-ms-lang(x),
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_download:hover:before,
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_theatre:hover:before,
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_subtitles:hover:before,
-.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_cardboard:hover:before {
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_cardboard:hover:before,
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_mini_player:hover:before {
     opacity: 1;
 }
 
@@ -1267,6 +1281,13 @@ _:-ms-lang(x),
     box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.8);
 }
 
+.fluid_mini_player_mode {
+    position: fixed;
+    right: 10px;
+    bottom: 10px;
+    z-index: 10;
+}
+
 .source_button_icon {
     background: url('../static/fluid-icons.svg') no-repeat;
     float: left;
@@ -1324,4 +1345,66 @@ _:-ms-lang(x),
     font-size: 6pt;
     content: 'HD';
     padding-left: 3px;
+}
+
+/** MiniPlayer */
+
+.fluid_video_wrapper.fluid_player_layout_default .mini-player-close-button-wrapper {
+    display: none;
+}
+
+.fluid_video_wrapper.fluid_mini_player_mode .mini-player-close-button-wrapper {
+    position: absolute;
+    background: rgb(0,0,0);
+    background: linear-gradient(45deg, rgba(0,0,0,0) 90%, rgba(0,0,0,0.6) 110%);
+    height: 100%;
+    width: 100%;
+    top: 0;
+    right: 0;
+    z-index: 31;
+    display: block;
+    opacity: 0;
+    -webkit-transition: opacity 0.3s ease-in-out;
+    -moz-transition: opacity 0.3s ease-in-out;
+    -ms-transition: opacity 0.3s ease-in-out;
+    -o-transition: opacity 0.3s ease-in-out;
+    transition: opacity 0.3s ease-in-out;
+    pointer-events: none;
+}
+
+.fluid_video_wrapper.fluid_mini_player_mode .mini-player-close-button {
+    position: absolute;
+    background: transparent url("../static/close-icon.svg") no-repeat scroll center center;
+    height: 22px;
+    width: 22px;
+    top: 6px;
+    right: 6px;
+    background-size: 22px;
+    cursor: pointer;
+    z-index: 32;
+    display: block;
+    pointer-events: all;
+}
+
+.fluid_video_wrapper.fluid_mini_player_mode:hover .mini-player-close-button-wrapper {
+    opacity: 1;
+}
+
+/* TODO Create styles for mobile */
+@media screen and (max-width: 768px) {
+    .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_mini_player {
+        display: none;
+    }
+}
+
+.fluidplayer-miniplayer-player-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.5rem;
+    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    background: #000 url('../static/miniplayer-toggle-on.svg') no-repeat 50% calc(50% - 48px);
+    background-size: 48px;
+    cursor: pointer;
 }
