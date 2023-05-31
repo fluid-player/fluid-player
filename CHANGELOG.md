@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.16.0 (2023-05-31)
+* [Pull #721](https://github.com/fluid-player/fluid-player/pull/721) Fluid Player loads midRoll even if timer is longer than main video
+* [Pull #732](https://github.com/fluid-player/fluid-player/pull/732) MiniPlayer MVP
+
 ## 3.15.0 (2023-05-09)
 * [Pull #727](https://github.com/fluid-player/fluid-player/pull/727) Player required 2 clicks to play video New Iphone 11 Pro Chrome
 
