@@ -484,6 +484,11 @@ export default function (playerInstance, options) {
         }
     };
 
+    /**
+     * Prepares VAST for instant ads
+     *
+     * @param roll
+     */
     playerInstance.prepareVast = (roll) => {
         let list = playerInstance.findRoll(roll);
 
@@ -495,10 +500,8 @@ export default function (playerInstance, options) {
             }
 
             playerInstance.processVastWithRetries(playerInstance.rollsById[rollListId]);
-            playerInstance.domRef.player.addEventListener('adId_' + rollListId, playerInstance[roll]);
         }
     };
-
 
     playerInstance.playMainVideoWhenVastFails = (errorCode) => {
         playerInstance.debugMessage('playMainVideoWhenVastFails called');
@@ -593,13 +596,13 @@ export default function (playerInstance, options) {
     /**
      * Parse the VAST Tag
      *
-     * @param vastTag
-     * @param adListId
+     * @param vastObj
      */
-
     playerInstance.processVastWithRetries = (vastObj) => {
         let vastTag = vastObj.vastTag;
         const rollListId = vastObj.id;
+
+        playerInstance.domRef.player.addEventListener('adId_' + rollListId, playerInstance[vastObj.roll]);
 
         const handleVastResult = function (pass, adOptionsList) {
             if (pass && Array.isArray(adOptionsList) && !playerInstance.displayOptions.vastOptions.allowVPAID && adOptionsList.some(adOptions => adOptions.vpaid)) {

@@ -1637,8 +1637,7 @@ const fluidPlayerClass = function () {
 
         const prepareVastAdsThatKnowDuration = () => {
             self.prepareVast('onPauseRoll');
-            self.prepareVast('postRoll');
-            self.prepareVast('midRoll');
+            self.scheduleOnDemandRolls();
         };
 
         if (isFirstStart) {
