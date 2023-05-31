@@ -1283,6 +1283,8 @@ _:-ms-lang(x),
 
 .fluid_mini_player_mode {
     position: fixed;
+    bottom: 10px;
+    right: 10px;
     z-index: 10;
 }
 

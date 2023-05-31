@@ -136,7 +136,7 @@ export default function (playerInstance) {
 
         videoWrapper.classList.add(
             FLUID_PLAYER_WRAPPER_CLASS,
-            `${FLUID_PLAYER_WRAPPER_CLASS}--${position.replace(/\s/, '-')}`
+            `${FLUID_PLAYER_WRAPPER_CLASS}--${position.trim().replace(/\s/, '-')}`
         );
 
         if (!isMobile) {
