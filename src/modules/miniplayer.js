@@ -6,8 +6,8 @@ export default function (playerInstance) {
     const MINIMUM_HEIGHT = 225; // Pixels
     const MINIMUM_WIDTH_MOBILE = 40; // Percentage
 
-    const TOUCH_STOP_TIMESTAMP_DIFF = 1000; // ms
-    const TOUCH_STOP_SCREEN_X_DIFF = 25; // Pixels
+    const DISABLE_MINI_PLAYER_MOBILE_ANIMATION_CLAMP = 50;
+    const DISABLE_MINI_PLAYER_MOBILE_ANIMATION_DEADZONE = 5;
 
     const DESKTOP_ONLY_MEDIA_QUERY = '(max-width: 768px)';
 
@@ -228,27 +228,29 @@ export default function (playerInstance) {
      */
     function setupMobile() {
         const disableMiniPlayerMobile = document.createElement('div');
-        const animationClamp = 50;
-        const minimumAnimationTrigger = 5;
         let animationAmount = 0;
         let startTimestamp = 0;
         let startScreenX = 0;
         let hasTriggeredAnimation;
         disableMiniPlayerMobile.classList.add(DISABLE_MINI_PLAYER_MOBILE_CLASS);
 
-        // Scroll X behaviour - Disable mini player and pauses video
-        disableMiniPlayerMobile.ontouchstart = (e) => {
+        disableMiniPlayerMobile.ontouchstart = event => {
             hasTriggeredAnimation = false;
-            startTimestamp = e.timeStamp;
-            startScreenX = e.changedTouches[0].screenX;
-            e.preventDefault();
+            startTimestamp = event.timeStamp;
+            startScreenX = event.changedTouches[0].screenX;
+            event.preventDefault();
         }
 
-        disableMiniPlayerMobile.ontouchmove = (e) => {
-            animationAmount = Math.min(Math.max(startScreenX - e.changedTouches[0].screenX, animationClamp * -1), animationClamp);
+        disableMiniPlayerMobile.ontouchmove = event => {
+            animationAmount = Math.min(
+                Math.max(
+                    startScreenX - event.changedTouches[0].screenX,
+                    DISABLE_MINI_PLAYER_MOBILE_ANIMATION_CLAMP * -1),
+                DISABLE_MINI_PLAYER_MOBILE_ANIMATION_CLAMP
+            );
 
-            if (Math.abs(animationAmount) > minimumAnimationTrigger) {
-                console.log('animating to ', animationAmount);
+            if (Math.abs(animationAmount) > DISABLE_MINI_PLAYER_MOBILE_ANIMATION_DEADZONE) {
+                // Moves the element the same amount as the touch event moved
                 playerInstance.domRef.wrapper.style.transform = `translateX(${animationAmount * -1}px)`;
                 hasTriggeredAnimation = true;
             } else {
@@ -256,15 +258,17 @@ export default function (playerInstance) {
             }
         }
 
-        disableMiniPlayerMobile.ontouchend = (e) => {
-            if (Math.abs(animationAmount) > minimumAnimationTrigger) {
+        disableMiniPlayerMobile.ontouchend = event => {
+            if (Math.abs(animationAmount) > DISABLE_MINI_PLAYER_MOBILE_ANIMATION_DEADZONE) {
+                // Scroll X behaviour - Disable mini player and pauses video
                 toggleMiniPlayer('off');
 
                 if (!playerInstance.domRef.player.paused) {
                     playerInstance.playPauseToggle();
                 }
-                e.preventDefault();
+                event.preventDefault();
             } else if (!hasTriggeredAnimation) {
+                // Tap behaviour - Disable mini player and moves screen to video
                 toggleMiniPlayer('off');
                 setTimeout(() => {
                     playerInstance.domRef.wrapper.scrollIntoView({
@@ -276,6 +280,11 @@ export default function (playerInstance) {
 
             animationAmount = 0;
             playerInstance.domRef.wrapper.style.transform = ``;
+        }
+
+        // Fallback for when there is no touch event
+        disableMiniPlayerMobile.onmouseup = () => {
+            toggleMiniPlayer('off');
         }
 
         playerInstance.domRef.wrapper.insertBefore(disableMiniPlayerMobile, playerInstance.domRef.player.nextSibling);
