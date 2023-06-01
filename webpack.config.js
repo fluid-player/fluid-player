@@ -68,6 +68,10 @@ module.exports = (env, argv) => {
         // Locate all E2E cases
         const caseFiles = [];
         fs.readdirSync(path.resolve(__dirname, 'test/html/')).forEach(file => {
+            if (file === 'special-cases') {
+                return;
+            }
+
             const absPath = path.resolve(__dirname, 'test/html/', file);
             const caseHtml = cheerio.load(fs.readFileSync(absPath));
             const publicName = file.replace('.tpl', '');
@@ -83,6 +87,17 @@ module.exports = (env, argv) => {
                 file: publicName,
                 name: caseHtml('title').text()
             });
+        });
+
+        fs.readdirSync(path.resolve(__dirname, 'test/html/special-cases')).forEach(file => {
+            const publicName = file.replace('.tpl', '');
+
+            plugins.push(new HtmlWebpackPlugin({
+                template: path.resolve(__dirname, 'test/html/special-cases', file),
+                inject: false,
+                filename: publicName,
+                scriptLoading: "blocking",
+            }));
         });
 
         // Emit all cases as separate HTML pages
