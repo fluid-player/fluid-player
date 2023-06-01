@@ -1,7 +1,7 @@
 <VAST version="3.0">
     <Ad id="6">
         <Wrapper>
-            <AdSystem>Adsession</AdSystem>
+            <AdSystem>Fluid Player</AdSystem>
             <VASTAdTagURI>
                 <![CDATA[ static/special-cases/fp-215-2.xml ]]>
             </VASTAdTagURI>

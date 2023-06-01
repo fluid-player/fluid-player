@@ -1,7 +1,7 @@
 <VAST version="2.0">
     <Ad id="1059939">
         <InLine>
-            <AdSystem version="7.9.24.0">adtool</AdSystem>
+            <AdSystem>Fluid Player</AdSystem>
             <AdTitle>Exclusive Offer - Join Now</AdTitle>
             <Description/>
             <Impression>
@@ -9,7 +9,7 @@
             </Impression>
             <Survey/>
             <Creatives>
-                <Creative AdID="1059939" sequence="1">
+                <Creative AdID="1" sequence="1">
                     <Linear skipoffset="00:00:07">
                         <Duration>00:00:30</Duration>
                         <TrackingEvents>
