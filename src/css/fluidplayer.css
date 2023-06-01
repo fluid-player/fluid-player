@@ -1454,6 +1454,7 @@ _:-ms-lang(x),
 
     .fluid_video_wrapper.fluid_mini_player_mode .disable-mini-player-mobile {
         display: block;
+        touch-action: none;
     }
 
     .fluidplayer-miniplayer-player-placeholder {

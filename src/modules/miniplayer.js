@@ -6,8 +6,8 @@ export default function (playerInstance) {
     const MINIMUM_HEIGHT = 225; // Pixels
     const MINIMUM_WIDTH_MOBILE = 40; // Percentage
 
-    const TOUCH_STOP_TIMESTAMP_DIFF = 500; // Pixels
-    const TOUCH_STOP_SCREEN_X_DIFF = 50; // Pixels
+    const DISABLE_MINI_PLAYER_MOBILE_ANIMATION_CLAMP = 50;
+    const DISABLE_MINI_PLAYER_MOBILE_ANIMATION_DEADZONE = 5;
 
     const DESKTOP_ONLY_MEDIA_QUERY = '(max-width: 768px)';
 
@@ -232,36 +232,65 @@ export default function (playerInstance) {
      */
     function setupMobile() {
         const disableMiniPlayerMobile = document.createElement('div');
+        let animationAmount = 0;
         let startTimestamp = 0;
         let startScreenX = 0;
+        let hasTriggeredAnimation;
         disableMiniPlayerMobile.classList.add(DISABLE_MINI_PLAYER_MOBILE_CLASS);
 
-        // Touch behaviour - Disable mini player and scroll player to view
-        disableMiniPlayerMobile.onclick = () => {
-            toggleMiniPlayer('off');
-            playerInstance.domRef.wrapper.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center',
-            });
+        disableMiniPlayerMobile.ontouchstart = event => {
+            hasTriggeredAnimation = false;
+            startTimestamp = event.timeStamp;
+            startScreenX = event.changedTouches[0].screenX;
+            event.preventDefault();
         }
 
-        // Scroll X behaviour - Disable mini player and pauses video
-        disableMiniPlayerMobile.ontouchstart = (e) => {
-            startTimestamp = e.timeStamp;
-            startScreenX = e.changedTouches[0].screenX;
-        }
-        disableMiniPlayerMobile.ontouchend = (e) => {
-            const currentTimestamp = e.timeStamp;
-            const currentScreenX = e.changedTouches[0].screenX;
+        disableMiniPlayerMobile.ontouchmove = event => {
+            animationAmount = Math.min(
+                Math.max(
+                    startScreenX - event.changedTouches[0].screenX,
+                    DISABLE_MINI_PLAYER_MOBILE_ANIMATION_CLAMP * -1),
+                DISABLE_MINI_PLAYER_MOBILE_ANIMATION_CLAMP
+            );
 
-            if (
-                currentTimestamp - startTimestamp < TOUCH_STOP_TIMESTAMP_DIFF &&  // Touch lasted at least X time
-                Math.abs(startScreenX - currentScreenX) > TOUCH_STOP_SCREEN_X_DIFF // Moved more than X pixels
-            ) {
-                toggleMiniPlayer('off');
-                playerInstance.playPauseToggle();
+            if (Math.abs(animationAmount) > DISABLE_MINI_PLAYER_MOBILE_ANIMATION_DEADZONE) {
+                // Moves the element the same amount as the touch event moved
+                playerInstance.domRef.wrapper.style.transform = `translateX(${animationAmount * -1}px)`;
+                hasTriggeredAnimation = true;
+            } else {
+                playerInstance.domRef.wrapper.style.transform = `translateX(0px)`
             }
         }
+
+        disableMiniPlayerMobile.ontouchend = event => {
+            if (Math.abs(animationAmount) > DISABLE_MINI_PLAYER_MOBILE_ANIMATION_DEADZONE) {
+                // Scroll X behaviour - Disable mini player and pauses video
+                toggleMiniPlayer('off');
+
+                if (!playerInstance.domRef.player.paused) {
+                    playerInstance.playPauseToggle();
+                }
+                event.preventDefault();
+            } else if (!hasTriggeredAnimation) {
+                // Tap behaviour - Disable mini player and moves screen to video
+                toggleMiniPlayer('off');
+                setTimeout(() => {
+                    playerInstance.domRef.wrapper.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center',
+                    });
+                })
+            }
+
+            animationAmount = 0;
+            playerInstance.domRef.wrapper.style.transform = ``;
+        }
+
+        // Fallback for when there is no touch event
+        disableMiniPlayerMobile.onmouseup = () => {
+            toggleMiniPlayer('off');
+        }
+
         playerInstance.domRef.wrapper.insertBefore(disableMiniPlayerMobile, playerInstance.domRef.player.nextSibling);
     }
 

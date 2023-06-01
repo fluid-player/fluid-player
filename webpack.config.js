@@ -109,7 +109,7 @@ module.exports = (env, argv) => {
         devServer: {
             static: wpDistOptions.path,
             // index: 'index.html',
-            // allowedHosts: "all", // To use with remote hosting (ie: ngrok)
+            allowedHosts: "all", // To use with remote hosting (ie: ngrok)
         },
         devtool: wpMode === 'development' ? 'source-map' : false,
         plugins,
