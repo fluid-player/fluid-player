@@ -228,41 +228,56 @@ export default function (playerInstance) {
      */
     function setupMobile() {
         const disableMiniPlayerMobile = document.createElement('div');
+        const animationClamp = 50;
+        const minimumAnimationTrigger = 5;
+        let animationAmount = 0;
         let startTimestamp = 0;
         let startScreenX = 0;
+        let hasTriggeredAnimation;
         disableMiniPlayerMobile.classList.add(DISABLE_MINI_PLAYER_MOBILE_CLASS);
-
-        // Touch behaviour - Disable mini player and scroll player to view
-        disableMiniPlayerMobile.onclick = () => {
-            toggleMiniPlayer('off');
-            playerInstance.domRef.wrapper.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center',
-            });
-        }
 
         // Scroll X behaviour - Disable mini player and pauses video
         disableMiniPlayerMobile.ontouchstart = (e) => {
+            hasTriggeredAnimation = false;
             startTimestamp = e.timeStamp;
             startScreenX = e.changedTouches[0].screenX;
             e.preventDefault();
         }
-        disableMiniPlayerMobile.ontouchend = (e) => {
-            const currentTimestamp = e.timeStamp;
-            const currentScreenX = e.changedTouches[0].screenX;
 
-            if (
-                currentTimestamp - startTimestamp < TOUCH_STOP_TIMESTAMP_DIFF &&  // Touch lasted at least X time
-                Math.abs(startScreenX - currentScreenX) > TOUCH_STOP_SCREEN_X_DIFF // Moved more than X pixels
-            ) {
+        disableMiniPlayerMobile.ontouchmove = (e) => {
+            animationAmount = Math.min(Math.max(startScreenX - e.changedTouches[0].screenX, animationClamp * -1), animationClamp);
+
+            if (Math.abs(animationAmount) > minimumAnimationTrigger) {
+                console.log('animating to ', animationAmount);
+                playerInstance.domRef.wrapper.style.transform = `translateX(${animationAmount * -1}px)`;
+                hasTriggeredAnimation = true;
+            } else {
+                playerInstance.domRef.wrapper.style.transform = `translateX(0px)`
+            }
+        }
+
+        disableMiniPlayerMobile.ontouchend = (e) => {
+            if (Math.abs(animationAmount) > minimumAnimationTrigger) {
                 toggleMiniPlayer('off');
 
                 if (!playerInstance.domRef.player.paused) {
                     playerInstance.playPauseToggle();
                 }
+                e.preventDefault();
+            } else if (!hasTriggeredAnimation) {
+                toggleMiniPlayer('off');
+                setTimeout(() => {
+                    playerInstance.domRef.wrapper.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center',
+                    });
+                })
             }
-            e.preventDefault();
+
+            animationAmount = 0;
+            playerInstance.domRef.wrapper.style.transform = ``;
         }
+
         playerInstance.domRef.wrapper.insertBefore(disableMiniPlayerMobile, playerInstance.domRef.player.nextSibling);
     }
 
