@@ -868,7 +868,7 @@ export default function (playerInstance, options) {
                 try {
                     /** @see VAST 4.0 Wrapper.fallbackOnNoAd */
                     const triggerFallbackOnNoAd = result.children.some(ad =>
-                        ad.tagType === 'wrapper' && ad.fallbackOnNoAd && (!/"type":"ad"/.test(JSON.stringify(ad)) || ad.httpError)
+                        ad.tagType === 'wrapper' && ad.fallbackOnNoAd && (!/"tagType":"ad"/.test(JSON.stringify(ad)) || ad.httpError)
                     );
 
                     if (triggerFallbackOnNoAd) {
