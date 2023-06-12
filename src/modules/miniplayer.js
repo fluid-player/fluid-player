@@ -5,6 +5,7 @@ export default function (playerInstance) {
     const MINIMUM_WIDTH = 400; // Pixels
     const MINIMUM_HEIGHT = 225; // Pixels
     const MINIMUM_WIDTH_MOBILE = 40; // Percentage
+    const TOGGLE_BY_VISIBILITY_DETECTION_RATE = 1000 / 60; // ms
 
     const DISABLE_MINI_PLAYER_MOBILE_ANIMATION_CLAMP = 50;
     const DISABLE_MINI_PLAYER_MOBILE_ANIMATION_DEADZONE = 5;
@@ -31,13 +32,16 @@ export default function (playerInstance) {
     /** @type null | Element */
     let placeholderElement = null;
     let isMobile = false;
+    /** @type undefined | NodeJS.Timer */
+    let toggleByVisibilityInterval = undefined;
 
     /**
      * Toggles the MiniPlayer given that it's enabled. Resets all other display modes.
      *
      * @param {'on'|'off'} [forceToggle]
+     * @param {boolean} manualToggle
      */
-    function toggleMiniPlayer(forceToggle) {
+    function toggleMiniPlayer(forceToggle, manualToggle = false) {
         playerInstance.debugMessage(`[MiniPlayer] Toggling MiniPlayer, forceToggle: ${forceToggle}`);
 
         const miniPlayerOptions = playerInstance.displayOptions.layoutControls.miniPlayer;
@@ -45,6 +49,10 @@ export default function (playerInstance) {
         if (!miniPlayerOptions.enabled) {
             playerInstance.debugMessage(`[MiniPlayer] Prevent toggle MiniPlayer, it's currently disabled`);
             return;
+        }
+
+        if (manualToggle) {
+            toggleScreenDetection();
         }
 
         if (window.matchMedia(DESKTOP_ONLY_MEDIA_QUERY).matches) {
@@ -79,7 +87,7 @@ export default function (playerInstance) {
             const closeButton = document.createElement('span');
             closeButton.classList.add(CLOSE_BUTTON_CLASS);
             closeButton.addEventListener('click', () => {
-                toggleMiniPlayer('off');
+                toggleMiniPlayer('off', true);
 
                 if (!playerInstance.domRef.player.paused) {
                     playerInstance.playPauseToggle();
@@ -265,7 +273,7 @@ export default function (playerInstance) {
         disableMiniPlayerMobile.ontouchend = event => {
             if (Math.abs(animationAmount) > DISABLE_MINI_PLAYER_MOBILE_ANIMATION_DEADZONE) {
                 // Scroll X behaviour - Disable mini player and pauses video
-                toggleMiniPlayer('off');
+                toggleMiniPlayer('off', true);
 
                 if (!playerInstance.domRef.player.paused) {
                     playerInstance.playPauseToggle();
@@ -273,7 +281,7 @@ export default function (playerInstance) {
                 event.preventDefault();
             } else if (!hasTriggeredAnimation) {
                 // Tap behaviour - Disable mini player and moves screen to video
-                toggleMiniPlayer('off');
+                toggleMiniPlayer('off', true);
                 setTimeout(() => {
                     playerInstance.domRef.wrapper.scrollIntoView({
                         behavior: 'smooth',
@@ -287,9 +295,7 @@ export default function (playerInstance) {
         }
 
         // Fallback for when there is no touch event
-        disableMiniPlayerMobile.onmouseup = () => {
-            toggleMiniPlayer('off');
-        }
+        disableMiniPlayerMobile.onmouseup = () => toggleMiniPlayer('off', true)
 
         playerInstance.domRef.wrapper.insertBefore(disableMiniPlayerMobile, playerInstance.domRef.player.nextSibling);
     }
@@ -306,7 +312,7 @@ export default function (playerInstance) {
         placeholderElement.style.height = `${placeholderHeight}px`;
         placeholderElement.style.width = `${placeholderWidth}px`;
         placeholderElement.innerText = playerInstance.displayOptions.layoutControls.miniPlayer.placeholderText || '';
-        placeholderElement.onclick = () => toggleMiniPlayer('off');
+        placeholderElement.onclick = () => toggleMiniPlayer('off', true);
 
         playerInstance.domRef.wrapper.parentElement.insertBefore(placeholderElement, playerInstance.domRef.wrapper);
     }
@@ -319,6 +325,34 @@ export default function (playerInstance) {
         placeholderElement = null;
     }
 
+    /**
+     * Toggles activating mini player when video leaves the viewport
+     */
+    function toggleScreenDetection() {
+        const autoToggle = playerInstance.displayOptions.layoutControls.miniPlayer.autoToggle;
+
+        if (toggleByVisibilityInterval || !autoToggle) {
+            clearInterval(toggleByVisibilityInterval);
+            return;
+        }
+
+        toggleByVisibilityInterval = setInterval(() => {
+            const isPlayerVisible = playerInstance.isElementVisible(playerInstance.domRef.player);
+            const isPlaceholderVisible = playerInstance.isElementVisible(document.querySelector(`.${PLACEHOLDER_CLASS}`));
+
+            if (playerInstance.domRef.player.paused) {
+                return;
+            }
+
+            if (!isPlayerVisible && !playerInstance.miniPlayerToggledOn) {
+                toggleMiniPlayer('on');
+            } else if (isPlaceholderVisible && playerInstance.miniPlayerToggledOn) {
+                toggleMiniPlayer('off');
+            }
+        }, TOGGLE_BY_VISIBILITY_DETECTION_RATE);
+    }
+
     // Exposes public module functions
     playerInstance.toggleMiniPlayer = toggleMiniPlayer;
+    playerInstance.toggleMiniPlayerScreenDetection = toggleScreenDetection;
 }
