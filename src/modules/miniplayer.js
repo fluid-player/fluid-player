@@ -17,6 +17,7 @@ export default function (playerInstance) {
     const PLACEHOLDER_CLASS = 'fluidplayer-miniplayer-player-placeholder'
     const DISABLE_MINI_PLAYER_MOBILE_CLASS = 'disable-mini-player-mobile';
 
+    const LINEAR_CLICKTHROUGH_SELECTOR = '.vast_clickthrough_layer';
     const NON_LINEAR_SELECTOR = '.fluid_nonLinear_ad img, .fluid_vpaid_nonlinear_slot_iframe';
     const VPAID_FRAME_SELECTOR = '.fluid_vpaidNonLinear_frame';
 
@@ -113,6 +114,7 @@ export default function (playerInstance) {
         originalHeight = null;
 
         adaptNonLinearSize();
+        adaptLinearSize();
         playerInstance.miniPlayerToggledOn = false;
         emitToggleEvent();
     }
@@ -150,6 +152,7 @@ export default function (playerInstance) {
 
         createPlayerPlaceholder(originalWidth, originalHeight);
         adaptNonLinearSize(targetWidth, targetHeight, targetMobileWidth);
+        adaptLinearSize();
         playerInstance.miniPlayerToggledOn = true;
         emitToggleEvent();
     }
@@ -180,7 +183,7 @@ export default function (playerInstance) {
     }
 
     /**
-     * Adapts NonLinear size to fit MiniPlayer view
+     * Adapts NonLinear size (if present) to fit MiniPlayer view
      *
      * @param {number} [width]
      * @param {number} [height]
@@ -224,6 +227,18 @@ export default function (playerInstance) {
                 vpaidFrame.style.width = `${Math.round(nonLinearWidth * targetRatio)}px`;
                 vpaidFrame.style.height = `${Math.round(nonLinearHeight * targetRatio)}px`;
             }
+        }
+    }
+
+    /**
+     * Adapts Linear size (if present) to fit MiniPlayer view
+     */
+    function adaptLinearSize() {
+        const clickTroughLayer = playerInstance.domRef.wrapper.querySelector(LINEAR_CLICKTHROUGH_SELECTOR);
+
+        if (clickTroughLayer) {
+            clickTroughLayer.style.width = `${playerInstance.domRef.player.offsetWidth}px`;
+            clickTroughLayer.style.height = `${playerInstance.domRef.player.offsetHeight}px`;
         }
     }
 
