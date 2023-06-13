@@ -5,7 +5,7 @@ export default function (playerInstance) {
     const MINIMUM_WIDTH = 400; // Pixels
     const MINIMUM_HEIGHT = 225; // Pixels
     const MINIMUM_WIDTH_MOBILE = 40; // Percentage
-    const TOGGLE_BY_VISIBILITY_DETECTION_RATE = 1000 / 60; // ms
+    const TOGGLE_BY_VISIBILITY_DETECTION_RATE = 1000 / 30; // ms
 
     const DISABLE_MINI_PLAYER_MOBILE_ANIMATION_CLAMP = 50;
     const DISABLE_MINI_PLAYER_MOBILE_ANIMATION_DEADZONE = 5;
@@ -33,8 +33,8 @@ export default function (playerInstance) {
     /** @type null | Element */
     let placeholderElement = null;
     let isMobile = false;
-    /** @type undefined | NodeJS.Timer */
-    let toggleByVisibilityInterval = undefined;
+    /** @type boolean */
+    let toggleByVisibilityControl = false;
 
     /**
      * Toggles the MiniPlayer given that it's enabled. Resets all other display modes.
@@ -341,31 +341,37 @@ export default function (playerInstance) {
     }
 
     /**
-     * Toggles activating mini player when video leaves the viewport
+     * Toggles auto toggle for mini player
      */
     function toggleScreenDetection() {
         const autoToggle = playerInstance.displayOptions.layoutControls.miniPlayer.autoToggle;
 
-        if (toggleByVisibilityInterval || !autoToggle) {
-            clearInterval(toggleByVisibilityInterval);
+        if (toggleByVisibilityControl || !autoToggle) {
+            document.removeEventListener('scroll', toggleMiniPlayerByVisibility);
             return;
         }
 
-        toggleByVisibilityInterval = setInterval(() => {
-            const isPlayerVisible = playerInstance.isElementVisible(playerInstance.domRef.player);
-            const isPlaceholderVisible = playerInstance.isElementVisible(document.querySelector(`.${PLACEHOLDER_CLASS}`));
-
-            if (playerInstance.domRef.player.paused) {
-                return;
-            }
-
-            if (!isPlayerVisible && !playerInstance.miniPlayerToggledOn) {
-                toggleMiniPlayer('on');
-            } else if (isPlaceholderVisible && playerInstance.miniPlayerToggledOn) {
-                toggleMiniPlayer('off');
-            }
-        }, TOGGLE_BY_VISIBILITY_DETECTION_RATE);
+        toggleByVisibilityControl = true;
+        document.addEventListener('scroll', toggleMiniPlayerByVisibility);
     }
+
+    /**
+     * Checks for player visibility and toggles mini player based on it
+     */
+    const toggleMiniPlayerByVisibility = playerInstance.throttle(function toggleMiniPlayerByVisibility() {
+        if (playerInstance.domRef.player.paused) {
+            return;
+        }
+
+        const isPlayerVisible = playerInstance.isElementVisible(playerInstance.domRef.player);
+        const isPlaceholderVisible = playerInstance.isElementVisible(document.querySelector(`.${PLACEHOLDER_CLASS}`));
+
+        if (!isPlayerVisible && !playerInstance.miniPlayerToggledOn) {
+            toggleMiniPlayer('on');
+        } else if (isPlaceholderVisible && playerInstance.miniPlayerToggledOn) {
+            toggleMiniPlayer('off');
+        }
+    }, TOGGLE_BY_VISIBILITY_DETECTION_RATE);
 
     // Exposes public module functions
     playerInstance.toggleMiniPlayer = toggleMiniPlayer;
