@@ -5,7 +5,7 @@ export default function (playerInstance) {
     const MINIMUM_WIDTH = 400; // Pixels
     const MINIMUM_HEIGHT = 225; // Pixels
     const MINIMUM_WIDTH_MOBILE = 40; // Percentage
-    const TOGGLE_BY_VISIBILITY_DETECTION_RATE = 1000 / 30; // ms
+    const TOGGLE_BY_VISIBILITY_DETECTION_RATE = 1000 / 60; // ms
 
     const DISABLE_MINI_PLAYER_MOBILE_ANIMATION_CLAMP = 50;
     const DISABLE_MINI_PLAYER_MOBILE_ANIMATION_DEADZONE = 5;
