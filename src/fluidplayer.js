@@ -319,7 +319,7 @@ const fluidPlayerClass = function () {
                     !Array.isArray(options[defaultKey])
                 ) {
                     overrideDefaults(defaults[defaultKey], options[defaultKey]);
-                } else if (options[defaultKey]) {
+                } else if (typeof options[defaultKey] !== 'undefined') {
                     defaults[defaultKey] = options[defaultKey];
                 }
             });
