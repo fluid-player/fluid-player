@@ -1,0 +1,108 @@
+<VAST version="2.0">
+    <Ad id="1059939">
+        <InLine>
+            <AdSystem>Fluid Player</AdSystem>
+            <AdTitle>Exclusive Offer - Join Now</AdTitle>
+            <Description/>
+            <Impression>
+                <![CDATA[ /impression ]]>
+            </Impression>
+            <Survey/>
+            <Creatives>
+                <Creative AdID="1" sequence="1">
+                    <Linear skipoffset="00:00:07">
+                        <Duration>00:00:30</Duration>
+                        <TrackingEvents>
+                            <Tracking event="start">
+                                <![CDATA[ /start-1 ]]>
+                            </Tracking>
+                            <Tracking event="start">
+                                <![CDATA[ /start-2 ]]>
+                            </Tracking>
+                            <Tracking event="firstQuartile">
+                                <![CDATA[ /firstQuartile-1 ]]>
+                            </Tracking>
+                            <Tracking event="firstQuartile">
+                                <![CDATA[ /firstQuartile-2 ]]>
+                            </Tracking>
+                            <Tracking event="midpoint">
+                                <![CDATA[ /midPoint-1 ]]>
+                            </Tracking>
+                            <Tracking event="midpoint">
+                                <![CDATA[ /midPoint-2]]>
+                            </Tracking>
+                            <Tracking event="thirdQuartile">
+                                <![CDATA[ /thirdQuartile-1 ]]>
+                            </Tracking>
+                            <Tracking event="thirdQuartile">
+                                <![CDATA[ /thirdQuartile-2 ]]>
+                            </Tracking>
+                            <Tracking event="complete">
+                                <![CDATA[ /complete-1 ]]>
+                            </Tracking>
+                            <Tracking event="complete">
+                                <![CDATA[ /complete-2 ]]>
+                            </Tracking>
+                            <Tracking event="pause">
+                                <![CDATA[ /pause-1 ]]>
+                            </Tracking>
+                            <Tracking event="pause">
+                                <![CDATA[ /pause-2 ]]>
+                            </Tracking>
+                            <Tracking event="mute">
+                                <![CDATA[ /mute-1 ]]>
+                            </Tracking>
+                            <Tracking event="mute">
+                                <![CDATA[ /mute-2 ]]>
+                            </Tracking>
+                            <Tracking event="fullscreen">
+                                <![CDATA[ /fullscreen-1 ]]>
+                            </Tracking>
+                            <Tracking event="fullscreen">
+                                <![CDATA[ /fullscreen-2 ]]>
+                            </Tracking>
+                            <Tracking event="skip">
+                                <![CDATA[ /skip-1 ]]>
+                            </Tracking>
+                            <Tracking event="skip">
+                                <![CDATA[ /skip2 ]]>
+                            </Tracking>
+                        </TrackingEvents>
+                        <AdParameters/>
+                        <VideoClicks>
+                            <ClickThrough>
+                                <![CDATA[ /clickThrough ]]>
+                            </ClickThrough>
+                            <ClickTracking id="Adtool">
+                                <![CDATA[ /click-1 ]]>
+                            </ClickTracking>
+                            <ClickTracking id="Adtool">
+                                <![CDATA[ /click-2 ]]>
+                            </ClickTracking>
+                        </VideoClicks>
+                        <MediaFiles>
+                            <MediaFile id="1" delivery="progressive" type="video/mp4" bitrate="0" width="1920" height="1080">
+                                <![CDATA[ https://cdn.jsdelivr.net/npm/big-buck-bunny-1080p@0.0.6/video.mp4 ]]>
+                            </MediaFile>
+                        </MediaFiles>
+                    </Linear>
+                </Creative>
+            </Creatives>
+            <Extensions>
+                <Extension>
+                    <AdWeight>100</AdWeight>
+                </Extension>
+                <Extension>
+                    <CTA>
+                        <Image/>
+                        <Title/>
+                        <Subtitle/>
+                        <Button/>
+                        <Url/>
+                        <Expand>false</Expand>
+                    </CTA>
+                </Extension>
+            </Extensions>
+        </InLine>
+    </Ad>
+</VAST>

@@ -1,0 +1,37 @@
+<VAST version="3.0">
+    <Ad id="6">
+        <Wrapper>
+            <AdSystem>Fluid Player</AdSystem>
+            <VASTAdTagURI>
+                <![CDATA[ static/special-cases/fp-215-2.xml ]]>
+            </VASTAdTagURI>
+            <Impression id="exotr">
+                <![CDATA[ /wrapper-impression ]]>
+            </Impression>
+            <Error>
+                <![CDATA[ /wrapper-error ]]>
+            </Error>
+            <Creatives>
+                <Creative sequence="1" id="10">
+                    <Linear>
+                        <TrackingEvents>
+                            <Tracking id="prog_1" event="progress" offset="00:00:10.000">
+                                <![CDATA[ /wrapper-progress ]]>
+                            </Tracking>
+                        </TrackingEvents>
+                        <VideoClicks>
+                            <ClickTracking>
+                                <![CDATA[ /wrapper-click ]]>
+                            </ClickTracking>
+                        </VideoClicks>
+                    </Linear>
+                </Creative>
+            </Creatives>
+            <Extensions>
+                <Extension type="waterfall" fallback_index="0">
+                    <Extension/>
+                </Extension>
+            </Extensions>
+        </Wrapper>
+    </Ad>
+</VAST>

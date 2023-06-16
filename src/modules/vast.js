@@ -6,7 +6,7 @@
  * @typedef {Object} RawAdTree
  * @property {Array<RawAdTree>} children
  * @property {XMLDocument} data
- * @property {'ad'|'wrapper'} type
+ * @property {'inLine'|'wrapper'} tagType
  * @property {boolean|undefined} fallbackOnNoAd
  * @property {Array<XMLDocument> | undefined} wrappers
 */
@@ -15,7 +15,7 @@
  * @typedef {Object} RawAd
  * @property {XMLDocument} data
  * @property {Array<XMLDocument>} wrappers
- * @property {'ad' | 'wrapper'} type
+ * @property {'inLine' | 'wrapper'} tagType
  */
 
 /**
@@ -318,7 +318,7 @@ export default function (playerInstance, options) {
                     if (typeof tmpOptions.stopTracking[eventType] === 'undefined') {
                         tmpOptions.stopTracking[eventType] = [];
                     }
-                    tmpOptions.tracking[eventType].push(trackingEvents[i].childNodes[0].nodeValue);
+                    tmpOptions.tracking[eventType].push(trackingEvents[i].textContent.trim());
                     tmpOptions.stopTracking[eventType] = false;
 
                     break;
@@ -337,7 +337,7 @@ export default function (playerInstance, options) {
                         };
                     }
 
-                    tmpOptions.tracking[eventType][oneEventOffset].elements.push(trackingEvents[i].childNodes[0].nodeValue);
+                    tmpOptions.tracking[eventType][oneEventOffset].elements.push(trackingEvents[i].textContent.trim());
 
                     break;
 
@@ -733,7 +733,7 @@ export default function (playerInstance, options) {
                 const fallbackOnNoAd = wrapperElement.attributes.fallbackOnNoAd && ["true", "1"].includes(wrapperElement.attributes.fallbackOnNoAd.value);
 
                 try {
-                    const wrapperResponse = await resolveAdTreeRequests(vastAdTagUri, maxDepth, { type: 'wrapper', ...adNode, fallbackOnNoAd }, currentDepth+1, !disableAdditionalWrappers);
+                    const wrapperResponse = await resolveAdTreeRequests(vastAdTagUri, maxDepth, { tagType: 'wrapper', ...adNode, fallbackOnNoAd }, currentDepth+1, !disableAdditionalWrappers);
                     wrapperResponse.fallbackOnNoAd = fallbackOnNoAd;
 
                     if (!allowMultipleAds || isAdPod) {
@@ -742,11 +742,11 @@ export default function (playerInstance, options) {
 
                     adTree.children.push(wrapperResponse);
                 } catch (e) {
-                    adTree.children.push({ type: `wrapper`, fallbackOnNoAd, httpError: true })
+                    adTree.children.push({ tagType: `wrapper`, fallbackOnNoAd, httpError: true })
                     playerInstance.debugMessage(`Error when loading Wrapper, will trigger fallback if available`, e);
                 }
             } else if (!vastAdTagUri) {
-                adTree.children.push({ type: 'ad', ...adNode });
+                adTree.children.push({ tagType: 'inLine', ...adNode });
             }
         }
 
@@ -766,7 +766,7 @@ export default function (playerInstance, options) {
             root.children.forEach(child => flattenAdTree(child, ads, [...root.wrappers || [], root.data]))
         }
 
-        if (root.type === 'ad') {
+        if (root.tagType === 'inLine') {
             ads.push({ ...root, wrappers: wrappers.filter(Boolean) });
         }
 
@@ -807,7 +807,7 @@ export default function (playerInstance, options) {
 
             // Register tracking events
             playerInstance.registerTrackingEvents(dataSource, ad);
-            const clickTracks = ad.type === 'linear' ?
+            const clickTracks = ad.adType === 'linear' ?
                 playerInstance.getClickTrackingEvents(dataSource) :
                 playerInstance.getNonLinearClickTrackingEvents(dataSource);
             playerInstance.registerClickTracking(clickTracks, ad);
@@ -868,7 +868,7 @@ export default function (playerInstance, options) {
                 try {
                     /** @see VAST 4.0 Wrapper.fallbackOnNoAd */
                     const triggerFallbackOnNoAd = result.children.some(ad =>
-                        ad.type === 'wrapper' && ad.fallbackOnNoAd && (!/"type":"ad"/.test(JSON.stringify(ad)) || ad.httpError)
+                        ad.tagType === 'wrapper' && ad.fallbackOnNoAd && (!/"tagType":"ad"/.test(JSON.stringify(ad)) || ad.httpError)
                     );
 
                     if (triggerFallbackOnNoAd) {
