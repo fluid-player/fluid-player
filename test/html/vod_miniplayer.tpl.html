@@ -101,14 +101,34 @@
             } : {})
         });
 
+        console.log('%cTEST INSTANCE', 'color: #fff; font-weight: bold; background-color: #BADA55; padding: 3px 6px; border-radius: 3px;', instance);
+
         instance.on('miniPlayerToggle', (event) => console.log(`[Event API] miniPlayerToggle`, event, event.detail.isToggledOn));
 
         Array.from(document.getElementById('setupForm').children).forEach(child => child.remove());
         const refreshPage = document.createElement('button');
         refreshPage.onclick = () => location.reload();
-        refreshPage.innerText = 'Reset';
+        refreshPage.innerText = 'Reset Test';
         refreshPage.style.marginBottom = '5px';
-        document.getElementById('setupForm').appendChild(refreshPage)
+        document.getElementById('setupForm').appendChild(refreshPage);
+
+        const toggleMiniPlayer = document.createElement('button');
+        toggleMiniPlayer.onclick = () => instance.toggleMiniPlayer();
+        toggleMiniPlayer.innerText = 'Toggle MiniPlayer (Controls API)';
+        toggleMiniPlayer.style.marginBottom = '5px';
+        document.getElementById('setupForm').appendChild(toggleMiniPlayer);
+
+        const toggleMiniPlayerOn = document.createElement('button');
+        toggleMiniPlayerOn.onclick = () => instance.toggleMiniPlayer(true);
+        toggleMiniPlayerOn.innerText = 'Toggle MiniPlayer ON (Controls API)';
+        toggleMiniPlayerOn.style.marginBottom = '5px';
+        document.getElementById('setupForm').appendChild(toggleMiniPlayerOn);
+
+        const toggleMiniPlayerOff = document.createElement('button');
+        toggleMiniPlayerOff.onclick = () => instance.toggleMiniPlayer(false);
+        toggleMiniPlayerOff.innerText = 'Toggle MiniPlayer OFF (Controls API)';
+        toggleMiniPlayerOff.style.marginBottom = '5px';
+        document.getElementById('setupForm').appendChild(toggleMiniPlayerOff);
     });
 </script>
 

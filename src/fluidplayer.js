@@ -3149,6 +3149,14 @@ const fluidPlayerInterface = function (instance) {
         return instance.fullscreenToggle(state)
     };
 
+    this.toggleMiniPlayer = (state) => {
+        if (state === undefined) {
+            state = !instance.miniPlayerToggledOn;
+        }
+
+        return instance.toggleMiniPlayer(state ? 'on' : 'off', true);
+    };
+
     this.destroy = () => {
         return instance.destroy()
     };

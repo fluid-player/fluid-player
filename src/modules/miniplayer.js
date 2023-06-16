@@ -52,6 +52,11 @@ export default function (playerInstance) {
             return;
         }
 
+        if ((forceToggle === 'on' && playerInstance.miniPlayerToggledOn) || (forceToggle === 'off' && !playerInstance.miniPlayerToggledOn)) {
+            playerInstance.debugMessage(`[MiniPlayer] Can't force toggle Mini Player to it's same state`);
+            return;
+        }
+
         if (manualToggle) {
             toggleScreenDetection();
         }
