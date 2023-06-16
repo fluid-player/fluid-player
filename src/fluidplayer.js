@@ -233,6 +233,8 @@ const fluidPlayerClass = function () {
                     height: 225,
                     widthMobile: 50,
                     placeholderText: 'Playing in Miniplayer',
+                    position: 'bottom right',
+                    autoToggle: false,
                 }
             },
             vastOptions: {
@@ -318,7 +320,7 @@ const fluidPlayerClass = function () {
                     !Array.isArray(options[defaultKey])
                 ) {
                     overrideDefaults(defaults[defaultKey], options[defaultKey]);
-                } else if (options[defaultKey]) {
+                } else if (typeof options[defaultKey] !== 'undefined') {
                     defaults[defaultKey] = options[defaultKey];
                 }
             });
@@ -1513,7 +1515,7 @@ const fluidPlayerClass = function () {
                     event.preventDefault();
                     break;
                 case 73: // i
-                    self.toggleMiniPlayer();
+                    self.toggleMiniPlayer(undefined, true);
                     break;
             }
 
@@ -1756,7 +1758,7 @@ const fluidPlayerClass = function () {
 
         // Mini Player
         if (self.displayOptions.layoutControls.miniPlayer.enabled && !self.isInIframe) {
-            self.trackEvent(self.domRef.player.parentNode, 'click', '.fluid_control_mini_player', () => self.toggleMiniPlayer(undefined));
+            self.trackEvent(self.domRef.player.parentNode, 'click', '.fluid_control_mini_player', () => self.toggleMiniPlayer(undefined, true));
         }
 
         self.domRef.player.addEventListener('ratechange', () => {
@@ -1938,6 +1940,8 @@ const fluidPlayerClass = function () {
         self.createPlaybackList();
 
         self.createDownload();
+
+        self.toggleMiniPlayerScreenDetection();
 
         if (!!self.displayOptions.layoutControls.controlForwardBackward.show) {
             self.initSkipControls();
@@ -3143,6 +3147,14 @@ const fluidPlayerInterface = function (instance) {
 
     this.toggleFullScreen = (state) => {
         return instance.fullscreenToggle(state)
+    };
+
+    this.toggleMiniPlayer = (state) => {
+        if (state === undefined) {
+            state = !instance.miniPlayerToggledOn;
+        }
+
+        return instance.toggleMiniPlayer(state ? 'on' : 'off', true);
     };
 
     this.destroy = () => {

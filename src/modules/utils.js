@@ -164,4 +164,43 @@ export default function (playerInstance, options) {
         }
         return value;
     };
+
+    /**
+     * Checks if element is fully visible in the viewport
+     *
+     * @param {Element} element
+     * @returns {boolean|null}
+     */
+    playerInstance.isElementVisible = (element) => {
+        if (!element) { return null; }
+
+        const rect = element.getBoundingClientRect();
+        return (
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+        );
+    }
+
+    /**
+     * Throttles callback by time
+     *
+     * @param callback
+     * @param time
+     * @returns {function(): void}
+     */
+    playerInstance.throttle = function throttle(callback, time) {
+        let throttleControl = false;
+
+        return function () {
+            if (!throttleControl) {
+                callback.apply(this, arguments);
+                throttleControl = true;
+                setTimeout(function () {
+                    throttleControl = false;
+                }, time);
+            }
+        }
+    }
 }
