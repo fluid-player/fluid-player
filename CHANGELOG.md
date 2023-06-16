@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 3.17.0 (2023-06-16)
+* [Pull #734](https://github.com/fluid-player/fluid-player/pull/734) MiniPlayer Mobile support
+* [Pull #735](https://github.com/fluid-player/fluid-player/pull/735) MiniPlayer position configuration
+* [Pull #739](https://github.com/fluid-player/fluid-player/pull/739) MiniPlayer Activate miniplayer when scrolling goes out of viewport
+* [Pull #740](https://github.com/fluid-player/fluid-player/pull/740) MiniPlayer Allowing trigger MiniPlayer by code
+* [Pull #736](https://github.com/fluid-player/fluid-player/pull/736) Fluid player doesn't track clicks on some sites
+
 ## 3.16.0 (2023-05-31)
 * [Pull #721](https://github.com/fluid-player/fluid-player/pull/721) Fluid Player loads midRoll even if timer is longer than main video
 * [Pull #732](https://github.com/fluid-player/fluid-player/pull/732) MiniPlayer MVP
