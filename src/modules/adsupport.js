@@ -613,7 +613,6 @@ export default function (playerInstance, options) {
     // ADS
     playerInstance.createNonLinearBoard = (ad) => {
         ad.played = true;
-        const playerWidth = playerInstance.domRef.player.clientWidth;
         const board = document.createElement('div');
         const vAlign = (playerInstance.rollsById[ad.rollListId].vAlign) ? playerInstance.rollsById[ad.rollListId].vAlign : playerInstance.nonLinearVerticalAlign;
 
@@ -627,6 +626,7 @@ export default function (playerInstance, options) {
         };
 
         creative.onload = function () {
+            const playerWidth = playerInstance.domRef.player.clientWidth;
             let origWidth;
             let origHeight;
             let newBannerWidth;

@@ -231,7 +231,10 @@ const fluidPlayerClass = function () {
                     enabled: true,
                     width: 400,
                     height: 225,
+                    widthMobile: 50,
                     placeholderText: 'Playing in Miniplayer',
+                    position: 'bottom right',
+                    autoToggle: false,
                 }
             },
             vastOptions: {
@@ -302,22 +305,30 @@ const fluidPlayerClass = function () {
                 'Use module callbacks instead!')
         }
 
-        // Overriding the default options
-        for (let key in options) {
-            if (!options.hasOwnProperty(key)) {
-                continue;
-            }
-            if (typeof options[key] == "object") {
-                for (let subKey in options[key]) {
-                    if (!options[key].hasOwnProperty(subKey)) {
-                        continue;
-                    }
-                    self.displayOptions[key][subKey] = options[key][subKey];
+        /**
+         * Replaces values from objects without replacing the default object
+         *
+         * @param defaults
+         * @param options
+         * @returns {object}
+         */
+        function overrideDefaults(defaults, options) {
+            Object.keys(options).forEach(defaultKey => {
+                if (
+                    typeof options[defaultKey] === 'object' &&
+                    options[defaultKey] !== null &&
+                    !Array.isArray(options[defaultKey])
+                ) {
+                    overrideDefaults(defaults[defaultKey], options[defaultKey]);
+                } else if (typeof options[defaultKey] !== 'undefined') {
+                    defaults[defaultKey] = options[defaultKey];
                 }
-            } else {
-                self.displayOptions[key] = options[key];
-            }
+            });
+
+            return defaults;
         }
+
+        overrideDefaults(self.displayOptions, options);
 
         self.domRef.wrapper = self.setupPlayerWrapper();
 
@@ -1504,7 +1515,7 @@ const fluidPlayerClass = function () {
                     event.preventDefault();
                     break;
                 case 73: // i
-                    self.toggleMiniPlayer();
+                    self.toggleMiniPlayer(undefined, true);
                     break;
             }
 
@@ -1746,7 +1757,7 @@ const fluidPlayerClass = function () {
 
         // Mini Player
         if (self.displayOptions.layoutControls.miniPlayer.enabled && !self.isInIframe) {
-            self.trackEvent(self.domRef.player.parentNode, 'click', '.fluid_control_mini_player', () => self.toggleMiniPlayer(undefined));
+            self.trackEvent(self.domRef.player.parentNode, 'click', '.fluid_control_mini_player', () => self.toggleMiniPlayer(undefined, true));
         }
 
         self.domRef.player.addEventListener('ratechange', () => {
@@ -1928,6 +1939,8 @@ const fluidPlayerClass = function () {
         self.createPlaybackList();
 
         self.createDownload();
+
+        self.toggleMiniPlayerScreenDetection();
 
         if (!!self.displayOptions.layoutControls.controlForwardBackward.show) {
             self.initSkipControls();
@@ -3133,6 +3146,14 @@ const fluidPlayerInterface = function (instance) {
 
     this.toggleFullScreen = (state) => {
         return instance.fullscreenToggle(state)
+    };
+
+    this.toggleMiniPlayer = (state) => {
+        if (state === undefined) {
+            state = !instance.miniPlayerToggledOn;
+        }
+
+        return instance.toggleMiniPlayer(state ? 'on' : 'off', true);
     };
 
     this.destroy = () => {
