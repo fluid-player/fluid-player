@@ -21,17 +21,13 @@
 
 <div id="setupForm">
     <div><input type="checkbox" name="enabled" id="enabled" checked><label for="enabled">Enabled</label></div>
-
+    <div><input type="checkbox" name="autoPlay" id="autoPlay" checked><label for="autoPlay">Auto Play</label></div>
     <div><input type="checkbox" name="vastad" id="vastad" checked><label for="vastad">VAST Ad</label></div>
-
+    <div><input type="checkbox" name="autoToggle" id="autoToggle" checked><label for="autoToggle">Auto Toggle</label></div>
     <div><input type="number" name="width" id="width" value="400"><label for="width">Width</label></div>
-
     <div><input type="number" name="height" id="height" value="225"><label for="height">Height</label></div>
-
     <div><input type="number" name="widthMobile" id="widthMobile" value="50"><label for="widthMobile">Width Mobile</label></div>
-
     <div><input type="text" name="placeholderText" id="placeholderText" value="Playing in Miniplayer"><label for="placeholderText">Placeholder Text</label></div>
-
     <div><input type="text" name="position" id="position" value="bottom right"><label for="position">Position (top left, top right, bottom left, bottom right)</label></div>
 
     <p><button id="setupPlayer">Show Player</button></p>
@@ -42,7 +38,9 @@
 <script>
     document.getElementById('setupPlayer').addEventListener('click', () => {
         const enabled = document.getElementById('enabled').checked;
+        const autoPlay = document.getElementById('autoPlay').checked;
         const vastad = document.getElementById('vastad').checked;
+        const autoToggle = document.getElementById('autoToggle').checked;
         const width = document.getElementById('width').value;
         const height = document.getElementById('height').value;
         const widthMobile = document.getElementById('widthMobile').value;
@@ -59,13 +57,15 @@
 
         const instance = fluidPlayer('fluid-player-e2e-case', {
             layoutControls: {
+                autoPlay,
                 miniPlayer: {
                     enabled,
                     width: Number(width),
                     height: Number(height),
                     widthMobile: Number(widthMobile),
                     placeholderText,
-                    position
+                    position,
+                    autoToggle
                 }
             },
             ...(vastad ? {
@@ -101,14 +101,34 @@
             } : {})
         });
 
+        console.log('%cTEST INSTANCE', 'color: #fff; font-weight: bold; background-color: #BADA55; padding: 3px 6px; border-radius: 3px;', instance);
+
         instance.on('miniPlayerToggle', (event) => console.log(`[Event API] miniPlayerToggle`, event, event.detail.isToggledOn));
 
         Array.from(document.getElementById('setupForm').children).forEach(child => child.remove());
         const refreshPage = document.createElement('button');
         refreshPage.onclick = () => location.reload();
-        refreshPage.innerText = 'Reset';
+        refreshPage.innerText = 'Reset Test';
         refreshPage.style.marginBottom = '5px';
-        document.getElementById('setupForm').appendChild(refreshPage)
+        document.getElementById('setupForm').appendChild(refreshPage);
+
+        const toggleMiniPlayer = document.createElement('button');
+        toggleMiniPlayer.onclick = () => instance.toggleMiniPlayer();
+        toggleMiniPlayer.innerText = 'Toggle MiniPlayer (Controls API)';
+        toggleMiniPlayer.style.marginBottom = '5px';
+        document.getElementById('setupForm').appendChild(toggleMiniPlayer);
+
+        const toggleMiniPlayerOn = document.createElement('button');
+        toggleMiniPlayerOn.onclick = () => instance.toggleMiniPlayer(true);
+        toggleMiniPlayerOn.innerText = 'Toggle MiniPlayer ON (Controls API)';
+        toggleMiniPlayerOn.style.marginBottom = '5px';
+        document.getElementById('setupForm').appendChild(toggleMiniPlayerOn);
+
+        const toggleMiniPlayerOff = document.createElement('button');
+        toggleMiniPlayerOff.onclick = () => instance.toggleMiniPlayer(false);
+        toggleMiniPlayerOff.innerText = 'Toggle MiniPlayer OFF (Controls API)';
+        toggleMiniPlayerOff.style.marginBottom = '5px';
+        document.getElementById('setupForm').appendChild(toggleMiniPlayerOff);
     });
 </script>
 
