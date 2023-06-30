@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.18.0 (2023-06-30)
+* [Pull #744](https://github.com/fluid-player/fluid-player/pull/744) Failed to resolve import "cheerio/lib/api/traversing"
+
 ## 3.17.0 (2023-06-16)
 * [Pull #734](https://github.com/fluid-player/fluid-player/pull/734) MiniPlayer Mobile support
 * [Pull #735](https://github.com/fluid-player/fluid-player/pull/735) MiniPlayer position configuration
