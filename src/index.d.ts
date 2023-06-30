@@ -16,7 +16,7 @@ declare type OnTheaterModeOn = (event: 'theatreModeOn', callback: () => void) =>
 declare type OnTheaterModeOff = (event: 'theatreModeOff', callback: () => void) => void;
 declare type OnTimeUpdate = (event: 'timeupdate', callback: (time: number) => void) => void;
 declare type OnMiniPlayerToggle =
-    (event: 'miniPlayerToggle', callback: (event: CustomEvent<{ isToggledOn: boolean }>) => void) => void; // TODO FIX THIS IN THE PUBLIC DOCS DOCUMENTATION
+    (event: 'miniPlayerToggle', callback: (event: CustomEvent<{ isToggledOn: boolean }>) => void) => void;
 
 declare interface FluidPlayerInstance {
     play: () => void;
@@ -202,7 +202,7 @@ declare interface FluidPlayerOptions {
     onBeforeXMLHttpRequestOpen?: (request: XMLHttpRequest) => void;
     onBeforeXMLHttpRequest?: (request: XMLHttpRequest) => void;
     debug?: boolean;
-    captions: Partial<{ // TODO: FIX DOCUMENTATION, THIS IS WRONG IN THE PUBLIC DOCS
+    captions: Partial<{
         play: string;
         pause: string;
         mute: string;
