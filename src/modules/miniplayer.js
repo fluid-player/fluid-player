@@ -1,5 +1,3 @@
-import {is} from "cheerio/lib/api/traversing";
-
 export default function (playerInstance) {
     // Module constants
     const MINIMUM_WIDTH = 400; // Pixels
