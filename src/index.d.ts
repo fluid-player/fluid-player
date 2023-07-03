@@ -27,7 +27,7 @@ declare interface FluidPlayerInstance {
     toggleControlBar: (shouldToggle: boolean) => void;
     toggleFullScreen: (shouldToggle: boolean) => void;
     toggleMiniPlayer: (shouldToggle: boolean) => void;
-    setHtmlOnPauseBlock: (pauseBlock: { html: string, width: number, height: number }) => void;
+    setHtmlOnPauseBlock: (pauseBlock: { html: string; width: number; height: number; }) => void;
     destroy: () => void;
     dashInstance: () => any | null;
     hlsInstance: () => any | null;
@@ -95,10 +95,10 @@ declare interface LayoutControls {
         show: boolean;
     }>;
     contextMenu: Partial<{
-        controls: boolean,
+        controls: boolean;
         links: Array<{
-            href: string,
-            label: string
+            href: string;
+            label: string;
         }>;
     }>;
     miniPlayer: Partial<{
@@ -211,4 +211,3 @@ declare interface FluidPlayerOptions {
         exitFullscreen: string;
     }>;
 }
-
