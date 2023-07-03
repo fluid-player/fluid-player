@@ -124,7 +124,7 @@ module.exports = (env, argv) => {
         devServer: {
             static: wpDistOptions.path,
             // index: 'index.html',
-            // allowedHosts: "all", // To use with remote hosting (ie: ngrok)
+            // disableHostCheck: true, // To use with remote hosting (ie: ngrok)
         },
         devtool: wpMode === 'development' ? 'source-map' : false,
         plugins,
@@ -140,17 +140,25 @@ module.exports = (env, argv) => {
             path: wpDistOptions.path,
             publicPath: wpDistOptions.publicPath
         },
+        resolve: {
+            extensions: ['.ts', '.js'],
+        },
         module: {
             rules: [
+                // {
+                //     test: /\.m?js$/,
+                //     exclude: /node_modules/,
+                //     use: {
+                //         loader: 'babel-loader',
+                //         options: {
+                //             presets: ['@babel/preset-env']
+                //         }
+                //     }
+                // },
                 {
-                    test: /\.m?js$/,
+                    test: /\.ts$/,
+                    use: 'ts-loader',
                     exclude: /node_modules/,
-                    use: {
-                        loader: 'babel-loader',
-                        options: {
-                            presets: ['@babel/preset-env']
-                        }
-                    }
                 },
                 {
                     test: /\.css$/i,

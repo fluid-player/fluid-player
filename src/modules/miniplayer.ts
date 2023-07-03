@@ -1,4 +1,4 @@
-export default function (playerInstance) {
+export default function (playerInstance: any) { // TODO: Remove any
     // Module constants
     const MINIMUM_WIDTH = 400; // Pixels
     const MINIMUM_HEIGHT = 225; // Pixels
@@ -23,16 +23,14 @@ export default function (playerInstance) {
     const MINI_PLAYER_TOGGLE_EVENT = 'miniPlayerToggle';
 
     // Module variables
-    let originalWidth = null;
-    let originalHeight = null;
-    let originalNonLinearWidth = null
-    let originalNonLinearHeight = null;
+    let originalWidth: number | null = null;
+    let originalHeight: number | null = null;
+    let originalNonLinearWidth: number | null = null
+    let originalNonLinearHeight: number | null = null;
     let isSetup = false;
-    /** @type null | Element */
-    let placeholderElement = null;
+    let placeholderElement: HTMLDivElement | null = null;
     let isMobile = false;
-    /** @type boolean */
-    let toggleByVisibilityControl = false;
+    let toggleByVisibilityControl: boolean = false;
 
     /**
      * Toggles the MiniPlayer given that it's enabled. Resets all other display modes.
@@ -40,7 +38,7 @@ export default function (playerInstance) {
      * @param {'on'|'off'} [forceToggle]
      * @param {boolean} manualToggle
      */
-    function toggleMiniPlayer(forceToggle, manualToggle = false) {
+    function toggleMiniPlayer(forceToggle: 'on' | 'off', manualToggle: boolean = false) {
         playerInstance.debugMessage(`[MiniPlayer] Toggling MiniPlayer, forceToggle: ${forceToggle}`);
 
         const miniPlayerOptions = playerInstance.displayOptions.layoutControls.miniPlayer;
@@ -138,7 +136,7 @@ export default function (playerInstance) {
      * @param {number} mobileWidth
      * @param {'top left'|'top right'|'bottom left'|'bottom right'} position
      */
-    function toggleMiniPlayerOn(width, height, mobileWidth, position) {
+    function toggleMiniPlayerOn(width: number, height: number, mobileWidth: number, position: 'top left' | 'top right' | 'bottom left' | 'bottom right') {
         const videoWrapper = playerInstance.domRef.wrapper;
         const targetWidth = width > MINIMUM_WIDTH ? width : MINIMUM_WIDTH;
         const targetHeight = height > MINIMUM_HEIGHT ? height : MINIMUM_HEIGHT;
@@ -185,11 +183,11 @@ export default function (playerInstance) {
      * @param {'clientWidth'|'clientHeight'|'width'|'height'} htmlProperty
      * @returns {number}
      */
-    function extractSizeFromElement(element, styleProperty, htmlProperty) {
+    function extractSizeFromElement(element: HTMLElement & { width: number, height: number }, styleProperty: 'width' | 'height' | null, htmlProperty: 'clientWidth' | 'clientHeight' | 'width' | 'height') {
         if (styleProperty && element.style[styleProperty] && element.style[styleProperty].match('px')) {
             return parseInt(element.style[styleProperty]);
         } else {
-            return String(element[htmlProperty]).match('px') ? parseInt(element[htmlProperty]) : element[htmlProperty];
+            return String(element[htmlProperty]).match('px') ? parseInt(element[htmlProperty] as unknown as string) : element[htmlProperty];
         }
     }
 
@@ -200,7 +198,7 @@ export default function (playerInstance) {
      * @param {number} [height]
      * @param {number} [mobileWidth]
      */
-    function adaptNonLinearSize(width, height, mobileWidth) {
+    function adaptNonLinearSize(width?: number, height?: number, mobileWidth?: number) {
         /** @type HTMLImageElement|HTMLIFrameElement */
         const nonLinear = playerInstance.domRef.wrapper.querySelector(NON_LINEAR_SELECTOR);
         /** @type HTMLElement */
@@ -261,7 +259,7 @@ export default function (playerInstance) {
         let animationAmount = 0;
         let startTimestamp = 0;
         let startScreenX = 0;
-        let hasTriggeredAnimation;
+        let hasTriggeredAnimation: boolean;
         disableMiniPlayerMobile.classList.add(DISABLE_MINI_PLAYER_MOBILE_CLASS);
 
         disableMiniPlayerMobile.ontouchstart = event => {
@@ -324,7 +322,7 @@ export default function (playerInstance) {
      * @param {number} placeholderWidth
      * @param {number} placeholderHeight
      */
-    function createPlayerPlaceholder(placeholderWidth, placeholderHeight) {
+    function createPlayerPlaceholder(placeholderWidth: number, placeholderHeight: number) {
         placeholderElement = document.createElement('div');
         placeholderElement.classList.add(PLACEHOLDER_CLASS);
         placeholderElement.style.height = `${placeholderHeight}px`;
