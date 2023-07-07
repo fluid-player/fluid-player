@@ -24,6 +24,12 @@ export default function (playerInstance, options) {
                 }
                 break;
             case 'application/x-mpegurl': // HLS
+                // Doesn't load hls.js if player can play it natively
+                if (playerInstance.domRef.player.canPlayType('application/x-mpegurl')) {
+                    playerInstance.debugMessage('Native HLS support found, skipping hls.js');
+                    break;
+                }
+
                 if (!playerInstance.hlsScriptLoaded && !window.Hls) {
                     playerInstance.hlsScriptLoaded = true;
                     import(/* webpackChunkName: "hlsjs" */ 'hls.js').then((it) => {
