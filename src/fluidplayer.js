@@ -2487,7 +2487,7 @@ const fluidPlayerClass = function () {
             self.toggleAdCountdown(false);
         }
 
-        if (event.type === 'mouseenter') {
+        if (event.type === 'mouseenter' || event.type === 'userActive') {
             self.domRef.player.style.cursor = 'default';
         }
 
