@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.19.0 (2023-07-12)
+* [Pull #746](https://github.com/fluid-player/fluid-player/pull/746) Could not find a declaration file for module 'fluid-player'
+
 ## 3.18.0 (2023-06-30)
 * [Pull #744](https://github.com/fluid-player/fluid-player/pull/744) Failed to resolve import "cheerio/lib/api/traversing"
 
