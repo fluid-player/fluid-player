@@ -1096,6 +1096,7 @@ const fluidPlayerClass = function () {
     };
 
     self.fullscreenToggle = () => {
+        self.debugMessage(`Toggling Full Screen`);
         const videoPlayerTag = self.domRef.player;
         const fullscreenTag = document.getElementById('fluid_video_wrapper_' + self.videoPlayerId);
         const requestFullscreenFunctionNames = self.checkFullscreenSupport('fluid_video_wrapper_' + self.videoPlayerId);
@@ -1138,6 +1139,10 @@ const fluidPlayerClass = function () {
 
         self.resizeVpaidAuto();
 
+        // Listen for fullscreen exit event on safari, as the fullscreen mode uses the native UI in iOS
+        self.domRef.player.addEventListener('webkitendfullscreen', () => {
+            self.fullscreenOff(fullscreenButton, menuOptionFullscreen);
+        });
     };
 
     self.findClosestParent = (el, selector) => {
@@ -2671,6 +2676,7 @@ const fluidPlayerClass = function () {
     };
 
     self.theatreToggle = () => {
+        self.debugMessage(`Toggling Theater Mode`);
         if (self.isInIframe) {
             return;
         }
