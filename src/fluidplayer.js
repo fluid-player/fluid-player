@@ -2335,13 +2335,13 @@ const fluidPlayerClass = function () {
      * Play button in the middle when the video loads
      */
     self.initPlayButton = () => {
-        // Create the html fpr the play button
+        // Create the html for the play button
         const containerDiv = document.createElement('div');
         containerDiv.id = self.videoPlayerId + '_fluid_initial_play_button';
         containerDiv.className = 'fluid_html_on_pause';
         const backgroundColor = (self.displayOptions.layoutControls.primaryColor) ? self.displayOptions.layoutControls.primaryColor : "#333333";
         containerDiv.innerHTML = '<div id="' + self.videoPlayerId + '_fluid_initial_play" class="fluid_initial_play" style="background-color:' + backgroundColor + '"><div id="' + self.videoPlayerId + '_fluid_state_button" class="fluid_initial_play_button"></div></div>';
-        const initPlayEventTypes = ['click', 'touchstart'];
+        const initPlayEventTypes = ['click', 'touchend'];
         const initPlayFunction = function () {
             self.playPauseToggle();
             initPlayEventTypes.forEach(eventType => containerDiv.removeEventListener(eventType, initPlayFunction))
@@ -2492,7 +2492,7 @@ const fluidPlayerClass = function () {
             self.toggleAdCountdown(false);
         }
 
-        if (event.type === 'mouseenter') {
+        if (event.type === 'mouseenter' || event.type === 'userActive') {
             self.domRef.player.style.cursor = 'default';
         }
 
