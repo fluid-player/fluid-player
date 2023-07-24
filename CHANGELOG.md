@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.20.0 (2023-07-24)
+* [Pull #749](https://github.com/fluid-player/fluid-player/pull/749) Mouse disappears
+* [Pull #750](https://github.com/fluid-player/fluid-player/pull/750) In mobile and when using .m3u8 files, user needs to click the player twice in order to play the video
+
 ## 3.19.0 (2023-07-12)
 * [Pull #746](https://github.com/fluid-player/fluid-player/pull/746) Could not find a declaration file for module 'fluid-player'
 
