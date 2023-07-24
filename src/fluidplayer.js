@@ -151,6 +151,7 @@ const fluidPlayerClass = function () {
         self.fluidPseudoPause = false;
         self.mobileInfo = self.getMobileOs();
         self.events = {};
+        self.skipOffset = 10;
 
         //Default options
         self.displayOptions = {
@@ -1422,12 +1423,12 @@ const fluidPlayerClass = function () {
 
         switch (keyCode) {
             case 37://left arrow
-                newCurrentTime -= 5;
-                newCurrentTime = (newCurrentTime < 5) ? 0 : newCurrentTime;
+                newCurrentTime -= self.skipOffset;
+                newCurrentTime = (newCurrentTime < self.skipOffset) ? 0 : newCurrentTime;
                 break;
             case 39://right arrow
-                newCurrentTime += 5;
-                newCurrentTime = (newCurrentTime > duration - 5) ? duration : newCurrentTime;
+                newCurrentTime += self.skipOffset;
+                newCurrentTime = (newCurrentTime > duration - self.skipOffset) ? duration : newCurrentTime;
                 break;
             case 35://End
                 newCurrentTime = duration;
@@ -1960,8 +1961,8 @@ const fluidPlayerClass = function () {
             self.domRef.player.currentTime = skipTo;
         };
 
-        self.domRef.controls.skipBack.addEventListener('click', skipFunction.bind(this, -10));
-        self.domRef.controls.skipForward.addEventListener('click', skipFunction.bind(this, 10));
+        self.domRef.controls.skipBack.addEventListener('click', skipFunction.bind(this, -self.skipOffset));
+        self.domRef.controls.skipForward.addEventListener('click', skipFunction.bind(this, self.skipOffset));
     };
 
     /**
