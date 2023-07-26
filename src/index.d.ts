@@ -93,6 +93,7 @@ declare interface LayoutControls {
     }>;
     controlForwardBackward: Partial<{
         show: boolean;
+        doubleTapMobile: boolean;
     }>;
     contextMenu: Partial<{
         controls: boolean;
