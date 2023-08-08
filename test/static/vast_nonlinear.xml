@@ -25,7 +25,7 @@
             <Creatives>
                 <Creative id="5480" sequence="1">
                     <NonLinearAds>
-                        <NonLinear width="480" height="90" minSuggestedDuration="00:00:15" scalable="true" maintainAspectRatio="true">
+                        <NonLinear width="480" height="90" minSuggestedDuration="00:00:10" scalable="true" maintainAspectRatio="true">
                             <StaticResource creativeType="image/png">
                                 <![CDATA[ https://placekitten.com/480/90 ]]>
                             </StaticResource>

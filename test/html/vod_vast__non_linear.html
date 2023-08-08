@@ -32,6 +32,41 @@
                     roll: 'preRoll',
                     vastTag: '/static/vast_nonlinear.xml',
                 },
+                {
+                    roll: 'midRoll',
+                    vastTag: '/static/vast_nonlinear.xml',
+                    timer: '25%',
+                },
+                {
+                    roll: 'midRoll',
+                    vastTag: '/static/vast_nonlinear.xml',
+                    timer: 50,
+                },
+                {
+                    roll: 'midRoll',
+                    vastTag: '/static/vast_nonlinear.xml',
+                    timer: '75.0%',
+                },
+                {
+                    roll: 'postRoll',
+                    vastTag: '/static/vast_nonlinear.xml',
+                },
+                // Uncomment the following lines to test invalid configurations
+                {
+                    roll: 'midRoll',
+                    vastTag: '/static/vast_nonlinear.xml',
+                    timer: '150%',
+                },
+                {
+                    roll: 'midRoll',
+                    vastTag: '/static/vast_nonlinear.xml',
+                    timer: Number.MAX_VALUE,
+                },
+                {
+                    roll: 'midRoll',
+                    vastTag: '/static/vast_nonlinear.xml',
+                    timer: 'Not a Number',
+                },
             ]
         }
     });
