@@ -151,6 +151,7 @@ const fluidPlayerClass = function () {
         self.fluidPseudoPause = false;
         self.mobileInfo = self.getMobileOs();
         self.events = {};
+        self.timeSkipOffsetAmount = 10;
 
         //Default options
         self.displayOptions = {
@@ -221,7 +222,8 @@ const fluidPlayerClass = function () {
                     theatre: true
                 },
                 controlForwardBackward: {
-                    show: false
+                    show: false,
+                    doubleTapMobile: true
                 },
                 contextMenu: {
                     controls: true,
@@ -1421,14 +1423,6 @@ const fluidPlayerClass = function () {
         let newCurrentTime = currentTime;
 
         switch (keyCode) {
-            case 37://left arrow
-                newCurrentTime -= 5;
-                newCurrentTime = (newCurrentTime < 5) ? 0 : newCurrentTime;
-                break;
-            case 39://right arrow
-                newCurrentTime += 5;
-                newCurrentTime = (newCurrentTime > duration - 5) ? duration : newCurrentTime;
-                break;
             case 35://End
                 newCurrentTime = duration;
                 break;
@@ -1498,7 +1492,11 @@ const fluidPlayerClass = function () {
                     event.preventDefault();
                     break;
                 case 37://left arrow
+                    self.skipRelative(-self.timeSkipOffsetAmount);
+                    break;
                 case 39://right arrow
+                    self.skipRelative(self.timeSkipOffsetAmount);
+                    break;
                 case 35://End
                 case 36://Home
                 case 48://0
@@ -1918,7 +1916,7 @@ const fluidPlayerClass = function () {
         };
         let initiateVolumebarTimerId = setInterval(initiateVolumebar, 100);
 
-        if (self.displayOptions.layoutControls.doubleclickFullscreen) {
+        if (self.displayOptions.layoutControls.doubleclickFullscreen && !(self.isTouchDevice() || self.displayOptions.layoutControls.controlForwardBackward.doubleTapMobile)) {
             self.domRef.player.addEventListener('dblclick', self.fullscreenToggle);
         }
 
@@ -1945,24 +1943,113 @@ const fluidPlayerClass = function () {
         if (!!self.displayOptions.layoutControls.controlForwardBackward.show) {
             self.initSkipControls();
         }
+
+        if (!!self.displayOptions.layoutControls.controlForwardBackward.doubleTapMobile) {
+            self.initDoubleTapSkip();
+        }
+
+        self.initSkipAnimationElements();
     };
 
     self.initSkipControls = () => {
-        const skipFunction = (period) => {
-            if (self.isCurrentlyPlayingAd) {
+        self.domRef.controls.skipBack.addEventListener('click', self.skipRelative.bind(this, -self.timeSkipOffsetAmount));
+        self.domRef.controls.skipForward.addEventListener('click', self.skipRelative.bind(this, self.timeSkipOffsetAmount));
+    };
+
+    /**
+     * Creates the skip animation elements and appends them to the player
+     *
+     * @returns {void}
+     */
+    self.initSkipAnimationElements = function initSkipAnimationElements() {
+        const skipAnimationWrapper = document.createElement('div');
+        skipAnimationWrapper.classList.add('fluid_player_skip_offset');
+
+        const skipAnimationBackward = document.createElement('div');
+        skipAnimationBackward.classList.add('fluid_player_skip_offset__backward');
+        skipAnimationWrapper.appendChild(skipAnimationBackward);
+
+        const skipAnimationBackwardIcon = document.createElement('div');
+        skipAnimationBackwardIcon.classList.add('fluid_player_skip_offset__backward-icon');
+        skipAnimationBackwardIcon.ontransitionend = () => skipAnimationBackwardIcon.classList.remove('animate');
+        skipAnimationBackward.appendChild(skipAnimationBackwardIcon);
+
+        const skipAnimationForward = document.createElement('div');
+        skipAnimationForward.classList.add('fluid_player_skip_offset__forward');
+        skipAnimationWrapper.appendChild(skipAnimationForward);
+
+        const skipAnimationForwardIcon = document.createElement('div');
+        skipAnimationForwardIcon.classList.add('fluid_player_skip_offset__forward-icon');
+        skipAnimationForwardIcon.ontransitionend = () => skipAnimationForwardIcon.classList.remove('animate');
+        skipAnimationForward.appendChild(skipAnimationForwardIcon);
+
+        self.domRef.player.parentNode.insertBefore(skipAnimationWrapper, self.domRef.player.nextSibling);
+    }
+
+    /**
+     * Initialises the double tap skip functionality
+     */
+    self.initDoubleTapSkip = () => {
+        let hasDoubleClicked = false;
+        let timeouts = [];
+
+        function clearTimeouts() {
+            timeouts.forEach(timeout => clearTimeout(timeout));
+            timeouts = [];
+        }
+
+        self.domRef.player.addEventListener('click', (event) => {
+            // Check if it's mobile on the fly and prevent double click skip if it is
+            if (!self.isTouchDevice()) {
                 return;
             }
 
-            let skipTo = self.domRef.player.currentTime + period;
-            if (skipTo < 0) {
-                skipTo = 0;
-            }
-            self.domRef.player.currentTime = skipTo;
-        };
+            const { offsetX } = event
+            const { clientWidth } = self.domRef.player;
 
-        self.domRef.controls.skipBack.addEventListener('click', skipFunction.bind(this, -10));
-        self.domRef.controls.skipForward.addEventListener('click', skipFunction.bind(this, 10));
-    };
+            // Simulates default behaviour if it's a single click
+            timeouts.push(setTimeout(() => {
+                hasDoubleClicked = false;
+                self.playPauseToggle();
+            }, 300));
+
+            // Skips video time if it's a double click
+            if (hasDoubleClicked) {
+                clearTimeouts();
+                hasDoubleClicked = false;
+                return self.skipRelative(offsetX < clientWidth / 2 ? -self.timeSkipOffsetAmount : self.timeSkipOffsetAmount);
+            }
+
+            hasDoubleClicked = true;
+        });
+    }
+
+    /**
+     * Skips the video time by timeOffset relative to the current video time
+     *
+     * @param {number} timeOffset
+     */
+    self.skipRelative = function skipRelative(timeOffset) {
+        self.debugMessage('skipping video time by ', timeOffset);
+        if (self.isCurrentlyPlayingAd) {
+            return;
+        }
+
+        let skipTo = self.domRef.player.currentTime + timeOffset;
+        if (skipTo < 0) {
+            skipTo = 0;
+        }
+        self.domRef.player.currentTime = skipTo;
+
+        // Trigger animation
+        if (timeOffset >= 0) {
+            const forwardElement = self.domRef.wrapper.querySelector(`.fluid_player_skip_offset__forward-icon`);
+            forwardElement.classList.add('animate');
+        } else {
+            const backwardElement = self.domRef.wrapper.querySelector(`.fluid_player_skip_offset__backward-icon`);
+            backwardElement.classList.add('animate');
+        }
+    }
 
     /**
      * Checks if the volumebar is rendered and the styling applied by comparing
@@ -1980,8 +2067,9 @@ const fluidPlayerClass = function () {
 
     self.setLayout = () => {
         //All other browsers
-        const listenTo = (self.isTouchDevice()) ? 'touchend' : 'click';
-        self.domRef.player.addEventListener(listenTo, () => self.playPauseToggle(), false);
+        if (!self.isTouchDevice()) {
+            self.domRef.player.addEventListener('click', () => self.playPauseToggle(), false);
+        }
         //Mobile Safari - because it does not emit a click event on initial click of the video
         self.domRef.player.addEventListener('play', self.initialPlay, false);
         self.setDefaultLayout();
