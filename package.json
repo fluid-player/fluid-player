@@ -11,7 +11,8 @@
     "build-dev-debug": "webpack --mode=development --debug",
     "dev-server": "webpack serve --mode=development --host 0.0.0.0",
     "dev-server-debug": "webpack serve --mode=development --env debug --host 0.0.0.0",
-    "dev-server-test": "webpack serve --mode=production --no-live-reload --host 0.0.0.0"
+    "dev-server-test": "webpack serve --mode=production --no-live-reload --host 0.0.0.0",
+    "start": "npm run dev-server-debug"
   },
   "repository": {
     "type": "git",

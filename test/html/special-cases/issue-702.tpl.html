@@ -5,7 +5,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>VOD with VPAID Non Linear</title>
+    <title>Issue 702 - CurrentTime reset after switch HLS source on IOS</title>
     <%= htmlWebpackPlugin.tags.headTags %>
     <style lang="css">
         #fluid-player-e2e-case {
@@ -16,9 +16,8 @@
 <body>
 
 <video id="fluid-player-e2e-case">
-    <source src="https://cdn.fluidplayer.com/videos/valerian-1080p.mkv" data-fluid-hd title="1080p" type="video/mp4"/>
-    <source src="https://cdn.fluidplayer.com/videos/valerian-720p.mkv" data-fluid-hd title="720p" type="video/mp4"/>
-    <source src="https://cdn.fluidplayer.com/videos/valerian-480p.mkv" title="480p" type="video/mp4"/>
+    <source src="https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_fmp4/master.m3u8?a=1" type="application/x-mpegURL" title="1">
+    <source src="https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.mp4/.m3u8" type="application/x-mpegURL" title="2">
 </video>
 
 <%= htmlWebpackPlugin.tags.bodyTags %>
@@ -27,12 +26,6 @@
     var instance = fluidPlayer('fluid-player-e2e-case', {
         vastOptions: {
             allowVPAID: true, // Default false.
-            adList: [
-                {
-                    roll: 'preRoll',
-                    vastTag: '/static/vpaid_nonlinear.xml',
-                },
-            ]
         }
     });
 </script>
