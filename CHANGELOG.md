@@ -1,9 +1,12 @@
 # CHANGELOG
 
+## 3.22.0 (2023-08-17)
+* [Pull #755](https://github.com/fluid-player/fluid-player/pull/755) Percentages are not accepted for "timer" property
+
 ## 3.21.0 (2023-08-08)
 * [Pull #748](https://github.com/fluid-player/fluid-player/pull/748) CurrentTime reset after switch HLS source on IOS
 * [Pull #752](https://github.com/fluid-player/fluid-player/pull/752) Add "controlForwardBackward" setting inside the player instead of the control bar
-*
+
 ## 3.20.0 (2023-07-24)
 * [Pull #749](https://github.com/fluid-player/fluid-player/pull/749) Mouse disappears
 * [Pull #750](https://github.com/fluid-player/fluid-player/pull/750) In mobile and when using .m3u8 files, user needs to click the player twice in order to play the video
