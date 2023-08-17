@@ -1137,9 +1137,14 @@ export default function (playerInstance, options) {
     /**
      * Schedule tasks that need to be run with the main video timer
      *
-     * @param task
+     * @param {{ time: number, rollListId: any, loadVast: any }} task
      */
     playerInstance.scheduleTask = (task) => {
+        if (task.time > playerInstance.mainVideoDuration || task.time < 0 || Number.isNaN(task.time)) {
+            console.warn(`Scheduled task has invalid time`, task.time, '. Check your configuration.');
+            return;
+        }
+
         playerInstance.debugMessage(`Scheduling task`, task);
 
         if (!playerInstance.timerPool.hasOwnProperty(task.time)) {
@@ -1188,6 +1193,12 @@ export default function (playerInstance, options) {
             .forEach(rollAd => {
                 // Request will have the vastTimeout time to load
                 if (rollAd.roll === `midRoll`) {
+                    if (typeof rollAd.timer === 'string') {
+                        // This can result in NaN, in that case the midRoll will simply not happen (user configuration error)
+                        rollAd.timer = Math.floor(playerInstance.mainVideoDuration / 100 * rollAd.timer.replace('%', ''));
+                        playerInstance.debugMessage(`Replaced midRoll from percentage to timer value ${rollAd.timer} seconds`);
+                    }
+
                     const time = rollAd.timer - (playerInstance.displayOptions.vastOptions.vastTimeout / 1000);
 
                     // Handles cases where the midRoll should be loaded now, skipping the task scheduler

@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+          name="viewport">
+    <meta content="ie=edge" http-equiv="X-UA-Compatible">
     <title>VOD with VAST Linear</title>
     <%= htmlWebpackPlugin.tags.headTags %>
     <style lang="css">
@@ -30,6 +30,25 @@
             adList: [
                 {
                     roll: 'preRoll',
+                    vastTag: '/static/vast_linear.xml',
+                },
+                {
+                    roll: 'midRoll',
+                    vastTag: '/static/vast_linear.xml',
+                    timer: '25%',
+                },
+                {
+                    roll: 'midRoll',
+                    vastTag: '/static/vast_linear.xml',
+                    timer: 50,
+                },
+                {
+                    roll: 'midRoll',
+                    vastTag: '/static/vast_linear.xml',
+                    timer: '75.0%',
+                },
+                {
+                    roll: 'postRoll',
                     vastTag: '/static/vast_linear.xml',
                 },
             ]
