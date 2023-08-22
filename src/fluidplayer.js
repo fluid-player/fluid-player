@@ -1256,7 +1256,6 @@ const fluidPlayerClass = function () {
     };
 
     self.onProgressbarMouseDown = (event) => {
-        console.log('onProgressbarMouseDown')
         self.displayOptions.layoutControls.playPauseAnimation = false;
         // we need an initial position for touchstart events, as mouse up has no offset x for iOS
         let initialPosition;
