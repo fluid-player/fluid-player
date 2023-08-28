@@ -355,7 +355,7 @@ export default function (playerInstance) {
         }
 
         toggleByVisibilityControl = true;
-        document.addEventListener('scroll', toggleMiniPlayerByVisibility);
+        document.addEventListener('scroll', toggleMiniPlayerByVisibility, { passive: true });
     }
 
     /**

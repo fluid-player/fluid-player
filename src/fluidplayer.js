@@ -496,7 +496,7 @@ const fluidPlayerClass = function () {
             //On mobile mouseleave behavior does not make sense, so it's better to keep controls, once the playback starts
             //Autohide behavior on timer is a separate functionality
             self.hideControlBar();
-            videoWrapper.addEventListener('touchstart', self.showControlBar, false);
+            videoWrapper.addEventListener('touchstart', self.showControlBar, { passive: true });
         }
 
         //Keyboard Controls
@@ -1319,9 +1319,9 @@ const fluidPlayerClass = function () {
         };
 
         document.addEventListener('mouseup', onProgressbarMouseUp);
-        document.addEventListener('touchend', onProgressbarMouseUp);
+        document.addEventListener('touchend', onProgressbarMouseUp, { passive: true });
         document.addEventListener('mousemove', onProgressbarMouseMove);
-        document.addEventListener('touchmove', onProgressbarMouseMove);
+        document.addEventListener('touchmove', onProgressbarMouseMove, { passive: true });
     };
 
     self.onVolumeBarMouseDown = () => {
@@ -1365,9 +1365,9 @@ const fluidPlayerClass = function () {
         }
 
         document.addEventListener('mouseup', onVolumeBarMouseUp);
-        document.addEventListener('touchend', onVolumeBarMouseUp);
+        document.addEventListener('touchend', onVolumeBarMouseUp, { passive: true });
         document.addEventListener('mousemove', onVolumeBarMouseMove);
-        document.addEventListener('touchmove', onVolumeBarMouseMove);
+        document.addEventListener('touchmove', onVolumeBarMouseMove, { passive: true });
     };
 
     self.findRoll = (roll) => {
@@ -1731,12 +1731,12 @@ const fluidPlayerClass = function () {
             );
         } else {
             document.getElementById(self.videoPlayerId + '_fluid_controls_progress_container')
-                .addEventListener(eventOn, event => self.onProgressbarMouseDown(event), false);
+                .addEventListener(eventOn, event => self.onProgressbarMouseDown(event), { passive: true });
         }
 
         //Set the volume controls
         document.getElementById(self.videoPlayerId + '_fluid_control_volume_container')
-            .addEventListener(eventOn, event => self.onVolumeBarMouseDown(), false);
+            .addEventListener(eventOn, event => self.onVolumeBarMouseDown(), { passive: true });
 
         self.domRef.player.addEventListener('volumechange', () => self.contolVolumebarUpdate());
 
@@ -2510,7 +2510,7 @@ const fluidPlayerClass = function () {
             : ['mousemove', 'mousedown', 'mouseup'];
 
         for (let i = 0; i < listenTo.length; i++) {
-            videoPlayer.addEventListener(listenTo[i], activity);
+            videoPlayer.addEventListener(listenTo[i], activity, { passive: true });
         }
     };
 
