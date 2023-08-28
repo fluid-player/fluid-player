@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.23.0 (2023-08-28)
+* [Pull #757](https://github.com/fluid-player/fluid-player/pull/757) Preload doesn't work for .m3u8 files when the player is serving in-stream ads
+* [Pull #760](https://github.com/fluid-player/fluid-player/pull/760) Lighthouse says: Does not use passive listeners to improve scrolling performance
+
 ## 3.22.0 (2023-08-17)
 * [Pull #755](https://github.com/fluid-player/fluid-player/pull/755) Percentages are not accepted for "timer" property
 
