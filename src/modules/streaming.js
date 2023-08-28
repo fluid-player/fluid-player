@@ -90,6 +90,7 @@ export default function (playerInstance, options) {
 
     playerInstance.initialiseHls = () => {
         if (Hls.isSupported()) {
+            playerInstance.debugMessage('Initializing hls.js');
 
             const defaultOptions = {
                 debug: typeof FP_DEBUG !== 'undefined' && FP_DEBUG === true,

@@ -397,12 +397,9 @@ const fluidPlayerClass = function () {
 
         self.setPersistentSettings();
 
-        // DO NOT initialize streamers if there are pre-rolls. It will break the streamers!
-        // Streamers will re-initialize once ad has been shown.
-        const preRolls = self.findRoll('preRoll');
-        if (!preRolls || 0 === preRolls.length) {
-            self.initialiseStreamers();
-        }
+        // Previously prevented to be initialized if preRolls were set up
+        // but now the streamers support reinitialization
+        self.initialiseStreamers();
 
         const _play_videoPlayer = playerNode.play;
 
