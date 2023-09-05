@@ -464,7 +464,6 @@ export default function (playerInstance, options) {
             duration = duration || playerInstance.vastOptions.duration;
 
             playerInstance.nonLinearTracking = setInterval(function () {
-                console.log('nonLonearTracking')
                 if (playerInstance.adFinished === true) {
                     return;
                 }
