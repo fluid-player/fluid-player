@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Player Reinitialization</title>
+    <%= htmlWebpackPlugin.tags.headTags %>
+    <style lang="css">
+        #fluid-player-e2e-case {
+            width: 90%;
+        }
+    </style>
+</head>
+<body>
+
+<div id="target"></div>
+
+<br/>
+
+<button id="destroy" role="button">Destroy</button>
+<button id="newInstance" role="button">Create New Instance</button>
+<button id="cd" role="button">Create and Destroy</button>
+
+<hr/>
+
+<p>This test is meant to check if the Fluid Player instance is properly clean up after destroying it</p>
+
+<%= htmlWebpackPlugin.tags.bodyTags %>
+
+<script>
+    let instance;
+    const targetElm = document.getElementById('target')
+    const destroyBtn = document.getElementById('destroy');
+    const newInstanceBtn = document.getElementById('newInstance');
+    const cdButton = document.getElementById('cd');
+
+    function destroy() {
+        instance.destroy();
+        instance = undefined;
+    }
+
+    function create() {
+        if (instance) {
+            return;
+        }
+
+        targetElm.innerHTML = `
+            <video id="fluid-player-e2e-case">
+                <source src="https://cdn.fluidplayer.com/videos/valerian-1080p.mkv" data-fluid-hd title="1080p" type="video/mp4"/>
+                <source src="https://cdn.fluidplayer.com/videos/valerian-720p.mkv" data-fluid-hd title="720p" type="video/mp4"/>
+                <source src="https://cdn.fluidplayer.com/videos/valerian-480p.mkv" title="480p" type="video/mp4"/>
+            </video>
+        `;
+        instance = fluidPlayer('fluid-player-e2e-case', {
+            layoutControls: {
+                allowDownload: true
+            },
+            vastOptions: {
+                adList: [
+                    {
+                        vastTag: '/static/vast_nonlinear.xml',
+                        roll: 'preRoll',
+                    },
+                    {
+                        vastTag: '/static/vast_nonlinear.xml',
+                        roll: 'midRoll',
+                        timer: 10,
+                    }
+                ],
+            },
+        });
+    }
+
+    destroyBtn.onclick = destroy;
+    newInstanceBtn.onclick = create;
+    cdButton.onclick = () => { create(); destroy(); }
+</script>
+
+</body>
+</html>

@@ -464,6 +464,7 @@ export default function (playerInstance, options) {
             duration = duration || playerInstance.vastOptions.duration;
 
             playerInstance.nonLinearTracking = setInterval(function () {
+                console.log('nonLonearTracking')
                 if (playerInstance.adFinished === true) {
                     return;
                 }
@@ -474,6 +475,7 @@ export default function (playerInstance, options) {
                     playerInstance.adFinished = true;
                 }
             }, 400);
+            playerInstance.destructors.push(() => clearInterval(playerInstance.nonLinearTracking));
         }
 
         const time = parseInt(playerInstance.getCurrentTime()) + parseInt(duration);
@@ -1132,6 +1134,7 @@ export default function (playerInstance, options) {
                 const keyTime = Math.floor(playerInstance.getCurrentTime());
                 playerInstance.adKeytimePlay(keyTime)
             }, 800);
+        playerInstance.destructors.push(() => playerInstance.timer);
     };
 
     /**
