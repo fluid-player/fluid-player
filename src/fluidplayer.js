@@ -79,8 +79,13 @@ const fluidPlayerClass = function () {
             throw 'Could not find a HTML node to attach to for target ' + playerTarget + '"';
         }
 
+        if (playerNode.classList.contains('js-fluid-player')) {
+            throw 'Invalid initializer - player target already is initialized';
+        }
+
         playerNode.setAttribute('playsinline', '');
         playerNode.setAttribute('webkit-playsinline', '');
+        playerNode.classList.add('js-fluid-player');
 
         self.domRef.player = playerNode;
         self.vrROTATION_POSITION = 0.1;
@@ -533,7 +538,9 @@ const fluidPlayerClass = function () {
 
         const loaderDiv = document.getElementById('vast_video_loading_' + self.videoPlayerId);
 
-        loaderDiv.style.display = showLoader ? 'table' : 'none';
+        if (loaderDiv) {
+            loaderDiv.style.display = showLoader ? 'table' : 'none';
+        }
     };
 
     self.sendRequest = (url, withCredentials, timeout, functionReadyStateChange) => {
@@ -1917,6 +1924,7 @@ const fluidPlayerClass = function () {
             }
         };
         let initiateVolumebarTimerId = setInterval(initiateVolumebar, 100);
+        self.destructors.push(() => clearInterval(initiateVolumebarTimerId));
 
         if (self.displayOptions.layoutControls.doubleclickFullscreen && !(self.isTouchDevice() || self.displayOptions.layoutControls.controlForwardBackward.doubleTapMobile)) {
             self.domRef.player.addEventListener('dblclick', self.fullscreenToggle);
@@ -2475,7 +2483,7 @@ const fluidPlayerClass = function () {
             self.newActivity = true;
         };
 
-        setInterval(() => {
+        const intervalId = setInterval(() => {
             if (self.newActivity !== true) {
                 return;
             }
@@ -2504,6 +2512,8 @@ const fluidPlayerClass = function () {
                 self.domRef.player.dispatchEvent(event);
             }, self.displayOptions.layoutControls.controlBar.autoHideTimeout * 1000);
         }, 300);
+
+        self.destructors.push(() => clearInterval(intervalId));
 
         const listenTo = (self.isTouchDevice())
             ? ['touchstart', 'touchmove', 'touchend']
@@ -2666,6 +2676,7 @@ const fluidPlayerClass = function () {
             }
         };
         progressInterval = setInterval(logProgress, 500);
+        self.destructors.push(() => clearInterval(progressInterval));
     };
 
     self.createPlaybackList = () => {
@@ -2744,7 +2755,7 @@ const fluidPlayerClass = function () {
                 e.stopImmediatePropagation();
             }
 
-            setInterval(function () {
+            setTimeout(function () {
                 linkItem.download = '';
                 linkItem.href = '';
             }, 100);
@@ -3171,20 +3182,19 @@ const fluidPlayerClass = function () {
     }
 
     self.destroy = () => {
+        self.domRef.player.classList.remove('js-fluid-player');
         const numDestructors = self.destructors.length;
 
         if (0 === numDestructors) {
             return;
         }
 
-        for (let i = 0; i < numDestructors; ++i) {
-            self.destructors[i].bind(this)();
-        }
+        self.destructors.forEach(destructor => destructor.call(self));
 
-        const container = document.getElementById('fluid_video_wrapper_' + self.videoPlayerId);
+        const container = self.domRef.wrapper;
 
         if (!container) {
-            console.warn('Unable to remove wrapper element for Fluid Player instance - element not found ' + self.videoPlayerId);
+            console.warn('Unable to remove wrapper element for Fluid Player instance - element not found');
             return;
         }
 
@@ -3198,7 +3208,7 @@ const fluidPlayerClass = function () {
             return;
         }
 
-        console.error('Unable to remove wrapper element for Fluid Player instance - no parent' + self.videoPlayerId);
+        console.error('Unable to remove wrapper element for Fluid Player instance - no parent');
     }
 };
 

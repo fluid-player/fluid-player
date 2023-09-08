@@ -370,7 +370,7 @@ export default function (playerInstance, options) {
         }
     };
 
-    //Passthrough for resizeAd
+    // Passthrough for resizeAd
     playerInstance.resizeVpaidAd = (width, height, viewMode) => {
         if (!playerInstance.vpaidAdUnit) {
             return;
@@ -396,7 +396,7 @@ export default function (playerInstance, options) {
         playerInstance.vpaidAdUnit.resumeAd();
     };
 
-    //Passthrough for expandAd()
+    // Passthrough for expandAd()
     playerInstance.expandVpaidAd = () => {
         if (!playerInstance.vpaidAdUnit) {
             return;
@@ -404,7 +404,7 @@ export default function (playerInstance, options) {
         playerInstance.vpaidAdUnit.expandAd();
     };
 
-    //Passthrough for collapseAd()
+    // Passthrough for collapseAd()
     playerInstance.collapseVpaidAd = () => {
         if (!playerInstance.vpaidAdUnit) {
             return;
@@ -429,7 +429,7 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.vpaidCallbackListenersAttach = () => {
-        //The key of the object is the event name and the value is a reference to the callback function that is registered with the creative
+        // The key of the object is the event name and the value is a reference to the callback function that is registered with the creative
         // Looping through the object and registering each of the callbacks with the creative
         for (let eventName in callbacks) {
             playerInstance.vpaidAdUnit.subscribe(callbacks[eventName](), eventName, playerInstance);
@@ -499,6 +499,8 @@ export default function (playerInstance, options) {
             }
 
         }, 100);
+
+        playerInstance.destructors.push(() => clearInterval(playerInstance.getVPAIDAdInterval));
 
     };
 
