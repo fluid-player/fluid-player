@@ -80,15 +80,16 @@ export default function (playerInstance, options) {
                     }
 
                 } else {
+                    const isAdClickable = !(
+                        playerInstance.rollsById[ad.rollListId].adClickable === false ||
+                        playerInstance.displayOptions.vastOptions.adClickable === false
+                    );
 
-                    const addClickthroughLayer = (typeof ad.adClickable != "undefined") ? ad.adClickable : playerInstance.displayOptions.vastOptions.adClickable;
-
-                    if (addClickthroughLayer) {
-                        playerInstance.addClickthroughLayer(playerInstance.videoPlayerId);
+                    if (isAdClickable) {
+                        playerInstance.addClickthroughLayer();
                     }
 
                     playerInstance.addCTAButton(ad.landingPage);
-
                 }
 
                 if (playerInstance.vastOptions.skipoffset !== false) {
