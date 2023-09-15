@@ -80,12 +80,14 @@ export default function (playerInstance, options) {
                     }
 
                 } else {
-                    const isAdClickable = !(
-                        playerInstance.rollsById[ad.rollListId].adClickable === false ||
-                        playerInstance.displayOptions.vastOptions.adClickable === false
-                    );
+                    let idAdClickable = [undefined, true]
+                      .includes(playerInstance.displayOptions.vastOptions.adClickable);
 
-                    if (isAdClickable) {
+                    if (playerInstance.rollsById[ad.rollListId].adClickable !== undefined) {
+                        idAdClickable = playerInstance.rollsById[ad.rollListId].adClickable;
+                    }
+
+                    if (idAdClickable) {
                         playerInstance.addClickthroughLayer();
                     }
 
