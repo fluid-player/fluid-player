@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.25.0 (2023-09-21)
+* [Pull #766](https://github.com/fluid-player/fluid-player/pull/766) adClickable and CTA parameters don't work when 2 VAST ad is loaded
+
 ## 3.24.0 (2023-09-08)
 * [Pull #763](https://github.com/fluid-player/fluid-player/pull/763) Player can't be restarted by destroying it and initializing it again
 
