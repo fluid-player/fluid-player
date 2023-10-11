@@ -24,35 +24,23 @@
 <%= htmlWebpackPlugin.tags.bodyTags %>
 
 <script>
-    var instance = fluidPlayer('fluid-player-e2e-case', {
+    const vast = 'https://bs.serving-sys.ru/Serving/adServer.bs?c=23&cn=display&pli=1002501224&ord=%random%&LineID=$$rclid=rclid&erid=erid$$'
+    const player = fluidPlayer("fluid-player-e2e-case", {
+        layoutControls: {
+            fillToContainer: false,
+            autoPlay: true,
+            controlBar: { hidden: true },
+        },
         vastOptions: {
-            allowVPAID: true, // Default false.
+            allowVPAID: true,
+            skipoffset: false,
             adList: [
                 {
-                    roll: 'preRoll',
-                    vastTag: '/static/vast_linear.xml',
-                },
-                {
-                    roll: 'midRoll',
-                    vastTag: '/static/vast_linear.xml',
-                    timer: '25%',
-                },
-                {
-                    roll: 'midRoll',
-                    vastTag: '/static/vast_linear.xml',
-                    timer: 50,
-                },
-                {
-                    roll: 'midRoll',
-                    vastTag: '/static/vast_linear.xml',
-                    timer: '75.0%',
-                },
-                {
-                    roll: 'postRoll',
-                    vastTag: '/static/vast_linear.xml',
+                    roll: "preRoll",
+                    vastTag: vast,
                 },
             ]
-        }
+        },
     });
 </script>
 
