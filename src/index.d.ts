@@ -7,16 +7,23 @@ declare module 'fluid-player' {
     export default fluidPlayer;
 }
 
-declare type OnPlay = (event: 'play', callback: () => void) => void;
-declare type OnPlaying = (event: 'playing', callback: () => void) => void;
-declare type OnPause = (event: 'pause', callback: () => void) => void;
-declare type OnEnded = (event: 'ended', callback: () => void) => void;
-declare type OnSeeked = (event: 'seeked', callback: () => void) => void;
-declare type OnTheaterModeOn = (event: 'theatreModeOn', callback: () => void) => void;
-declare type OnTheaterModeOff = (event: 'theatreModeOff', callback: () => void) => void;
-declare type OnTimeUpdate = (event: 'timeupdate', callback: (time: number) => void) => void;
+declare type AdditionalEventInfo = { mediaSourceType: 'ad' | 'source' };
+declare type OnPlay = (event: 'play', callback: (additionalInfo: AdditionalEventInfo) => void) => void;
+declare type OnPlaying =
+    (event: 'playing', callback: (event: Event, additionalInfo: AdditionalEventInfo) => void) => void;
+declare type OnPause = (event: 'pause', callback: (additionalInfo: AdditionalEventInfo) => void) => void;
+declare type OnEnded = (event: 'ended', callback: (additionalInfo: AdditionalEventInfo) => void) => void;
+declare type OnSeeked = (event: 'seeked', callback: (additionalInfo: AdditionalEventInfo) => void) => void;
+declare type OnTheaterModeOn =
+    (event: 'theatreModeOn', callback: (event: Event, additionalInfo: AdditionalEventInfo) => void) => void;
+declare type OnTheaterModeOff =
+    (event: 'theatreModeOff', callback: (event: Event, additionalInfo: AdditionalEventInfo) => void) => void;
+declare type OnTimeUpdate =
+    (event: 'timeupdate', callback: (time: number, additionalInfo: AdditionalEventInfo) => void) => void;
 declare type OnMiniPlayerToggle =
-    (event: 'miniPlayerToggle', callback: (event: CustomEvent<{ isToggledOn: boolean }>) => void) => void;
+    (event: 'miniPlayerToggle', callback: (event: CustomEvent<{
+        isToggledOn: boolean
+    }>, additionalInfo: AdditionalEventInfo) => void) => void;
 
 declare interface FluidPlayerInstance {
     play: () => void;

@@ -3057,7 +3057,16 @@ const fluidPlayerClass = function () {
         controlBar.className = controlBar.className.replace(' initial_controls_show', '');
     };
 
-    self.on = (eventCall, functionCall) => {
+    self.on = (eventCall, callback) => {
+        /**
+         * Improves events by adding player info to the callbacks
+         */
+        const getAdditionalInfo = () => ({
+            mediaSourceType: self.adFinished === false ? 'ad' : 'source'
+        });
+
+        const functionCall = (...args) => callback(...args, getAdditionalInfo());
+
         switch (eventCall) {
             case 'play':
                 self.domRef.player.onplay = functionCall;
