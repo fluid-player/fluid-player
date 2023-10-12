@@ -38,6 +38,7 @@ declare interface FluidPlayerInstance {
 declare interface LayoutControls {
     primaryColor: false | string;
     posterImage: false | string;
+    posterImageSize: 'auto' | 'cover' | 'contain';
     playButtonShowing: boolean;
     playPauseAnimation: boolean;
     fillToContainer: boolean;
