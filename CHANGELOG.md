@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.26.0 (2023-10-12)
+* [Pull #768](https://github.com/fluid-player/fluid-player/pull/768) Stretch posterImage to playerwindow
+* [Pull #769](https://github.com/fluid-player/fluid-player/pull/769) Events don't differ from Ad and Main video
+
 ## 3.25.0 (2023-09-21)
 * [Pull #766](https://github.com/fluid-player/fluid-player/pull/766) adClickable and CTA parameters don't work when 2 VAST ad is loaded
 
