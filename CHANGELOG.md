@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.27.0 (2023-10-19)
+* [Pull #771](https://github.com/fluid-player/fluid-player/pull/771) Method loadVpaid create frame without body
+
 ## 3.26.0 (2023-10-12)
 * [Pull #768](https://github.com/fluid-player/fluid-player/pull/768) Stretch posterImage to playerwindow
 * [Pull #769](https://github.com/fluid-player/fluid-player/pull/769) Events don't differ from Ad and Main video
