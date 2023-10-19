@@ -454,7 +454,10 @@ export default function (playerInstance, options) {
 
         playerInstance.domRef.player.parentNode.insertBefore(vpaidIframe, playerInstance.domRef.player.nextSibling);
 
-        vpaidIframe.contentWindow.document.write('<script src="' + vpaidJsUrl + '"></scr' + 'ipt>');
+        const vpaidJsScriptElement = document.createElement('script');
+        vpaidJsScriptElement.src = vpaidJsUrl;
+
+        vpaidIframe.contentWindow.document.head.append(vpaidJsScriptElement);
 
         // set interval with timeout
         playerInstance.tempVpaidCounter = 0;
