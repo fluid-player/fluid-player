@@ -367,7 +367,7 @@ export default function (playerInstance) {
         }
 
         const isPlayerVisible = playerInstance.isElementVisible(playerInstance.domRef.player);
-        const isPlaceholderVisible = playerInstance.isElementVisible(document.querySelector(`.${PLACEHOLDER_CLASS}`));
+        const isPlaceholderVisible = playerInstance.isElementVisible(playerInstance.domRef.wrapper.querySelector(`.${PLACEHOLDER_CLASS}`));
 
         if (!isPlayerVisible && !playerInstance.miniPlayerToggledOn) {
             toggleMiniPlayer('on');
