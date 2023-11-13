@@ -3,7 +3,7 @@
     <Ad id="123456">
         <Wrapper>
             <AdSystem>Ad System</AdSystem>
-            <VASTAdTagURI><![CDATA[https://elixircasts.ru/fluidplayer-bug/wrapper.xml]]></VASTAdTagURI>
+            <VASTAdTagURI><![CDATA[/static/vast_wrapper.xml]]></VASTAdTagURI>
             <Impression><![CDATA[/nesting_wrapper_impression]]></Impression>
             <Error><![CDATA[/nested_wrapper_error]]></Error>
             <Creatives>
