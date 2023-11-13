@@ -5,7 +5,7 @@
             <AdSystem>Ad System</AdSystem>
             <VASTAdTagURI><![CDATA[/static/vast_wrapper.xml]]></VASTAdTagURI>
             <Impression><![CDATA[/nesting_wrapper_impression]]></Impression>
-            <Error><![CDATA[/nested_wrapper_error]]></Error>
+            <Error><![CDATA[/nesting_wrapper_error]]></Error>
             <Creatives>
                 <Creative>
                     <Linear>
