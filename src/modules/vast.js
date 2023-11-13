@@ -763,7 +763,7 @@ export default function (playerInstance, options) {
      */
     function flattenAdTree(root, ads = [], wrappers = []) {
         if (Array.isArray(root.children) && root.children.length) {
-            root.children.forEach(child => flattenAdTree(child, ads, [...root.wrappers || [], root.data]))
+            root.children.forEach(child => flattenAdTree(child, ads, [...wrappers || [], root.data]))
         }
 
         if (root.tagType === 'inLine') {

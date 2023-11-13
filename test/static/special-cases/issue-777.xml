@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VAST xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../vast4.xsd" version="4.2">
+    <Ad id="123456">
+        <Wrapper>
+            <AdSystem>Ad System</AdSystem>
+            <VASTAdTagURI><![CDATA[https://elixircasts.ru/fluidplayer-bug/wrapper.xml]]></VASTAdTagURI>
+            <Impression><![CDATA[/nesting_wrapper_impression]]></Impression>
+            <Error><![CDATA[/nested_wrapper_error]]></Error>
+            <Creatives>
+                <Creative>
+                    <Linear>
+                        <TrackingEvents>
+                            <Tracking event="progress" offset="00:00:10.000"><![CDATA[/nesting_wrapper_progress]]></Tracking>
+                        </TrackingEvents>
+                        <VideoClicks>
+                            <ClickTracking><![CDATA[/nesting_wrapper_click]]></ClickTracking>
+                        </VideoClicks>
+                    </Linear>
+                </Creative>
+            </Creatives>
+        </Wrapper>
+    </Ad>
+</VAST>
