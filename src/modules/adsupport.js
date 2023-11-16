@@ -15,11 +15,10 @@ export default function (playerInstance, options) {
         const playVideoPlayer = ad => {
             playerInstance.switchPlayerToVpaidMode = ad => {
                 playerInstance.debugMessage('starting function switchPlayerToVpaidMode');
-                const vpaidIframe = playerInstance.videoPlayerId + "_" + ad.id + "_fluid_vpaid_iframe";
+                const vpaidIframe = "fp_" + ad.id + "_fluid_vpaid_iframe";
                 const creativeData = {};
                 creativeData.AdParameters = ad.adParameters;
                 const slotElement = document.createElement('div');
-                slotElement.id = playerInstance.videoPlayerId + "_fluid_vpaid_slot";
                 slotElement.className = 'fluid_vpaid_slot';
                 slotElement.setAttribute('adListId', ad.id);
 
@@ -130,10 +129,10 @@ export default function (playerInstance, options) {
 
                 // if in vr mode then do not show
                 if (playerInstance.vrMode) {
-                    const adCountDownTimerText = document.getElementById('ad_countdown' + playerInstance.videoPlayerId);
-                    const ctaButton = document.getElementById(playerInstance.videoPlayerId + '_fluid_cta');
-                    const addAdPlayingTextOverlay = document.getElementById(playerInstance.videoPlayerId + '_fluid_ad_playing');
-                    const skipBtn = document.getElementById('skip_button_' + playerInstance.videoPlayerId);
+                    const adCountDownTimerText = playerInstance.domRef.wrapper.querySelector('.ad_countdown');
+                    const ctaButton = playerInstance.domRef.wrapper.querySelector('.fluid_ad_cta');
+                    const addAdPlayingTextOverlay = playerInstance.domRef.wrapper.querySelector('.fluid_ad_playing');
+                    const skipBtn = playerInstance.domRef.wrapper.querySelector('.skip_button');
 
                     if (adCountDownTimerText) {
                         adCountDownTimerText.style.display = 'none';
@@ -495,7 +494,7 @@ export default function (playerInstance, options) {
 
             const vAlign = (ad.vAlign) ? ad.vAlign : playerInstance.nonLinearVerticalAlign;
             const showCloseButton = (ad.vpaidNonLinearCloseButton) ? ad.vpaidNonLinearCloseButton : playerInstance.vpaidNonLinearCloseButton;
-            const vpaidIframe = playerInstance.videoPlayerId + "_" + ad.id + "_fluid_vpaid_iframe";
+            const vpaidIframe = "fp_" + ad.id + "_fluid_vpaid_iframe";
             const creativeData = {};
             creativeData.AdParameters = ad.adParameters;
             const slotWrapper = document.createElement('div');
@@ -529,7 +528,6 @@ export default function (playerInstance, options) {
                 slotWrapper.appendChild(slotFrame);
 
                 const closeBtn = document.createElement('div');
-                closeBtn.id = 'close_button_' + playerInstance.videoPlayerId;
                 closeBtn.className = 'close_button';
                 closeBtn.innerHTML = '';
                 closeBtn.title = playerInstance.displayOptions.layoutControls.closeButtonCaption;
@@ -559,7 +557,7 @@ export default function (playerInstance, options) {
             }
 
             const slotIframe = document.createElement('iframe');
-            slotIframe.id = playerInstance.videoPlayerId + "non_linear_vapid_slot_iframe";
+            slotIframe.id = playerInstance.videoPlayerId + 'non_linear_vapid_slot_iframe';
             slotIframe.className = 'fluid_vpaid_nonlinear_slot_iframe';
             slotIframe.setAttribute('width', adWidth + 'px');
             slotIframe.setAttribute('height', adHeight + 'px');
@@ -661,10 +659,14 @@ export default function (playerInstance, options) {
 
             if (playerInstance.rollsById[ad.rollListId].roll !== 'onPauseRoll') {
                 //Show the board only if media loaded
-                document.getElementById('fluid_nonLinear_' + ad.id).style.display = '';
+                const nonLinear = playerInstance.domRef.wrapper.querySelector('#fluid_nonLinear_' + ad.id);
+
+                if (nonLinear) {
+                    nonLinear.style.display = ''
+                }
             }
 
-            const img = document.getElementById(creative.id);
+            const img = playerInstance.domRef.wrapper.querySelector('#' + creative.id);
             img.width = newBannerWidth;
             img.height = newBannerHeight;
 
@@ -694,7 +696,6 @@ export default function (playerInstance, options) {
         }
 
         const closeBtn = document.createElement('div');
-        closeBtn.id = 'close_button_' + playerInstance.videoPlayerId;
         closeBtn.className = 'close_button';
         closeBtn.innerHTML = '';
         closeBtn.title = playerInstance.displayOptions.layoutControls.closeButtonCaption;
@@ -755,7 +756,7 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.closeNonLinear = (adId) => {
-        const element = document.querySelector('#fluid_nonLinear_' + adId + ', #fluid_vpaidNonLinear_' + adId);
+        const element = playerInstance.domRef.wrapper.querySelector('#fluid_nonLinear_' + adId + ', #fluid_vpaidNonLinear_' + adId);
         if (element) {
             element.remove();
         }
@@ -857,10 +858,10 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.createAdMarker = (adListId, time) => {
-        const markersHolder = document.getElementById(playerInstance.videoPlayerId + '_ad_markers_holder');
+        const markersHolder = playerInstance.domRef.wrapper.querySelector('.fluid_controls_ad_markers_holder');
         const adMarker = document.createElement('div');
-        adMarker.id = 'ad_marker_' + playerInstance.videoPlayerId + "_" + adListId;
-        adMarker.className = 'fluid_controls_ad_marker';
+        adMarker.className = 'fluid_controls_ad_marker fluid_controls_ad_marker_' + adListId;
+        adMarker.dataset.adListId = adListId;
         adMarker.style.left = (time / playerInstance.mainVideoDuration * 100) + '%';
         if (playerInstance.isCurrentlyPlayingAd) {
             adMarker.style.display = 'none';
@@ -869,19 +870,18 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.hideAdMarker = (adListId) => {
-        const element = document.getElementById('ad_marker_' + playerInstance.videoPlayerId + "_" + adListId);
+        const element = playerInstance.domRef.wrapper.querySelector('fluid_controls_ad_marker_' + adListId);
         if (element) {
             element.style.display = 'none';
         }
     };
 
     playerInstance.showAdMarkers = () => {
-        const markersHolder = document.getElementById(playerInstance.videoPlayerId + '_ad_markers_holder');
+        const markersHolder = playerInstance.domRef.wrapper.querySelector('.fluid_controls_ad_markers_holder');
         const adMarkers = markersHolder.getElementsByClassName('fluid_controls_ad_marker');
-        const idPrefix = 'ad_marker_' + playerInstance.videoPlayerId + "_";
         for (let i = 0; i < adMarkers.length; ++i) {
             const item = adMarkers[i];
-            const rollListId = item.id.replace(idPrefix, '');
+            const rollListId = item.dataset.adListId;
             if (playerInstance.rollsById[rollListId].played === false) {
                 item.style.display = '';
             }
@@ -889,7 +889,7 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.hideAdMarkers = () => {
-        const markersHolder = document.getElementById(playerInstance.videoPlayerId + '_ad_markers_holder');
+        const markersHolder = playerInstance.domRef.wrapper.querySelector('.fluid_controls_ad_markers_holder');
         const adMarkers = markersHolder.getElementsByClassName('fluid_controls_ad_marker');
         for (let i = 0; i < adMarkers.length; ++i) {
             const item = adMarkers[i];
@@ -946,11 +946,11 @@ export default function (playerInstance, options) {
                     return;
                 }
 
-                const nonLinearAdExists = document.getElementsByClassName('fluid_nonLinear_ad')[0];
+                const nonLinearAdExists = playerInstance.domRef.wrapper.getElementsByClassName('fluid_nonLinear_ad')[0];
                 if (!nonLinearAdExists) {
                     playerInstance.createBoard(ad);
                     playerInstance.currentOnPauseRollAd = rollListId;
-                    let onPauseAd = document.getElementById('fluid_nonLinear_' + rollListId);
+                    let onPauseAd = playerInstance.domRef.wrapper.getElementById('fluid_nonLinear_' + rollListId);
                     if (onPauseAd) {
                         onPauseAd.style.display = 'none';
                     }
@@ -988,7 +988,7 @@ export default function (playerInstance, options) {
             const ad = playerInstance.rollsById[onPauseRoll].ads[0];
 
             playerInstance.vastOptions = ad;
-            const onPauseAd = document.getElementById('fluid_nonLinear_' + ad.id);
+            const onPauseAd = playerInstance.domRef.wrapper.getElementById('fluid_nonLinear_' + ad.id);
 
             if (onPauseAd && playerInstance.domRef.player.paused) {
                 setTimeout(function () {
@@ -1092,7 +1092,7 @@ export default function (playerInstance, options) {
                 if (ad.played === false && !playerInstance.displayOptions.layoutControls.showCardBoardView) {
                     playerInstance.createNonLinearStatic(ad);
                     if (playerInstance.displayOptions.vastOptions.showProgressbarMarkers) {
-                        playerInstance.hideAdMarker(ad);
+                        playerInstance.hideAdMarker(rollListId);
                     }
 
                     // delete nonLinear after playing
@@ -1259,7 +1259,7 @@ export default function (playerInstance, options) {
         playerInstance.vastOptions = null;
 
         playerInstance.setBuffering();
-        const progressbarContainer = document.getElementById(playerInstance.videoPlayerId + '_fluid_controls_progress_container');
+        const progressbarContainer = playerInstance.domRef.wrapper.querySelector('.fluid_controls_progress_container');
 
         if (progressbarContainer !== null) {
             const backgroundColor = (playerInstance.displayOptions.layoutControls.primaryColor) ? playerInstance.displayOptions.layoutControls.primaryColor : "white";
@@ -1278,7 +1278,7 @@ export default function (playerInstance, options) {
         }
 
         if (playerInstance.hasTitle()) {
-            const title = document.getElementById(playerInstance.videoPlayerId + '_title');
+            const title = playerInstance.domRef.wrapper.querySelector('.fp_title');
             title.style.display = 'inline';
         }
     };
@@ -1315,13 +1315,12 @@ export default function (playerInstance, options) {
     playerInstance.addSkipButton = () => {
         // TODO: ahh yes, the DIVbutton...
         const divSkipButton = document.createElement('div');
-        divSkipButton.id = 'skip_button_' + playerInstance.videoPlayerId;
         divSkipButton.className = 'skip_button skip_button_disabled';
         if (playerInstance.vastOptions.skipoffset > 0) {
             divSkipButton.innerHTML = playerInstance.displayOptions.vastOptions.skipButtonCaption.replace('[seconds]', playerInstance.vastOptions.skipoffset);
         }
 
-        document.getElementById('fluid_video_wrapper_' + playerInstance.videoPlayerId).appendChild(divSkipButton);
+        playerInstance.domRef.wrapper.appendChild(divSkipButton);
 
         if (playerInstance.vastOptions.skipoffset === 0) {
             playerInstance.decreaseSkipOffset();
@@ -1338,13 +1337,12 @@ export default function (playerInstance, options) {
             return; // Shouldn't show countdown if ad is a video live stream
         }
 
-        const videoWrapper = document.getElementById('fluid_video_wrapper_' + playerInstance.videoPlayerId);
+        const videoWrapper = playerInstance.domRef.wrapper;
         const divAdCountdown = document.createElement('div');
 
         // Create element
         const adCountdown = playerInstance.pad(parseInt(playerInstance.currentVideoDuration / 60)) + ':' + playerInstance.pad(parseInt(playerInstance.currentVideoDuration % 60));
         const durationText = parseInt(adCountdown);
-        divAdCountdown.id = 'ad_countdown' + playerInstance.videoPlayerId;
         divAdCountdown.className = 'ad_countdown';
         divAdCountdown.innerHTML = "<span class='ad_timer_prefix'>Ad - </span>" + durationText;
 
@@ -1358,7 +1356,7 @@ export default function (playerInstance, options) {
 
     playerInstance.decreaseAdCountdown = function decreaseAdCountdown() {
         const sec = parseInt(playerInstance.currentVideoDuration) - parseInt(playerInstance.domRef.player.currentTime);
-        const btn = document.getElementById('ad_countdown' + playerInstance.videoPlayerId);
+        const btn = playerInstance.domRef.wrapper.querySelector('.ad_countdown');
 
         if (btn && isNaN(sec)) {
             btn.parentNode.removeChild(btn);
@@ -1373,14 +1371,14 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.removeAdCountdown = () => {
-        const btn = document.getElementById('ad_countdown' + playerInstance.videoPlayerId);
+        const btn = playerInstance.domRef.wrapper.querySelector('.ad_countdown');
         if (btn) {
             btn.parentElement.removeChild(btn);
         }
     };
 
     playerInstance.toggleAdCountdown = (showing) => {
-        const btn = document.getElementById('ad_countdown' + playerInstance.videoPlayerId);
+        const btn = playerInstance.domRef.wrapper.querySelector('.ad_countdown');
         if (btn) {
             if (showing) {
                 btn.style.display = 'inline-block';
@@ -1392,7 +1390,6 @@ export default function (playerInstance, options) {
 
     playerInstance.addAdPlayingText = (textToShow) => {
         const adPlayingDiv = document.createElement('div');
-        adPlayingDiv.id = playerInstance.videoPlayerId + '_fluid_ad_playing';
 
         if (playerInstance.displayOptions.layoutControls.primaryColor) {
             adPlayingDiv.style.backgroundColor = playerInstance.displayOptions.layoutControls.primaryColor;
@@ -1402,15 +1399,15 @@ export default function (playerInstance, options) {
         adPlayingDiv.className = 'fluid_ad_playing';
         adPlayingDiv.innerText = textToShow;
 
-        document.getElementById('fluid_video_wrapper_' + playerInstance.videoPlayerId).appendChild(adPlayingDiv);
+        playerInstance.domRef.wrapper.appendChild(adPlayingDiv);
     };
 
     playerInstance.positionTextElements = (adListData) => {
         const allowedPosition = ['top left', 'top right', 'bottom left', 'bottom right'];
 
-        const skipButton = document.getElementById('skip_button_' + playerInstance.videoPlayerId);
-        const adPlayingDiv = document.getElementById(playerInstance.videoPlayerId + '_fluid_ad_playing');
-        const ctaButton = document.getElementById(playerInstance.videoPlayerId + '_fluid_cta');
+        const skipButton = playerInstance.domRef.wrapper.querySelector('.skip_button');
+        const adPlayingDiv = playerInstance.domRef.wrapper.querySelector('.fluid_ad_playing');
+        const ctaButton = playerInstance.domRef.wrapper.querySelector('.fluid_ad_cta');
 
         let ctaButtonHeightWithSpacing = 0;
         let adPlayingDivHeightWithSpacing = 0;
@@ -1506,7 +1503,7 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.removeAdPlayingText = () => {
-        const div = document.getElementById(playerInstance.videoPlayerId + '_fluid_ad_playing');
+        const div = playerInstance.domRef.wrapper.querySelector('.fluid_ad_playing');
         if (!div) {
             return;
         }
@@ -1544,7 +1541,6 @@ export default function (playerInstance, options) {
      */
     playerInstance.createAndAppendCTAButton = (adCTAText, displayUrl, trackingUrl) => {
         const ctaButton = document.createElement('div');
-        ctaButton.id = playerInstance.videoPlayerId + '_fluid_cta';
         ctaButton.className = 'fluid_ad_cta';
 
         const link = document.createElement('span');
@@ -1568,11 +1564,11 @@ export default function (playerInstance, options) {
 
         ctaButton.appendChild(link);
 
-        document.getElementById('fluid_video_wrapper_' + playerInstance.videoPlayerId).appendChild(ctaButton);
+        playerInstance.domRef.wrapper.appendChild(ctaButton);
     };
 
     playerInstance.removeCTAButton = () => {
-        const btn = document.getElementById(playerInstance.videoPlayerId + '_fluid_cta');
+        const btn = playerInstance.domRef.wrapper.querySelector('.fluid_ad_cta');
         if (!btn) {
             return;
         }
@@ -1582,7 +1578,7 @@ export default function (playerInstance, options) {
 
     playerInstance.decreaseSkipOffset = () => {
         let sec = playerInstance.vastOptions.skipoffset - Math.floor(playerInstance.domRef.player.currentTime);
-        const btn = document.getElementById('skip_button_' + playerInstance.videoPlayerId);
+        const btn = playerInstance.domRef.wrapper.querySelector('.skip_button');
 
         if (!btn) {
             playerInstance.domRef.player.removeEventListener('timeupdate', playerInstance.decreaseSkipOffset);
@@ -1598,7 +1594,7 @@ export default function (playerInstance, options) {
         // TODO: refactored, but this is still terrible - remove all this and just make the button clickable...
         const skipLink = document.createElement('a');
         skipLink.href = '#';
-        skipLink.id = 'skipHref_' + playerInstance.videoPlayerId;
+        skipLink.className = 'js-skipHref';
         skipLink.innerHTML = playerInstance.displayOptions.vastOptions.skipButtonClickCaption;
         skipLink.onclick = (e) => {
             e.preventDefault();
@@ -1634,7 +1630,7 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.removeSkipButton = () => {
-        const btn = document.getElementById('skip_button_' + playerInstance.videoPlayerId);
+        const btn = playerInstance.domRef.wrapper.querySelector('.skip_button');
         if (btn) {
             btn.parentElement.removeChild(btn);
         }
@@ -1648,7 +1644,6 @@ export default function (playerInstance, options) {
 
         const divClickThrough = document.createElement('div');
         divClickThrough.className = 'vast_clickthrough_layer';
-        divClickThrough.id = 'vast_clickthrough_layer_' + playerInstance.videoPlayerId;
         divClickThrough.setAttribute(
             'style',
             'position: absolute; cursor: pointer; top: 0; left: 0; width: ' +
@@ -1668,7 +1663,7 @@ export default function (playerInstance, options) {
             }
         };
 
-        const clickthroughLayer = document.getElementById('vast_clickthrough_layer_' + playerInstance.videoPlayerId);
+        const clickthroughLayer = playerInstance.domRef.wrapper.querySelector('.vast_clickthrough_layer');
         const isIos9orLower = (playerInstance.mobileInfo.device === 'iPhone') && (playerInstance.mobileInfo.userOsMajor !== false) && (playerInstance.mobileInfo.userOsMajor <= 9);
 
         clickthroughLayer.onclick = () => {
@@ -1693,7 +1688,7 @@ export default function (playerInstance, options) {
      * Remove the Clickthrough layer
      */
     playerInstance.removeClickthrough = () => {
-        const clickthroughLayer = document.getElementById('vast_clickthrough_layer_' + playerInstance.videoPlayerId);
+        const clickthroughLayer = playerInstance.domRef.wrapper.querySelector('.vast_clickthrough_layer');
 
         if (clickthroughLayer) {
             clickthroughLayer.parentNode.removeChild(clickthroughLayer);
