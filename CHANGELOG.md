@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.28.0 (2023-11-16)
+* [Pull #776](https://github.com/fluid-player/fluid-player/pull/776) Fluid Player doesn't work with shadow DOM
+
 ## 3.27.0 (2023-10-19)
 * [Pull #771](https://github.com/fluid-player/fluid-player/pull/771) Method loadVpaid create frame without body
 
