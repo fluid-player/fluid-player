@@ -950,7 +950,12 @@ export default function (playerInstance, options) {
                 if (!nonLinearAdExists) {
                     playerInstance.createBoard(ad);
                     playerInstance.currentOnPauseRollAd = rollListId;
-                    let onPauseAd = playerInstance.domRef.wrapper.getElementById('fluid_nonLinear_' + rollListId);
+                    let onPauseAd = '';
+                    for (const child of playerInstance.domRef.wrapper.children) {
+                        if (child.id === 'fluid_nonLinear_' + rollListId) {
+                            onPauseAd = child;
+                        }
+                    }
                     if (onPauseAd) {
                         onPauseAd.style.display = 'none';
                     }
@@ -988,7 +993,12 @@ export default function (playerInstance, options) {
             const ad = playerInstance.rollsById[onPauseRoll].ads[0];
 
             playerInstance.vastOptions = ad;
-            const onPauseAd = playerInstance.domRef.wrapper.getElementById('fluid_nonLinear_' + ad.id);
+            let onPauseAd = '';
+            for (const child of playerInstance.domRef.wrapper.children) {
+                if (child.id === 'fluid_nonLinear_' + ad.id) {
+                    onPauseAd = child;
+                }
+            }
 
             if (onPauseAd && playerInstance.domRef.player.paused) {
                 setTimeout(function () {
