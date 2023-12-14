@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.29.0 (2023-12-14)
+* [Pull #783](https://github.com/fluid-player/fluid-player/pull/783) Fix test cases in the development sever
+* [Pull #785](https://github.com/fluid-player/fluid-player/pull/785) FluidPlayer > Error > onPauseRoll In Video Banner VAST
+
 ## 3.28.0 (2023-11-16)
 * [Pull #776](https://github.com/fluid-player/fluid-player/pull/776) Fluid Player doesn't work with shadow DOM
 
