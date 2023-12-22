@@ -34,7 +34,7 @@ if (typeof Object.assign != 'function') {
 
 // CustomEvent polyfill
 (function () {
-    if (typeof window.CustomEvent === 'function') return false;
+    if (typeof globalThis.CustomEvent === 'function') return false;
 
     function CustomEvent(event, params) {
         params = params || {bubbles: false, cancelable: false, detail: undefined};
@@ -43,29 +43,35 @@ if (typeof Object.assign != 'function') {
         return evt;
     }
 
-    CustomEvent.prototype = window.Event.prototype;
+    CustomEvent.prototype = globalThis.Event.prototype;
 
-    window.CustomEvent = CustomEvent;
+    globalThis.CustomEvent = CustomEvent;
 })();
 
 // .remove() polyfill
-(function (arr) {
-    arr.forEach(function (item) {
-        if (item.hasOwnProperty('remove')) {
-            return;
-        }
-        Object.defineProperty(item, 'remove', {
-            configurable: true,
-            enumerable: true,
-            writable: true,
-            value: function remove() {
-                if (this.parentNode === null) {
-                    return;
-                }
-                this.parentNode.removeChild(this);
+if (
+    typeof globalThis.Element !== 'undefined' &&
+    typeof globalThis.CharacterData !== 'undefined' &&
+    typeof globalThis.DocumentType !== 'undefined'
+) {
+    (function (arr) {
+        arr.forEach(function (item) {
+            if (item.hasOwnProperty('remove')) {
+                return;
             }
+            Object.defineProperty(item, 'remove', {
+                configurable: true,
+                enumerable: true,
+                writable: true,
+                value: function remove() {
+                    if (this.parentNode === null) {
+                        return;
+                    }
+                    this.parentNode.removeChild(this);
+                }
+            });
         });
-    });
-})([Element.prototype, CharacterData.prototype, DocumentType.prototype]);
+    })([Element.prototype, CharacterData.prototype, DocumentType.prototype]);
+}
 
 promisePolyfill.polyfill();
