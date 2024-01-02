@@ -461,43 +461,44 @@ export default function (playerInstance, options) {
         // set interval with timeout
         playerInstance.tempVpaidCounter = 0;
         playerInstance.getVPAIDAdInterval = setInterval(function () {
+            if (vpaidIframe && vpaidIframe.contentWindow) {
+                const fn = vpaidIframe.contentWindow['getVPAIDAd'];
 
-            const fn = vpaidIframe.contentWindow['getVPAIDAd'];
+                // check if JS is loaded fully in iframe
+                if (fn && typeof fn == 'function') {
 
-            // check if JS is loaded fully in iframe
-            if (fn && typeof fn == 'function') {
+                    if (playerInstance.vpaidAdUnit) {
+                        playerInstance.hardStopVpaidAd(ad);
+                    }
 
-                if (playerInstance.vpaidAdUnit) {
-                    playerInstance.hardStopVpaidAd(ad);
-                }
+                    playerInstance.vpaidAdUnit = fn();
+                    clearInterval(playerInstance.getVPAIDAdInterval);
+                    if (playerInstance.checkVPAIDInterface(playerInstance.vpaidAdUnit)) {
 
-                playerInstance.vpaidAdUnit = fn();
-                clearInterval(playerInstance.getVPAIDAdInterval);
-                if (playerInstance.checkVPAIDInterface(playerInstance.vpaidAdUnit)) {
+                        if (playerInstance.getVpaidAdLinear()) {
+                            playerInstance.isCurrentlyPlayingAd = true;
+                            playerInstance.switchPlayerToVpaidMode(ad);
+                        } else {
+                            playerInstance.debugMessage('non linear vpaid ad is loaded');
+                            playerInstance.loadVpaidNonlinearAssets(ad);
+                        }
 
-                    if (playerInstance.getVpaidAdLinear()) {
-                        playerInstance.isCurrentlyPlayingAd = true;
-                        playerInstance.switchPlayerToVpaidMode(ad);
+                    }
+
+                } else {
+
+                    // video player will wait for 2seconds if vpaid is not loaded, then it will declare vast error and move ahead
+                    playerInstance.tempVpaidCounter++;
+                    if (playerInstance.tempVpaidCounter >= 20) {
+                        clearInterval(playerInstance.getVPAIDAdInterval);
+                        playerInstance.rollsById[ad.rollListId].error = true;
+                        playerInstance.playMainVideoWhenVpaidFails(403);
+                        return false;
                     } else {
-                        playerInstance.debugMessage('non linear vpaid ad is loaded');
-                        playerInstance.loadVpaidNonlinearAssets(ad);
+                        playerInstance.debugMessage(playerInstance.tempVpaidCounter);
                     }
 
                 }
-
-            } else {
-
-                // video player will wait for 2seconds if vpaid is not loaded, then it will declare vast error and move ahead
-                playerInstance.tempVpaidCounter++;
-                if (playerInstance.tempVpaidCounter >= 20) {
-                    clearInterval(playerInstance.getVPAIDAdInterval);
-                    playerInstance.rollsById[ad.rollListId].error = true;
-                    playerInstance.playMainVideoWhenVpaidFails(403);
-                    return false;
-                } else {
-                    playerInstance.debugMessage(playerInstance.tempVpaidCounter);
-                }
-
             }
 
         }, 100);

@@ -489,7 +489,7 @@ export default function (playerInstance, options) {
         // pass the js
 
         playerInstance.loadVpaidNonlinearAssets = function (ad) {
-
+            playerInstance.vastOptions = ad;
             playerInstance.debugMessage('starting function switchPlayerToVpaidMode');
 
             const vAlign = (ad.vAlign) ? ad.vAlign : playerInstance.nonLinearVerticalAlign;
