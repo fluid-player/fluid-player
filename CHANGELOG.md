@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.30.0 (2024-01-11)
+* [Pull #789](https://github.com/fluid-player/fluid-player/pull/789) Uncaught TypeError: Cannot set properties of null (setting 'slotIframe') while testing on VOD with VPAID Non Linear
+
 ## 3.29.0 (2023-12-14)
 * [Pull #783](https://github.com/fluid-player/fluid-player/pull/783) Fix test cases in the development sever
 * [Pull #785](https://github.com/fluid-player/fluid-player/pull/785) FluidPlayer > Error > onPauseRoll In Video Banner VAST
