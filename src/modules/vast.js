@@ -877,7 +877,6 @@ export default function (playerInstance, options) {
                         playerInstance.debugMessage('Error on VAST Wrapper, triggering fallbackOnNoAd. Ad tree:', result);
                     }
 
-                    console.log(result)
                     result = flattenAdTree(result).map(ad => processAdCreatives(registerAdProperties(ad, tmpOptions)));
 
                     const playableAds = getPlayableAds(
