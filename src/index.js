@@ -8,15 +8,15 @@ if ('undefined' === typeof FP_BUILD_VERSION) {
 }
 
 if ('undefined' === typeof FP_ENV) {
-    const isLocalhost = window
-        && window.location
-        && (window.location.hostname === 'localhost'
-            || window.location.hostname === '127.0.0.1'
-            || window.location.hostname === '');
+    const isLocalhost = globalThis
+        && globalThis.location
+        && (globalThis.location.hostname === 'localhost'
+            || globalThis.location.hostname === '127.0.0.1'
+            || globalThis.location.hostname === '');
 
     if ('undefined' !== typeof process && process && process.env && process.env.NODE_ENV) {
         globalThis.FP_ENV = process.env.NODE_ENV;
-    } else if (window && !isLocalhost) {
+    } else if (globalThis && !isLocalhost) {
         globalThis.FP_ENV = 'production';
     } else {
         globalThis.FP_ENV = 'development';
