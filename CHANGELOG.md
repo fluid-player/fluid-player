@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.31.0 (2024-01-25)
+* [Pull #788](https://github.com/fluid-player/fluid-player/pull/788) Fluid Player doesn't work with Next.js
+* [Pull #791](https://github.com/fluid-player/fluid-player/pull/791) Impression events aren't called for some VAST tags within the VAST wrapper chain
+
 ## 3.30.0 (2024-01-11)
 * [Pull #789](https://github.com/fluid-player/fluid-player/pull/789) Uncaught TypeError: Cannot set properties of null (setting 'slotIframe') while testing on VOD with VPAID Non Linear
 
