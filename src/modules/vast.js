@@ -762,12 +762,14 @@ export default function (playerInstance, options) {
      * @returns {Array<RawAd>}
      */
     function flattenAdTree(root, ads = [], wrappers = []) {
+        const currentWrappers = [...wrappers, root.data];
+
         if (Array.isArray(root.children) && root.children.length) {
-            root.children.forEach(child => flattenAdTree(child, ads, [...root.wrappers || [], root.data]))
+            root.children.forEach(child => flattenAdTree(child, ads, currentWrappers));
         }
 
         if (root.tagType === 'inLine') {
-            ads.push({ ...root, wrappers: wrappers.filter(Boolean) });
+            ads.push({ ...root, wrappers: currentWrappers.filter(Boolean) });
         }
 
         return ads;
