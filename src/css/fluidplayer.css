@@ -325,6 +325,7 @@
 }
 
 .fluid_html_on_pause,
+.fluid_html_on_pause_container,
 .fluid_pseudo_poster {
     position: absolute;
     top: 0;
@@ -340,6 +341,7 @@
     pointer-events: none;
 }
 
+.fluid_html_on_pause_container *,
 .fluid_html_on_pause * {
     pointer-events: auto;
 }

@@ -1658,7 +1658,7 @@ const fluidPlayerClass = function () {
 
         self.adTimer();
 
-        const blockOnPause = self.domRef.wrapper.querySelector('.fluid_html_on_pause');
+        const blockOnPause = self.domRef.wrapper.querySelector('.fluid_html_on_pause_container');
 
         if (blockOnPause && !self.isCurrentlyPlayingAd) {
             if (self.domRef.player.paused) {
