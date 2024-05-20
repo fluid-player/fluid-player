@@ -16,7 +16,7 @@
 <body>
 
 <video id="fluid-player-e2e-case">
-    <source src="https://vm2.dashif.org/livesim/mup_30/testpic_2s/Manifest.mpd" type="application/dash+xml"/>
+    <source src="https://dash.akamaized.net/dash264/TestCasesIOP33/adapatationSetSwitching/5/manifest.mpd" type="application/dash+xml"/>
 </video>
 
 <%= htmlWebpackPlugin.tags.bodyTags %>
@@ -28,11 +28,11 @@
             adList: [
                 {
                     roll: 'preRoll',
-                    vastTag: '/static/vpaid_linear.xml'
+                    vastTag: '/static/vast_linear.xml'
                 },
                 {
                     roll: 'midRoll',
-                    vastTag: '/static/vpaid_nonlinear.xml',
+                    vastTag: '/static/vast_nonlinear.xml',
                     timer: 4
                 },
             ]

@@ -16,9 +16,9 @@
 <body>
 
 <video id="fluid-player-e2e-case">
-    <source src='https://cdn.fluidplayer.com/videos/valerian-1080p.mkv' data-fluid-hd title="1080p" type='video/mp4'/>
-    <source src='https://cdn.fluidplayer.com/videos/valerian-720p.mkv' data-fluid-hd title="720p" type='video/mp4'/>
-    <source src='https://cdn.fluidplayer.com/videos/valerian-480p.mkv' title="480p" type='video/mp4'/>
+    <source src="https://cdn.fluidplayer.com/videos/valerian-1080p.mkv" data-fluid-hd title="1080p" type="video/mp4"/>
+    <source src="https://cdn.fluidplayer.com/videos/valerian-720p.mkv" data-fluid-hd title="720p" type="video/mp4"/>
+    <source src="https://cdn.fluidplayer.com/videos/valerian-480p.mkv" title="480p" type="video/mp4"/>
 </video>
 
 <%= htmlWebpackPlugin.tags.bodyTags %>
@@ -30,6 +30,25 @@
             adList: [
                 {
                     roll: 'preRoll',
+                    vastTag: '/static/vast_nonlinear.xml',
+                },
+                {
+                    roll: 'midRoll',
+                    vastTag: '/static/vast_nonlinear.xml',
+                    timer: '25%',
+                },
+                {
+                    roll: 'midRoll',
+                    vastTag: '/static/vast_nonlinear.xml',
+                    timer: 50,
+                },
+                {
+                    roll: 'midRoll',
+                    vastTag: '/static/vast_nonlinear.xml',
+                    timer: '75.0%',
+                },
+                {
+                    roll: 'postRoll',
                     vastTag: '/static/vast_nonlinear.xml',
                 },
             ]

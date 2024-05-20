@@ -1,5 +1,67 @@
 # CHANGELOG
 
+## 3.32.0 (2024-03-21)
+* [Pull #804](https://github.com/fluid-player/fluid-player/pull/804) htmlOnPauseBlock not being displayed with last version of FP
+
+## 3.31.0 (2024-01-25)
+* [Pull #788](https://github.com/fluid-player/fluid-player/pull/788) Fluid Player doesn't work with Next.js
+* [Pull #791](https://github.com/fluid-player/fluid-player/pull/791) Impression events aren't called for some VAST tags within the VAST wrapper chain
+
+## 3.30.0 (2024-01-11)
+* [Pull #789](https://github.com/fluid-player/fluid-player/pull/789) Uncaught TypeError: Cannot set properties of null (setting 'slotIframe') while testing on VOD with VPAID Non Linear
+
+## 3.29.0 (2023-12-14)
+* [Pull #783](https://github.com/fluid-player/fluid-player/pull/783) Fix test cases in the development sever
+* [Pull #785](https://github.com/fluid-player/fluid-player/pull/785) FluidPlayer > Error > onPauseRoll In Video Banner VAST
+
+## 3.28.0 (2023-11-16)
+* [Pull #776](https://github.com/fluid-player/fluid-player/pull/776) Fluid Player doesn't work with shadow DOM
+
+## 3.27.0 (2023-10-19)
+* [Pull #771](https://github.com/fluid-player/fluid-player/pull/771) Method loadVpaid create frame without body
+
+## 3.26.0 (2023-10-12)
+* [Pull #768](https://github.com/fluid-player/fluid-player/pull/768) Stretch posterImage to playerwindow
+* [Pull #769](https://github.com/fluid-player/fluid-player/pull/769) Events don't differ from Ad and Main video
+
+## 3.25.0 (2023-09-21)
+* [Pull #766](https://github.com/fluid-player/fluid-player/pull/766) adClickable and CTA parameters don't work when 2 VAST ad is loaded
+
+## 3.24.0 (2023-09-08)
+* [Pull #763](https://github.com/fluid-player/fluid-player/pull/763) Player can't be restarted by destroying it and initializing it again
+
+## 3.23.0 (2023-08-28)
+* [Pull #757](https://github.com/fluid-player/fluid-player/pull/757) Preload doesn't work for .m3u8 files when the player is serving in-stream ads
+* [Pull #760](https://github.com/fluid-player/fluid-player/pull/760) Lighthouse says: Does not use passive listeners to improve scrolling performance
+
+## 3.22.0 (2023-08-17)
+* [Pull #755](https://github.com/fluid-player/fluid-player/pull/755) Percentages are not accepted for "timer" property
+
+## 3.21.0 (2023-08-08)
+* [Pull #748](https://github.com/fluid-player/fluid-player/pull/748) CurrentTime reset after switch HLS source on IOS
+* [Pull #752](https://github.com/fluid-player/fluid-player/pull/752) Add "controlForwardBackward" setting inside the player instead of the control bar
+
+## 3.20.0 (2023-07-24)
+* [Pull #749](https://github.com/fluid-player/fluid-player/pull/749) Mouse disappears
+* [Pull #750](https://github.com/fluid-player/fluid-player/pull/750) In mobile and when using .m3u8 files, user needs to click the player twice in order to play the video
+
+## 3.19.0 (2023-07-12)
+* [Pull #746](https://github.com/fluid-player/fluid-player/pull/746) Could not find a declaration file for module 'fluid-player'
+
+## 3.18.0 (2023-06-30)
+* [Pull #744](https://github.com/fluid-player/fluid-player/pull/744) Failed to resolve import "cheerio/lib/api/traversing"
+
+## 3.17.0 (2023-06-16)
+* [Pull #734](https://github.com/fluid-player/fluid-player/pull/734) MiniPlayer Mobile support
+* [Pull #735](https://github.com/fluid-player/fluid-player/pull/735) MiniPlayer position configuration
+* [Pull #739](https://github.com/fluid-player/fluid-player/pull/739) MiniPlayer Activate miniplayer when scrolling goes out of viewport
+* [Pull #740](https://github.com/fluid-player/fluid-player/pull/740) MiniPlayer Allowing trigger MiniPlayer by code
+* [Pull #736](https://github.com/fluid-player/fluid-player/pull/736) Fluid player doesn't track clicks on some sites
+
+## 3.16.0 (2023-05-31)
+* [Pull #721](https://github.com/fluid-player/fluid-player/pull/721) Fluid Player loads midRoll even if timer is longer than main video
+* [Pull #732](https://github.com/fluid-player/fluid-player/pull/732) MiniPlayer MVP
+
 ## 3.15.0 (2023-05-09)
 * [Pull #727](https://github.com/fluid-player/fluid-player/pull/727) Player required 2 clicks to play video New Iphone 11 Pro Chrome
 

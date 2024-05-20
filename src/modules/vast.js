@@ -6,7 +6,7 @@
  * @typedef {Object} RawAdTree
  * @property {Array<RawAdTree>} children
  * @property {XMLDocument} data
- * @property {'ad'|'wrapper'} type
+ * @property {'inLine'|'wrapper'} tagType
  * @property {boolean|undefined} fallbackOnNoAd
  * @property {Array<XMLDocument> | undefined} wrappers
 */
@@ -15,7 +15,7 @@
  * @typedef {Object} RawAd
  * @property {XMLDocument} data
  * @property {Array<XMLDocument>} wrappers
- * @property {'ad' | 'wrapper'} type
+ * @property {'inLine' | 'wrapper'} tagType
  */
 
 /**
@@ -318,7 +318,7 @@ export default function (playerInstance, options) {
                     if (typeof tmpOptions.stopTracking[eventType] === 'undefined') {
                         tmpOptions.stopTracking[eventType] = [];
                     }
-                    tmpOptions.tracking[eventType].push(trackingEvents[i].childNodes[0].nodeValue);
+                    tmpOptions.tracking[eventType].push(trackingEvents[i].textContent.trim());
                     tmpOptions.stopTracking[eventType] = false;
 
                     break;
@@ -337,7 +337,7 @@ export default function (playerInstance, options) {
                         };
                     }
 
-                    tmpOptions.tracking[eventType][oneEventOffset].elements.push(trackingEvents[i].childNodes[0].nodeValue);
+                    tmpOptions.tracking[eventType][oneEventOffset].elements.push(trackingEvents[i].textContent.trim());
 
                     break;
 
@@ -448,17 +448,17 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.recalculateAdDimensions = () => {
-        const videoPlayer = document.getElementById(playerInstance.videoPlayerId);
-        const divClickThrough = document.getElementById('vast_clickthrough_layer_' + playerInstance.videoPlayerId);
+        const videoPlayer = playerInstance.domRef.player;
+        const divClickThrough = playerInstance.domRef.wrapper.querySelector('.vast_clickthrough_layer');
 
         if (divClickThrough) {
             divClickThrough.style.width = videoPlayer.offsetWidth + 'px';
             divClickThrough.style.height = videoPlayer.offsetHeight + 'px';
         }
 
-        const requestFullscreenFunctionNames = playerInstance.checkFullscreenSupport('fluid_video_wrapper_' + playerInstance.videoPlayerId);
-        const fullscreenButton = document.getElementById(playerInstance.videoPlayerId + '_fluid_control_fullscreen');
-        const menuOptionFullscreen = document.getElementById(playerInstance.videoPlayerId + 'context_option_fullscreen');
+        const requestFullscreenFunctionNames = playerInstance.checkFullscreenSupport();
+        const fullscreenButton = playerInstance.domRef.wrapper.querySelector('.fluid_control_fullscreen');
+        const menuOptionFullscreen = playerInstance.domRef.wrapper.querySelector('.context_option_fullscreen');
 
         if (requestFullscreenFunctionNames) {
             // this will go other way around because we already exited full screen
@@ -472,7 +472,7 @@ export default function (playerInstance, options) {
         } else {
             // TODO: I am fairly certain this fallback does not work...
             //The browser does not support the Fullscreen API, so a pseudo-fullscreen implementation is used
-            const fullscreenTag = document.getElementById('fluid_video_wrapper_' + playerInstance.videoPlayerId);
+            const fullscreenTag = playerInstance.domRef.wrapper;
 
             if (fullscreenTag.className.search(/\bpseudo_fullscreen\b/g) !== -1) {
                 fullscreenTag.className += ' pseudo_fullscreen';
@@ -484,6 +484,11 @@ export default function (playerInstance, options) {
         }
     };
 
+    /**
+     * Prepares VAST for instant ads
+     *
+     * @param roll
+     */
     playerInstance.prepareVast = (roll) => {
         let list = playerInstance.findRoll(roll);
 
@@ -495,10 +500,8 @@ export default function (playerInstance, options) {
             }
 
             playerInstance.processVastWithRetries(playerInstance.rollsById[rollListId]);
-            playerInstance.domRef.player.addEventListener('adId_' + rollListId, playerInstance[roll]);
         }
     };
-
 
     playerInstance.playMainVideoWhenVastFails = (errorCode) => {
         playerInstance.debugMessage('playMainVideoWhenVastFails called');
@@ -593,13 +596,13 @@ export default function (playerInstance, options) {
     /**
      * Parse the VAST Tag
      *
-     * @param vastTag
-     * @param adListId
+     * @param vastObj
      */
-
     playerInstance.processVastWithRetries = (vastObj) => {
         let vastTag = vastObj.vastTag;
         const rollListId = vastObj.id;
+
+        playerInstance.domRef.player.addEventListener('adId_' + rollListId, playerInstance[vastObj.roll]);
 
         const handleVastResult = function (pass, adOptionsList) {
             if (pass && Array.isArray(adOptionsList) && !playerInstance.displayOptions.vastOptions.allowVPAID && adOptionsList.some(adOptions => adOptions.vpaid)) {
@@ -632,7 +635,7 @@ export default function (playerInstance, options) {
                     playerInstance.adPool[rollListId].push(Object.assign({}, tmpOptions));
 
                     if (playerInstance.hasTitle()) {
-                        const title = document.getElementById(playerInstance.videoPlayerId + '_title');
+                        const title = playerInstance.domRef.wrapper.querySelector('.fp_title');
                         title.style.display = 'none';
                     }
 
@@ -730,7 +733,7 @@ export default function (playerInstance, options) {
                 const fallbackOnNoAd = wrapperElement.attributes.fallbackOnNoAd && ["true", "1"].includes(wrapperElement.attributes.fallbackOnNoAd.value);
 
                 try {
-                    const wrapperResponse = await resolveAdTreeRequests(vastAdTagUri, maxDepth, { type: 'wrapper', ...adNode, fallbackOnNoAd }, currentDepth+1, !disableAdditionalWrappers);
+                    const wrapperResponse = await resolveAdTreeRequests(vastAdTagUri, maxDepth, { tagType: 'wrapper', ...adNode, fallbackOnNoAd }, currentDepth+1, !disableAdditionalWrappers);
                     wrapperResponse.fallbackOnNoAd = fallbackOnNoAd;
 
                     if (!allowMultipleAds || isAdPod) {
@@ -739,11 +742,11 @@ export default function (playerInstance, options) {
 
                     adTree.children.push(wrapperResponse);
                 } catch (e) {
-                    adTree.children.push({ type: `wrapper`, fallbackOnNoAd, httpError: true })
+                    adTree.children.push({ tagType: `wrapper`, fallbackOnNoAd, httpError: true })
                     playerInstance.debugMessage(`Error when loading Wrapper, will trigger fallback if available`, e);
                 }
             } else if (!vastAdTagUri) {
-                adTree.children.push({ type: 'ad', ...adNode });
+                adTree.children.push({ tagType: 'inLine', ...adNode });
             }
         }
 
@@ -759,12 +762,14 @@ export default function (playerInstance, options) {
      * @returns {Array<RawAd>}
      */
     function flattenAdTree(root, ads = [], wrappers = []) {
+        const currentWrappers = [...wrappers, root.data];
+
         if (Array.isArray(root.children) && root.children.length) {
-            root.children.forEach(child => flattenAdTree(child, ads, [...root.wrappers || [], root.data]))
+            root.children.forEach(child => flattenAdTree(child, ads, currentWrappers));
         }
 
-        if (root.type === 'ad') {
-            ads.push({ ...root, wrappers: wrappers.filter(Boolean) });
+        if (root.tagType === 'inLine') {
+            ads.push({ ...root, wrappers: currentWrappers.filter(Boolean) });
         }
 
         return ads;
@@ -804,7 +809,7 @@ export default function (playerInstance, options) {
 
             // Register tracking events
             playerInstance.registerTrackingEvents(dataSource, ad);
-            const clickTracks = ad.type === 'linear' ?
+            const clickTracks = ad.adType === 'linear' ?
                 playerInstance.getClickTrackingEvents(dataSource) :
                 playerInstance.getNonLinearClickTrackingEvents(dataSource);
             playerInstance.registerClickTracking(clickTracks, ad);
@@ -865,7 +870,7 @@ export default function (playerInstance, options) {
                 try {
                     /** @see VAST 4.0 Wrapper.fallbackOnNoAd */
                     const triggerFallbackOnNoAd = result.children.some(ad =>
-                        ad.type === 'wrapper' && ad.fallbackOnNoAd && (!/"type":"ad"/.test(JSON.stringify(ad)) || ad.httpError)
+                        ad.tagType === 'wrapper' && ad.fallbackOnNoAd && (!/"tagType":"ad"/.test(JSON.stringify(ad)) || ad.httpError)
                     );
 
                     if (triggerFallbackOnNoAd) {
@@ -1004,10 +1009,9 @@ export default function (playerInstance, options) {
 
     playerInstance.vastLogoBehaviour = (vastPlaying) => {
         if (!playerInstance.displayOptions.layoutControls.logo.showOverAds) {
-            const logoHolder = document.getElementById(playerInstance.videoPlayerId + '_logo');
-            const logoImage = document.getElementById(playerInstance.videoPlayerId + '_logo_image');
+            const logoHolder = playerInstance.domRef.wrapper.querySelector('.logo_holder');
 
-            if (!logoHolder || !logoImage) {
+            if (!logoHolder) {
                 return;
             }
 

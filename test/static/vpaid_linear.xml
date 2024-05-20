@@ -1,6 +1,5 @@
-<VAST
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast.xsd" version="3.0">
-	<Ad id="1234567">
+<VAST xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast4.xsd" version="4.2">
+    <Ad id="1234567">
 		<InLine>
 			<AdSystem>GDFP</AdSystem>
 			<AdTitle>Linear VPAID Example</AdTitle>
@@ -28,7 +27,7 @@
 						</TrackingEvents>
 						<AdParameters>
 							<![CDATA[
-{"videos":[ {"url":"https://iab-publicfiles.s3.amazonaws.com/vast/VAST-4.0-Short-Intro.mp4","mimetype":"video/mp4"}]}
+{"videos":[ {"url":"https://cdn.jsdelivr.net/npm/big-buck-bunny-1080p@0.0.6/video.mp4","mimetype":"video/mp4"}]}
 ]]>
 						</AdParameters>
 						<VideoClicks>

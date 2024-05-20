@@ -85,10 +85,9 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.generateTimelinePreviewTags = () => {
-        const progressContainer = document.getElementById(playerInstance.videoPlayerId + '_fluid_controls_progress_container');
+        const progressContainer = playerInstance.domRef.wrapper.querySelector('.fluid_controls_progress_container');
         const previewContainer = document.createElement('div');
 
-        previewContainer.id = playerInstance.videoPlayerId + '_fluid_timeline_preview_container';
         previewContainer.className = 'fluid_timeline_preview_container';
         previewContainer.style.display = 'none';
         previewContainer.style.position = 'absolute';
@@ -97,7 +96,6 @@ export default function (playerInstance, options) {
 
         //Shadow is needed to not trigger mouseleave event, that stops showing thumbnails, in case one scrubs a bit too fast and leaves current thumb before new one drawn.
         const previewContainerShadow = document.createElement('div');
-        previewContainerShadow.id = playerInstance.videoPlayerId + '_fluid_timeline_preview_container_shadow';
         previewContainerShadow.className = 'fluid_timeline_preview_container_shadow';
         previewContainerShadow.style.position = 'absolute';
         previewContainerShadow.style.display = 'none';
@@ -118,9 +116,9 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.drawTimelinePreview = (event) => {
-        const timelinePreviewTag = document.getElementById(playerInstance.videoPlayerId + '_fluid_timeline_preview_container');
-        const timelinePreviewShadow = document.getElementById(playerInstance.videoPlayerId + '_fluid_timeline_preview_container_shadow');
-        const progressContainer = document.getElementById(playerInstance.videoPlayerId + '_fluid_controls_progress_container');
+        const timelinePreviewTag = playerInstance.domRef.wrapper.querySelector('.fluid_timeline_preview_container');
+        const timelinePreviewShadow = playerInstance.domRef.wrapper.querySelector('.fluid_timeline_preview_container_shadow');
+        const progressContainer = playerInstance.domRef.wrapper.querySelector('.fluid_controls_progress_container');
         const totalWidth = progressContainer.clientWidth;
 
         if (playerInstance.isCurrentlyPlayingAd) {
@@ -173,17 +171,17 @@ export default function (playerInstance, options) {
             eventOn = 'touchmove';
             eventOff = 'touchend';
         }
-        document.getElementById(playerInstance.videoPlayerId + '_fluid_controls_progress_container')
+        playerInstance.domRef.wrapper.querySelector('.fluid_controls_progress_container')
             .addEventListener(eventOn, playerInstance.drawTimelinePreview.bind(playerInstance), false);
-        document.getElementById(playerInstance.videoPlayerId + '_fluid_controls_progress_container')
+        playerInstance.domRef.wrapper.querySelector('.fluid_controls_progress_container')
             .addEventListener(eventOff, function (event) {
-                const progress = document.getElementById(playerInstance.videoPlayerId + '_fluid_controls_progress_container');
+                const progress = playerInstance.domRef.wrapper.querySelector('.fluid_controls_progress_container');
                 if (typeof event.clientX !== 'undefined' && progress.contains(document.elementFromPoint(event.clientX, event.clientY))) {
                     //False positive (Chrome bug when fast click causes leave event)
                     return;
                 }
-                document.getElementById(playerInstance.videoPlayerId + '_fluid_timeline_preview_container').style.display = 'none';
-                document.getElementById(playerInstance.videoPlayerId + '_fluid_timeline_preview_container_shadow').style.display = 'none';
+                playerInstance.domRef.wrapper.querySelector('.fluid_timeline_preview_container').style.display = 'none';
+                playerInstance.domRef.wrapper.querySelector('.fluid_timeline_preview_container_shadow').style.display = 'none';
             }, false);
         playerInstance.generateTimelinePreviewTags();
 

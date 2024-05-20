@@ -1,4 +1,4 @@
-<VAST xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.iab.com/VAST" version="4.2">
+<VAST xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast4.xsd" version="4.2">
     <Ad id="1" adType="video">
         <InLine>
             <AdSystem version="1">stripcash.com</AdSystem>
@@ -9,13 +9,16 @@
                         <Duration>00:00:00</Duration>
                         <MediaFiles>
                             <MediaFile id="1" delivery="streaming" type="application/vnd.apple.mpegurl" width="480" height="640">
-                                <![CDATA[ https://b-hls-25.doppiocdn.com/hls/28710081/master/28710081.m3u8 ]]>
+                                <![CDATA[ https://cdn.fluidplayer.com/videos/HLS/index.m3u8 ]]>
                             </MediaFile>
                         </MediaFiles>
                         <VideoClicks>
                             <ClickThrough id="1">
                                 <![CDATA[ http://www.example.com ]]>
                             </ClickThrough>
+                            <ClickTracking>
+                                <![CDATA[ http://www.example.com/click-tracking ]]>
+                            </ClickTracking>
                         </VideoClicks>
                         <TrackingEvents>
                             <Tracking event="start">http://www.example.com/start</Tracking>

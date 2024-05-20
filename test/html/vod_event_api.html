@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+          name="viewport">
+    <meta content="ie=edge" http-equiv="X-UA-Compatible">
+    <title>VOD with Event API callbacks</title>
+    <%= htmlWebpackPlugin.tags.headTags %>
+    <style lang="css">
+        #fluid-player-e2e-case {
+            width: 90%;
+        }
+    </style>
+</head>
+<body>
+
+<video id="fluid-player-e2e-case">
+    <source src="https://cdn.fluidplayer.com/videos/valerian-1080p.mkv" data-fluid-hd title="1080p" type="video/mp4"/>
+    <source src="https://cdn.fluidplayer.com/videos/valerian-720p.mkv" data-fluid-hd title="720p" type="video/mp4"/>
+    <source src="https://cdn.fluidplayer.com/videos/valerian-480p.mkv" title="480p" type="video/mp4"/>
+</video>
+
+<p>Check your console for the messages beginning with <strong><i>type</i>Callback</strong></p>
+
+<%= htmlWebpackPlugin.tags.bodyTags %>
+
+<script>
+    var instance = fluidPlayer('fluid-player-e2e-case', {
+        vastOptions: {
+            allowVPAID: true, // Default false.
+            adList: [
+                {
+                    roll: 'preRoll',
+                    vastTag: '/static/vast_linear.xml',
+                },
+                {
+                    roll: 'midRoll',
+                    vastTag: '/static/vast_linear.xml',
+                    timer: '25%',
+                },
+                {
+                    roll: 'midRoll',
+                    vastTag: '/static/vast_linear.xml',
+                    timer: 50,
+                },
+                {
+                    roll: 'midRoll',
+                    vastTag: '/static/vast_linear.xml',
+                    timer: '75.0%',
+                },
+                {
+                    roll: 'postRoll',
+                    vastTag: '/static/vast_linear.xml',
+                },
+            ]
+        },
+    });
+
+    instance.on('play', (...args) => console.log('playCallback', ...args));
+    instance.on('seeked', (...args) => console.log('seekedCallback', ...args));
+    instance.on('playing', (...args) => console.log('playingCallback', ...args));
+    instance.on('theatreModeOn', (...args) => console.log('theatreModeOnCallback', ...args));
+    instance.on('theatreModeOff', (...args) => console.log('theatreModeOffCallback', ...args));
+    instance.on('timeupdate', (...args) => console.log('timeupdateCallback', ...args));
+    instance.on('ended', (...args) => console.log('endedCallback', ...args));
+    instance.on('pause', (...args) => console.log('pauseCallback', ...args));
+    instance.on('miniPlayerToggle', (...args) => console.log('miniPlayerToggleCallback', ...args));
+</script>
+
+</body>
+</html>

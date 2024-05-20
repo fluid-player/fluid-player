@@ -7,6 +7,18 @@
                 "mimeType": "video/mp4",
                 "resolution": "720p",
                 "hd": "true"
+            },
+            {
+                "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+                "mimeType": "video/mp4",
+                "resolution": "1080p",
+                "hd": "true"
+            },
+            {
+                "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+                "mimeType": "video/mp4",
+                "resolution": "4k",
+                "hd": "true"
             }
         ],
         "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg",
@@ -25,6 +37,12 @@
                 "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
                 "mimeType": "video/mp4",
                 "resolution": "720p",
+                "hd": "true"
+            },
+            {
+                "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+                "mimeType": "video/mp4",
+                "resolution": "1080p",
                 "hd": "true"
             }
         ],

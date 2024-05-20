@@ -1,6 +1,6 @@
 {
   "name": "fluid-player",
-  "version": "3.15.0",
+  "version": "3.32.0",
   "description": "Fluid Player is a free HTML5 video player",
   "main": "src/index.js",
   "scripts": {
@@ -11,7 +11,8 @@
     "build-dev-debug": "webpack --mode=development --debug",
     "dev-server": "webpack serve --mode=development --host 0.0.0.0",
     "dev-server-debug": "webpack serve --mode=development --env debug --host 0.0.0.0",
-    "dev-server-test": "webpack serve --mode=production --no-live-reload --host 0.0.0.0"
+    "dev-server-test": "webpack serve --mode=production --no-live-reload --host 0.0.0.0",
+    "start": "npm run dev-server-debug"
   },
   "repository": {
     "type": "git",
@@ -49,7 +50,7 @@
     "semver": "^7.3.2",
     "style-loader": "^3.3.1",
     "webpack": "^5.75.0",
-    "webpack-cli": "^5.0.1",
+    "webpack-cli": "^5.1.1",
     "webpack-dev-server": "^4.11.1"
   }
 }

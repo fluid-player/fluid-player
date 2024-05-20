@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>VOD with Mini Player</title>
+    <%= htmlWebpackPlugin.tags.headTags %>
+    <style lang="css">
+        #fluid-player-e2e-case { width: 90%; }
+
+        body { height: 300vh; background: rgb(131,58,180); background: linear-gradient(0deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 50%, rgba(252,176,69,1) 100%); }
+
+        #setupForm { display: flex; align-items: flex-start; flex-direction: column; }
+    </style>
+</head>
+<body>
+
+<%= htmlWebpackPlugin.tags.bodyTags %>
+
+<div id="setupForm">
+    <div><input type="checkbox" name="enabled" id="enabled" checked><label for="enabled">Enabled</label></div>
+    <div><input type="checkbox" name="autoPlay" id="autoPlay" checked><label for="autoPlay">Auto Play</label></div>
+    <div><input type="checkbox" name="vastad" id="vastad" checked><label for="vastad">VAST Ad</label></div>
+    <div><input type="checkbox" name="autoToggle" id="autoToggle" checked><label for="autoToggle">Auto Toggle</label></div>
+    <div><input type="number" name="width" id="width" value="400"><label for="width">Width</label></div>
+    <div><input type="number" name="height" id="height" value="225"><label for="height">Height</label></div>
+    <div><input type="number" name="widthMobile" id="widthMobile" value="50"><label for="widthMobile">Width Mobile</label></div>
+    <div><input type="text" name="placeholderText" id="placeholderText" value="Playing in Miniplayer"><label for="placeholderText">Placeholder Text</label></div>
+    <div><input type="text" name="position" id="position" value="bottom right"><label for="position">Position (top left, top right, bottom left, bottom right)</label></div>
+
+    <p><button id="setupPlayer">Show Player</button></p>
+</div>
+
+<div id="mountingPoint"></div>
+
+<script>
+    document.getElementById('setupPlayer').addEventListener('click', () => {
+        const enabled = document.getElementById('enabled').checked;
+        const autoPlay = document.getElementById('autoPlay').checked;
+        const vastad = document.getElementById('vastad').checked;
+        const autoToggle = document.getElementById('autoToggle').checked;
+        const width = document.getElementById('width').value;
+        const height = document.getElementById('height').value;
+        const widthMobile = document.getElementById('widthMobile').value;
+        const placeholderText = document.getElementById('placeholderText').value;
+        const position = document.getElementById('position').value;
+        const mountingPoint = document.getElementById('mountingPoint');
+        mountingPoint.innerHTML = `
+            <video id="fluid-player-e2e-case">
+                <source src="https://cdn.fluidplayer.com/videos/valerian-1080p.mkv" data-fluid-hd title="1080p" type="video/mp4"/>
+                <source src="https://cdn.fluidplayer.com/videos/valerian-720p.mkv" data-fluid-hd title="720p" type="video/mp4"/>
+                <source src="https://cdn.fluidplayer.com/videos/valerian-480p.mkv" title="480p" type="video/mp4"/>
+            </video>
+        `;
+
+        const instance = fluidPlayer('fluid-player-e2e-case', {
+            layoutControls: {
+                autoPlay,
+                miniPlayer: {
+                    enabled,
+                    width: Number(width),
+                    height: Number(height),
+                    widthMobile: Number(widthMobile),
+                    placeholderText,
+                    position,
+                    autoToggle
+                }
+            },
+            ...(vastad ? {
+                vastOptions: {
+                    allowVPAID: true,
+                    adText: 'Advertising helps us keep the lights on', // Default null,
+                    adTextPosition: 'top left', // Default 'top left
+                    adCTAText: 'Subscribe now!', // Default "Visit now!",
+                    adCTATextPosition: 'top right', //Default 'bottom right’,
+                    adCTATextVast: true, // Enabled. To use the CTA text as provided in the VAST XML.
+                    adList: [
+                        {
+                            roll: 'preRoll',
+                            vastTag: '/static/vast_linear.xml',
+                        },
+                        {
+                            roll: 'midRoll',
+                            vastTag: '/static/vast_nonlinear.xml',
+                            timer: 0
+                        },
+                        {
+                            roll: 'midRoll',
+                            vastTag: '/static/vpaid_linear.xml',
+                            timer: 10
+                        },
+                        {
+                            roll: 'midRoll',
+                            vastTag: '/static/vpaid_nonlinear.xml',
+                            timer: 15
+                        }
+                    ]
+                },
+            } : {})
+        });
+
+        console.log('%cTEST INSTANCE', 'color: #fff; font-weight: bold; background-color: #BADA55; padding: 3px 6px; border-radius: 3px;', instance);
+
+        instance.on('miniPlayerToggle', (event) => console.log(`[Event API] miniPlayerToggle`, event, event.detail.isToggledOn));
+
+        Array.from(document.getElementById('setupForm').children).forEach(child => child.remove());
+        const refreshPage = document.createElement('button');
+        refreshPage.onclick = () => location.reload();
+        refreshPage.innerText = 'Reset Test';
+        refreshPage.style.marginBottom = '5px';
+        document.getElementById('setupForm').appendChild(refreshPage);
+
+        const toggleMiniPlayer = document.createElement('button');
+        toggleMiniPlayer.onclick = () => instance.toggleMiniPlayer();
+        toggleMiniPlayer.innerText = 'Toggle MiniPlayer (Controls API)';
+        toggleMiniPlayer.style.marginBottom = '5px';
+        document.getElementById('setupForm').appendChild(toggleMiniPlayer);
+
+        const toggleMiniPlayerOn = document.createElement('button');
+        toggleMiniPlayerOn.onclick = () => instance.toggleMiniPlayer(true);
+        toggleMiniPlayerOn.innerText = 'Toggle MiniPlayer ON (Controls API)';
+        toggleMiniPlayerOn.style.marginBottom = '5px';
+        document.getElementById('setupForm').appendChild(toggleMiniPlayerOn);
+
+        const toggleMiniPlayerOff = document.createElement('button');
+        toggleMiniPlayerOff.onclick = () => instance.toggleMiniPlayer(false);
+        toggleMiniPlayerOff.innerText = 'Toggle MiniPlayer OFF (Controls API)';
+        toggleMiniPlayerOff.style.marginBottom = '5px';
+        document.getElementById('setupForm').appendChild(toggleMiniPlayerOff);
+    });
+</script>
+
+</body>
+</html>

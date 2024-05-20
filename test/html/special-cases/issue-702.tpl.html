@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Issue 702 - CurrentTime reset after switch HLS source on IOS</title>
+    <%= htmlWebpackPlugin.tags.headTags %>
+    <style lang="css">
+        #fluid-player-e2e-case {
+            width: 90%;
+        }
+    </style>
+</head>
+<body>
+
+<video id="fluid-player-e2e-case">
+    <source src="https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_fmp4/master.m3u8?a=1" type="application/x-mpegURL" title="1">
+    <source src="https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.mp4/.m3u8" type="application/x-mpegURL" title="2">
+</video>
+
+<%= htmlWebpackPlugin.tags.bodyTags %>
+
+<script>
+    var instance = fluidPlayer('fluid-player-e2e-case', {
+        vastOptions: {
+            allowVPAID: true, // Default false.
+        }
+    });
+</script>
+
+</body>
+</html>
