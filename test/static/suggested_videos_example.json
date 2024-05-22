@@ -9,20 +9,31 @@
                 "hd": "true"
             },
             {
-                "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+                "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
                 "mimeType": "video/mp4",
-                "resolution": "1080p",
-                "hd": "true"
-            },
-            {
-                "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-                "mimeType": "video/mp4",
-                "resolution": "4k",
-                "hd": "true"
+                "resolution": "480p"
             }
         ],
         "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg",
         "title": "Big Buck Bunny",
+        "subtitles": [
+            {
+                "label": "English",
+                "url": "/static/subtitles/english.vtt",
+                "lang": "en"
+            },
+            {
+                "label": "Nederlands",
+                "url": "/static/subtitles/deutsch.vtt",
+                "lang": "nl"
+            },
+            {
+                "label": "Deutsch",
+                "url": "/static/subtitles/deutsch.vtt",
+                "lang": "de",
+                "default": true
+            }
+        ],
         "tags": [
             "animals",
             "bunny",

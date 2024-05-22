@@ -2109,7 +2109,7 @@ const fluidPlayerClass = function () {
         }
     };
 
-    self.createVideoSourceSwitch = () => {
+    self.createVideoSourceSwitch = (initialLoad = true) => {
         const sources = [];
         const sourcesList = self.domRef.player.querySelectorAll('source');
         [].forEach.call(sourcesList, source => {
@@ -2142,6 +2142,12 @@ const fluidPlayerClass = function () {
             const getTheType = source.url.split(".").pop();
             if (self.mobileInfo.userOs === 'iOS' && getTheType === 'mkv') {
                 continue;
+            }
+
+            // On suggested videos, if the resolution doesn't exist in the new source list, use the first one in the list
+            // This gets overwritten if it's needed by setPersistentSettings()
+            if(firstSource && !initialLoad) {
+                self.domRef.player.src = source.url;
             }
 
             const sourceSelected = (firstSource) ? "source_selected" : "";
@@ -2177,6 +2183,11 @@ const fluidPlayerClass = function () {
 
             sourceChangeList.appendChild(sourceChangeDiv);
             appendSourceChange = true;
+        }
+
+        if (appendSourceChange && !initialLoad) {
+            sourceChangeButton.appendChild(sourceChangeList);
+            return;
         }
 
         if (appendSourceChange) {

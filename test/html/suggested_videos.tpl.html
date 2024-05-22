@@ -15,18 +15,26 @@
 </head>
 <body>
 
-<video id="fluid-player-e2e-case">
+<!-- <video id="fluid-player-e2e-case">
     <source src='https://cdn.fluidplayer.com/videos/valerian-1080p.mkv' data-fluid-hd title="1080p" type='video/mp4'/>
     <source src='https://cdn.fluidplayer.com/videos/valerian-720p.mkv' data-fluid-hd title="720p" type='video/mp4'/>
-    <source src='https://cdn.fluidplayer.com/videos/valerian-480p.mkv' title="480p" type='video/mp4'/>
+    <source src='http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4' title="480p" type='video/mp4'/>
+</video> -->
+<video id="fluid-player-e2e-case">
+    <source src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" type="video/mp4"/>
+    <track label="English" kind="metadata" srclang="en" src="/static/subtitles/english.vtt" default>
+    <track label="Deutsch" kind="metadata" srclang="de" src="/static/subtitles/deutsch.vtt">
 </video>
 
 <%= htmlWebpackPlugin.tags.bodyTags %>
 
 <script>
     var instance = fluidPlayer('fluid-player-e2e-case', {
+        layoutControls: {
+            subtitlesEnabled: true
+        },
         suggestedVideos: {
-            configUrl: '/static/suggested_videos_example.json'
+            configUrl: '/static/suggested_videos_example.json',
         }
     });
 </script>
