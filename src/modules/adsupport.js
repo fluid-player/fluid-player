@@ -257,9 +257,11 @@ export default function (playerInstance, options) {
 
     playerInstance.playRoll = (adList) => {
         // register all the ad pods
+        const newPods = [];
         for (let i = 0; i < adList.length; i++) {
-            playerInstance.temporaryAdPods.push(adList[i]);
+            newPods.push(adList[i]);
         }
+        playerInstance.temporaryAdPods = newPods;
 
         if (playerInstance.vastOptions !== null && playerInstance.vastOptions.adType.toLowerCase() === 'linear') {
             return;

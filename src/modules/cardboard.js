@@ -92,14 +92,16 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.cardBoardResize = () => {
-        playerInstance.domRef.player.addEventListener('theatreModeOn', function () {
-            playerInstance.vrViewer.onWindowResize();
-        });
+        playerInstance.domRef.player.removeEventListener('theatreModeOn', handleWindowResize);
+        playerInstance.domRef.player.addEventListener('theatreModeOn', handleWindowResize);
 
-        playerInstance.domRef.player.addEventListener('theatreModeOff', function () {
-            playerInstance.vrViewer.onWindowResize();
-        });
+        playerInstance.domRef.player.removeEventListener('theatreModeOff', handleWindowResize);
+        playerInstance.domRef.player.addEventListener('theatreModeOff', handleWindowResize);
     };
+
+    function handleWindowResize() {
+        playerInstance.vrViewer.onWindowResize();
+    }
 
     playerInstance.cardBoardSwitchToNormal = () => {
         const vrJoystickPanel = playerInstance.domRef.wrapper.querySelector('.fluid_vr_joystick_panel');

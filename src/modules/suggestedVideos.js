@@ -42,52 +42,81 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.resetPlayer = (sources, subtitles) => {
-        // Document better, this part is for HTML video removal I think
-        // TODO: getting by 'video' is not a good idea, do something with an ID or more specific name
-        const videoDOM = document.getElementsByTagName('video')[0];
+        const videoDOM = document.getElementById(playerInstance.videoPlayerId);
         videoDOM.innerHTML = '';
 
         let sourcesHTML = '';
-        sources.forEach(source => {
-            sourcesHTML += `<source src='${source.url}' ${source.hd ? 'data-fluid-hd' : ''} title="${source.resolution}" type='${source.mimeType}'/>`;
-        });
-        subtitles.forEach(subtitle => {
-            sourcesHTML += `<track label="${subtitle.label}" kind="metadata" srclang="${subtitle.lang}" src="${subtitle.url}" ${subtitle.default ? 'default' : ''}>`;
-        });
-        console.log(sourcesHTML);
+        if (sources) {
+            sources.forEach(source => {
+                sourcesHTML += `<source src='${source.url}' ${source.hd ? 'data-fluid-hd' : ''} title="${source.resolution}" type='${source.mimeType}'/>`;
+            });
+        }
+        if (subtitles) {
+            subtitles.forEach(subtitle => {
+                sourcesHTML += `<track label="${subtitle.label}" kind="metadata" srclang="${subtitle.lang}" src="${subtitle.url}" ${subtitle.default ? 'default' : ''}>`;
+            });
+        }
 
         videoDOM.innerHTML = sourcesHTML;
 
         // This for the custom list
         playerInstance.removeVideoSourcesListFromDOM();
 
-        // TODO: when coming from a video with no switch, it bugs out and can't open the switch
         const videoSourceList = document.getElementsByClassName('fluid_control_video_source')[0];
         videoSourceList.innerHTML = '';
         playerInstance.domRef.player.src = '';
         playerInstance.createVideoSourceSwitch(false);
 
-        // TODO: same problem as video sources here above
         // Subtitles
         playerInstance.removeSubtitlesListFromDOM();
         const videoSubtitlesList = document.getElementsByClassName('fluid_control_subtitles')[0];
         videoSubtitlesList.innerHTML = '';
-        console.dir(playerInstance.domRef.player);
-        // if (playerInstance.domRef.player.textTracks) {
-
-        // }
         playerInstance.createSubtitles(false);
 
-        // TODO: do the same as video switch for every other option under here
-
-        // playerInstance.createCardboard();
-        // playerInstance.userActivityChecker();
-        // playerInstance.setVastList();
+        // set persistent settings and try to load in new video
         playerInstance.setPersistentSettings();
         playerInstance.initialiseStreamers();
         playerInstance.domRef.player.currentTime = 0;
-        playerInstance.setCurrentTimeAndPlay(playerInstance.domRef.player.currentTime, true);
+        playerInstance.domRef.player.mainVideoCurrentTime = 0;
+        playerInstance.setCurrentTimeAndPlay(0, false);
         playerInstance.setBuffering();
+
+        // Clear midroll and postroll ads
+        playerInstance.timerPool = {};
+        playerInstance.rollsById = {};
+        playerInstance.adPool = {};
+        playerInstance.adGroupedByRolls = {};
+        playerInstance.onPauseRollAdPods = [];
+        playerInstance.currentOnPauseRollAd = '';
+
+        // Reset variables and flags, needed for assigning the different rolls correctly
+        playerInstance.isTimer = false;
+        playerInstance.timer = null;
+        playerInstance.firstPlayLaunched = false;
+
+        // Clear preroll ads
+        playerInstance.preRollAdsResolved = false;
+        playerInstance.preRollAdPods = [];
+        playerInstance.preRollAdPodsLength = 0;
+        playerInstance.preRollVastResolved = 0;
+        playerInstance.autoplayAfterAd = true;
+
+        // Wait until new selected video is buffered so we can get the video length
+        // This is needed for mid and post rolls to assign the correct time key to their respective triggers
+        const checkMainVideoDuration = () => {
+            if (!isNaN(playerInstance.domRef.player.duration) && playerInstance.domRef.player.duration > 0) {
+                playerInstance.mainVideoDuration = playerInstance.domRef.player.duration;
+
+                clearInterval(intervalId);
+
+                // Set up ads
+                playerInstance.setVastList();
+                playerInstance.checkForNextAd();
+                playerInstance.playPauseToggle();
+            }
+        };
+
+        const intervalId = setInterval(checkMainVideoDuration, 100);
     }
 
     playerInstance.createVideoTile = (config) => {
@@ -111,15 +140,7 @@ export default function (playerInstance, options) {
         return videoTile;
     };
 
-    playerInstance.createVideoSourcesHTML = () => {
-        let sourcesHTML = ''
-        sources.forEach(source => {
-            sourcesHTML += `<source src='${source.url}' ${source.hd && 'data-fluid-hd'} title="${source.resolution}" type='${source.mimeType}'/>`;
-        });
-    }
-
     playerInstance.removeVideoSourcesListFromDOM = () => {
-        // TODO: same as todo on subtitles
         const sourcesDOM = document.getElementsByClassName('fluid_video_source_list_item');
         for (let i = 0; i < sourcesDOM.length; i++) {
             sourcesDOM[i].remove();
@@ -127,7 +148,6 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.removeSubtitlesListFromDOM = () => {
-        // TODO: change fluid_subtitle_list_item to getting it by fluid_subtitle_list
         const tracksDOM = document.getElementsByClassName('fluid_subtitle_list_item');
         for (let i = 0; i < tracksDOM.length; i++) {
             tracksDOM[i].remove();
@@ -140,5 +160,9 @@ export default function (playerInstance, options) {
             suggestedVideosDOM.remove();
         }
     };
+
+    playerInstance.isShowingSuggestedVideos = () => {
+        return !!document.getElementsByClassName('suggested_tile_grid')[0];
+    }
 
 }

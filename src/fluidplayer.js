@@ -635,7 +635,12 @@ const fluidPlayerClass = function () {
             self.playPauseToggle();
         }
 
-        self.displaySuggestedVideos();
+        // Event listener doesn't wait on flags to be flipped from post roll ads, needs small time out to compensate
+        setTimeout(() => {
+            if (!self.isCurrentlyPlayingAd) {
+                self.displaySuggestedVideos();
+            }
+        }, 100);
     };
 
     self.getCurrentTime = () => {
@@ -1264,6 +1269,8 @@ const fluidPlayerClass = function () {
             if (totalWidth) {
                 self.domRef.player.currentTime = self.currentVideoDuration * timeBarX / totalWidth;
             }
+
+            self.hideSuggestedVideos();
         };
 
         const onProgressbarMouseMove = event => {
@@ -2185,16 +2192,11 @@ const fluidPlayerClass = function () {
             appendSourceChange = true;
         }
 
-        if (appendSourceChange && !initialLoad) {
-            sourceChangeButton.appendChild(sourceChangeList);
-            return;
-        }
-
         if (appendSourceChange) {
             sourceChangeButton.appendChild(sourceChangeList);
-            sourceChangeButton.addEventListener('click', () => {
-                self.openCloseVideoSourceSwitch();
-            });
+            // To reset player for suggested videos, in case the event listener already exists
+            sourceChangeButton.removeEventListener('click', self.openCloseVideoSourceSwitch);
+            sourceChangeButton.addEventListener('click', self.openCloseVideoSourceSwitch);
         } else {
             // Didn't give any source options
             self.domRef.wrapper.querySelector('.fluid_control_video_source').style.display = 'none';
@@ -2204,7 +2206,7 @@ const fluidPlayerClass = function () {
     self.openCloseVideoSourceSwitch = () => {
         const sourceChangeList = self.domRef.wrapper.querySelector('.fluid_video_sources_list');
 
-        if (self.isCurrentlyPlayingAd) {
+        if (self.isCurrentlyPlayingAd || self.isShowingSuggestedVideos()) {
             sourceChangeList.style.display = 'none';
             return;
         }
