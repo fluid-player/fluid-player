@@ -1,0 +1,14 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "dev-server-test",
+			"problemMatcher": [
+				"$node-sass"
+			],
+			"label": "npm: dev-server-test",
+			"detail": "webpack serve --mode=production --no-live-reload --host 0.0.0.0"
+		}
+	]
+}
