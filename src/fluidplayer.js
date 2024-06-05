@@ -8,8 +8,8 @@ import SubtitleModule from './modules/subtitles';
 import TimelineModule from './modules/timeline';
 import AdSupportModule from './modules/adsupport';
 import StreamingModule from './modules/streaming';
-import UtilsModule from './modules/utils'
-import SuggestedVideosModule from './modules/suggestedVideos'
+import UtilsModule from './modules/utils';
+import SuggestedVideosModule from './modules/suggestedVideos';
 import MiniPlayerModule from './modules/miniplayer';
 
 const FP_MODULES = [

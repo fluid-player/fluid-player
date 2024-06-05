@@ -59,7 +59,7 @@ export default function (playerInstance, options) {
         );
     };
 
-    playerInstance.createSubtitlesSwitch = (initialLoad = true) => {
+    playerInstance.createSubtitlesSwitch = () => {
         const subtitlesOff = 'OFF';
         playerInstance.subtitlesData = [];
 
@@ -208,7 +208,7 @@ export default function (playerInstance, options) {
         }
     };
 
-    playerInstance.createSubtitles = (initialLoad = true) => {
+    playerInstance.createSubtitles = () => {
         const divSubtitlesContainer = document.createElement('div');
         divSubtitlesContainer.className = 'fluid_subtitles_container';
         playerInstance.domRef.player.parentNode.insertBefore(divSubtitlesContainer, playerInstance.domRef.player.nextSibling);
@@ -219,7 +219,7 @@ export default function (playerInstance, options) {
 
         import(/* webpackChunkName: "vttjs" */ 'videojs-vtt.js').then((it) => {
             window.WebVTT = it.WebVTT;
-            playerInstance.createSubtitlesSwitch(initialLoad);
+            playerInstance.createSubtitlesSwitch();
         });
     };
 }
