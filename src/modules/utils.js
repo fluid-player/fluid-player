@@ -203,4 +203,103 @@ export default function (playerInstance, options) {
             }
         }
     }
+
+    playerInstance.getImageTwoMostProminentColours = (imageUrl) => {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.crossOrigin = 'Anonymous';
+            img.src = imageUrl;
+
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0, img.width, img.height);
+                const imageData = ctx.getImageData(0, 0, img.width, img.height).data;
+
+                const colorCount = {};
+                for (let i = 0; i < imageData.length; i += 4) {
+                    const r = imageData[i];
+                    const g = imageData[i + 1];
+                    const b = imageData[i + 2];
+                    const color = `rgb(${r},${g},${b})`;
+
+                    if (colorCount[color]) {
+                        colorCount[color]++;
+                    } else {
+                        colorCount[color] = 1;
+                    }
+                }
+
+                const rgbToHsl = (r, g, b) => {
+                    r /= 255, g /= 255, b /= 255;
+                    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+                    let h, s, l = (max + min) / 2;
+
+                    if (max === min) {
+                        h = s = 0;
+                    } else {
+                        const d = max - min;
+                        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                        switch (max) {
+                            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                            case g: h = (b - r) / d + 2; break;
+                            case b: h = (r - g) / d + 4; break;
+                        }
+                        h /= 6;
+                    }
+
+                    return [h, s, l];
+                };
+
+                const sortedColors = Object.keys(colorCount).map(color => {
+                    const [r, g, b] = color.match(/\d+/g).map(Number);
+                    const [h, s, l] = rgbToHsl(r, g, b);
+                    return { color, h, s, l, score: s + (1 - Math.abs(2 * l - 1)) };
+                }).sort((a, b) => b.score - a.score);
+
+                const isCloseToBlack = (color) => {
+                    const rgb = color.match(/\d+/g).map(Number);
+                    const blackThreshold = 40;
+                    return rgb[0] < blackThreshold && rgb[1] < blackThreshold && rgb[2] < blackThreshold;
+                };
+
+                const minHueDifference = 0.1;
+                const minSaturationDifference = 0.1;
+                const minLightnessDifference = 0.1;
+
+                let mostVibrantColors = [];
+
+                for (const colorObj of sortedColors) {
+                    if (mostVibrantColors.length === 2) break;
+                    if (!isCloseToBlack(colorObj.color)) {
+                        const enoughDifference = mostVibrantColors.every(existingColor => {
+                            const hueDifference = Math.abs(colorObj.h - existingColor.h);
+                            const saturationDifference = Math.abs(colorObj.s - existingColor.s);
+                            const lightnessDifference = Math.abs(colorObj.l - existingColor.l);
+                            return (
+                                hueDifference >= minHueDifference &&
+                                saturationDifference >= minSaturationDifference &&
+                                lightnessDifference >= minLightnessDifference
+                            );
+                        });
+                        if (enoughDifference) {
+                            mostVibrantColors.push(colorObj);
+                        }
+                    }
+                }
+
+                if (mostVibrantColors.length < 2) {
+                    mostVibrantColors = sortedColors.slice(0, 2);
+                }
+
+                resolve(mostVibrantColors.map(colorObj => colorObj.color));
+            };
+
+            img.onerror = () => {
+                reject(new Error('Failed to load image'));
+            };
+        });
+    }
 }

@@ -9,12 +9,12 @@
                 "hd": "true"
             },
             {
-                "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+                "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
                 "mimeType": "video/mp4",
                 "resolution": "480p"
             }
         ],
-        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg",
+        "thumbnailUrl": "https://picsum.photos/1280/720",
         "title": "Big Buck Bunny",
         "subtitles": [
             {
@@ -34,12 +34,7 @@
                 "default": true
             }
         ],
-        "tags": [
-            "animals",
-            "bunny",
-            "adorable",
-            "indie"
-        ]
+        "configUrl" : "/static/suggested_videos_example_v1.json"
     },
     {
         "id": 1,
@@ -57,14 +52,9 @@
                 "hd": "true"
             }
         ],
-        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ElephantsDream.jpg",
+        "thumbnailUrl": "https://picsum.photos/720/1280",
         "title": "Elephant Dream",
-        "tags": [
-            "animals",
-            "elephant",
-            "adorable",
-            "indie"
-        ]
+        "configUrl" : "/static/suggested_videos_example_v1.json"
     },
     {
         "id": 2,
@@ -76,14 +66,22 @@
                 "hd": "true"
             }
         ],
-        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerBlazes.jpg",
+        "thumbnailUrl": "https://picsum.photos/1280/600",
         "title": "For Bigger Blazes",
-        "tags": [
-            "For bigger",
-            "Blaze",
-            "google",
-            "fire"
-        ]
+        "subtitles": [
+            {
+                "label": "English",
+                "url": "/static/subtitles/english.vtt",
+                "lang": "en"
+            },
+            {
+                "label": "Deutsch",
+                "url": "/static/subtitles/deutsch.vtt",
+                "lang": "de",
+                "default": true
+            }
+        ],
+        "configUrl" : "/static/suggested_videos_example_v1.json"
     },
     {
         "id": 3,
@@ -95,13 +93,27 @@
                 "hd": "true"
             }
         ],
-        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerEscapes.jpg",
+        "thumbnailUrl": "https://picsum.photos/1280/720",
         "title": "For Bigger Escape",
-        "tags": [
-            "For bigger",
-            "Escaping",
-            "google"
-        ]
+        "subtitles": [
+            {
+                "label": "English",
+                "url": "/static/subtitles/english.vtt",
+                "lang": "en",
+                "default": true
+            },
+            {
+                "label": "Nederlands",
+                "url": "/static/subtitles/deutsch.vtt",
+                "lang": "nl"
+            },
+            {
+                "label": "Deutsch",
+                "url": "/static/subtitles/deutsch.vtt",
+                "lang": "de"
+            }
+        ],
+        "configUrl" : "/static/suggested_videos_example_v1.json"
     },
     {
         "id": 4,
@@ -115,12 +127,7 @@
         ],
         "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerFun.jpg",
         "title": "For Bigger Fun",
-        "tags": [
-            "For bigger",
-            "Fun",
-            "google",
-            "funny"
-        ]
+        "configUrl" : "/static/suggested_videos_example_v1.json"
     },
     {
         "id": 5,
@@ -134,15 +141,20 @@
         ],
         "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerJoyrides.jpg",
         "title": "For Bigger Joyrides",
-        "tags": [
-            "For bigger",
-            "family",
-            "cars",
-            "joyrides",
-            "the fast and the furious",
-            "google",
-            "funny"
-        ]
+        "subtitles": [
+            {
+                "label": "English",
+                "url": "/static/subtitles/english.vtt",
+                "lang": "en"
+            },
+            {
+                "label": "Nederlands",
+                "url": "/static/subtitles/deutsch.vtt",
+                "lang": "nl",
+                "default": true
+            }
+        ],
+        "configUrl" : "/static/suggested_videos_example_v1.json"
     },
     {
         "id": 6,
@@ -154,15 +166,27 @@
                 "hd": "true"
             }
         ],
-        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerMeltdowns.jpg",
+        "thumbnailUrl": "https://picsum.photos/1280/720",
         "title": "For Bigger Meltdowns",
-        "tags": [
-            "For bigger",
-            "Meltdown",
-            "blaze",
-            "google",
-            "fire"
-        ]
+        "subtitles": [
+            {
+                "label": "English",
+                "url": "/static/subtitles/english.vtt",
+                "lang": "en"
+            },
+            {
+                "label": "Nederlands",
+                "url": "/static/subtitles/deutsch.vtt",
+                "lang": "nl"
+            },
+            {
+                "label": "Deutsch",
+                "url": "/static/subtitles/deutsch.vtt",
+                "lang": "de",
+                "default": true
+            }
+        ],
+        "configUrl" : "/static/suggested_videos_example_v1.json"
     },
     {
         "id": 7,
@@ -174,12 +198,27 @@
                 "hd": "true"
             }
         ],
-        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/Sintel.jpg",
+        "thumbnailUrl": "https://picsum.photos/200/300",
         "title": "Sintel",
-        "tags": [
-            "Sintel",
-            "robot"
-        ]
+        "subtitles": [
+            {
+                "label": "English",
+                "url": "/static/subtitles/english.vtt",
+                "lang": "en"
+            },
+            {
+                "label": "Nederlands",
+                "url": "/static/subtitles/deutsch.vtt",
+                "lang": "nl"
+            },
+            {
+                "label": "Deutsch",
+                "url": "/static/subtitles/deutsch.vtt",
+                "lang": "de",
+                "default": true
+            }
+        ],
+        "configUrl" : "/static/suggested_videos_example_v1.json"
     },
     {
         "id": 8,
@@ -193,12 +232,25 @@
         ],
         "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/SubaruOutbackOnStreetAndDirt.jpg",
         "title": "Subaru Outback On Street And Dirt",
-        "tags": [
-            "cars",
-            "the fast and the furious",
-            "family",
-            "subaru"
-        ]
+        "subtitles": [
+            {
+                "label": "English",
+                "url": "/static/subtitles/english.vtt",
+                "lang": "en"
+            },
+            {
+                "label": "Nederlands",
+                "url": "/static/subtitles/deutsch.vtt",
+                "lang": "nl"
+            },
+            {
+                "label": "Deutsch",
+                "url": "/static/subtitles/deutsch.vtt",
+                "lang": "de",
+                "default": true
+            }
+        ],
+        "configUrl" : "/static/suggested_videos_example_v1.json"
     },
     {
         "id": 9,
@@ -212,10 +264,25 @@
         ],
         "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/TearsOfSteel.jpg",
         "title": "Tears of Steel",
-        "tags": [
-            "Steel",
-            "tears"
-        ]
+        "subtitles": [
+            {
+                "label": "English",
+                "url": "/static/subtitles/english.vtt",
+                "lang": "en"
+            },
+            {
+                "label": "Nederlands",
+                "url": "/static/subtitles/deutsch.vtt",
+                "lang": "nl"
+            },
+            {
+                "label": "Deutsch",
+                "url": "/static/subtitles/deutsch.vtt",
+                "lang": "de",
+                "default": true
+            }
+        ],
+        "configUrl" : "/static/suggested_videos_example_v1.json"
     },
     {
         "id": 10,
@@ -229,14 +296,25 @@
         ],
         "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/VolkswagenGTIReview.jpg",
         "title": "Volkswagen GTI Review",
-        "tags": [
-            "cars",
-            "the fast and the furious",
-            "family",
-            "gti",
-            "vw",
-            "volkswagen"
-        ]
+        "subtitles": [
+            {
+                "label": "English",
+                "url": "/static/subtitles/english.vtt",
+                "lang": "en"
+            },
+            {
+                "label": "Nederlands",
+                "url": "/static/subtitles/deutsch.vtt",
+                "lang": "nl"
+            },
+            {
+                "label": "Deutsch",
+                "url": "/static/subtitles/deutsch.vtt",
+                "lang": "de",
+                "default": true
+            }
+        ],
+        "configUrl" : "/static/suggested_videos_example_v1.json"
     },
     {
         "id": 11,
@@ -250,11 +328,25 @@
         ],
         "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/WeAreGoingOnBullrun.jpg",
         "title": "We Are Going On Bullrun",
-        "tags": [
-            "Bull",
-            "animals",
-            "run"
-        ]
+        "subtitles": [
+            {
+                "label": "English",
+                "url": "/static/subtitles/english.vtt",
+                "lang": "en"
+            },
+            {
+                "label": "Nederlands",
+                "url": "/static/subtitles/deutsch.vtt",
+                "lang": "nl"
+            },
+            {
+                "label": "Deutsch",
+                "url": "/static/subtitles/deutsch.vtt",
+                "lang": "de",
+                "default": true
+            }
+        ],
+        "configUrl" : "/static/suggested_videos_example_v1.json"
     },
     {
         "id": 12,
@@ -268,9 +360,24 @@
         ],
         "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/WhatCarCanYouGetForAGrand.jpg",
         "title": "What care can you get for a grand?",
-        "tags": [
-            "money",
-            "info"
-        ]
+        "subtitles": [
+            {
+                "label": "English",
+                "url": "/static/subtitles/english.vtt",
+                "lang": "en"
+            },
+            {
+                "label": "Nederlands",
+                "url": "/static/subtitles/deutsch.vtt",
+                "lang": "nl"
+            },
+            {
+                "label": "Deutsch",
+                "url": "/static/subtitles/deutsch.vtt",
+                "lang": "de",
+                "default": true
+            }
+        ],
+        "configUrl" : "/static/suggested_videos_example_v1.json"
     }
 ]
