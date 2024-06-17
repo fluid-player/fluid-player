@@ -52,6 +52,19 @@
                 "hd": "true"
             }
         ],
+        "subtitles": [
+            {
+                "label": "English",
+                "url": "/static/subtitles/english.vtt",
+                "lang": "en"
+            },
+            {
+                "label": "Deutsch",
+                "url": "/static/subtitles/deutsch.vtt",
+                "lang": "de",
+                "default": true
+            }
+        ],
         "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ElephantsDream.jpg",
         "title": "Elephant Dream",
         "configUrl" : "/static/suggested_videos_example_v2.json"
@@ -166,7 +179,7 @@
                 "hd": "true"
             }
         ],
-        "thumbnailUrl": "https://picsum.photos/1280/720",
+        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerMeltdowns.jpg",
         "title": "For Bigger Meltdowns",
         "subtitles": [
             {
@@ -198,7 +211,7 @@
                 "hd": "true"
             }
         ],
-        "thumbnailUrl": "https://picsum.photos/200/300",
+        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/Sintel.jpg",
         "title": "Sintel",
         "subtitles": [
             {

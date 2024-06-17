@@ -2129,13 +2129,18 @@ const fluidPlayerClass = function () {
             }
         });
 
+        const sourceChangeButton = self.domRef.wrapper.querySelector('.fluid_control_video_source');
         self.videoSources = sources;
+
+        if (self.videoSources.length > 1) {
+            sourceChangeButton.style.display = 'inline-block';
+        } else {
+            sourceChangeButton.style.display = 'none';
+        }
+
         if (self.videoSources.length <= 1) {
             return;
         }
-
-        const sourceChangeButton = self.domRef.wrapper.querySelector('.fluid_control_video_source');
-        sourceChangeButton.style.display = 'inline-block';
 
         let appendSourceChange = false;
 
@@ -2888,7 +2893,7 @@ const fluidPlayerClass = function () {
         }
     };
 
-    self.setPersistentSettings = () => {
+    self.setPersistentSettings = (ignoreMute = false) => {
         try {
             if (!(typeof (Storage) !== 'undefined' && typeof (localStorage) !== 'undefined')) {
                 return;
@@ -2908,7 +2913,8 @@ const fluidPlayerClass = function () {
 
         self.fluidStorage = localStorage;
         if (typeof (self.fluidStorage.fluidVolume) !== 'undefined'
-            && self.displayOptions.layoutControls.persistentSettings.volume) {
+            && self.displayOptions.layoutControls.persistentSettings.volume
+            && !ignoreMute) {
             self.setVolume(self.fluidStorage.fluidVolume);
 
             if (typeof (self.fluidStorage.fluidMute) !== 'undefined' && self.fluidStorage.fluidMute === 'true') {

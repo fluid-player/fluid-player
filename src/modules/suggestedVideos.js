@@ -37,6 +37,7 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.clickSuggestedVideo = (sources, subtitles, configUrl) => {
+        playerInstance.toggleLoader(true);
         playerInstance.hideSuggestedVideos();
         playerInstance.resetPlayer(sources, subtitles, configUrl);
 
@@ -66,9 +67,11 @@ export default function (playerInstance, options) {
         const videoSourceList = playerInstance.domRef.wrapper.getElementsByClassName('fluid_control_video_source')[0];
         videoSourceList.innerHTML = '';
         playerInstance.domRef.player.src = '';
+        playerInstance.domRef.player.removeAttribute('src');
+        playerInstance.setVideoSource(sources[0].url);
         playerInstance.createVideoSourceSwitch(false);
         playerInstance.resetSubtitles();
-        playerInstance.setPersistentSettings();
+        playerInstance.setPersistentSettings(true);
         playerInstance.loadInNewVideo();
         playerInstance.resetAds();
 
@@ -114,6 +117,7 @@ export default function (playerInstance, options) {
         playerInstance.removeSubtitlesListFromDOM();
         const videoSubtitlesList = playerInstance.domRef.wrapper.getElementsByClassName('fluid_control_subtitles')[0];
         videoSubtitlesList.innerHTML = '';
+        playerInstance.domRef.player.load();
         playerInstance.createSubtitles(false);
     }
 
@@ -121,7 +125,6 @@ export default function (playerInstance, options) {
         playerInstance.initialiseStreamers();
         playerInstance.domRef.player.currentTime = 0;
         playerInstance.domRef.player.mainVideoCurrentTime = 0;
-        playerInstance.setCurrentTimeAndPlay(0, false);
         playerInstance.setBuffering();
     }
 
@@ -150,6 +153,7 @@ export default function (playerInstance, options) {
          // This is needed for mid and post rolls to assign the correct time key to their respective triggers
          const checkMainVideoDuration = () => {
              if (!isNaN(playerInstance.domRef.player.duration) && playerInstance.domRef.player.duration > 0) {
+                playerInstance.toggleLoader(true);
                  playerInstance.mainVideoDuration = playerInstance.domRef.player.duration;
 
                  clearInterval(intervalId);
