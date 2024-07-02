@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.33.0 (2024-07-02)
+* [Pull #818](https://github.com/fluid-player/fluid-player/pull/818) Suggested Videos Feature in Fluid Player
+
 ## 3.32.0 (2024-03-21)
 * [Pull #804](https://github.com/fluid-player/fluid-player/pull/804) htmlOnPauseBlock not being displayed with last version of FP
 
