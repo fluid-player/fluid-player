@@ -9,6 +9,7 @@ import TimelineModule from './modules/timeline';
 import AdSupportModule from './modules/adsupport';
 import StreamingModule from './modules/streaming';
 import UtilsModule from './modules/utils';
+import SuggestedVideosModule from './modules/suggestedVideos';
 import MiniPlayerModule from './modules/miniplayer';
 
 const FP_MODULES = [
@@ -20,6 +21,7 @@ const FP_MODULES = [
     AdSupportModule,
     StreamingModule,
     UtilsModule,
+    SuggestedVideosModule,
     MiniPlayerModule
 ];
 
@@ -242,6 +244,9 @@ const fluidPlayerClass = function () {
                     autoToggle: false,
                 }
             },
+            suggestedVideos: {
+                configUrl: null
+            },
             vastOptions: {
                 adList: {},
                 skipButtonCaption: 'Skip ad in [seconds]',
@@ -399,6 +404,8 @@ const fluidPlayerClass = function () {
         self.setVastList();
 
         self.setPersistentSettings();
+
+        self.generateSuggestedVideoList();
 
         // Previously prevented to be initialized if preRolls were set up
         // but now the streamers support reinitialization
@@ -627,6 +634,13 @@ const fluidPlayerClass = function () {
             self.switchToMainVideo();
             self.playPauseToggle();
         }
+
+        // Event listener doesn't wait on flags to be flipped from post roll ads, needs small time out to compensate
+        setTimeout(() => {
+            if (!self.isCurrentlyPlayingAd) {
+                self.displaySuggestedVideos();
+            }
+        }, 100);
     };
 
     self.getCurrentTime = () => {
@@ -1255,6 +1269,8 @@ const fluidPlayerClass = function () {
             if (totalWidth) {
                 self.domRef.player.currentTime = self.currentVideoDuration * timeBarX / totalWidth;
             }
+
+            self.hideSuggestedVideos();
         };
 
         const onProgressbarMouseMove = event => {
@@ -1569,6 +1585,7 @@ const fluidPlayerClass = function () {
     };
 
     self.playPauseToggle = () => {
+        self.hideSuggestedVideos();
         const isFirstStart = !self.firstPlayLaunched;
         const preRolls = self.findRoll('preRoll');
 
@@ -2099,7 +2116,7 @@ const fluidPlayerClass = function () {
         }
     };
 
-    self.createVideoSourceSwitch = () => {
+    self.createVideoSourceSwitch = (initialLoad = true) => {
         const sources = [];
         const sourcesList = self.domRef.player.querySelectorAll('source');
         [].forEach.call(sourcesList, source => {
@@ -2112,13 +2129,18 @@ const fluidPlayerClass = function () {
             }
         });
 
+        const sourceChangeButton = self.domRef.wrapper.querySelector('.fluid_control_video_source');
         self.videoSources = sources;
+
+        if (self.videoSources.length > 1) {
+            sourceChangeButton.style.display = 'inline-block';
+        } else {
+            sourceChangeButton.style.display = 'none';
+        }
+
         if (self.videoSources.length <= 1) {
             return;
         }
-
-        const sourceChangeButton = self.domRef.wrapper.querySelector('.fluid_control_video_source');
-        sourceChangeButton.style.display = 'inline-block';
 
         let appendSourceChange = false;
 
@@ -2132,6 +2154,12 @@ const fluidPlayerClass = function () {
             const getTheType = source.url.split(".").pop();
             if (self.mobileInfo.userOs === 'iOS' && getTheType === 'mkv') {
                 continue;
+            }
+
+            // On suggested videos, if the resolution doesn't exist in the new source list, use the first one in the list
+            // This gets overwritten if it's needed by setPersistentSettings()
+            if(firstSource && !initialLoad) {
+                self.domRef.player.src = source.url;
             }
 
             const sourceSelected = (firstSource) ? "source_selected" : "";
@@ -2171,9 +2199,9 @@ const fluidPlayerClass = function () {
 
         if (appendSourceChange) {
             sourceChangeButton.appendChild(sourceChangeList);
-            sourceChangeButton.addEventListener('click', () => {
-                self.openCloseVideoSourceSwitch();
-            });
+            // To reset player for suggested videos, in case the event listener already exists
+            sourceChangeButton.removeEventListener('click', self.openCloseVideoSourceSwitch);
+            sourceChangeButton.addEventListener('click', self.openCloseVideoSourceSwitch);
         } else {
             // Didn't give any source options
             self.domRef.wrapper.querySelector('.fluid_control_video_source').style.display = 'none';
@@ -2183,7 +2211,7 @@ const fluidPlayerClass = function () {
     self.openCloseVideoSourceSwitch = () => {
         const sourceChangeList = self.domRef.wrapper.querySelector('.fluid_video_sources_list');
 
-        if (self.isCurrentlyPlayingAd) {
+        if (self.isCurrentlyPlayingAd || self.isShowingSuggestedVideos()) {
             sourceChangeList.style.display = 'none';
             return;
         }
@@ -2865,7 +2893,7 @@ const fluidPlayerClass = function () {
         }
     };
 
-    self.setPersistentSettings = () => {
+    self.setPersistentSettings = (ignoreMute = false) => {
         try {
             if (!(typeof (Storage) !== 'undefined' && typeof (localStorage) !== 'undefined')) {
                 return;
@@ -2885,7 +2913,8 @@ const fluidPlayerClass = function () {
 
         self.fluidStorage = localStorage;
         if (typeof (self.fluidStorage.fluidVolume) !== 'undefined'
-            && self.displayOptions.layoutControls.persistentSettings.volume) {
+            && self.displayOptions.layoutControls.persistentSettings.volume
+            && !ignoreMute) {
             self.setVolume(self.fluidStorage.fluidVolume);
 
             if (typeof (self.fluidStorage.fluidMute) !== 'undefined' && self.fluidStorage.fluidMute === 'true') {
@@ -2921,6 +2950,7 @@ const fluidPlayerClass = function () {
             return;
         }
         self.playPauseToggle();
+
         return true;
     };
 

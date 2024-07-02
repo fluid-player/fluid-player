@@ -141,22 +141,26 @@ export default function (playerInstance, options) {
 
         if (appendSubtitleChange) {
             subtitlesChangeButton.appendChild(subtitlesChangeList);
-            subtitlesChangeButton.addEventListener('click', function () {
-                playerInstance.openCloseSubtitlesSwitch();
-            });
+            subtitlesChangeButton.removeEventListener('click', handleSubtitlesChange);
+            subtitlesChangeButton.addEventListener('click', handleSubtitlesChange);
         } else {
             // Didn't give any subtitle options
             playerInstance.domRef.wrapper.querySelector('.fluid_control_subtitles').style.display = 'none';
         }
 
-        //attach subtitles to show based on time
-        //this function is for rendering of subtitles when content is playing
-        const videoPlayerSubtitlesUpdate = function () {
-            playerInstance.renderSubtitles();
-        };
-
+        playerInstance.domRef.player.removeEventListener('timeupdate', videoPlayerSubtitlesUpdate);
         playerInstance.domRef.player.addEventListener('timeupdate', videoPlayerSubtitlesUpdate);
     };
+
+    function handleSubtitlesChange() {
+        playerInstance.openCloseSubtitlesSwitch();
+    }
+
+    //attach subtitles to show based on time
+    //this function is for rendering of subtitles when content is playing
+    function videoPlayerSubtitlesUpdate() {
+        playerInstance.renderSubtitles();
+    }
 
     playerInstance.renderSubtitles = () => {
         const videoPlayer = playerInstance.domRef.player;

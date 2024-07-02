@@ -1,3 +1,5 @@
+@import "./suggestedVideos.css";
+
 .fluid_video_wrapper {
     animation: none;
     animation-delay: 0;
