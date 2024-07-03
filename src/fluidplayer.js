@@ -637,7 +637,7 @@ const fluidPlayerClass = function () {
 
         // Event listener doesn't wait on flags to be flipped from post roll ads, needs small time out to compensate
         setTimeout(() => {
-            if (!self.isCurrentlyPlayingAd) {
+            if (!self.isCurrentlyPlayingAd && self.displayOptions.suggestedVideos.configUrl) {
                 self.displaySuggestedVideos();
             }
         }, 100);
