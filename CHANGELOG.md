@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.33.0 (2024-07-11)
+* [Pull #819](https://github.com/fluid-player/fluid-player/pull/819) When users don't have suggested videos, there's a console error
+
 ## 3.33.0 (2024-07-02)
 * [Pull #818](https://github.com/fluid-player/fluid-player/pull/818) Suggested Videos Feature in Fluid Player
 
