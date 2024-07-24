@@ -535,59 +535,72 @@ export default function (playerInstance, options) {
             return;
         }
 
-        // Current support is for only one creative element
-        const creativeElements = Array.from(adElement.getElementsByTagName('Creative')).splice(0, 1);
+        const creativeElements = Array.from(adElement.getElementsByTagName('Creative'));
 
         if (creativeElements.length) {
-            creativeElements.forEach(creativeElement => {
+            for (let i = 0; i < creativeElements.length; i++) {
+                const creativeElement = creativeElements[i];
 
-                if (ad.adType === 'linear') {
-                    const linearCreatives = creativeElement.getElementsByTagName('Linear');
-                    const creativeLinear = linearCreatives[0];
-
-                    //Extract the Ad data if it is actually the Ad (!wrapper)
-                    if (!playerInstance.hasVastAdTagUri(adElement) && playerInstance.hasInLine(adElement)) {
-                        //Set initial values
-                        ad.adFinished = false;
-                        ad.vpaid = false;
-
-                        //Extract the necessary data from the Linear node
-                        ad.skipoffset = playerInstance.convertTimeStringToSeconds(creativeLinear.getAttribute('skipoffset'));
-                        ad.clickthroughUrl = playerInstance.getClickThroughUrlFromLinear(creativeLinear);
-                        ad.duration = playerInstance.getDurationFromLinear(creativeLinear);
-                        ad.mediaFileList = playerInstance.getMediaFileListFromLinear(creativeLinear);
-                        ad.adParameters = playerInstance.getAdParametersFromLinear(creativeLinear);
-                        ad.iconClick = ad.iconClick || playerInstance.getIconClickThroughFromLinear(creativeLinear);
-
-                        if (ad.adParameters) {
-                            ad.vpaid = true;
+                try {
+                    if (ad.adType === 'linear') {
+                        const linearCreatives = creativeElement.getElementsByTagName('Linear');
+                        const creativeLinear = linearCreatives[0];
+    
+                        //Extract the Ad data if it is actually the Ad (!wrapper)
+                        if (!playerInstance.hasVastAdTagUri(adElement) && playerInstance.hasInLine(adElement)) {
+                            //Set initial values
+                            ad.adFinished = false;
+                            ad.vpaid = false;
+    
+                            //Extract the necessary data from the Linear node
+                            ad.skipoffset = playerInstance.convertTimeStringToSeconds(creativeLinear.getAttribute('skipoffset'));
+                            ad.clickthroughUrl = playerInstance.getClickThroughUrlFromLinear(creativeLinear);
+                            ad.duration = playerInstance.getDurationFromLinear(creativeLinear);
+                            ad.mediaFileList = playerInstance.getMediaFileListFromLinear(creativeLinear);
+                            ad.adParameters = playerInstance.getAdParametersFromLinear(creativeLinear);
+                            ad.iconClick = ad.iconClick || playerInstance.getIconClickThroughFromLinear(creativeLinear);
+    
+                            if (ad.adParameters) {
+                                ad.vpaid = true;
+                            }
                         }
                     }
-                }
-
-                if (ad.adType === 'nonLinear') {
-                    const nonLinearCreatives = creativeElement.getElementsByTagName('NonLinearAds');
-                    const creativeNonLinear = nonLinearCreatives[0];
-
-                    //Extract the Ad data if it is actually the Ad (!wrapper)
-                    if (!playerInstance.hasVastAdTagUri(adElement) && playerInstance.hasInLine(adElement)) {
-                        //Set initial values
-                        ad.vpaid = false;
-
-                        //Extract the necessary data from the NonLinear node
-                        ad.clickthroughUrl = playerInstance.getClickThroughUrlFromNonLinear(creativeNonLinear);
-                        ad.duration = playerInstance.getDurationFromNonLinear(creativeNonLinear); // VAST version < 4.0
-                        ad.dimension = playerInstance.getDimensionFromNonLinear(creativeNonLinear); // VAST version < 4.0
-                        ad.staticResource = playerInstance.getStaticResourceFromNonLinear(creativeNonLinear);
-                        ad.creativeType = playerInstance.getCreativeTypeFromStaticResources(creativeNonLinear);
-                        ad.adParameters = playerInstance.getAdParametersFromLinear(creativeNonLinear);
-
-                        if (ad.adParameters) {
-                            ad.vpaid = true;
+    
+                    if (ad.adType === 'nonLinear') {
+                        const nonLinearCreatives = creativeElement.getElementsByTagName('NonLinearAds');
+                        const creativeNonLinear = nonLinearCreatives[0];
+    
+                        //Extract the Ad data if it is actually the Ad (!wrapper)
+                        if (!playerInstance.hasVastAdTagUri(adElement) && playerInstance.hasInLine(adElement)) {
+                            //Set initial values
+                            ad.vpaid = false;
+    
+                            //Extract the necessary data from the NonLinear node
+                            ad.clickthroughUrl = playerInstance.getClickThroughUrlFromNonLinear(creativeNonLinear);
+                            ad.duration = playerInstance.getDurationFromNonLinear(creativeNonLinear); // VAST version < 4.0
+                            ad.dimension = playerInstance.getDimensionFromNonLinear(creativeNonLinear); // VAST version < 4.0
+                            ad.staticResource = playerInstance.getStaticResourceFromNonLinear(creativeNonLinear);
+                            ad.creativeType = playerInstance.getCreativeTypeFromStaticResources(creativeNonLinear);
+                            ad.adParameters = playerInstance.getAdParametersFromLinear(creativeNonLinear);
+    
+                            if (ad.adParameters) {
+                                ad.vpaid = true;
+                            }
                         }
                     }
+
+                    // Current support is for only one creative element
+                    // break the loop if creative was successful
+                    break;
+                } catch (err) {
+                    if (creativeElement.firstElementChild &&
+                        !(creativeElement.firstElementChild.tagName === 'Linear' ||
+                            creativeElement.firstElementChild.tagName === 'NonLinearAds')) {
+                        console.warn('Skipping ' + creativeElement.firstElementChild.tagName + ', this might not be supported yet.')
+                    }
+                    console.error(err);
                 }
-            });
+            };
         }
 
         return ad;
