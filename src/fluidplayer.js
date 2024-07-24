@@ -275,6 +275,9 @@ const fluidPlayerClass = function () {
                     })
                 }
             },
+            hls: {
+                overrideNative: false
+            },
             captions: {
                 play: 'Play',
                 pause: 'Pause',
