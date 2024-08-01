@@ -24,8 +24,12 @@ export default function (playerInstance, options) {
                 }
                 break;
             case 'application/x-mpegurl': // HLS
+                const { displayOptions, domRef } = playerInstance;
+                const { player } = domRef;
+                const { hls } = displayOptions;
+
                 // Doesn't load hls.js if player can play it natively
-                if (playerInstance.domRef.player.canPlayType('application/x-mpegurl')) {
+                if (player.canPlayType('application/x-mpegurl') && !hls.overrideNative) {
                     playerInstance.debugMessage('Native HLS support found, skipping hls.js');
                     break;
                 }
