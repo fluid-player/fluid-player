@@ -1,6 +1,10 @@
 # CHANGELOG
 
-## 3.33.0 (2024-07-11)
+## 3.35.0 (2024-08-01)
+* [Pull #825](https://github.com/fluid-player/fluid-player/pull/825) Fix image freezing
+* [Pull #826](https://github.com/fluid-player/fluid-player/pull/826) Ads cannot be displayed when XML content has two Creative tags
+
+## 3.34.0 (2024-07-11)
 * [Pull #819](https://github.com/fluid-player/fluid-player/pull/819) When users don't have suggested videos, there's a console error
 
 ## 3.33.0 (2024-07-02)
