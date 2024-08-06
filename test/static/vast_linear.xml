@@ -56,6 +56,17 @@
             <Impression id="">
                 <![CDATA[ http://www.example.com/impression ]]>
             </Impression>
+            <ViewableImpression id="1543">
+                <Viewable>
+                  <![CDATA[ http://www.example.com/view-impression ]]>
+                </Viewable>
+                <NotViewable>
+                  <![CDATA[ https://search.iabtechlab.com/error?errcode=102&imprid=s5-ea2f7f298e28c0c98374491aec3dfeb1&ts=1243 ]]>
+                </NotViewable>
+                <ViewUndetermined>
+                  <![CDATA[ https://search.iabtechlab.com/error?errcode=102&imprid=s5-ea2f7f298e28c0c98374491aec3dfeb1&ts=1243 ]]>
+                </ViewUndetermined>
+            </ViewableImpression>
         </InLine>
     </Ad>
 </VAST>

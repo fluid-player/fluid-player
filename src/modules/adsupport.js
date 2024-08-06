@@ -358,6 +358,17 @@ export default function (playerInstance, options) {
     playerInstance.scheduleTrackingEvent = (currentTime, duration) => {
         if (currentTime === 0) {
             playerInstance.trackSingleEvent('start');
+            playerInstance.observe();
+            playerInstance.domRef.player.timeInView = 0;
+        }
+
+        // View Impression is defined by IAB as: Watching at least 2 seconds of the video where at least 50% of the ad’s pixels are visible on the screen
+        if (playerInstance.domRef.player.inView) {
+            if (playerInstance.domRef.player.timeInView > 2) {
+                playerInstance.trackSingleEvent('viewImpression');
+            } else {
+                playerInstance.domRef.player.timeInView += currentTime;
+            }
         }
 
         if ((typeof playerInstance.vastOptions.tracking['progress'] !== 'undefined') &&
@@ -429,6 +440,21 @@ export default function (playerInstance, options) {
                     (typeof playerInstance.vastOptions.impression.length !== 'undefined')
                 ) {
                     trackingUris = playerInstance.vastOptions.impression;
+                }
+                break;
+
+            case 'viewImpression':
+                if (playerInstance.vastOptions.stopTracking['viewImpression'] === true) {
+                    break;
+                }
+
+                if (
+                    (typeof playerInstance.vastOptions.viewImpression !== 'undefined') &&
+                    (playerInstance.vastOptions.viewImpression !== null) &&
+                    (typeof playerInstance.vastOptions.viewImpression.length !== 'undefined')
+                ) {
+                    trackingUris = playerInstance.vastOptions.viewImpression;
+                    playerInstance.vastOptions.stopTracking['viewImpression'] = true;
                 }
                 break;
 

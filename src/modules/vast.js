@@ -23,6 +23,7 @@
  * @property {Array<string>} clicktracking
  * @property {string} errorUrl
  * @property {Array<string>} impressions
+ * @property {Array<string>} viewImpression
  * @property {Array<any>} stopTracking
  * @property {Array<any>} tracking
  * @property {number|null} sequence
@@ -362,6 +363,17 @@ export default function (playerInstance, options) {
 
     };
 
+    playerInstance.registerViewableImpressionEvents = (viewableImpressionTags, tmpOptions) => {
+        if (!viewableImpressionTags.length) {
+            return;
+        }
+
+        for (let i = 0; i < viewableImpressionTags.length; i++) {
+            const viewableImpressionEvent = playerInstance.extractNodeData(viewableImpressionTags[i]);
+            tmpOptions.viewImpression.push(viewableImpressionEvent);
+        }
+    };
+
     playerInstance.registerImpressionEvents = (impressionTags, tmpOptions) => {
         if (!impressionTags.length) {
             return;
@@ -688,6 +700,7 @@ export default function (playerInstance, options) {
             tracking: [],
             stopTracking: [],
             impression: [],
+            viewImpression: [],
             clicktracking: [],
             vastLoaded: false
         };
@@ -792,7 +805,7 @@ export default function (playerInstance, options) {
      * Register Ad element properties to an Ad based on its data and its wrapper data if available
      *
      * @param {RawAd} rawAd
-     * @param {{ tracking: Array, stopTracking: Array, impression: Array, clicktracking: Array }} options
+     * @param {{ tracking: Array, stopTracking: Array, impression: Array, viewImpression: Array, clicktracking: Array }} options
      * @returns {Ad}
      */
     function registerAdProperties(rawAd, options) {
@@ -806,6 +819,12 @@ export default function (playerInstance, options) {
             const impression = dataSource.getElementsByTagName('Impression');
             if (impression !== null) {
                 playerInstance.registerImpressionEvents(impression, ad);
+            }
+
+            // Register viewable impressions
+            const viewableImpression = dataSource.getElementsByTagName('Viewable');
+            if (viewableImpression !== null) {
+                playerInstance.registerViewableImpressionEvents(viewableImpression, ad);
             }
 
             // Get the error tag, if any
