@@ -1911,7 +1911,8 @@ const fluidPlayerClass = function () {
         let initiateVolumebarTimerId = setInterval(initiateVolumebar, 100);
         self.destructors.push(() => clearInterval(initiateVolumebarTimerId));
 
-        if (self.displayOptions.layoutControls.doubleclickFullscreen && !(self.isTouchDevice() || self.displayOptions.layoutControls.controlForwardBackward.doubleTapMobile)) {
+        if (self.displayOptions.layoutControls.doubleclickFullscreen && !(self.isTouchDevice() || self.displayOptions.layoutControls.controlForwardBackward.doubleTapMobile))
+            console.log('Double Click Event Triggered.');  {
             self.domRef.player.addEventListener('dblclick', self.fullscreenToggle);
         }
 
