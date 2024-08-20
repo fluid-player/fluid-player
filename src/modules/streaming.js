@@ -126,96 +126,119 @@ export default function (playerInstance, options) {
     playerInstance.createHLSVideoSourceSwitch = () => {
         playerInstance.hlsPlayer.on(Hls.Events.MANIFEST_PARSED, function () {
             try {
-                const HLSLevels =  playerInstance.hlsPlayer.levels.map((level, index) => ({
-                    id: index,
-                    title: String(level.width),
-                    isHD: level.videoRange === 'HDR'
-                }));
-
-                const levels = [...HLSLevels, {
-                    id: -1,
-                    title: 'auto',
-                    isHD: false
-                }];
-
-                const auto = levels.find(level => level.title === 'auto');
-                playerInstance.hlsPlayer.currentLevel = auto.id;
-
-                const sourceChangeButton = playerInstance.domRef.wrapper.querySelector('.fluid_control_video_source');
+                const levels = createHLSLevels();
                 playerInstance.videoSources = levels;
 
+                const sourceChangeButton = playerInstance.domRef.wrapper.querySelector('.fluid_control_video_source');
 
-                if (playerInstance.videoSources.length > 1) {
-                    sourceChangeButton.style.display = 'inline-block';
-                } else {
-                    sourceChangeButton.style.display = 'none';
-                }
+                toggleSourceChangeButtonVisibility(levels, sourceChangeButton);
 
-                if (playerInstance.videoSources.length <= 1) {
-                    return;
-                }
+                if (levels.length <= 1) return;
 
-                let appendSourceChange = false;
-
-                const sourceChangeList = document.createElement('div');
-                sourceChangeList.className = 'fluid_video_sources_list';
-                sourceChangeList.style.display = 'none';
-
-                for (const level of playerInstance.videoSources) {
-                    const persistencyLevelExists = playerInstance.videoSources.find(level => level.title === playerInstance.fluidStorage.fluidQuality);
-                    let sourceSelected = (!persistencyLevelExists && level.title === 'auto') ? "source_selected" : "";
-
-                    if (level.title === playerInstance.fluidStorage.fluidQuality) {
-                        sourceSelected = "source_selected";
-                    }
-
-                    const hdElement = (level.isHD) ? '<sup style="color:' + playerInstance.displayOptions.layoutControls.primaryColor + '" class="fp_hd_source"></sup>' : '';
-                    const sourceChangeDiv = document.createElement('div');
-                    sourceChangeDiv.className = 'fluid_video_source_list_item js-source_' + level.title;
-                    sourceChangeDiv.innerHTML = '<span class="source_button_icon ' + sourceSelected + '"></span>' + level.title + hdElement;
-
-                    sourceChangeDiv.addEventListener('click', function (event) {
-                        event.stopPropagation();
-                        // While changing source the player size can flash, we want to set the pixel dimensions then back to 100% afterwards
-                        playerInstance.domRef.player.style.width = playerInstance.domRef.player.clientWidth + 'px';
-                        playerInstance.domRef.player.style.height = playerInstance.domRef.player.clientHeight + 'px';
-
-                        const videoChangedTo = this;
-                        const sourceIcons = playerInstance.domRef.wrapper.getElementsByClassName('source_button_icon');
-                        for (let i = 0; i < sourceIcons.length; i++) {
-                            sourceIcons[i].className = sourceIcons[i].className.replace('source_selected', '');
-                        }
-                        videoChangedTo.firstChild.className += ' source_selected';
-
-                        playerInstance.videoSources.forEach(source => {
-                            if (source.title === videoChangedTo.innerText.replace(/(\r\n\t|\n|\r\t)/gm, '')) {
-                                playerInstance.hlsPlayer.currentLevel = level.id;
-                                playerInstance.fluidStorage.fluidQuality = level.title;
-                            }
-                        });
-
-                        playerInstance.openCloseVideoSourceSwitch();
-                    });
-
-                    sourceChangeList.appendChild(sourceChangeDiv);
-                    appendSourceChange = true;
-                };
-
-                if (appendSourceChange) {
-                    sourceChangeButton.appendChild(sourceChangeList);
-                    // To reset player for suggested videos, in case the event listener already exists
-                    sourceChangeButton.removeEventListener('click', playerInstance.openCloseVideoSourceSwitch);
-                    sourceChangeButton.addEventListener('click', playerInstance.openCloseVideoSourceSwitch);
-                } else {
-                    // Didn't give any source options
-                    playerInstance.domRef.wrapper.querySelector('.fluid_control_video_source').style.display = 'none';
-                }
+                const sourceChangeList = createSourceChangeList(levels);
+                attachSourceChangeList(sourceChangeButton, sourceChangeList);
+            } catch (err) {
+                console.error(err);
             }
-            catch (err) {
-                console.error(err)
-            }
-        })
+        });
     };
+
+    function createHLSLevels() {
+        const HLSLevels = playerInstance.hlsPlayer.levels.map((level, index) => ({
+            id: index,
+            title: String(level.width),
+            isHD: level.videoRange === 'HDR',
+        }));
+
+        const autoLevel = {
+            id: -1,
+            title: 'auto',
+            isHD: false,
+        };
+
+        const levels = [...HLSLevels, autoLevel];
+        playerInstance.hlsPlayer.currentLevel = autoLevel.id;
+
+        return levels;
+    }
+
+    function toggleSourceChangeButtonVisibility(levels, sourceChangeButton) {
+        if (levels.length > 1) {
+            sourceChangeButton.style.display = 'inline-block';
+        } else {
+            sourceChangeButton.style.display = 'none';
+        }
+    }
+
+    function createSourceChangeList(levels) {
+        const sourceChangeList = document.createElement('div');
+        sourceChangeList.className = 'fluid_video_sources_list';
+        sourceChangeList.style.display = 'none';
+
+        levels.forEach(level => {
+            const sourceChangeDiv = createSourceChangeItem(level);
+            sourceChangeList.appendChild(sourceChangeDiv);
+        });
+
+        return sourceChangeList;
+    }
+
+    function createSourceChangeItem(level) {
+        const sourceSelectedClass = getSourceSelectedClass(level);
+        const hdIndicator = level.isHD ? `<sup style="color:${playerInstance.displayOptions.layoutControls.primaryColor}" class="fp_hd_source"></sup>` : '';
+
+        const sourceChangeDiv = document.createElement('div');
+        sourceChangeDiv.className = `fluid_video_source_list_item js-source_${level.title}`;
+        sourceChangeDiv.innerHTML = `<span class="source_button_icon ${sourceSelectedClass}"></span>${level.title}${hdIndicator}`;
+
+        sourceChangeDiv.addEventListener('click', event => onSourceChangeClick(event, level));
+
+        return sourceChangeDiv;
+    }
+
+    function getSourceSelectedClass(level) {
+        const persistencyLevelExists = playerInstance.videoSources.some(source => source.title === playerInstance.fluidStorage.fluidQuality);
+        if (!persistencyLevelExists && level.title === 'auto') {
+            return "source_selected";
+        }
+        return level.title === playerInstance.fluidStorage.fluidQuality ? "source_selected" : "";
+    }
+
+    function onSourceChangeClick(event, level) {
+        event.stopPropagation();
+
+        setPlayerDimensions();
+
+        const videoChangedTo = event.currentTarget;
+        clearSourceSelectedIcons();
+
+        videoChangedTo.firstChild.classList.add('source_selected');
+
+        playerInstance.videoSources.forEach(source => {
+            if (source.title === videoChangedTo.textContent.trim()) {
+                playerInstance.hlsPlayer.currentLevel = level.id;
+                playerInstance.fluidStorage.fluidQuality = level.title;
+            }
+        });
+
+        playerInstance.openCloseVideoSourceSwitch();
+    }
+
+    function setPlayerDimensions() {
+        playerInstance.domRef.player.style.width = `${playerInstance.domRef.player.clientWidth}px`;
+        playerInstance.domRef.player.style.height = `${playerInstance.domRef.player.clientHeight}px`;
+    }
+
+    function clearSourceSelectedIcons() {
+        const sourceIcons = playerInstance.domRef.wrapper.getElementsByClassName('source_button_icon');
+        Array.from(sourceIcons).forEach(icon => icon.classList.remove('source_selected'));
+    }
+
+    function attachSourceChangeList(sourceChangeButton, sourceChangeList) {
+        sourceChangeButton.appendChild(sourceChangeList);
+        sourceChangeButton.removeEventListener('click', playerInstance.openCloseVideoSourceSwitch);
+        sourceChangeButton.addEventListener('click', playerInstance.openCloseVideoSourceSwitch);
+    }
 
     playerInstance.detachStreamers = () => {
         if (playerInstance.dashPlayer) {
