@@ -35,7 +35,7 @@ const FP_RUNTIME_DEBUG = typeof FP_DEBUG !== 'undefined' && FP_DEBUG === true;
 
 let playerInstances = 0;
 
-const fluidPlayerClass = function() {
+const fluidPlayerClass = function () {
     // "self" always points to current instance of the player within the scope of the instance
     // This should help readability and context awareness slightly...
     const self = this;
@@ -47,9 +47,9 @@ const fluidPlayerClass = function() {
     // noinspection JSUnresolvedVariable
     self.version = typeof FP_BUILD_VERSION !== 'undefined' ? FP_BUILD_VERSION : '';
     // noinspection JSUnresolvedVariable
-    self.homepage = typeof FP_HOMEPAGE !== 'undefined' ?
-        FP_HOMEPAGE + '/?utm_source=player&utm_medium=context_menu&utm_campaign=organic' :
-        '';
+    self.homepage = typeof FP_HOMEPAGE !== 'undefined'
+        ? FP_HOMEPAGE + '/?utm_source=player&utm_medium=context_menu&utm_campaign=organic'
+        : '';
     self.destructors = [];
 
     self.init = (playerTarget, options) => {
@@ -218,7 +218,8 @@ const fluidPlayerClass = function() {
                     width: null
                 },
                 layout: 'default', //options: 'default', '<custom>'
-                playerInitCallback: (function() {}),
+                playerInitCallback: (function () {
+                }),
                 persistentSettings: {
                     volume: true,
                     quality: true,
@@ -264,10 +265,14 @@ const fluidPlayerClass = function() {
                 vpaidTimeout: 3000,
 
                 vastAdvanced: {
-                    vastLoadedCallback: (function() {}),
-                    noVastVideoCallback: (function() {}),
-                    vastVideoSkippedCallback: (function() {}),
-                    vastVideoEndedCallback: (function() {})
+                    vastLoadedCallback: (function () {
+                    }),
+                    noVastVideoCallback: (function () {
+                    }),
+                    vastVideoSkippedCallback: (function () {
+                    }),
+                    vastVideoEndedCallback: (function () {
+                    })
                 }
             },
             hls: {
@@ -287,15 +292,20 @@ const fluidPlayerClass = function() {
                 configureHls: (options) => {
                     return options;
                 },
-                onBeforeInitHls: (hls) => {},
-                onAfterInitHls: (hls) => {},
+                onBeforeInitHls: (hls) => {
+                },
+                onAfterInitHls: (hls) => {
+                },
                 configureDash: (options) => {
                     return options;
                 },
-                onBeforeInitDash: (dash) => {},
-                onAfterInitDash: (dash) => {}
+                onBeforeInitDash: (dash) => {
+                },
+                onAfterInitDash: (dash) => {
+                }
             },
-            onBeforeXMLHttpRequestOpen: (request) => {},
+            onBeforeXMLHttpRequestOpen: (request) => {
+            },
             onBeforeXMLHttpRequest: (request) => {
                 if (FP_RUNTIME_DEBUG || FP_DEVELOPMENT_MODE) {
                     console.debug('[FP_DEBUG] Request made', request);
@@ -406,13 +416,13 @@ const fluidPlayerClass = function() {
 
         const _play_videoPlayer = playerNode.play;
 
-        playerNode.play = function() {
+        playerNode.play = function () {
             let promise = null;
 
             if (self.displayOptions.layoutControls.showCardBoardView) {
                 if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                     DeviceOrientationEvent.requestPermission()
-                        .then(function(response) {
+                        .then(function (response) {
                             if (response === 'granted') {
                                 self.debugMessage('DeviceOrientationEvent permission granted!');
                             }
@@ -443,7 +453,7 @@ const fluidPlayerClass = function() {
                         clearTimeout(self.promiseTimeout);
                     });
 
-                    self.promiseTimeout = setTimeout(function() {
+                    self.promiseTimeout = setTimeout(function () {
                         if (self.isPlayingMedia === false) {
                             self.announceLocalError(204, '[FP_ERROR] Timeout error. Failed to play video?');
                         }
@@ -459,7 +469,7 @@ const fluidPlayerClass = function() {
         };
 
         const videoPauseOriginal = playerNode.pause;
-        playerNode.pause = function() {
+        playerNode.pause = function () {
             if (self.isPlayingMedia === true) {
                 self.isPlayingMedia = false;
                 return videoPauseOriginal.apply(this, arguments);
@@ -497,9 +507,7 @@ const fluidPlayerClass = function() {
             //On mobile mouseleave behavior does not make sense, so it's better to keep controls, once the playback starts
             //Autohide behavior on timer is a separate functionality
             self.hideControlBar();
-            self.domRef.wrapper.addEventListener('touchstart', self.showControlBar, {
-                passive: true
-            });
+            self.domRef.wrapper.addEventListener('touchstart', self.showControlBar, { passive: true });
         }
 
         //Keyboard Controls
@@ -519,7 +527,8 @@ const fluidPlayerClass = function() {
                     textTrack.mode = 'hidden';
                 }
             }
-        } catch (_ignored) {}
+        } catch (_ignored) {
+        }
     };
 
     self.getCurrentVideoDuration = () => {
@@ -592,7 +601,7 @@ const fluidPlayerClass = function() {
 
     // TODO: rename
     self.announceLocalError = (code, msg) => {
-        const parsedCode = typeof(code) !== 'undefined' ? parseInt(code) : 900;
+        const parsedCode = typeof (code) !== 'undefined' ? parseInt(code) : 900;
         let message = '[Error] (' + parsedCode + '): ';
         message += !msg ? 'Failed to load Vast' : msg;
         console.warn(message);
@@ -610,7 +619,7 @@ const fluidPlayerClass = function() {
     self.onMainVideoEnded = (event) => {
         self.debugMessage('onMainVideoEnded is called');
 
-        if (self.isCurrentlyPlayingAd && self.autoplayAfterAd) { // It may be in-stream ending, and if it's not postroll then we don't execute anything
+        if (self.isCurrentlyPlayingAd && self.autoplayAfterAd) {  // It may be in-stream ending, and if it's not postroll then we don't execute anything
             return;
         }
 
@@ -638,9 +647,9 @@ const fluidPlayerClass = function() {
     };
 
     self.getCurrentTime = () => {
-        return self.isCurrentlyPlayingAd ?
-            self.mainVideoCurrentTime :
-            self.domRef.player.currentTime;
+        return self.isCurrentlyPlayingAd
+            ? self.mainVideoCurrentTime
+            : self.domRef.player.currentTime;
     };
 
     /**
@@ -680,7 +689,7 @@ const fluidPlayerClass = function() {
     self.onRecentWaiting = () => {
         self.recentWaiting = true;
 
-        setTimeout(function() {
+        setTimeout(function () {
             self.recentWaiting = false;
         }, 1000);
     };
@@ -689,7 +698,7 @@ const fluidPlayerClass = function() {
      * Dispatches a custom pause event which is not present when seeking.
      */
     self.onFluidPlayerPause = () => {
-        setTimeout(function() {
+        setTimeout(function () {
             if (self.recentWaiting) {
                 return;
             }
@@ -929,7 +938,7 @@ const fluidPlayerClass = function() {
 
         self.domRef.wrapper.querySelector('.fluid_initial_play').classList.add('transform-active');
         setTimeout(
-            function() {
+            function () {
                 self.domRef.wrapper.querySelector('.fluid_initial_play').classList.remove('transform-active');
             },
             800
@@ -1137,7 +1146,7 @@ const fluidPlayerClass = function() {
         let matchesFn = null;
 
         // find vendor prefix
-        ['matches', 'webkitMatchesSelector', 'mozMatchesSelector', 'msMatchesSelector', 'oMatchesSelector'].some(function(fn) {
+        ['matches', 'webkitMatchesSelector', 'mozMatchesSelector', 'msMatchesSelector', 'oMatchesSelector'].some(function (fn) {
             if (typeof document.body[fn] == 'function') {
                 matchesFn = fn;
                 return true;
@@ -1176,7 +1185,8 @@ const fluidPlayerClass = function() {
                     .replace(')', '')
                     .replace(/\s/g, '')
                     .replace(/px/g, '')
-                    .split(',');
+                    .split(',')
+                    ;
             }
         } catch (e) {
             coordinates = null;
@@ -1304,13 +1314,9 @@ const fluidPlayerClass = function() {
         };
 
         document.addEventListener('mouseup', onProgressbarMouseUp);
-        document.addEventListener('touchend', onProgressbarMouseUp, {
-            passive: true
-        });
+        document.addEventListener('touchend', onProgressbarMouseUp, { passive: true });
         document.addEventListener('mousemove', onProgressbarMouseMove);
-        document.addEventListener('touchmove', onProgressbarMouseMove, {
-            passive: true
-        });
+        document.addEventListener('touchmove', onProgressbarMouseMove, { passive: true });
     };
 
     self.onVolumeBarMouseDown = () => {
@@ -1354,13 +1360,9 @@ const fluidPlayerClass = function() {
         }
 
         document.addEventListener('mouseup', onVolumeBarMouseUp);
-        document.addEventListener('touchend', onVolumeBarMouseUp, {
-            passive: true
-        });
+        document.addEventListener('touchend', onVolumeBarMouseUp, { passive: true });
         document.addEventListener('mousemove', onVolumeBarMouseMove);
-        document.addEventListener('touchmove', onVolumeBarMouseMove, {
-            passive: true
-        });
+        document.addEventListener('touchmove', onVolumeBarMouseMove, { passive: true });
     };
 
     self.findRoll = (roll) => {
@@ -1418,22 +1420,22 @@ const fluidPlayerClass = function() {
         let newCurrentTime = currentTime;
 
         switch (keyCode) {
-            case 35: //End
+            case 35://End
                 newCurrentTime = duration;
                 break;
-            case 36: //Home
+            case 36://Home
                 newCurrentTime = 0;
                 break;
-            case 48: //0
-            case 49: //1
-            case 50: //2
-            case 51: //3
-            case 52: //4
-            case 53: //5
-            case 54: //6
-            case 55: //7
-            case 56: //8
-            case 57: //9
+            case 48://0
+            case 49://1
+            case 50://2
+            case 51://3
+            case 52://4
+            case 53://5
+            case 54://6
+            case 55://7
+            case 56://8
+            case 57://9
                 if (keyCode < 58 && keyCode > 47) {
                     const percent = (keyCode - 48) * 10;
                     newCurrentTime = duration * percent / 100;
@@ -1445,8 +1447,8 @@ const fluidPlayerClass = function() {
     };
 
     self.handleMouseleave = (event) => {
-        if (typeof event.clientX !== 'undefined' &&
-            self.domRef.wrapper.contains(document.elementFromPoint(event.clientX, event.clientY))) {
+        if (typeof event.clientX !== 'undefined'
+            && self.domRef.wrapper.contains(document.elementFromPoint(event.clientX, event.clientY))) {
             //false positive; we didn't actually leave the player
             return;
         }
@@ -1465,45 +1467,45 @@ const fluidPlayerClass = function() {
             const keyCode = event.keyCode;
 
             switch (keyCode) {
-                case 70: //f
+                case 70://f
                     self.fullscreenToggle();
                     event.preventDefault();
                     break;
-                case 13: //Enter
-                case 32: //Space
+                case 13://Enter
+                case 32://Space
                     self.playPauseToggle();
                     event.preventDefault();
                     break;
-                case 77: //m
+                case 77://m
                     self.muteToggle();
                     event.preventDefault();
                     break;
-                case 38: //up arrow
+                case 38://up arrow
                     self.onKeyboardVolumeChange('asc');
                     event.preventDefault();
                     break;
-                case 40: //down arrow
+                case 40://down arrow
                     self.onKeyboardVolumeChange('desc');
                     event.preventDefault();
                     break;
-                case 37: //left arrow
+                case 37://left arrow
                     self.skipRelative(-self.timeSkipOffsetAmount);
                     break;
-                case 39: //right arrow
+                case 39://right arrow
                     self.skipRelative(self.timeSkipOffsetAmount);
                     break;
-                case 35: //End
-                case 36: //Home
-                case 48: //0
-                case 49: //1
-                case 50: //2
-                case 51: //3
-                case 52: //4
-                case 53: //5
-                case 54: //6
-                case 55: //7
-                case 56: //8
-                case 57: //9
+                case 35://End
+                case 36://Home
+                case 48://0
+                case 49://1
+                case 50://2
+                case 51://3
+                case 52://4
+                case 53://5
+                case 54://6
+                case 55://7
+                case 56://8
+                case 57://9
                     self.onKeyboardSeekPosition(keyCode);
                     event.preventDefault();
                     break;
@@ -1535,7 +1537,7 @@ const fluidPlayerClass = function() {
     self.handleWindowClick = (e) => {
         if (!self.domRef.wrapper) {
             console.warn('Dangling click event listener should be collected for unknown wrapper.' +
-                'Did you forget to call destroy on player instance?');
+              'Did you forget to call destroy on player instance?');
             return;
         }
 
@@ -1638,9 +1640,9 @@ const fluidPlayerClass = function() {
             // The URL is hardcoded here to cover widest possible use cases.
             // If you know of an alternative workaround for this issue - let us know!
             const browserVersion = self.getBrowserVersion();
-            const isChromeAndroid = self.mobileInfo.userOs !== false &&
-                self.mobileInfo.userOs === 'Android' &&
-                browserVersion.browserName === 'Google Chrome';
+            const isChromeAndroid = self.mobileInfo.userOs !== false
+                && self.mobileInfo.userOs === 'Android'
+                && browserVersion.browserName === 'Google Chrome';
 
             if ('Safari' === browserVersion.browserName || isChromeAndroid) {
                 self.domRef.player.src = 'https://cdn.fluidplayer.com/static/blank.mp4';
@@ -1725,16 +1727,12 @@ const fluidPlayerClass = function() {
             );
         } else {
             self.domRef.wrapper.querySelector('.fluid_controls_progress_container')
-                .addEventListener(eventOn, event => self.onProgressbarMouseDown(event), {
-                    passive: true
-                });
+                .addEventListener(eventOn, event => self.onProgressbarMouseDown(event), { passive: true });
         }
 
         //Set the volume controls
         self.domRef.wrapper.querySelector('.fluid_control_volume_container')
-            .addEventListener(eventOn, event => self.onVolumeBarMouseDown(), {
-                passive: true
-            });
+            .addEventListener(eventOn, event => self.onVolumeBarMouseDown(), { passive: true });
 
         self.domRef.player.addEventListener('volumechange', () => self.contolVolumebarUpdate());
 
@@ -1873,33 +1871,34 @@ const fluidPlayerClass = function() {
 
     self.setDefaultLayout = () => {
         self.domRef.wrapper.className += ' fluid_player_layout_' + self.displayOptions.layoutControls.layout;
-    
+
         self.setCustomContextMenu();
-    
+
         const controls = self.generateCustomControlTags({
             displayVolumeBar: self.checkShouldDisplayVolumeBar(),
-            primaryColor: self.displayOptions.layoutControls.primaryColor ?
-                self.displayOptions.layoutControls.primaryColor : 'red',
+            primaryColor: self.displayOptions.layoutControls.primaryColor
+                ? self.displayOptions.layoutControls.primaryColor
+                : 'red',
             controlForwardBackward: !!self.displayOptions.layoutControls.controlForwardBackward.show,
             miniPlayer: self.displayOptions.layoutControls.miniPlayer,
         });
-    
+
         // Remove the default controls
         self.domRef.player.removeAttribute('controls');
-    
+
         // Insert custom controls and append loader
         self.domRef.player.parentNode.insertBefore(controls.root, self.domRef.player.nextSibling);
         self.domRef.player.parentNode.insertBefore(controls.loader, self.domRef.player.nextSibling);
-    
+
         // Register controls locally
         self.domRef.controls = controls;
-    
+
         /**
          * Set the volumebar after its elements are properly rendered.
          */
         let remainingAttemptsToInitiateVolumeBar = 100;
-    
-        const initiateVolumebar = function() {
+
+        const initiateVolumebar = function () {
             if (!remainingAttemptsToInitiateVolumeBar) {
                 clearInterval(initiateVolumebarTimerId);
             } else if (self.checkIfVolumebarIsRendered()) {
@@ -1911,48 +1910,41 @@ const fluidPlayerClass = function() {
         };
         let initiateVolumebarTimerId = setInterval(initiateVolumebar, 100);
         self.destructors.push(() => clearInterval(initiateVolumebarTimerId));
-    
-        // Separate behavior for desktop and mobile
-        if (self.displayOptions.layoutControls.doubleclickFullscreen && !self.isTouchDevice()) {
-            self.domRef.player.addEventListener('dblclick', () => {
-                console.log('Double click detected for fullscreen'); // Optional for debugging
-                self.fullscreenToggle();
-            });
-        } else if (self.isTouchDevice() && !!self.displayOptions.layoutControls.controlForwardBackward.doubleTapMobile) {
-            self.initDoubleTapSkip();
+
+        if (self.displayOptions.layoutControls.doubleclickFullscreen && !(self.isTouchDevice() || self.displayOptions.layoutControls.controlForwardBackward.doubleTapMobile)) {
+            self.domRef.player.addEventListener('dblclick', self.fullscreenToggle);
         }
-    
+
         self.initHtmlOnPauseBlock();
-    
+
         self.setCustomControls();
-    
+
         self.setupThumbnailPreview();
-    
+
         self.createTimePositionPreview();
-    
+
         self.posterImage();
-    
+
         self.initPlayButton();
-    
+
         self.setVideoPreload();
-    
+
         self.createPlaybackList();
-    
+
         self.createDownload();
-    
+
         self.toggleMiniPlayerScreenDetection();
-    
+
         if (!!self.displayOptions.layoutControls.controlForwardBackward.show) {
             self.initSkipControls();
         }
-    
+
         if (!!self.displayOptions.layoutControls.controlForwardBackward.doubleTapMobile) {
             self.initDoubleTapSkip();
         }
-    
+
         self.initSkipAnimationElements();
     };
-    
 
     self.initSkipControls = () => {
         self.domRef.controls.skipBack.addEventListener('click', self.skipRelative.bind(this, -self.timeSkipOffsetAmount));
@@ -1993,40 +1985,31 @@ const fluidPlayerClass = function() {
      * Initialises the double tap skip functionality
      */
     self.initDoubleTapSkip = () => {
-        let hasDoubleClicked = false;
-        let timeouts = [];
-    
-        function clearTimeouts() {
-            timeouts.forEach(timeout => clearTimeout(timeout));
-            timeouts = [];
+        if (!self.isTouchDevice()) {
+            return;
         }
-    
-        self.domRef.player.addEventListener('click', (event) => {
-            // Check if it's mobile on the fly and prevent double click skip if it is
-            if (!self.isTouchDevice()) {
-                return;
-            }
-    
-            const { offsetX } = event;
+
+        let lastTapTime = 0;
+
+        self.domRef.player.addEventListener('touchend', (event) => {
+        const currentTime = new Date().getTime();
+        const tapGap = currentTime - lastTapTime;
+
+          if (tapGap < 300 && tapGap > 0) {
+            const { offsetX } = event.changedTouches[0];
             const { clientWidth } = self.domRef.player;
-    
-            // Simulates default behaviour if it's a single click
-            timeouts.push(setTimeout(() => {
-                hasDoubleClicked = false;
-                self.playPauseToggle();
-            }, 300));
-    
-            // Skips video time if it's a double click
-            if (hasDoubleClicked) {
-                clearTimeouts();
-                hasDoubleClicked = false;
-                return self.skipRelative(offsetX < clientWidth / 2 ? -self.timeSkipOffsetAmount : self.timeSkipOffsetAmount);
+
+            if (offsetX < clientWidth / 2) {
+                self.skipRelative(-self.timeSkipOffsetAmount);
+            } else {
+                self.skipRelative(self.timeSkipOffsetAmount);
             }
-    
-            hasDoubleClicked = true;
-        });
-    }
-    
+          }
+           
+        lastTapTime = currentTime;
+       });
+    };
+
 
     /**
      * Skips the video time by timeOffset relative to the current video time
@@ -2070,11 +2053,13 @@ const fluidPlayerClass = function() {
     };
 
     self.setLayout = () => {
-        //All other browsers
+        // All other browsers
         if (!self.isTouchDevice()) {
             self.domRef.player.addEventListener('click', () => self.playPauseToggle(), false);
+            self.domRef.player.addEventListener('dblclick', self.fullscreenToggle);
         }
-        //Mobile Safari - because it does not emit a click event on initial click of the video
+        
+        // Mobile Safari - because it does not emit a click event on the initial click of the video
         self.domRef.player.addEventListener('play', self.initialPlay, false);
         self.setDefaultLayout();
     };
@@ -2085,8 +2070,8 @@ const fluidPlayerClass = function() {
         }
 
         ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'msfullscreenchange'].forEach(eventType => {
-            if (typeof(document['on' + eventType]) === 'object') {
-                document.addEventListener(eventType, function(ev) {
+            if (typeof (document['on' + eventType]) === 'object') {
+                document.addEventListener(eventType, function (ev) {
                     self.recalculateAdDimensions();
                 }, false);
             }
@@ -2099,9 +2084,9 @@ const fluidPlayerClass = function() {
         const wrapper = document.createElement('div');
 
         wrapper.id = 'fluid_video_wrapper_' + self.videoPlayerId;
-        wrapper.className = self.isTouchDevice() ?
-            'fluid_video_wrapper mobile' :
-            'fluid_video_wrapper';
+        wrapper.className = self.isTouchDevice()
+            ? 'fluid_video_wrapper mobile'
+            : 'fluid_video_wrapper';
 
         //Assign the height/width dimensions to the wrapper
         if (self.displayOptions.layoutControls.fillToContainer) {
@@ -2170,7 +2155,7 @@ const fluidPlayerClass = function() {
 
             // On suggested videos, if the resolution doesn't exist in the new source list, use the first one in the list
             // This gets overwritten if it's needed by setPersistentSettings()
-            if (firstSource && !initialLoad) {
+            if(firstSource && !initialLoad) {
                 self.domRef.player.src = source.url;
             }
 
@@ -2181,7 +2166,7 @@ const fluidPlayerClass = function() {
             sourceChangeDiv.className = 'fluid_video_source_list_item js-source_' + source.title;
             sourceChangeDiv.innerHTML = '<span class="source_button_icon ' + sourceSelected + '"></span>' + source.title + hdElement;
 
-            sourceChangeDiv.addEventListener('click', function(event) {
+            sourceChangeDiv.addEventListener('click', function (event) {
                 event.stopPropagation();
                 // While changing source the player size can flash, we want to set the pixel dimensions then back to 100% afterwards
                 self.domRef.player.style.width = self.domRef.player.clientWidth + 'px';
@@ -2375,7 +2360,7 @@ const fluidPlayerClass = function() {
 
         if (self.displayOptions.layoutControls.logo.clickUrl !== null) {
             logoImage.style.cursor = 'pointer';
-            logoImage.addEventListener('click', function() {
+            logoImage.addEventListener('click', function () {
                 const win = window.open(self.displayOptions.layoutControls.logo.clickUrl, '_blank');
                 win.focus();
             });
@@ -2383,10 +2368,10 @@ const fluidPlayerClass = function() {
 
         // If a mouseOverImage is provided then we must set up the listeners for it
         if (self.displayOptions.layoutControls.logo.mouseOverImageUrl) {
-            logoImage.addEventListener('mouseover', function() {
+            logoImage.addEventListener('mouseover', function () {
                 logoImage.src = self.displayOptions.layoutControls.logo.mouseOverImageUrl;
             }, false);
-            logoImage.addEventListener('mouseout', function() {
+            logoImage.addEventListener('mouseout', function () {
                 logoImage.src = self.displayOptions.layoutControls.logo.imageUrl;
             }, false);
         }
@@ -2409,7 +2394,7 @@ const fluidPlayerClass = function() {
         containerDiv.className = 'fluid_html_on_pause_container';
         containerDiv.style.display = 'none';
         containerDiv.innerHTML = self.displayOptions.layoutControls.htmlOnPauseBlock.html;
-        containerDiv.onclick = function(event) {
+        containerDiv.onclick = function (event) {
             self.playPauseToggle();
         };
 
@@ -2434,7 +2419,7 @@ const fluidPlayerClass = function() {
         const backgroundColor = (self.displayOptions.layoutControls.primaryColor) ? self.displayOptions.layoutControls.primaryColor : "#333333";
         containerDiv.innerHTML = '<div class="fluid_initial_play" style="background-color:' + backgroundColor + '"><div class="fluid_initial_play_button"></div></div>';
         const initPlayEventTypes = ['click', 'touchend'];
-        const initPlayFunction = function() {
+        const initPlayFunction = function () {
             self.playPauseToggle();
             initPlayEventTypes.forEach(eventType => containerDiv.removeEventListener(eventType, initPlayFunction))
         };
@@ -2514,12 +2499,12 @@ const fluidPlayerClass = function() {
 
         self.destructors.push(() => clearInterval(intervalId));
 
-        const listenTo = (self.isTouchDevice()) ? ['touchstart', 'touchmove', 'touchend'] : ['mousemove', 'mousedown', 'mouseup'];
+        const listenTo = (self.isTouchDevice())
+            ? ['touchstart', 'touchmove', 'touchend']
+            : ['mousemove', 'mousedown', 'mouseup'];
 
         for (let i = 0; i < listenTo.length; i++) {
-            videoPlayer.addEventListener(listenTo[i], activity, {
-                passive: true
-            });
+            videoPlayer.addEventListener(listenTo[i], activity, { passive: true });
         }
     };
 
@@ -2691,20 +2676,20 @@ const fluidPlayerClass = function() {
         sourceChangeList.style.display = 'none';
 
         if (
-            !Array.isArray(self.displayOptions.layoutControls.controlBar.playbackRates) ||
-            self.displayOptions.layoutControls.controlBar.playbackRates.some(
+            !Array.isArray(self.displayOptions.layoutControls.controlBar.playbackRates)
+            || self.displayOptions.layoutControls.controlBar.playbackRates.some(
                 rate => typeof rate !== 'string' || Number.isNaN(Number(rate.replace('x', '')))
             )
         ) {
             self.displayOptions.layoutControls.controlBar.playbackRates = ['x2', 'x1.5', 'x1', 'x0.5'];
         }
 
-        self.displayOptions.layoutControls.controlBar.playbackRates.forEach(function(rate) {
+        self.displayOptions.layoutControls.controlBar.playbackRates.forEach(function (rate) {
             const sourceChangeDiv = document.createElement('div');
             sourceChangeDiv.className = 'fluid_video_playback_rates_item';
             sourceChangeDiv.innerText = rate;
 
-            sourceChangeDiv.addEventListener('click', function(event) {
+            sourceChangeDiv.addEventListener('click', function (event) {
                 event.stopPropagation();
                 let playbackRate = this.innerText.replace('x', '');
                 self.setPlaybackSpeed(playbackRate);
@@ -2715,7 +2700,7 @@ const fluidPlayerClass = function() {
         });
 
         sourceChangeButton.appendChild(sourceChangeList);
-        sourceChangeButton.addEventListener('click', function() {
+        sourceChangeButton.addEventListener('click', function () {
             self.openCloseVideoPlaybackRate();
         });
     };
@@ -2729,7 +2714,7 @@ const fluidPlayerClass = function() {
         }
 
         sourceChangeList.style.display = 'block';
-        const mouseOut = function() {
+        const mouseOut = function () {
             sourceChangeList.removeEventListener('mouseleave', mouseOut);
             sourceChangeList.style.display = 'none';
         };
@@ -2745,14 +2730,14 @@ const fluidPlayerClass = function() {
 
         let downloadClick = document.createElement('a');
         downloadClick.className = 'fp_download_click';
-        downloadClick.onclick = function(e) {
+        downloadClick.onclick = function (e) {
             const linkItem = this;
 
             if (typeof e.stopImmediatePropagation !== 'undefined') {
                 e.stopImmediatePropagation();
             }
 
-            setTimeout(function() {
+            setTimeout(function () {
                 linkItem.download = '';
                 linkItem.href = '';
             }, 100);
@@ -2760,7 +2745,7 @@ const fluidPlayerClass = function() {
 
         downloadOption.appendChild(downloadClick);
 
-        downloadOption.addEventListener('click', function() {
+        downloadOption.addEventListener('click', function () {
             const downloadItem = self.domRef.wrapper.querySelector('.fp_download_click');
             downloadItem.download = self.originalSrc;
             downloadItem.href = self.originalSrc;
@@ -2841,10 +2826,10 @@ const fluidPlayerClass = function() {
         switch (self.displayOptions.layoutControls.theatreSettings.horizontalAlign) {
             case 'center':
                 // We must calculate the margin differently based on whether they passed % or px
-                if (typeof(workingWidth) == 'string' && workingWidth.substr(workingWidth.length - 1) === "%") {
+                if (typeof (workingWidth) == 'string' && workingWidth.substr(workingWidth.length - 1) === "%") {
                     // A margin of half the remaining space
                     defaultHorizontalMargin = ((100 - parseInt(workingWidth.substring(0, workingWidth.length - 1))) / 2) + "%";
-                } else if (typeof(workingWidth) == 'string' && workingWidth.substr(workingWidth.length - 2) === "px") {
+                } else if (typeof (workingWidth) == 'string' && workingWidth.substr(workingWidth.length - 2) === "px") {
                     // Half the (Remaining width / fullwidth)
                     defaultHorizontalMargin = (((screen.width - parseInt(workingWidth.substring(0, workingWidth.length - 2))) / screen.width) * 100 / 2) + "%";
                 } else {
@@ -2876,8 +2861,8 @@ const fluidPlayerClass = function() {
             console.log('[FP_ERROR] Not allowed value in posterImageSize');
             return;
         }
-        containerDiv.style.background = "url('" + self.displayOptions.layoutControls.posterImage + "') center center / " +
-            self.displayOptions.layoutControls.posterImageSize + " no-repeat black";
+        containerDiv.style.background = "url('" + self.displayOptions.layoutControls.posterImage + "') center center / "
+            + self.displayOptions.layoutControls.posterImageSize + " no-repeat black";
         self.domRef.player.parentNode.insertBefore(containerDiv, null);
     };
 
@@ -2907,7 +2892,7 @@ const fluidPlayerClass = function() {
 
     self.setPersistentSettings = (ignoreMute = false) => {
         try {
-            if (!(typeof(Storage) !== 'undefined' && typeof(localStorage) !== 'undefined')) {
+            if (!(typeof (Storage) !== 'undefined' && typeof (localStorage) !== 'undefined')) {
                 return;
             }
         } catch (e) {
@@ -2915,8 +2900,7 @@ const fluidPlayerClass = function() {
         }
 
         // See https://github.com/fluid-player/fluid-player/issues/271
-        const testKey = '_fp_storage_enabled',
-            storage = localStorage;
+        const testKey = '_fp_storage_enabled', storage = localStorage;
         try {
             storage.setItem(testKey, '1');
             storage.removeItem(testKey);
@@ -2925,18 +2909,18 @@ const fluidPlayerClass = function() {
         }
 
         self.fluidStorage = localStorage;
-        if (typeof(self.fluidStorage.fluidVolume) !== 'undefined' &&
-            self.displayOptions.layoutControls.persistentSettings.volume &&
-            !ignoreMute) {
+        if (typeof (self.fluidStorage.fluidVolume) !== 'undefined'
+            && self.displayOptions.layoutControls.persistentSettings.volume
+            && !ignoreMute) {
             self.setVolume(self.fluidStorage.fluidVolume);
 
-            if (typeof(self.fluidStorage.fluidMute) !== 'undefined' && self.fluidStorage.fluidMute === 'true') {
+            if (typeof (self.fluidStorage.fluidMute) !== 'undefined' && self.fluidStorage.fluidMute === 'true') {
                 self.muteToggle();
             }
         }
 
-        if (typeof(self.fluidStorage.fluidQuality) !== 'undefined' &&
-            self.displayOptions.layoutControls.persistentSettings.quality) {
+        if (typeof (self.fluidStorage.fluidQuality) !== 'undefined'
+            && self.displayOptions.layoutControls.persistentSettings.quality) {
             const sourceOption = self.domRef.wrapper.querySelector('.js-source_' + self.fluidStorage.fluidQuality);
             const sourceChangeButton = self.domRef.wrapper.querySelector('.fluid_control_video_source');
             if (sourceOption) {
@@ -2945,14 +2929,14 @@ const fluidPlayerClass = function() {
             }
         }
 
-        if (typeof(self.fluidStorage.fluidSpeed) !== 'undefined' &&
-            self.displayOptions.layoutControls.persistentSettings.speed) {
+        if (typeof (self.fluidStorage.fluidSpeed) !== 'undefined'
+            && self.displayOptions.layoutControls.persistentSettings.speed) {
             self.setPlaybackSpeed(self.fluidStorage.fluidSpeed);
         }
 
-        if (typeof(self.fluidStorage.fluidTheatre) !== 'undefined' &&
-            self.fluidStorage.fluidTheatre === 'true' &&
-            self.displayOptions.layoutControls.persistentSettings.theatre) {
+        if (typeof (self.fluidStorage.fluidTheatre) !== 'undefined'
+            && self.fluidStorage.fluidTheatre === 'true'
+            && self.displayOptions.layoutControls.persistentSettings.theatre) {
             self.theatreToggle();
         }
     };
@@ -3017,7 +3001,7 @@ const fluidPlayerClass = function() {
             containerDiv.className = 'fluid_html_on_pause';
             containerDiv.style.display = 'none';
             containerDiv.innerHTML = passedHtml.html;
-            containerDiv.onclick = function() {
+            containerDiv.onclick = function () {
                 self.playPauseToggle();
             };
 
@@ -3223,7 +3207,7 @@ const fluidPlayerClass = function() {
  * Public Fluid Player API interface
  * @param instance
  */
-const fluidPlayerInterface = function(instance) {
+const fluidPlayerInterface = function (instance) {
     this.play = () => {
         return instance.play()
     };
@@ -3292,7 +3276,7 @@ const fluidPlayerInterface = function(instance) {
  * @param options Fluid Player configuration options
  * @returns {fluidPlayerInterface}
  */
-const fluidPlayerInitializer = function(target, options) {
+const fluidPlayerInitializer = function (target, options) {
     const instance = new fluidPlayerClass();
 
     if (!options) {
