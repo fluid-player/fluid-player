@@ -1911,8 +1911,12 @@ const fluidPlayerClass = function () {
         let initiateVolumebarTimerId = setInterval(initiateVolumebar, 100);
         self.destructors.push(() => clearInterval(initiateVolumebarTimerId));
 
-        if (self.displayOptions.layoutControls.doubleclickFullscreen && !(self.isTouchDevice() || self.displayOptions.layoutControls.controlForwardBackward.doubleTapMobile)) {
-            self.domRef.player.addEventListener('dblclick', self.fullscreenToggle);
+        if (self.displayOptions.layoutControls.doubleclickFullscreen) {
+            if (!self.isTouchDevice()) {
+                self.domRef.player.addEventListener('dblclick', self.fullscreenToggle);
+            } else if (!self.displayOptions.layoutControls.controlForwardBackward.doubleTapMobile) {
+                self.domRef.player.addEventListener('dblclick', self.fullscreenToggle);
+            }
         }
 
         self.initHtmlOnPauseBlock();
@@ -1985,31 +1989,39 @@ const fluidPlayerClass = function () {
      * Initialises the double tap skip functionality
      */
     self.initDoubleTapSkip = () => {
-        if (!self.isTouchDevice()) {
-            return;
+        let hasDoubleClicked = false;
+        let timeouts = [];
+
+        function clearTimeouts() {
+            timeouts.forEach(timeout => clearTimeout(timeout));
+            timeouts = [];
         }
 
-        let lastTapTime = 0;
+        self.domRef.player.addEventListener('click', (event) => {
+            // Check if it's mobile on the fly and prevent double click skip if it is
+            if (!self.isTouchDevice()) {
+                return;
+            }
 
-        self.domRef.player.addEventListener('touchend', (event) => {
-        const currentTime = new Date().getTime();
-        const tapGap = currentTime - lastTapTime;
-
-          if (tapGap < 300 && tapGap > 0) {
-            const { offsetX } = event.changedTouches[0];
+            const { offsetX } = event
             const { clientWidth } = self.domRef.player;
 
-            if (offsetX < clientWidth / 2) {
-                self.skipRelative(-self.timeSkipOffsetAmount);
-            } else {
-                self.skipRelative(self.timeSkipOffsetAmount);
-            }
-          }
-           
-        lastTapTime = currentTime;
-       });
-    };
+            // Simulates default behaviour if it's a single click
+            timeouts.push(setTimeout(() => {
+                hasDoubleClicked = false;
+                self.playPauseToggle();
+            }, 300));
 
+            // Skips video time if it's a double click
+            if (hasDoubleClicked) {
+                clearTimeouts();
+                hasDoubleClicked = false;
+                return self.skipRelative(offsetX < clientWidth / 2 ? -self.timeSkipOffsetAmount : self.timeSkipOffsetAmount);
+            }
+
+            hasDoubleClicked = true;
+        });
+    }
 
     /**
      * Skips the video time by timeOffset relative to the current video time
@@ -2053,13 +2065,11 @@ const fluidPlayerClass = function () {
     };
 
     self.setLayout = () => {
-        // All other browsers
+        //All other browsers
         if (!self.isTouchDevice()) {
             self.domRef.player.addEventListener('click', () => self.playPauseToggle(), false);
-            self.domRef.player.addEventListener('dblclick', self.fullscreenToggle);
         }
-        
-        // Mobile Safari - because it does not emit a click event on the initial click of the video
+        //Mobile Safari - because it does not emit a click event on initial click of the video
         self.domRef.player.addEventListener('play', self.initialPlay, false);
         self.setDefaultLayout();
     };
