@@ -2353,10 +2353,10 @@ he@^1.2.0:
   resolved "https://registry.npmjs.org/he/-/he-1.2.0.tgz"
   integrity sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==
 
-hls.js@^1.3.2:
-  version "1.3.2"
-  resolved "https://registry.yarnpkg.com/hls.js/-/hls.js-1.3.2.tgz#bf3e46f71dddadfe7ce1d0b372b36e5617736110"
-  integrity sha512-qb9xNRBnYoNuJfACsolKzlzNxl0ietBxC6Aa1H45GZTkmg3XjEc7gfXThCINCw/0F+sm3n0x1m4toqWecxjWwA==
+hls.js@^1.5.13:
+  version "1.5.14"
+  resolved "https://registry.yarnpkg.com/hls.js/-/hls.js-1.5.14.tgz#1d52be309a06aab25fee667c4969d8abf9f8fe59"
+  integrity sha512-5wLiQ2kWJMui6oUslaq8PnPOv1vjuee5gTxjJD0DSsccY12OXtDT0h137UuqjczNeHzeEYR0ROZQibKNMr7Mzg==
 
 hpack.js@^2.1.6:
   version "2.1.6"
