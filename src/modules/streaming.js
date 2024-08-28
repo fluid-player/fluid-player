@@ -89,7 +89,7 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.initialiseHls = () => {
-        if (Hls.isSupported()) {
+        if (typeof Hls !== 'undefined' && Hls.isSupported()) {
             playerInstance.debugMessage('Initializing hls.js');
 
             const defaultOptions = {
@@ -137,6 +137,9 @@ export default function (playerInstance, options) {
 
                 const sourceChangeList = createSourceChangeList(levels);
                 attachSourceChangeList(sourceChangeButton, sourceChangeList);
+
+                // Set initial level based on persisted quality or default to auto
+                setInitialLevel(levels);
             } catch (err) {
                 console.error(err);
             }
@@ -156,10 +159,7 @@ export default function (playerInstance, options) {
             isHD: false,
         };
 
-        const levels = [...HLSLevels, autoLevel];
-        playerInstance.hlsPlayer.currentLevel = autoLevel.id;
-
-        return levels;
+        return [...HLSLevels, autoLevel];
     }
 
     function toggleSourceChangeButtonVisibility(levels, sourceChangeButton) {
@@ -204,7 +204,7 @@ export default function (playerInstance, options) {
         return level.title === playerInstance.fluidStorage.fluidQuality ? "source_selected" : "";
     }
 
-    function onSourceChangeClick(event, level) {
+    function onSourceChangeClick(event, selectedLevel) {
         event.stopPropagation();
 
         setPlayerDimensions();
@@ -215,15 +215,16 @@ export default function (playerInstance, options) {
         videoChangedTo.firstChild.classList.add('source_selected');
 
         playerInstance.videoSources.forEach(source => {
-            if (source.title === videoChangedTo.textContent.trim()) {
-                playerInstance.hlsPlayer.currentLevel = level.id;
-                playerInstance.fluidStorage.fluidQuality = level.title;
+            if (source.title === videoChangedTo.innerText.replace(/(\r\n\t|\n|\r\t)/gm, '')) {
+                playerInstance.hlsPlayer.currentLevel = selectedLevel.id;
+                playerInstance.fluidStorage.fluidQuality = selectedLevel.title;
             }
         });
 
         playerInstance.openCloseVideoSourceSwitch();
     }
 
+    // While changing source the player size can flash, we want to set the pixel dimensions then back to 100% afterwards
     function setPlayerDimensions() {
         playerInstance.domRef.player.style.width = `${playerInstance.domRef.player.clientWidth}px`;
         playerInstance.domRef.player.style.height = `${playerInstance.domRef.player.clientHeight}px`;
@@ -238,6 +239,19 @@ export default function (playerInstance, options) {
         sourceChangeButton.appendChild(sourceChangeList);
         sourceChangeButton.removeEventListener('click', playerInstance.openCloseVideoSourceSwitch);
         sourceChangeButton.addEventListener('click', playerInstance.openCloseVideoSourceSwitch);
+    }
+
+    function setInitialLevel(levels) {
+        // Check if a persistency level exists and set the current level accordingly
+        const persistedLevel = levels.find(level => level.title === playerInstance.fluidStorage.fluidQuality);
+
+        if (persistedLevel) {
+            playerInstance.hlsPlayer.currentLevel = persistedLevel.id;
+        } else {
+            // Default to 'auto' if no persisted level is found
+            const autoLevel = levels.find(level => level.title === 'auto');
+            playerInstance.hlsPlayer.currentLevel = autoLevel.id;
+        }
     }
 
     playerInstance.detachStreamers = () => {
