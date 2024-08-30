@@ -1911,13 +1911,13 @@ const fluidPlayerClass = function () {
         let initiateVolumebarTimerId = setInterval(initiateVolumebar, 100);
         self.destructors.push(() => clearInterval(initiateVolumebarTimerId));
 
-        if (self.displayOptions.layoutControls.doubleclickFullscreen) {
-            if (!self.isTouchDevice()) {
-                self.domRef.player.addEventListener('dblclick', self.fullscreenToggle);
-            } else if (!self.displayOptions.layoutControls.controlForwardBackward.doubleTapMobile) {
-                self.domRef.player.addEventListener('dblclick', self.fullscreenToggle);
-            }
+        if (
+            self.displayOptions.layoutControls.doubleclickFullscreen &&
+            (!self.isTouchDevice() || !self.displayOptions.layoutControls.controlForwardBackward.doubleTapMobile)
+        ) {
+            self.domRef.player.addEventListener('dblclick', self.fullscreenToggle);
         }
+        
 
         self.initHtmlOnPauseBlock();
 
