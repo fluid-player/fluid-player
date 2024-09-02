@@ -129,11 +129,12 @@ export default function (playerInstance, options) {
                 const levels = createHLSLevels();
                 playerInstance.videoSources = levels;
 
+                // <=2 because of the added auto function
+                if (levels.length <= 2) return;
+
                 const sourceChangeButton = playerInstance.domRef.wrapper.querySelector('.fluid_control_video_source');
 
                 toggleSourceChangeButtonVisibility(levels, sourceChangeButton);
-
-                if (levels.length <= 1) return;
 
                 const sourceChangeList = createSourceChangeList(levels);
                 attachSourceChangeList(sourceChangeButton, sourceChangeList);
@@ -147,11 +148,20 @@ export default function (playerInstance, options) {
     };
 
     function createHLSLevels() {
-        const HLSLevels = playerInstance.hlsPlayer.levels.map((level, index) => ({
-            id: index,
-            title: String(level.width),
-            isHD: level.videoRange === 'HDR',
-        }));
+        const HLSLevels = playerInstance.hlsPlayer.levels
+            .sort((a, b) => {
+                // First sort by width in descending order
+                if (b.width !== a.width) {
+                    return b.width - a.width;
+                }
+                // If width is the same, sort by bitrate in descending order
+                return b.bitrate - a.bitrate;
+            })
+            .map((level, index) => ({
+                id: index,
+                title: String(level.width),
+                isHD: level.videoRange === 'HDR',
+            }));
 
         const autoLevel = {
             id: -1,
@@ -197,11 +207,23 @@ export default function (playerInstance, options) {
     }
 
     function getSourceSelectedClass(level) {
-        const persistencyLevelExists = playerInstance.videoSources.some(source => source.title === playerInstance.fluidStorage.fluidQuality);
-        if (!persistencyLevelExists && level.title === 'auto') {
+        const matchingLevels = playerInstance.videoSources.filter(source => source.title === playerInstance.fluidStorage.fluidQuality);
+
+        // If there are multiple matching levels, use the first one
+        if (matchingLevels.length > 1) {
+            if (matchingLevels[0].id === level.id) {
+                return "source_selected";
+            }
+        } else if (matchingLevels.length === 1) {
+            return matchingLevels[0].id === level.id ? "source_selected" : "";
+        }
+
+        // Fallback to auto selection if no persistent level exists
+        if (!matchingLevels.length && level.title === 'auto') {
             return "source_selected";
         }
-        return level.title === playerInstance.fluidStorage.fluidQuality ? "source_selected" : "";
+
+        return "";
     }
 
     function onSourceChangeClick(event, selectedLevel) {
