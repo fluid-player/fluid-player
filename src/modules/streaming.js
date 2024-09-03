@@ -127,20 +127,21 @@ export default function (playerInstance, options) {
         playerInstance.hlsPlayer.on(Hls.Events.MANIFEST_PARSED, function () {
             try {
                 const levels = createHLSLevels();
-                playerInstance.videoSources = levels;
+                const sortedLevels = sortLevels(levels);
+                playerInstance.videoSources = sortedLevels;
 
                 // <=2 because of the added auto function
-                if (levels.length <= 2) return;
+                if (sortedLevels.length <= 2) return;
 
                 const sourceChangeButton = playerInstance.domRef.wrapper.querySelector('.fluid_control_video_source');
 
-                toggleSourceChangeButtonVisibility(levels, sourceChangeButton);
+                toggleSourceChangeButtonVisibility(sortedLevels, sourceChangeButton);
 
-                const sourceChangeList = createSourceChangeList(levels);
+                const sourceChangeList = createSourceChangeList(sortedLevels);
                 attachSourceChangeList(sourceChangeButton, sourceChangeList);
 
                 // Set initial level based on persisted quality or default to auto
-                setInitialLevel(levels);
+                setInitialLevel(sortedLevels);
             } catch (err) {
                 console.error(err);
             }
@@ -149,24 +150,18 @@ export default function (playerInstance, options) {
 
     function createHLSLevels() {
         const HLSLevels = playerInstance.hlsPlayer.levels
-            .sort((a, b) => {
-                // First sort by width in descending order
-                if (b.width !== a.width) {
-                    return b.width - a.width;
-                }
-                // If width is the same, sort by bitrate in descending order
-                return b.bitrate - a.bitrate;
-            })
             .map((level, index) => ({
                 id: index,
                 title: String(level.width),
                 isHD: level.videoRange === 'HDR',
+                bitrate: level.bitrate
             }));
 
         const autoLevel = {
             id: -1,
             title: 'auto',
             isHD: false,
+            bitrate: 0
         };
 
         return [...HLSLevels, autoLevel];
@@ -274,6 +269,17 @@ export default function (playerInstance, options) {
             const autoLevel = levels.find(level => level.title === 'auto');
             playerInstance.hlsPlayer.currentLevel = autoLevel.id;
         }
+    }
+
+    function sortLevels(levels) {
+        return [...levels].sort((a, b) => {
+            // First sort by width in descending order
+            if (b.width !== a.width) {
+                return b.width - a.width;
+            }
+            // If width is the same, sort by bitrate in descending order
+            return b.bitrate - a.bitrate;
+        });
     }
 
     playerInstance.detachStreamers = () => {
