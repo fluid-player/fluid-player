@@ -122,6 +122,7 @@ export default function (playerInstance, options) {
     }
 
     playerInstance.loadInNewVideo = () => {
+        playerInstance.displayOptions.layoutControls.mediaType = playerInstance.getCurrentSrcType();
         playerInstance.initialiseStreamers();
         playerInstance.domRef.player.currentTime = 0;
         playerInstance.domRef.player.mainVideoCurrentTime = 0;

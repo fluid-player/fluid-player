@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Hls VOD suggested videos</title>
+    <%= htmlWebpackPlugin.tags.headTags %>
+    <style lang="css">
+        #fluid-player-e2e-case, #fluid-player-e2e-case-2 {
+            width: 90%;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Hls with suggested videos</h1>
+<aside><b>NOTE</b>: Only Hls supports auto quality, for now</aside>
+<ul>
+    <li>Initial video is an mp4</li>
+    <ul>
+        <li>no auto option</li>
+    </ul>
+    <li>All suggested videos in the initial video are Hls</li>
+    <li>Suggested videos at the end of the second video are mp4's</li>
+    <ul>
+        <li>no auto option</li>
+    </ul>
+</ul>
+<video id="fluid-player-e2e-case">
+    <source src='https://www.fluidplayer.com/videos/In-video-Banner.mp4' data-fluid-hd title="1080p" type='video/mp4'/>
+    <source src='https://www.fluidplayer.com/videos/In-video-Banner.mp4' data-fluid-hd title="720p" type='video/mp4'/>
+    <source src='https://www.fluidplayer.com/videos/In-video-Banner.mp4' title="480p" type='video/mp4'/>
+</video>
+
+<%= htmlWebpackPlugin.tags.bodyTags %>
+
+<script>
+    var instance = fluidPlayer('fluid-player-e2e-case', {
+        layoutControls: {
+            subtitlesEnabled: true,
+        },
+        suggestedVideos: {
+            configUrl: '/static/suggested_videos_example_v3.json',
+        },
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,170 @@
+[
+    {
+        "id": 0,
+        "sources": [
+            {
+                "url": "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8",
+                "mimeType": "application/x-mpegurl",
+                "resolution": "720p",
+                "hd": "true"
+            }
+        ],
+        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg",
+        "title": "HLS VOD",
+        "configUrl" : "/static/suggested_videos_example_v2.json"
+    },
+    {
+        "id": 1,
+        "sources": [
+            {
+                "url": "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8",
+                "mimeType": "application/x-mpegurl",
+                "resolution": "720p",
+                "hd": "true"
+            }
+        ],
+        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg",
+        "title": "HLS VOD",
+        "configUrl" : "/static/suggested_videos_example_v2.json"
+    },
+    {
+        "id": 2,
+        "sources": [
+            {
+                "url": "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8",
+                "mimeType": "application/x-mpegurl",
+                "resolution": "720p",
+                "hd": "true"
+            }
+        ],
+        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg",
+        "title": "HLS VOD",
+        "configUrl" : "/static/suggested_videos_example_v2.json"
+    },
+    {
+        "id": 3,
+        "sources": [
+            {
+                "url": "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8",
+                "mimeType": "application/x-mpegurl",
+                "resolution": "720p",
+                "hd": "true"
+            }
+        ],
+        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg",
+        "title": "HLS VOD",
+        "configUrl" : "/static/suggested_videos_example_v2.json"
+    },
+    {
+        "id": 4,
+        "sources": [
+            {
+                "url": "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8",
+                "mimeType": "application/x-mpegurl",
+                "resolution": "720p",
+                "hd": "true"
+            }
+        ],
+        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg",
+        "title": "HLS VOD",
+        "configUrl" : "/static/suggested_videos_example_v2.json"
+    },
+    {
+        "id": 5,
+        "sources": [
+            {
+                "url": "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8",
+                "mimeType": "application/x-mpegurl",
+                "resolution": "720p",
+                "hd": "true"
+            }
+        ],
+        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg",
+        "title": "HLS VOD",
+        "configUrl" : "/static/suggested_videos_example_v2.json"
+    },
+    {
+        "id": 6,
+        "sources": [
+            {
+                "url": "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8",
+                "mimeType": "application/x-mpegurl",
+                "resolution": "720p",
+                "hd": "true"
+            }
+        ],
+        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg",
+        "title": "HLS VOD",
+        "configUrl" : "/static/suggested_videos_example_v2.json"
+    },
+    {
+        "id": 7,
+        "sources": [
+            {
+                "url": "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8",
+                "mimeType": "application/x-mpegurl",
+                "resolution": "720p",
+                "hd": "true"
+            }
+        ],
+        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg",
+        "title": "HLS VOD",
+        "configUrl" : "/static/suggested_videos_example_v2.json"
+    },
+    {
+        "id": 8,
+        "sources": [
+            {
+                "url": "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8",
+                "mimeType": "application/x-mpegurl",
+                "resolution": "720p",
+                "hd": "true"
+            }
+        ],
+        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg",
+        "title": "HLS VOD",
+        "configUrl" : "/static/suggested_videos_example_v2.json"
+    },
+    {
+        "id": 9,
+        "sources": [
+            {
+                "url": "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8",
+                "mimeType": "application/x-mpegurl",
+                "resolution": "720p",
+                "hd": "true"
+            }
+        ],
+        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg",
+        "title": "HLS VOD",
+        "configUrl" : "/static/suggested_videos_example_v2.json"
+    },
+    {
+        "id": 10,
+        "sources": [
+            {
+                "url": "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8",
+                "mimeType": "application/x-mpegurl",
+                "resolution": "720p",
+                "hd": "true"
+            }
+        ],
+        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg",
+        "title": "HLS VOD",
+        "configUrl" : "/static/suggested_videos_example_v2.json"
+    },
+    {
+        "id": 11,
+        "sources": [
+            {
+                "url": "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8",
+                "mimeType": "application/x-mpegurl",
+                "resolution": "720p",
+                "hd": "true"
+            }
+        ],
+        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg",
+        "title": "HLS VOD",
+        "configUrl" : "/static/suggested_videos_example_v2.json"
+    }
+]
