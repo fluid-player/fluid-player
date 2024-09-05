@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.36.0 (2024-09-05)
+* [Pull #832](https://github.com/fluid-player/fluid-player/pull/832) Show quality change icon in player when working with hls (m3u8)
+
 ## 3.35.0 (2024-08-01)
 * [Pull #825](https://github.com/fluid-player/fluid-player/pull/825) Fix image freezing
 * [Pull #826](https://github.com/fluid-player/fluid-player/pull/826) Ads cannot be displayed when XML content has two Creative tags
