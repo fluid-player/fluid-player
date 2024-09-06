@@ -226,7 +226,7 @@ const fluidPlayerClass = function () {
                 },
                 controlForwardBackward: {
                     show: false,
-                    doubleTapMobile: true
+                    doubleTapMobile: false
                 },
                 contextMenu: {
                     controls: true,
