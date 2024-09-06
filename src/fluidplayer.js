@@ -412,7 +412,13 @@ const fluidPlayerClass = function () {
 
         // Previously prevented to be initialized if preRolls were set up
         // but now the streamers support reinitialization
-        self.initialiseStreamers();
+        if (self.displayOptions.layoutControls.preload === "none") {
+            self.domRef.player.addEventListener('play', () => {
+                self.initialiseStreamers();
+            }, { once: true });
+        } else {
+            self.initialiseStreamers();
+        }
 
         const _play_videoPlayer = playerNode.play;
 
