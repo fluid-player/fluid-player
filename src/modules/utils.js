@@ -183,6 +183,27 @@ export default function (playerInstance, options) {
         );
     }
 
+    playerInstance.observe = () => {
+        var observer = new IntersectionObserver(
+            function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.intersectionRatio >= 0.5) {
+                        playerInstance.domRef.player.inView = true;
+                    }
+
+                    if (entry.intersectionRatio == 0 && entry.target.glast) {
+                        playerInstance.domRef.player.inView = false;
+                    }
+                });
+            },
+            {
+                threshold: [0.0, 0.5],
+            },
+        );
+
+        observer.observe(playerInstance.domRef.wrapper);
+    }
+
     /**
      * Throttles callback by time
      *
