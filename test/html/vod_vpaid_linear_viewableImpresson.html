@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>VOD with VPAID Linear Viewable Impression</title>
+    <%= htmlWebpackPlugin.tags.headTags %>
+    <style lang="css">
+        #fluid-player-e2e-case, #fluid-player-e2e-case-2 {
+            width: 90%;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Viewable impression tests</h1>
+
+<p>Regular scenario: Here you should see the viewable impression being called in the network tab</p>
+
+<video id="fluid-player-e2e-case-2">
+    <source src="https://cdn.fluidplayer.com/videos/valerian-1080p.mkv" data-fluid-hd title="1080p" type="video/mp4"/>
+    <source src="https://cdn.fluidplayer.com/videos/valerian-720p.mkv" data-fluid-hd title="720p" type="video/mp4"/>
+    <source src="https://cdn.fluidplayer.com/videos/valerian-480p.mkv" title="480p" type="video/mp4"/>
+</video>
+
+<p>Player off screen, so no viewable impression is going to be called</p>
+<p>Order of what's happening</p>
+<ul>
+    <li>Player starts -> 2 seconds later it will go off screen</li>
+    <li>Player starts playing ad after 5 seconds, there should be no viewable impression</li>
+    <li>The moment you scroll down to the player, the viewable impression should be called in the network tab (if the ad is still rolling)</li>
+</ul>
+
+<video id="fluid-player-e2e-case">
+    <source src="https://cdn.fluidplayer.com/videos/valerian-1080p.mkv" data-fluid-hd title="1080p" type="video/mp4"/>
+    <source src="https://cdn.fluidplayer.com/videos/valerian-720p.mkv" data-fluid-hd title="720p" type="video/mp4"/>
+    <source src="https://cdn.fluidplayer.com/videos/valerian-480p.mkv" title="480p" type="video/mp4"/>
+</video>
+
+<%= htmlWebpackPlugin.tags.bodyTags %>
+
+<script>
+    var instance = fluidPlayer('fluid-player-e2e-case', {
+        vastOptions: {
+            allowVPAID: true, // Default false.
+            adList: [
+                {
+                    roll: 'midRoll',
+                    vastTag: '/static/vpaid_linear.xml',
+                    timer: 5
+                }
+            ]
+        }
+    });
+
+    var instance2 = fluidPlayer('fluid-player-e2e-case-2', {
+        vastOptions: {
+            allowVPAID: true, // Default false.
+            adList: [
+                {
+                    roll: 'midRoll',
+                    vastTag: '/static/vpaid_linear.xml',
+                    timer: 5
+                }
+            ]
+        }
+    });
+
+    instance.on('play', function() {
+        setTimeout(() => {
+            var video_player =document.getElementById('fluid_video_wrapper_fluid-player-e2e-case')
+            video_player.style.marginTop = '150vh';
+        }, 2000);
+    });
+</script>
+
+</body>
+</html>
