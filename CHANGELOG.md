@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.37.0 (2024-09-17)
+* [Pull #821](https://github.com/fluid-player/fluid-player/pull/821) Added support for VAST ViewableImpression
+* [Pull #833](https://github.com/fluid-player/fluid-player/pull/833) doubleclickFullscreen not working
+
 ## 3.36.0 (2024-09-05)
 * [Pull #832](https://github.com/fluid-player/fluid-player/pull/832) Show quality change icon in player when working with hls (m3u8)
 
