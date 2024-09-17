@@ -6,6 +6,17 @@
 			<Description>Vpaid Linear Video Ad</Description>
 			<Error>http://www.example.com/error</Error>
 			<Impression>http://www.example.com/impression</Impression>
+			<ViewableImpression>
+				<Viewable>
+				  <![CDATA[https://example.com/viewable-impression]]>
+				</Viewable>
+				<NotViewable>
+				  <![CDATA[https://example.com/not-viewable-impression]]>
+				</NotViewable>
+				<ViewUndetermined>
+				  <![CDATA[https://example.com/view-undetermined]]>
+				</ViewUndetermined>
+			</ViewableImpression>
 			<Creatives>
 				<Creative sequence="1">
 					<Linear skipoffset="00:00:03">
@@ -36,7 +47,7 @@
 						</VideoClicks>
 						<MediaFiles>
 
-						<!--
+							<!--
 						<MediaFile apiFramework="VPAID" type="application/javascript">
 							https://secure-ds.serving-sys.com/BurstingCachedScripts/VPAID/HTML5_1_40_0_0/VPAIDAPI.js
 						</MediaFile>
