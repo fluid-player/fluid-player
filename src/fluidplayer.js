@@ -190,7 +190,9 @@ const fluidPlayerClass = function () {
                     horizontalAlign: 'center',
                     keepPosition: false
                 },
-                theatreAdvanced: false,
+                theatreAdvanced: {
+                    theatreElement: null,
+                },
                 title: null,
                 logo: {
                     imageUrl: null,
@@ -2760,6 +2762,7 @@ const fluidPlayerClass = function () {
     };
 
     self.theatreToggle = () => {
+        debugger;
         self.debugMessage(`Toggling Theater Mode`);
         if (self.isInIframe) {
             return;
@@ -2770,7 +2773,7 @@ const fluidPlayerClass = function () {
 
         // Advanced Theatre mode if specified
         if (self.displayOptions.layoutControls.theatreAdvanced) {
-            const elementForTheatre = self.domRef.wrapper.getElementById(self.displayOptions.layoutControls.theatreAdvanced.theatreElement);
+            const elementForTheatre = self.domRef.wrapper.querySelector(`#${self.displayOptions.layoutControls.theatreAdvanced.theatreElement}`); 
             const theatreClassToApply = self.displayOptions.layoutControls.theatreAdvanced.classToApply;
             if (elementForTheatre != null && theatreClassToApply != null) {
                 if (!self.theatreMode) {
