@@ -2762,7 +2762,6 @@ const fluidPlayerClass = function () {
     };
 
     self.theatreToggle = () => {
-        debugger;
         self.debugMessage(`Toggling Theater Mode`);
         if (self.isInIframe) {
             return;
