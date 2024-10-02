@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.38.0 (2024-10-02)
+* [Pull #838](https://github.com/fluid-player/fluid-player/pull/838) TheatreAdvanced is not working and breaks player
+
 ## 3.37.0 (2024-09-17)
 * [Pull #821](https://github.com/fluid-player/fluid-player/pull/821) Added support for VAST ViewableImpression
 * [Pull #833](https://github.com/fluid-player/fluid-player/pull/833) doubleclickFullscreen not working
