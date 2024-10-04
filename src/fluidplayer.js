@@ -157,6 +157,8 @@ const fluidPlayerClass = function () {
         self.mobileInfo = self.getMobileOs();
         self.events = {};
         self.timeSkipOffsetAmount = 10;
+        // Only for linear ads, non linear are not taken into account
+        self.currentMediaSourceType = 'source';
 
         //Default options
         self.displayOptions = {
@@ -3048,27 +3050,33 @@ const fluidPlayerClass = function () {
     self.on = (eventCall, callback) => {
         /**
          * Improves events by adding player info to the callbacks
+         *
+         * source | preRoll | midRoll | postRoll
          */
         const getAdditionalInfo = () => ({
-            mediaSourceType: self.adFinished === false ? 'ad' : 'source'
+            mediaSourceType: self.currentMediaSourceType
         });
 
-        const functionCall = (...args) => callback(...args, getAdditionalInfo());
+        const functionCall = (event, richData) => {
+            const args = event || {};
+            const additionalInfo = { ...getAdditionalInfo(), ...richData };
+            return callback(eventCall, additionalInfo);
+        }
 
         switch (eventCall) {
             case 'play':
-                self.domRef.player.onplay = functionCall;
+                self.domRef.player.addEventListener('play', functionCall);
                 break;
             case 'seeked':
-                self.domRef.player.onseeked = functionCall;
+                self.domRef.player.addEventListener('seeked', functionCall);
                 break;
             case 'ended':
-                self.domRef.player.onended = functionCall;
+                self.domRef.player.addEventListener('ended', functionCall);
                 break;
             case 'pause':
-                self.domRef.player.addEventListener('pause', () => {
+                self.domRef.player.addEventListener('pause', (event) => {
                     if (!self.fluidPseudoPause) {
-                        functionCall();
+                        functionCall(event);
                     }
                 });
                 break;
@@ -3082,15 +3090,15 @@ const fluidPlayerClass = function () {
                 self.domRef.player.addEventListener('theatreModeOff', functionCall);
                 break;
             case 'timeupdate':
-                self.domRef.player.addEventListener('timeupdate', () => {
-                    functionCall(self.getCurrentTime())
+                self.domRef.player.addEventListener('timeupdate', (event) => {
+                    functionCall(event, {currentTime: self.domRef.player.currentTime})
                 });
                 break;
             case 'miniPlayerToggle':
                 self.domRef.player.addEventListener('miniPlayerToggle', functionCall);
                 break;
             default:
-                console.log('[FP_ERROR] Event not recognised');
+                console.log('[FP_ERROR] Event "' + eventCall + '" not recognised');
                 break;
         }
     };
