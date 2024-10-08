@@ -272,6 +272,9 @@ export default function (playerInstance, options) {
         if (adToPlay !== null) {
             playerInstance.renderLinearAd(adToPlay, true);
         }
+
+        const roll = playerInstance.rollsById[adToPlay.rollListId].roll;
+        playerInstance.currentMediaSourceType = roll;
     };
 
     playerInstance.backupMainVideoContentTime = (rollListId) => {
@@ -1272,6 +1275,8 @@ export default function (playerInstance, options) {
         playerInstance.debugMessage('starting main video');
 
         playerInstance.domRef.player.src = playerInstance.originalSrc;
+
+        playerInstance.currentMediaSourceType = 'source';
 
         playerInstance.initialiseStreamers();
 
