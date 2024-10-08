@@ -3057,50 +3057,36 @@ const fluidPlayerClass = function () {
             mediaSourceType: self.currentMediaSourceType
         });
 
-        const functionCall = (event, richData) => {
-            const args = event || {};
-            const additionalInfo = { ...getAdditionalInfo(), ...richData };
+        const functionCall = (event, additionalEventData = {}) => {
+            const additionalInfo = Object.assign({}, { event }, getAdditionalInfo(), additionalEventData);
             return callback(eventCall, additionalInfo);
         }
 
-        switch (eventCall) {
-            case 'play':
-                self.domRef.player.addEventListener('play', functionCall);
-                break;
-            case 'seeked':
-                self.domRef.player.addEventListener('seeked', functionCall);
-                break;
-            case 'ended':
-                self.domRef.player.addEventListener('ended', functionCall);
-                break;
-            case 'pause':
-                self.domRef.player.addEventListener('pause', (event) => {
-                    if (!self.fluidPseudoPause) {
-                        functionCall(event);
-                    }
-                });
-                break;
-            case 'playing':
-                self.domRef.player.addEventListener('playing', functionCall);
-                break;
-            case 'theatreModeOn':
-                self.domRef.player.addEventListener('theatreModeOn', functionCall);
-                break;
-            case 'theatreModeOff':
-                self.domRef.player.addEventListener('theatreModeOff', functionCall);
-                break;
-            case 'timeupdate':
-                self.domRef.player.addEventListener('timeupdate', (event) => {
-                    functionCall(event, {currentTime: self.domRef.player.currentTime})
-                });
-                break;
-            case 'miniPlayerToggle':
-                self.domRef.player.addEventListener('miniPlayerToggle', functionCall);
-                break;
-            default:
-                console.log('[FP_ERROR] Event "' + eventCall + '" not recognised');
-                break;
+        const eventHandlers = {
+            play: () => self.domRef.player.addEventListener('play', functionCall),
+            seeked: () => self.domRef.player.addEventListener('seeked', functionCall),
+            ended: () => self.domRef.player.addEventListener('ended', functionCall),
+            pause: () => self.domRef.player.addEventListener('pause', (event) => {
+                if (!self.fluidPseudoPause) {
+                    functionCall(event)
+                }
+            }),
+            playing: () => self.domRef.player.addEventListener('playing', functionCall),
+            theatreModeOn: () => self.domRef.player.addEventListener('theatreModeOn', functionCall),
+            theatreModeOff: () => self.domRef.player.addEventListener('theatreModeOff', functionCall),
+            timeupdate: () => self.domRef.player.addEventListener('timeupdate', (event) => {
+                functionCall(event, { currentTime: self.domRef.player.currentTime });
+            }),
+            miniPlayerToggle: () => self.domRef.player.addEventListener('miniPlayerToggle', functionCall)
+        };
+
+        if (!eventHandlers[eventCall]) {
+            console.error(`[FP_ERROR] Event "${eventCall}" is not recognized`);
+            return;
         }
+
+        // Call event handler
+        eventHandlers[eventCall]();
     };
 
     self.toggleLogo = (logo) => {
