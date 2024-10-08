@@ -98,6 +98,11 @@ export default function (playerInstance, options) {
 
             const defaultOptions = {
                 debug: typeof FP_DEBUG !== 'undefined' && FP_DEBUG === true,
+                startPosition: 0,
+                liveSyncDurationCount: 1,
+                maxBufferLength: 1,
+                maxMaxBufferLength: 30,
+                lowLatencyMode: true,
                 p2pConfig: {
                     logLevel: false,
                 },

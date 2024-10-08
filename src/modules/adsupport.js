@@ -174,6 +174,11 @@ export default function (playerInstance, options) {
                     window.Hls = it.default;
                     const hls = new Hls({
                         debug: typeof FP_DEBUG !== 'undefined' && FP_DEBUG === true,
+                        startPosition: 0,
+                        liveSyncDurationCount: 1,
+                        maxBufferLength: 10,
+                        maxMaxBufferLength: 30,
+                        lowLatencyMode: true,
                         p2pConfig: {
                             logLevel: false,
                         },
