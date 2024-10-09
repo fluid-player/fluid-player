@@ -174,6 +174,7 @@ export default function (playerInstance, options) {
                     window.Hls = it.default;
                     const hls = new Hls({
                         debug: typeof FP_DEBUG !== 'undefined' && FP_DEBUG === true,
+                        startPosition: 0,
                         p2pConfig: {
                             logLevel: false,
                         },
