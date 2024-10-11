@@ -3072,6 +3072,7 @@ const fluidPlayerClass = function () {
                 }
             }),
             playing: () => self.domRef.player.addEventListener('playing', functionCall),
+            waiting: () => self.domRef.player.addEventListener('waiting', functionCall),
             theatreModeOn: () => self.domRef.player.addEventListener('theatreModeOn', functionCall),
             theatreModeOff: () => self.domRef.player.addEventListener('theatreModeOff', functionCall),
             timeupdate: () => self.domRef.player.addEventListener('timeupdate', (event) => {
