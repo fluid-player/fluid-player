@@ -242,7 +242,8 @@ const fluidPlayerClass = function () {
                     placeholderText: 'Playing in Miniplayer',
                     position: 'bottom right',
                     autoToggle: false,
-                }
+                },
+                roundedCorners: 0
             },
             suggestedVideos: {
                 configUrl: null
@@ -2102,6 +2103,18 @@ const fluidPlayerClass = function () {
             wrapper.style.height = self.domRef.player.clientHeight + 'px';
             wrapper.style.width = self.domRef.player.clientWidth + 'px';
         }
+
+        const parseBorderRadius = () => {
+            const roundedCorners = self.displayOptions.layoutControls.roundedCorners;
+            const parsedValue = Number(roundedCorners);
+
+            return !isNaN(parsedValue) && parsedValue !== 0
+                ? `${parsedValue}px`
+                : roundedCorners;
+        }
+
+        wrapper.style.borderRadius = self.domRef.player.style.borderRadius = parseBorderRadius();
+        wrapper.style.overflow = 'hidden';
 
         self.domRef.player.style.height = '100%';
         self.domRef.player.style.width = '100%';
