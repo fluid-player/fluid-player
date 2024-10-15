@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.39.0 (2024-10-15)
+* [Pull #842](https://github.com/fluid-player/fluid-player/pull/842) Ads events
+* [Pull #843](https://github.com/fluid-player/fluid-player/pull/843) Mid Roll is not working with Live stream videos
+
 ## 3.38.0 (2024-10-02)
 * [Pull #838](https://github.com/fluid-player/fluid-player/pull/838) TheatreAdvanced is not working and breaks player
 
