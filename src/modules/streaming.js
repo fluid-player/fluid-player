@@ -98,6 +98,7 @@ export default function (playerInstance, options) {
 
             const defaultOptions = {
                 debug: typeof FP_DEBUG !== 'undefined' && FP_DEBUG === true,
+                startPosition: 0,
                 p2pConfig: {
                     logLevel: false,
                 },
