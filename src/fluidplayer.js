@@ -157,6 +157,8 @@ const fluidPlayerClass = function () {
         self.mobileInfo = self.getMobileOs();
         self.events = {};
         self.timeSkipOffsetAmount = 10;
+        // Only for linear ads, non linear are not taken into account
+        self.currentMediaSourceType = 'source';
 
         //Default options
         self.displayOptions = {
@@ -3050,51 +3052,44 @@ const fluidPlayerClass = function () {
     self.on = (eventCall, callback) => {
         /**
          * Improves events by adding player info to the callbacks
+         *
+         * source | preRoll | midRoll | postRoll
          */
         const getAdditionalInfo = () => ({
-            mediaSourceType: self.adFinished === false ? 'ad' : 'source'
+            mediaSourceType: self.currentMediaSourceType
         });
 
-        const functionCall = (...args) => callback(...args, getAdditionalInfo());
-
-        switch (eventCall) {
-            case 'play':
-                self.domRef.player.onplay = functionCall;
-                break;
-            case 'seeked':
-                self.domRef.player.onseeked = functionCall;
-                break;
-            case 'ended':
-                self.domRef.player.onended = functionCall;
-                break;
-            case 'pause':
-                self.domRef.player.addEventListener('pause', () => {
-                    if (!self.fluidPseudoPause) {
-                        functionCall();
-                    }
-                });
-                break;
-            case 'playing':
-                self.domRef.player.addEventListener('playing', functionCall);
-                break;
-            case 'theatreModeOn':
-                self.domRef.player.addEventListener('theatreModeOn', functionCall);
-                break;
-            case 'theatreModeOff':
-                self.domRef.player.addEventListener('theatreModeOff', functionCall);
-                break;
-            case 'timeupdate':
-                self.domRef.player.addEventListener('timeupdate', () => {
-                    functionCall(self.getCurrentTime())
-                });
-                break;
-            case 'miniPlayerToggle':
-                self.domRef.player.addEventListener('miniPlayerToggle', functionCall);
-                break;
-            default:
-                console.log('[FP_ERROR] Event not recognised');
-                break;
+        const functionCall = (event, additionalEventData = {}) => {
+            const additionalInfo = Object.assign({}, { event }, getAdditionalInfo(), additionalEventData);
+            return callback(eventCall, additionalInfo);
         }
+
+        const eventHandlers = {
+            play: () => self.domRef.player.addEventListener('play', functionCall),
+            seeked: () => self.domRef.player.addEventListener('seeked', functionCall),
+            ended: () => self.domRef.player.addEventListener('ended', functionCall),
+            pause: () => self.domRef.player.addEventListener('pause', (event) => {
+                if (!self.fluidPseudoPause) {
+                    functionCall(event)
+                }
+            }),
+            playing: () => self.domRef.player.addEventListener('playing', functionCall),
+            waiting: () => self.domRef.player.addEventListener('waiting', functionCall),
+            theatreModeOn: () => self.domRef.player.addEventListener('theatreModeOn', functionCall),
+            theatreModeOff: () => self.domRef.player.addEventListener('theatreModeOff', functionCall),
+            timeupdate: () => self.domRef.player.addEventListener('timeupdate', (event) => {
+                functionCall(event, { currentTime: self.domRef.player.currentTime });
+            }),
+            miniPlayerToggle: () => self.domRef.player.addEventListener('miniPlayerToggle', functionCall)
+        };
+
+        if (!eventHandlers[eventCall]) {
+            console.error(`[FP_ERROR] Event "${eventCall}" is not recognized`);
+            return;
+        }
+
+        // Call event handler
+        eventHandlers[eventCall]();
     };
 
     self.toggleLogo = (logo) => {
