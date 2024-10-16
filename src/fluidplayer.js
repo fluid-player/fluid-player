@@ -2574,6 +2574,8 @@ const fluidPlayerClass = function () {
                 }
             }
         }
+
+        self.repositionSubtitlesContainer('12px');
     };
 
     self.showControlBar = (event) => {
@@ -2613,6 +2615,8 @@ const fluidPlayerClass = function () {
                 }
             }
         }
+
+        self.repositionSubtitlesContainer('46px');
     };
 
     self.linkControlBarUserActivity = () => {
