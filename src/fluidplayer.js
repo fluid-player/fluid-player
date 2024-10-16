@@ -159,6 +159,7 @@ const fluidPlayerClass = function () {
         self.timeSkipOffsetAmount = 10;
         // Only for linear ads, non linear are not taken into account
         self.currentMediaSourceType = 'source';
+        self.subtitlesSize = 1; // in 'em'
 
         //Default options
         self.displayOptions = {
@@ -1515,6 +1516,14 @@ const fluidPlayerClass = function () {
                     break;
                 case 73: // i
                     self.toggleMiniPlayer(undefined, true);
+                    break;
+                case 187: // = and +
+                    self.resizeSubtitles(self.subtitlesSize += 0.5);
+                    break;
+                case 189: // - and _
+                    if (self.subtitlesSize > 0.5) {
+                        self.resizeSubtitles(self.subtitlesSize -= 0.5);
+                    }
                     break;
             }
 
