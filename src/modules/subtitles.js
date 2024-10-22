@@ -218,7 +218,7 @@ export default function (playerInstance, options) {
         }
 
         import(/* webpackChunkName: "vttjs" */ 'videojs-vtt.js').then((it) => {
-            window.WebVTT = it.WebVTT;
+            window.WebVTT = it.WebVTT || it.default.WebVTT;
             playerInstance.createSubtitlesSwitch();
         });
     };
