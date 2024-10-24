@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 3.40.0 (2024-10-24)
+* [Pull #844](https://github.com/fluid-player/fluid-player/pull/844) MiniPlayer Follow Up > Improving UX and be Google compliant
+* [Pull #846](https://github.com/fluid-player/fluid-player/pull/846) Rounded corners on player
+* [Pull #848](https://github.com/fluid-player/fluid-player/pull/848) Uncaught TypeError: Cannot read properties of undefined (reading 'Parser') when using subtitles
+
 ## 3.39.0 (2024-10-15)
 * [Pull #842](https://github.com/fluid-player/fluid-player/pull/842) Ads events
 * [Pull #843](https://github.com/fluid-player/fluid-player/pull/843) Mid Roll is not working with Live stream videos
