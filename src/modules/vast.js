@@ -781,8 +781,7 @@ export default function (playerInstance, options) {
                         mediaFileUrl = mediaFile.textContent.trim();
                         try {
                             const mediaFileObj = JSON.parse(mediaFileUrl);
-                            mediaFileUrl = mediaFileObj.videos[0].url;
-                            console.log("Extracted video URL:", mediaFileUrl);
+                            mediaFileUrl = mediaFileObj.videos[0].url;                      
                         } catch (error) {
                             console.error("Error parsing media file URL:", error);
                         }
@@ -793,10 +792,8 @@ export default function (playerInstance, options) {
                     mediaFileIsValid = false;
                     for (const mediaFileTemp of mediaFile) {
                         mediaFileUrl = mediaFileTemp.textContent.trim();
-                        console.log("Extracted video URL:", mediaFileUrl);
                     }
                 };
-
                 mediaFileIsValid = await validateMediaFile(mediaFileUrl);
                 if (mediaFileIsValid) {
                     adTree.children.push({ tagType: 'inLine', mediaFileUrl, ...adNode });
