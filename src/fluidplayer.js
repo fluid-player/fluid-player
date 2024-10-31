@@ -3073,8 +3073,8 @@ const fluidPlayerClass = function () {
         });
 
         const functionCall = (event, additionalEventData = {}) => {
-            const additionalInfo = Object.assign({}, { event }, getAdditionalInfo(), additionalEventData);
-            return callback(eventCall, additionalInfo);
+            const additionalInfo =  {...getAdditionalInfo(), ...additionalEventData}
+            return callback(event, additionalInfo);
         }
 
         const eventHandlers = {
