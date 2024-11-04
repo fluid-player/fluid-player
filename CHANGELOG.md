@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.41.0 (2024-11-04)
+* [Pull #850](https://github.com/fluid-player/fluid-player/pull/850) New event system breaks current implementations
+
 ## 3.40.0 (2024-10-24)
 * [Pull #844](https://github.com/fluid-player/fluid-player/pull/844) MiniPlayer Follow Up > Improving UX and be Google compliant
 * [Pull #846](https://github.com/fluid-player/fluid-player/pull/846) Rounded corners on player
