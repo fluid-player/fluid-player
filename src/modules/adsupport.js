@@ -1621,6 +1621,9 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.decreaseSkipOffset = () => {
+        if (typeof playerInstance.vastOptions === 'undefined' || playerInstance.vastOptions === null) {
+            return;
+        }
         let sec = playerInstance.vastOptions.skipoffset - Math.floor(playerInstance.domRef.player.currentTime);
         const btn = playerInstance.domRef.wrapper.querySelector('.skip_button');
 
