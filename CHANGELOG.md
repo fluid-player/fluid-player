@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.42.0 (2024-11-05)
+* [Pull #836](https://github.com/fluid-player/fluid-player/pull/836) FallbackVastTags may not be working
+
 ## 3.41.0 (2024-11-04)
 * [Pull #850](https://github.com/fluid-player/fluid-player/pull/850) New event system breaks current implementations
 
