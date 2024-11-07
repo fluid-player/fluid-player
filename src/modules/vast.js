@@ -557,13 +557,13 @@ export default function (playerInstance, options) {
                     if (ad.adType === 'linear') {
                         const linearCreatives = creativeElement.getElementsByTagName('Linear');
                         const creativeLinear = linearCreatives[0];
-    
+
                         //Extract the Ad data if it is actually the Ad (!wrapper)
                         if (!playerInstance.hasVastAdTagUri(adElement) && playerInstance.hasInLine(adElement)) {
                             //Set initial values
                             ad.adFinished = false;
                             ad.vpaid = false;
-    
+
                             //Extract the necessary data from the Linear node
                             ad.skipoffset = playerInstance.convertTimeStringToSeconds(creativeLinear.getAttribute('skipoffset'));
                             ad.clickthroughUrl = playerInstance.getClickThroughUrlFromLinear(creativeLinear);
@@ -571,22 +571,22 @@ export default function (playerInstance, options) {
                             ad.mediaFileList = playerInstance.getMediaFileListFromLinear(creativeLinear);
                             ad.adParameters = playerInstance.getAdParametersFromLinear(creativeLinear);
                             ad.iconClick = ad.iconClick || playerInstance.getIconClickThroughFromLinear(creativeLinear);
-    
+
                             if (ad.adParameters) {
                                 ad.vpaid = true;
                             }
                         }
                     }
-    
+
                     if (ad.adType === 'nonLinear') {
                         const nonLinearCreatives = creativeElement.getElementsByTagName('NonLinearAds');
                         const creativeNonLinear = nonLinearCreatives[0];
-    
+
                         //Extract the Ad data if it is actually the Ad (!wrapper)
                         if (!playerInstance.hasVastAdTagUri(adElement) && playerInstance.hasInLine(adElement)) {
                             //Set initial values
                             ad.vpaid = false;
-    
+
                             //Extract the necessary data from the NonLinear node
                             ad.clickthroughUrl = playerInstance.getClickThroughUrlFromNonLinear(creativeNonLinear);
                             ad.duration = playerInstance.getDurationFromNonLinear(creativeNonLinear); // VAST version < 4.0
@@ -594,7 +594,7 @@ export default function (playerInstance, options) {
                             ad.staticResource = playerInstance.getStaticResourceFromNonLinear(creativeNonLinear);
                             ad.creativeType = playerInstance.getCreativeTypeFromStaticResources(creativeNonLinear);
                             ad.adParameters = playerInstance.getAdParametersFromLinear(creativeNonLinear);
-    
+
                             if (ad.adParameters) {
                                 ad.vpaid = true;
                             }
@@ -781,13 +781,13 @@ export default function (playerInstance, options) {
                         mediaFileUrl = mediaFile.textContent.trim();
                         try {
                             const mediaFileObj = JSON.parse(mediaFileUrl);
-                            mediaFileUrl = mediaFileObj.videos[0].url;                      
+                            mediaFileUrl = mediaFileObj.videos[0].url;
                         } catch (error) {
                             console.error("Error parsing media file URL:", error);
                         }
                     }
                 } else if (Array.from(adElement.getElementsByTagName('MediaFiles')).length) {
-                    const mediaFiles = Array.from(adElement.getElementsByTagName('MediaFiles'));   
+                    const mediaFiles = Array.from(adElement.getElementsByTagName('MediaFiles'));
                     const mediaFile = mediaFiles[0].getElementsByTagName('MediaFile');
                     mediaFileIsValid = false;
                     for (const mediaFileTemp of mediaFile) {
@@ -798,12 +798,10 @@ export default function (playerInstance, options) {
                 if (mediaFileIsValid) {
                     adTree.children.push({ tagType: 'inLine', mediaFileUrl, ...adNode });
                     break;
+                } else {
+                    adTree.children.push({ tagType: 'inLine', mediaError: true, ...adNode });
+                    playerInstance.debugMessage(`No valid media file found in Inline ad.`);
                 }
-            }
-
-            if (!mediaFileIsValid) {
-                adTree.children.push({ tagType: 'inLine', mediaError: true, ...adNode });
-                playerInstance.debugMessage(`No valid media file found in Inline ad.`);
             }
         }
 
