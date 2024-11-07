@@ -185,6 +185,7 @@ const fluidPlayerClass = function () {
                 showCardBoardJoystick: false,
                 allowTheatre: true,
                 doubleclickFullscreen: true,
+                autoRotateFullScreen: false,
                 theatreSettings: {
                     width: '100%',
                     height: '60%',
@@ -1919,6 +1920,9 @@ const fluidPlayerClass = function () {
         if (self.displayOptions.layoutControls.doubleclickFullscreen && !(self.isTouchDevice() || !self.displayOptions.layoutControls.controlForwardBackward.doubleTapMobile)) {
             self.domRef.player.addEventListener('dblclick', self.fullscreenToggle);
         }
+        if (self.displayOptions.layoutControls.autoRotateFullScreen && self.isTouchDevice()) {
+            window.matchMedia("(orientation: landscape)").addEventListener('change', self.handleOrientationChange);
+        }
 
         self.initHtmlOnPauseBlock();
 
@@ -1955,6 +1959,48 @@ const fluidPlayerClass = function () {
         self.domRef.controls.skipBack.addEventListener('click', self.skipRelative.bind(this, -self.timeSkipOffsetAmount));
         self.domRef.controls.skipForward.addEventListener('click', self.skipRelative.bind(this, self.timeSkipOffsetAmount));
     };
+
+    // Function to handle fullscreen toggle based on orientation
+    self.handleOrientationChange = () => {
+        const isLandscape = window.matchMedia("(orientation: landscape)").matches;
+        const videoPlayerTag = self.domRef.player;
+        const fullscreenTag = self.domRef.wrapper;
+        const requestFullscreenFunctionNames = self.checkFullscreenSupport();
+        const fullscreenButton = videoPlayerTag.parentNode.getElementsByClassName('fluid_control_fullscreen');
+        const menuOptionFullscreen = fullscreenTag.querySelector('.context_option_fullscreen');
+        let functionNameToExecute;
+        if (isLandscape) {
+            if (requestFullscreenFunctionNames) {
+                if (requestFullscreenFunctionNames.goFullscreen === 'webkitEnterFullscreen') {
+                    functionNameToExecute = 'videoPlayerTag.' + requestFullscreenFunctionNames.goFullscreen + '();';
+                    self.fullscreenOn(fullscreenButton, menuOptionFullscreen);
+                    new Function('videoPlayerTag', functionNameToExecute)(videoPlayerTag);
+                } else {
+                    if (document[requestFullscreenFunctionNames.isFullscreen] === null) {
+                        functionNameToExecute = 'videoPlayerTag.' + requestFullscreenFunctionNames.goFullscreen + '();';
+                        self.fullscreenOn(fullscreenButton, menuOptionFullscreen);
+                    }
+                    new Function('videoPlayerTag', functionNameToExecute)(fullscreenTag);
+                }
+            } else {
+                fullscreenTag.className += ' pseudo_fullscreen';
+                self.fullscreenOn(fullscreenButton, menuOptionFullscreen);
+            }
+        } else {
+            fullscreenTag.className = fullscreenTag.className.replace(/\bpseudo_fullscreen\b/g, '');
+            if (requestFullscreenFunctionNames) {
+                functionNameToExecute = 'document.' + requestFullscreenFunctionNames.exitFullscreen + '();';
+                self.fullscreenOff(fullscreenButton, menuOptionFullscreen);
+                new Function('videoPlayerTag', functionNameToExecute)(fullscreenTag);
+            }  else {
+                if (fullscreenTag.className.search(/\bpseudo_fullscreen\b/g) !== -1) {
+                    fullscreenTag.className = fullscreenTag.className.replace(/\bpseudo_fullscreen\b/g, '');
+                    self.fullscreenOff(fullscreenButton, menuOptionFullscreen);
+                }
+            }
+        }
+        self.resizeVpaidAuto();
+    }
 
     /**
      * Creates the skip animation elements and appends them to the player
