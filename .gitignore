@@ -1,7 +1,6 @@
 node_modules/
 dist/
 dist-cdn/
-e2e/
 
 # IDEs and editors
 /.idea
