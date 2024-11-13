@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.43.0 (2024-11-13)
+* [Pull #855](https://github.com/fluid-player/fluid-player/pull/855) Fluidplayer doesn't play Wrapper ads
+
 ## 3.42.0 (2024-11-05)
 * [Pull #836](https://github.com/fluid-player/fluid-player/pull/836) FallbackVastTags may not be working
 
