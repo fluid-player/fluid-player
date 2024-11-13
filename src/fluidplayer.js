@@ -2518,7 +2518,7 @@ const fluidPlayerClass = function () {
                 }
 
                 self.isUserActive = false;
-                
+
                 let event = new CustomEvent('userInactive');
                 self.domRef.player.dispatchEvent(event);
             }, self.displayOptions.layoutControls.controlBar.autoHideTimeout * 1000);
