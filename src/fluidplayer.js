@@ -1924,6 +1924,21 @@ const fluidPlayerClass = function () {
             window.matchMedia("(orientation: landscape)").addEventListener('change', self.handleOrientationChange);
         }
 
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    self.domRef.player.inView = true;
+                    if (self.displayOptions.layoutControls.autoRotateFullScreen && self.isTouchDevice()) {
+                        window.matchMedia("(orientation: landscape)").addEventListener('change', self.handleOrientationChange);
+                    }
+                } else {
+                    self.domRef.player.inView = false;
+                }
+            });
+        });
+
+        observer.observe(self.domRef.player);
+
         self.initHtmlOnPauseBlock();
 
         self.setCustomControls();
@@ -1969,7 +1984,7 @@ const fluidPlayerClass = function () {
         const fullscreenButton = videoPlayerTag.parentNode.getElementsByClassName('fluid_control_fullscreen');
         const menuOptionFullscreen = fullscreenTag.querySelector('.context_option_fullscreen');
         let functionNameToExecute;
-        if (isLandscape) {
+        if (isLandscape && self.domRef.player.inView) {
             if (requestFullscreenFunctionNames) {
                 if (requestFullscreenFunctionNames.goFullscreen === 'webkitEnterFullscreen') {
                     functionNameToExecute = 'videoPlayerTag.' + requestFullscreenFunctionNames.goFullscreen + '();';
