@@ -1998,9 +1998,13 @@ const fluidPlayerClass = function () {
             timeouts = [];
         }
 
-        self.domRef.player.addEventListener('click', (event) => {
+        self.domRef.player.addEventListener('pointerdown', (event) => {
             // Check if it's mobile on the fly and prevent double click skip if it is
             if (!self.isTouchDevice()) {
+                return;
+            }
+
+            if (!self.isControlBarVisible()) {
                 return;
             }
 
