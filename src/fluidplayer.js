@@ -2014,7 +2014,6 @@ const fluidPlayerClass = function () {
             // Simulates default behaviour if it's a single click
             timeouts.push(setTimeout(() => {
                 hasDoubleClicked = false;
-                self.playPauseToggle();
             }, 300));
 
             // Skips video time if it's a double click
@@ -2517,10 +2516,10 @@ const fluidPlayerClass = function () {
                     return;
                 }
 
-                self.isUserActive = false;
 
                 let event = new CustomEvent('userInactive');
                 self.domRef.player.dispatchEvent(event);
+                self.isUserActive = false;     
             }, self.displayOptions.layoutControls.controlBar.autoHideTimeout * 1000);
         }, 300);
 
@@ -2637,6 +2636,13 @@ const fluidPlayerClass = function () {
         self.domRef.player.addEventListener('userInactive', self.hideTitle);
 
         self.domRef.player.addEventListener('userActive', self.showControlBar);
+        self.domRef.player.addEventListener('touchstart', function (event) {
+            if (self.isUserActive && self.isTouchDevice()) {
+                self.playPauseToggle();
+            } else {
+                self.domRef.player.addEventListener('userActive', self.showControlBar);
+            }
+        });
         self.domRef.player.addEventListener('userActive', self.showTitle);
     };
 
