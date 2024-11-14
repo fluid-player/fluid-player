@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.44.0 (2024-11-14)
+* [Pull #851](https://github.com/fluid-player/fluid-player/pull/851) Mobile on click show control bar instead of pausing video
+
 ## 3.43.0 (2024-11-13)
 * [Pull #855](https://github.com/fluid-player/fluid-player/pull/855) Fluidplayer doesn't play Wrapper ads
 
