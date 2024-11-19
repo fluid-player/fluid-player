@@ -798,12 +798,10 @@ export default function (playerInstance, options) {
                 if (mediaFileIsValid) {
                     adTree.children.push({ tagType: 'inLine', mediaFileUrl, ...adNode });
                     break;
+                } else {
+                    adTree.children.push({ tagType: 'inLine', mediaError: true, ...adNode });
+                    playerInstance.debugMessage(`No valid media file found in Inline ad.`);
                 }
-            }
-
-            if (!mediaFileIsValid) {
-                adTree.children.push({ tagType: 'inLine', mediaError: true, ...adNode });
-                playerInstance.debugMessage(`No valid media file found in Inline ad.`);
             }
         }
 
