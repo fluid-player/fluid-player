@@ -418,6 +418,8 @@ const fluidPlayerClass = function () {
         // Previously prevented to be initialized if preRolls were set up
         // but now the streamers support reinitialization
         self.initialiseStreamers();
+        self.detectLiveStream();
+        self.showLiveIndicator();
 
         const _play_videoPlayer = playerNode.play;
 
@@ -796,6 +798,10 @@ const fluidPlayerClass = function () {
         controls.rightContainer.className = 'fluid_controls_right';
         controls.root.appendChild(controls.rightContainer);
 
+        controls.live_indicator = document.createElement('div');
+        controls.live_indicator.className = 'fluid_button fluid_control_live_indicator';
+        controls.rightContainer.appendChild(controls.live_indicator);
+
         // Right container -> Fullscreen
         controls.fullscreen = document.createElement('div');
         controls.fullscreen.className = 'fluid_button fluid_control_fullscreen fluid_button_fullscreen';
@@ -870,6 +876,33 @@ const fluidPlayerClass = function () {
         controls.rightContainer.appendChild(controls.duration);
 
         return controls;
+    };
+
+    self.detectLiveStream = function () {
+        const sourceElement = this.domRef.player.querySelector('source');
+        const sourceUrl = sourceElement?.src || '';
+        const isLiveAttribute = sourceElement?.getAttribute('data-live') === 'true';
+        const isHLSorDASH = sourceUrl.includes('.m3u8') || sourceUrl.includes('.mpd');
+        this.isLiveStream = isLiveAttribute || isHLSorDASH;
+    };
+
+    self.showLiveIndicator = () => {
+        const isLiveStream = this.isLiveStream || false;
+        if (isLiveStream) {
+            const liveIndicator = self.domRef.player.parentNode.getElementsByClassName('fluid_control_live_indicator');
+            const liveIndicatorButton = document.createElement('span');
+            liveIndicatorButton.className = 'fluid_button_live_indicator';
+            liveIndicatorButton.innerHTML = `LIVE<span class="live_circle"></span>`;
+
+            liveIndicatorButton.addEventListener('click', () => {
+                self.domRef.player.currentTime = self.currentVideoDuration;
+            });
+
+            for (let i = 0; i < liveIndicator.length; i++) {
+                liveIndicator[i].appendChild(liveIndicatorButton);
+            }
+
+        }
     };
 
     self.controlPlayPauseToggle = () => {
