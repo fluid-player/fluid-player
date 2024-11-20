@@ -868,12 +868,18 @@ const fluidPlayerClass = function () {
         // Right container -> Volume Control + Live Steam Button
         const durationContainer = document.createElement('div');
         durationContainer.className = 'fluid_control_duration';
+
+        controls.duration = document.createElement('div');
+        controls.duration.className = 'fluid_fluid_control_duration';
+        controls.duration.innerText = '00:00 / 00:00';
+
         if (!options.displayVolumeBar) {
             durationContainer.className = durationContainer.className + ' no_volume_bar';
         }
+
         controls.live_indicator = document.createElement('div');
-        controls.live_indicator.className = 'fluid_button fluid_control_live_indicator';
-        durationContainer.appendChild(controls.live_indicator);
+        controls.live_indicator.className = 'fluid_control_live_indicator';
+        durationContainer.append(controls.live_indicator, controls.duration);
         controls.rightContainer.appendChild(durationContainer);
 
         return controls;
