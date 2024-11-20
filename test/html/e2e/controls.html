@@ -27,7 +27,9 @@
     var instance = fluidPlayer('fluid-player-e2e-case', {
         layoutControls: {
             controlBar: {
-                autoHide: false
+                autoHide: true,
+                autoHideTimeout: 1,
+                animated: true
             },
         }
     });
