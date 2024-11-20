@@ -49,7 +49,7 @@ describe('CONTROLS', () => {
     /**
    * TODO: if we circle back to this, here are the following notes:
    * The good:
-   * - quite clean way for working
+   * - quite clean way of working
    * - easy to understand
    * - for desktop only applications
    * 
