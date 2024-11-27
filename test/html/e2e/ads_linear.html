@@ -16,9 +16,7 @@
 <body>
 
 <video id="fluid-player-e2e-case">
-    <source src="https://cdn.fluidplayer.com/videos/valerian-1080p.mkv" data-fluid-hd title="1080p" type="video/mp4"/>
-    <source src="https://cdn.fluidplayer.com/videos/valerian-720p.mkv" data-fluid-hd title="720p" type="video/mp4"/>
-    <source src="https://cdn.fluidplayer.com/videos/valerian-480p.mkv" title="480p" type="video/mp4"/>
+    <source src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4" data-fluid-hd title="1080p" type="video/mp4"/>
 </video>
 
 <%= htmlWebpackPlugin.tags.bodyTags %>
@@ -30,16 +28,16 @@
             adList: [
                 {
                     roll: 'preRoll',
-                    vastTag: '/static/vast_linear.xml',
+                    vastTag: '/static/vast_linear_e2e.xml',
                 },
                 {
                     roll: 'midRoll',
-                    vastTag: '/static/vast_linear.xml',
-                    timer: 20,
+                    vastTag: '/static/vast_linear_e2e.xml',
+                    timer: 5,
                 },
                 {
                     roll: 'postRoll',
-                    vastTag: '/static/vast_linear.xml',
+                    vastTag: '/static/vast_linear_e2e.xml',
                 },
             ]
         },
