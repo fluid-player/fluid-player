@@ -1,19 +1,21 @@
 import { test, expect } from '@playwright/test';
+import { waitForVideoToPlay, setVideoCurrentTime, getVideoCurrentTime } from './functions/video';
+import { waitForSpecificNetworkCall } from './functions/network';
 
 test.describe('desktop ads', () => {
-    test('should navigate to the publishers advertised website on click', async ({ page }) => {
-        await page.goto('/ads_linear.html');
 
+    test.beforeEach(async ({ page }) => {
+        console.log(`Running ${test.info().title}`);
+        await page.goto('/ads_linear.html');
+    });
+
+    test('should navigate to the publishers advertised website on click', async ({ page }) => {
         const fullPlayer = page.locator('#fluid_video_wrapper_fluid-player-e2e-case');
 
         // start the video
         fullPlayer.click();
 
-        // Wait for video to start playing
-        await page.waitForFunction(() => {
-            const video = document.querySelector('video');
-            return video && !video.paused;
-        });
+        await waitForVideoToPlay(page);
 
         // Set up a listener for the 'popup' event
         // This listener listens for a new _blank tab to open
@@ -35,18 +37,12 @@ test.describe('desktop ads', () => {
     });
 
     test('should fire pre-, mid- and postRoll based on time', async ({ page }) => {
-        await page.goto('/ads_linear.html');
-
         const fullPlayer = page.locator('#fluid_video_wrapper_fluid-player-e2e-case');
         const skipButton = page.locator('.skip_button');
 
         // Start the video
         fullPlayer.click();
-        // Wait for video to start playing
-        await page.waitForFunction(() => {
-            const video = document.querySelector('video');
-            return video && !video.paused;
-        });
+        await waitForVideoToPlay(page);
 
         /**
          * PREROLL
@@ -62,20 +58,32 @@ test.describe('desktop ads', () => {
         /**
          * MIDROLL
          */
+        await page.waitForFunction(() => {
+            const videoElement = document.querySelector('video') as HTMLVideoElement;
+            // 15 is the length of the ad
+            return videoElement && Math.floor(videoElement.duration) !== 15;
+        });
         const video = page.locator('video');
 
-        await video.evaluate((vid) => {
-            (vid as HTMLVideoElement).currentTime = 4;
-        });
-
-        await page.waitForTimeout(2000);
+        // Midrolls don't trigger if you seek less then 5 seconds before their time
+        await setVideoCurrentTime(video, 35);
+        await page.waitForTimeout(5500);
         await expect(skipButton).toHaveText(/Skip ad in 2/);
         // Wait for skip ad timer
         await page.waitForTimeout(2500);
         await expect(skipButton).toHaveText(/Skip Ad /);
 
-         // Skip the ad
-         skipButton.click();
+        // Skip the ad
+        skipButton.click();
+
+        await page.waitForTimeout(500);
+
+        await waitForVideoToPlay(page);
+
+        const currentTime = await getVideoCurrentTime(video);
+
+        // Check if the video resumes after the midroll at the correct time
+        expect(Math.floor(currentTime)).toEqual(39);
 
         /**
          * POSTROLL
@@ -104,12 +112,9 @@ test.describe('desktop ads', () => {
     });
 
     test('ad should not be skipped when the ad countdown is not done', async ({ page }) => {
-        await page.goto('/ads_linear.html');
-
         const fullPlayer = page.locator('#fluid_video_wrapper_fluid-player-e2e-case');
         const skipButton = page.locator('.skip_button');
         const video = page.locator('video');
-
 
         // Start the video
         fullPlayer.click();
@@ -119,15 +124,24 @@ test.describe('desktop ads', () => {
             return videoElement && videoElement.duration > 0;
         }, { timeout: 5000 });
 
-        // Click the button but it should not be skipped
-        skipButton.click();
-
-        // TODO: check if duration is still the same
-
         const adDuration = await video.evaluate((vid) => {
             const videoElement = vid as HTMLVideoElement;
             return videoElement.duration;
         });
+
+        // Click the button but it should not be skipped
+        skipButton.click();
+
+        // If the ad still has the same video duration, that means the video is not skipped
+        const videoDurationAfterClick = await video.evaluate((vid) => {
+            const videoElement = vid as HTMLVideoElement;
+            return videoElement.duration;
+        });
+
+        expect(videoDurationAfterClick).not.toBeFalsy();
+        expect(adDuration).not.toBeFalsy();
+
+        expect(videoDurationAfterClick).toEqual(adDuration);
 
         await page.waitForTimeout(2000);
         // Skip Ad
@@ -144,5 +158,21 @@ test.describe('desktop ads', () => {
 
         expect(videoDuration).not.toEqual(adDuration);
     });
+
+    test('impression url should be called', async ({ page }) => {
+        const fullPlayer = page.locator('#fluid_video_wrapper_fluid-player-e2e-case');
+
+        // start the video
+        fullPlayer.click();
+
+        const request = await waitForSpecificNetworkCall(
+            page,
+            'http://www.example.com/impression',
+            'GET'
+        );
+
+        expect(request.url()).toBe('http://www.example.com/impression');
+    });
+
 });
 

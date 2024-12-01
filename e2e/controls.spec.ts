@@ -1,10 +1,13 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('desktop controls', () => {
-    test('should toggle play/pause when clicking the player', async ({ page }) => {
-        // Navigate to the page
-        await page.goto('/controls.html');
 
+    test.beforeEach(async ({ page }) => {
+        console.log(`Running ${test.info().title}`);
+        await page.goto('/controls.html');
+    });
+
+    test('should toggle play/pause when clicking the player', async ({ page }) => {
         // Selectors
         const fullPlayer = page.locator('#fluid_video_wrapper_fluid-player-e2e-case');
         const playButton = page.locator('.fluid_button_play');

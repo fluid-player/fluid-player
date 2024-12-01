@@ -70,6 +70,8 @@ export default defineConfig({
     // },
   ],
 
+  snapshotPathTemplate: '{testDir}/snapshots/{arg}{ext}', // Use the specified filename
+
   /* Run your local dev server before starting the tests */
   // webServer: {
   //   command: 'npm run start',
