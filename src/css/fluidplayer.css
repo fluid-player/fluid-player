@@ -737,7 +737,7 @@ _:-ms-lang(x),
     border-radius: 4px;
     font-weight: bold;
     font-size: 11px;
-    cursor: pointer;
+    margin-bottom: 3px;
 }
 
 .live_circle {
@@ -761,10 +761,6 @@ _:-ms-lang(x),
     height: 4px;
     background-color: #ffffff;
     border-radius: 50%;
-}
-
-.fluid_button_live_indicator:hover {
-    background-color: #d62828;
 }
 
 /* On smaller devices (mobile) */
