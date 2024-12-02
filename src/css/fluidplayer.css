@@ -767,25 +767,6 @@ _:-ms-lang(x),
     background-color: #d62828;
 }
 
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-        opacity: 1;
-    }
-    50% {
-        transform: scale(1.2);
-        opacity: 0.7;
-    }
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-.live_circle {
-    animation: pulse 1.5s infinite ease-in-out;
-}
-
 /* On smaller devices (mobile) */
 @media (max-width: 768px) {
     .fluid_button_live_indicator {
