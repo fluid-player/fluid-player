@@ -72,18 +72,31 @@ export async function getVideoCurrentTime(video: Locator): Promise<number> {
     });
 }
 
+// /**
+//  * Wait until the video start playing again, is unpaused
+//  *
+//  * @param page - Playwright video locator
+//  * @param timeout
+//  */
+// export async function waitForVideoToPlay(
+//     page: Page,
+//     timeout: number = 10000
+// ): Promise<void> {
+//     await page.waitForFunction(() => {
+//         const video = document.querySelector('video');
+//         return video && !video.paused;
+//     }, { timeout });
+// }
+
 /**
- * Wait until the video start playing again, is unpaused
+ * Waits until the given video element starts playing.
  *
- * @param page - Playwright video locator
- * @param timeout
+ * @param video - The Playwright Locator for the video element.
  */
-export async function waitForVideoToPlay(
-    page: Page,
-    timeout: number = 10000
-): Promise<void> {
-    await page.waitForFunction(() => {
-        const video = document.querySelector('video');
-        return video && !video.paused;
-    }, { timeout });
+export async function waitForVideoToPlay(video: Locator): Promise<void> {
+    await video.evaluate((vid) => {
+        return new Promise<void>((resolve) => {
+            vid.addEventListener('playing', () => resolve(), { once: true });
+        });
+    });
 }

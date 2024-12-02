@@ -12,7 +12,7 @@
     "dev-server-debug": "webpack serve --mode=development --env debug --host 0.0.0.0",
     "dev-server-test": "webpack serve --mode=production --no-live-reload --host 0.0.0.0",
     "start": "npm run dev-server-debug",
-    "e2e-gui": "npx playwright test --ui",
+    "e2e-ui": "npx playwright test --ui",
     "e2e-report": "npx playwright show-report",
     "e2e": "npx playwright test",
     "cy-e2e-gui": "cypress open --e2e --browser chrome",

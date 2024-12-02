@@ -11,11 +11,12 @@ test.describe('desktop ads', () => {
 
     test('should navigate to the publishers advertised website on click', async ({ page }) => {
         const fullPlayer = page.locator('#fluid_video_wrapper_fluid-player-e2e-case');
+        const video = page.locator('video');
 
         // start the video
         fullPlayer.click();
 
-        await waitForVideoToPlay(page);
+        await waitForVideoToPlay(video);
 
         // Set up a listener for the 'popup' event
         // This listener listens for a new _blank tab to open
@@ -39,10 +40,11 @@ test.describe('desktop ads', () => {
     test('should fire pre-, mid- and postRoll based on time', async ({ page }) => {
         const fullPlayer = page.locator('#fluid_video_wrapper_fluid-player-e2e-case');
         const skipButton = page.locator('.skip_button');
+        const video = page.locator('video');
 
         // Start the video
         fullPlayer.click();
-        await waitForVideoToPlay(page);
+        await waitForVideoToPlay(video);
 
         /**
          * PREROLL
@@ -63,7 +65,6 @@ test.describe('desktop ads', () => {
             // 15 is the length of the ad
             return videoElement && Math.floor(videoElement.duration) !== 15;
         });
-        const video = page.locator('video');
 
         // Midrolls don't trigger if you seek less then 5 seconds before their time
         await setVideoCurrentTime(video, 35);
@@ -78,7 +79,7 @@ test.describe('desktop ads', () => {
 
         await page.waitForTimeout(500);
 
-        await waitForVideoToPlay(page);
+        await waitForVideoToPlay(video);
 
         const currentTime = await getVideoCurrentTime(video);
 

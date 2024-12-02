@@ -14,12 +14,13 @@ test.describe('suggested videos', () => {
         const video = page.locator('video');
 
         fullPlayer.click();
-        await waitForVideoToPlay(page);
+        await waitForVideoToPlay(video);
 
         const videoDuration = await getVideoDuration(video);
         await setVideoCurrentTime(video, videoDuration - 5);
 
-        await page.waitForTimeout(5000);
+        await waitForVideoToPlay(video);
+        await page.waitForTimeout(5500);
 
         const suggestedVideosGrid = page.locator('.suggested_tile_grid');
         await expect(suggestedVideosGrid).not.toBeVisible();
