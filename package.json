@@ -14,9 +14,7 @@
     "start": "npm run dev-server-debug",
     "e2e-ui": "npx playwright test --ui",
     "e2e-report": "npx playwright show-report",
-    "e2e": "npx playwright test",
-    "cy-e2e-gui": "cypress open --e2e --browser chrome",
-    "cy-e2e": "cypress run"
+    "e2e": "npx playwright test"
   },
   "repository": {
     "type": "git",
@@ -52,7 +50,6 @@
     "cheerio": "^1.0.0-rc.3",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.3",
-    "cypress": "^13.15.2",
     "html-webpack-plugin": "^5.5.0",
     "semver": "^7.3.2",
     "style-loader": "^3.3.1",
