@@ -798,10 +798,6 @@ const fluidPlayerClass = function () {
         controls.rightContainer.className = 'fluid_controls_right';
         controls.root.appendChild(controls.rightContainer);
 
-        controls.live_indicator = document.createElement('div');
-        controls.live_indicator.className = 'fluid_button fluid_control_live_indicator';
-        controls.rightContainer.appendChild(controls.live_indicator);
-
         // Right container -> Fullscreen
         controls.fullscreen = document.createElement('div');
         controls.fullscreen.className = 'fluid_button fluid_control_fullscreen fluid_button_fullscreen';
@@ -869,16 +865,27 @@ const fluidPlayerClass = function () {
         controls.mute.className = 'fluid_button fluid_button_volume fluid_control_mute';
         controls.rightContainer.appendChild(controls.mute);
 
-        // Right container -> Volume container
+        // Right container -> Volume Control + Live Steam Button
+        const durationContainer = document.createElement('div');
+        durationContainer.className = 'fluid_control_duration';
+
         controls.duration = document.createElement('div');
-        controls.duration.className = 'fluid_control_duration fluid_fluid_control_duration';
+        controls.duration.className = 'fluid_fluid_control_duration';
         controls.duration.innerText = '00:00 / 00:00';
-        controls.rightContainer.appendChild(controls.duration);
+
+        if (!options.displayVolumeBar) {
+            durationContainer.className = durationContainer.className + ' no_volume_bar';
+        }
+
+        controls.live_indicator = document.createElement('div');
+        controls.live_indicator.className = 'fluid_control_live_indicator';
+        durationContainer.append(controls.live_indicator, controls.duration);
+        controls.rightContainer.appendChild(durationContainer);
 
         return controls;
     };
 
-    self.detectLiveStream = function () {
+    self.detectLiveStream = () => {
         const sourceElement = this.domRef.player.querySelector('source');
         const sourceUrl = sourceElement?.src || '';
         const isLiveAttribute = sourceElement?.getAttribute('data-live') === 'true';
@@ -1011,8 +1018,25 @@ const fluidPlayerClass = function () {
 
         const timePlaceholder = self.domRef.player.parentNode.getElementsByClassName('fluid_control_duration');
 
+        self.detectLiveStream();
+
         for (let i = 0; i < timePlaceholder.length; i++) {
-            timePlaceholder[i].innerHTML = durationText;
+            timePlaceholder[i].innerHTML = '';
+
+            if (this.isLiveStream) {
+                const liveIndicatorButton = document.createElement('span');
+                liveIndicatorButton.className = 'fluid_button_live_indicator';
+                liveIndicatorButton.innerHTML = `LIVE<span class="live_circle"></span>`;
+                liveIndicatorButton.addEventListener('pointerdown', () => {
+                    self.domRef.player.currentTime = self.currentVideoDuration;
+                });
+                timePlaceholder[i].appendChild(liveIndicatorButton);
+            }
+
+            const durationTextElement = document.createElement('span');
+            durationTextElement.className = 'fluid_fluid_control_duration';
+            durationTextElement.innerText = durationText;
+            timePlaceholder[i].appendChild(durationTextElement);
         }
     };
 
