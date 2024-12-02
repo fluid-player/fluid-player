@@ -418,6 +418,8 @@ const fluidPlayerClass = function () {
         // Previously prevented to be initialized if preRolls were set up
         // but now the streamers support reinitialization
         self.initialiseStreamers();
+        self.detectLiveStream();
+        self.showLiveIndicator();
 
         const _play_videoPlayer = playerNode.play;
 
@@ -863,13 +865,51 @@ const fluidPlayerClass = function () {
         controls.mute.className = 'fluid_button fluid_button_volume fluid_control_mute';
         controls.rightContainer.appendChild(controls.mute);
 
-        // Right container -> Volume container
+        // Right container -> Volume Control + Live Steam Button
+        const durationContainer = document.createElement('div');
+        durationContainer.className = 'fluid_control_duration';
+
         controls.duration = document.createElement('div');
-        controls.duration.className = 'fluid_control_duration fluid_fluid_control_duration';
+        controls.duration.className = 'fluid_fluid_control_duration';
         controls.duration.innerText = '00:00 / 00:00';
-        controls.rightContainer.appendChild(controls.duration);
+
+        if (!options.displayVolumeBar) {
+            durationContainer.className = durationContainer.className + ' no_volume_bar';
+        }
+
+        controls.live_indicator = document.createElement('div');
+        controls.live_indicator.className = 'fluid_control_live_indicator';
+        durationContainer.append(controls.live_indicator, controls.duration);
+        controls.rightContainer.appendChild(durationContainer);
 
         return controls;
+    };
+
+    self.detectLiveStream = () => {
+        const sourceElement = this.domRef.player.querySelector('source');
+        const sourceUrl = sourceElement?.src || '';
+        const isLiveAttribute = sourceElement?.getAttribute('data-live') === 'true';
+        const isHLSorDASH = sourceUrl.includes('.m3u8') || sourceUrl.includes('.mpd');
+        this.isLiveStream = isLiveAttribute || isHLSorDASH;
+    };
+
+    self.showLiveIndicator = () => {
+        const isLiveStream = this.isLiveStream || false;
+        if (isLiveStream) {
+            const liveIndicator = self.domRef.player.parentNode.getElementsByClassName('fluid_control_live_indicator');
+            const liveIndicatorButton = document.createElement('span');
+            liveIndicatorButton.className = 'fluid_button_live_indicator';
+            liveIndicatorButton.innerHTML = `LIVE<span class="live_circle"></span>`;
+
+            liveIndicatorButton.addEventListener('click', () => {
+                self.domRef.player.currentTime = self.currentVideoDuration;
+            });
+
+            for (let i = 0; i < liveIndicator.length; i++) {
+                liveIndicator[i].appendChild(liveIndicatorButton);
+            }
+
+        }
     };
 
     self.controlPlayPauseToggle = () => {
@@ -978,8 +1018,25 @@ const fluidPlayerClass = function () {
 
         const timePlaceholder = self.domRef.player.parentNode.getElementsByClassName('fluid_control_duration');
 
+        self.detectLiveStream();
+
         for (let i = 0; i < timePlaceholder.length; i++) {
-            timePlaceholder[i].innerHTML = durationText;
+            timePlaceholder[i].innerHTML = '';
+
+            if (this.isLiveStream) {
+                const liveIndicatorButton = document.createElement('span');
+                liveIndicatorButton.className = 'fluid_button_live_indicator';
+                liveIndicatorButton.innerHTML = `LIVE<span class="live_circle"></span>`;
+                liveIndicatorButton.addEventListener('pointerdown', () => {
+                    self.domRef.player.currentTime = self.currentVideoDuration;
+                });
+                timePlaceholder[i].appendChild(liveIndicatorButton);
+            }
+
+            const durationTextElement = document.createElement('span');
+            durationTextElement.className = 'fluid_fluid_control_duration';
+            durationTextElement.innerText = durationText;
+            timePlaceholder[i].appendChild(durationTextElement);
         }
     };
 
