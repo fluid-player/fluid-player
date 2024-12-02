@@ -55,7 +55,7 @@ test.describe('desktop ads', () => {
         await expect(skipButton).toHaveText(/Skip Ad /);
 
         // Skip the ad
-        skipButton.click();
+        await skipButton.click();
 
         /**
          * MIDROLL
@@ -75,7 +75,7 @@ test.describe('desktop ads', () => {
         await expect(skipButton).toHaveText(/Skip Ad /);
 
         // Skip the ad
-        skipButton.click();
+        await skipButton.click();
 
         await page.waitForTimeout(500);
 
@@ -102,8 +102,9 @@ test.describe('desktop ads', () => {
         await page.waitForTimeout(2500);
         await expect(skipButton).toHaveText(/Skip Ad /);
 
+        await skipButton.waitFor({ state: 'visible', timeout: 5000 });
         // Skip the ad
-        skipButton.click();
+        await skipButton.click();
 
         // Check if video is marked as ended
         await page.waitForFunction(() => {
@@ -131,6 +132,7 @@ test.describe('desktop ads', () => {
         });
 
         // Click the button but it should not be skipped
+        // NOTE: don't add 'await' because it will wait until it can skip
         skipButton.click();
 
         // If the ad still has the same video duration, that means the video is not skipped
@@ -146,7 +148,7 @@ test.describe('desktop ads', () => {
 
         await page.waitForTimeout(2000);
         // Skip Ad
-        skipButton.click();
+        await skipButton.click();
         await page.waitForTimeout(500);
 
         const videoDuration = await video.evaluate((vid) => {
