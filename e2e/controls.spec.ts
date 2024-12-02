@@ -45,5 +45,25 @@ test.describe('desktop controls', () => {
         await expect(playButton).toBeVisible();
         await expect(pauseButton).not.toBeVisible();
     });
+
+    test('mouse should disappear when hovering the video', async ({ page }) => {
+        const video = page.locator('video');
+        const playButton = page.locator('.fluid_button_play');
+
+        await playButton.click();
+
+        // Hover over the video
+        await video.hover();
+
+        await page.waitForTimeout(1500);
+
+        // Evaluate the cursor CSS property of the video element or its parent
+        const isCursorHidden = await video.evaluate((vid) => {
+            const computedStyle = window.getComputedStyle(vid);
+            return computedStyle.cursor === 'none';
+        });
+
+        expect(isCursorHidden).toBeTruthy(); // Assert that the cursor is hidden
+    });
 });
 
