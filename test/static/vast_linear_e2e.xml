@@ -1,0 +1,72 @@
+<VAST xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast4.xsd" version="4.2">
+    <Ad id="1" adType="video">
+        <InLine>
+            <AdSystem version="1">Test</AdSystem>
+            <AdTitle>Vast Linear</AdTitle>
+            <Creatives>
+                <Creative sequence="1" id="1">
+                    <Linear skipoffset="00:00:02">
+                        <Duration>00:00:00</Duration>
+                        <MediaFiles>
+                            <MediaFile id="1" delivery="progressive" type="video/mp4" bitrate="500" width="400" height="300" minBitrate="360" maxBitrate="1080" scalable="1" maintainAspectRatio="1" codec="0">
+                                <![CDATA[ http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4 ]]>
+                            </MediaFile>
+                        </MediaFiles>
+                        <VideoClicks>
+                            <ClickThrough id="1">
+                                <![CDATA[ http://www.example.com ]]>
+                            </ClickThrough>
+                            <ClickTracking>
+                                <![CDATA[ http://www.example.com/click-tracking ]]>
+                            </ClickTracking>
+                        </VideoClicks>
+                        <TrackingEvents>
+                            <Tracking event="start">http://www.example.com/start</Tracking>
+                            <Tracking event="firstQuartile">http://www.example.com/firstQuartile</Tracking>
+                            <Tracking event="midpoint">http://www.example.com/midpoint</Tracking>
+                            <Tracking event="thirdQuartile">http://www.example.com/thirdQuartile</Tracking>
+                            <Tracking event="complete">http://www.example.com/complete</Tracking>
+                            <Tracking event="mute">http://www.example.com/mute</Tracking>
+                            <Tracking event="rewind">http://www.example.com/rewind</Tracking>
+                            <Tracking event="pause">http://www.example.com/pause</Tracking>
+                            <Tracking event="resume">http://www.example.com/resume</Tracking>
+                            <Tracking event="fullscreen">http://www.example.com/fullscreen</Tracking>
+                            <Tracking event="creativeView">http://www.example.com/creativeView</Tracking>
+                            <Tracking event="acceptInvitation">http://www.example.com/acceptInvitation</Tracking>
+                            <Tracking event="skip">http://www.example.com/skip</Tracking>
+                            <Tracking event="progress" offset="00:00:05">http://www.example.com/progress5</Tracking>
+                            <Tracking event="progress" offset="00:00:10">http://www.example.com/progress10</Tracking>
+                            <Tracking event="progress" offset="00:00:15">http://www.example.com/progress15</Tracking>
+                            <Tracking event="progress" offset="00:00:20">http://www.example.com/progress20</Tracking>
+                            <Tracking event="progress" offset="00:00:25">http://www.example.com/progress25</Tracking>
+                        </TrackingEvents>
+                        <Icons>
+                            <Icon>
+                                <IconClicks> <!-- Will fall back to IconClickTrough if no TitleCTA extension found -->
+                                    <IconClickThrough>https://www.example.com/IconClickThrough</IconClickThrough>
+                                </IconClicks>
+                            </Icon>
+                        </Icons>
+                    </Linear>
+                    <UniversalAdId idRegistry="unknown">unknown</UniversalAdId>
+                </Creative>
+            </Creatives>
+            <Extensions>
+            </Extensions>
+            <Impression id="">
+                <![CDATA[ http://www.example.com/impression ]]>
+            </Impression>
+            <ViewableImpression id="1543">
+                <Viewable>
+                  <![CDATA[ http://www.example.com/view-impression ]]>
+                </Viewable>
+                <NotViewable>
+                  <![CDATA[ https://search.iabtechlab.com/error?errcode=102&imprid=s5-ea2f7f298e28c0c98374491aec3dfeb1&ts=1243 ]]>
+                </NotViewable>
+                <ViewUndetermined>
+                  <![CDATA[ https://search.iabtechlab.com/error?errcode=102&imprid=s5-ea2f7f298e28c0c98374491aec3dfeb1&ts=1243 ]]>
+                </ViewUndetermined>
+            </ViewableImpression>
+        </InLine>
+    </Ad>
+</VAST>

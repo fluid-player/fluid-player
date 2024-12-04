@@ -1,7 +1,6 @@
 node_modules/
 dist/
 dist-cdn/
-e2e/
 
 # IDEs and editors
 /.idea
@@ -18,3 +17,9 @@ e2e/
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# E2E
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
