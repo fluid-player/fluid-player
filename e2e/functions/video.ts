@@ -72,22 +72,6 @@ export async function getVideoCurrentTime(video: Locator): Promise<number> {
     });
 }
 
-// /**
-//  * Wait until the video start playing again, is unpaused
-//  *
-//  * @param page - Playwright video locator
-//  * @param timeout
-//  */
-// export async function waitForVideoToPlay(
-//     page: Page,
-//     timeout: number = 10000
-// ): Promise<void> {
-//     await page.waitForFunction(() => {
-//         const video = document.querySelector('video');
-//         return video && !video.paused;
-//     }, { timeout });
-// }
-
 /**
  * Waits until the given video element starts playing.
  *
