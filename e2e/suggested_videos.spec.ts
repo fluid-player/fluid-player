@@ -30,7 +30,7 @@ test.describe('suggested videos', () => {
         skipButton.click();
 
         await expect(suggestedVideosGrid).toBeVisible();
-        expect(await suggestedVideosGrid.screenshot()).toMatchSnapshot('baseline-sv-grid.png');
+        expect(await suggestedVideosGrid.screenshot()).toMatchSnapshot('baseline-sv-grid.png', { threshold: 0.02 });
     });
 
 });
