@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.45.0 (2024-12-09)
+* [Pull #859](https://github.com/fluid-player/fluid-player/pull/859) Create E2E project for Fluid Player
+* [Pull #857](https://github.com/fluid-player/fluid-player/pull/857) Live Indicator
+
 ## 3.44.0 (2024-11-14)
 * [Pull #851](https://github.com/fluid-player/fluid-player/pull/851) Mobile on click show control bar instead of pausing video
 
