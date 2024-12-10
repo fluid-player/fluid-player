@@ -1978,7 +1978,6 @@ const fluidPlayerClass = function () {
 
     // Function to handle fullscreen toggle based on orientation
     self.handleOrientationChange = () => {
-        alert('triggered')
         const isLandscape = window.matchMedia("(orientation: landscape)").matches;
         const videoPlayerTag = self.domRef.player;
         const fullscreenTag = self.domRef.wrapper;
