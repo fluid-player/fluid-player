@@ -1920,24 +1920,25 @@ const fluidPlayerClass = function () {
         if (self.displayOptions.layoutControls.doubleclickFullscreen && !(self.isTouchDevice() || !self.displayOptions.layoutControls.controlForwardBackward.doubleTapMobile)) {
             self.domRef.player.addEventListener('dblclick', self.fullscreenToggle);
         }
-        if (self.displayOptions.layoutControls.autoRotateFullScreen && self.isTouchDevice()) {
-            window.matchMedia("(orientation: landscape)").addEventListener('change', self.handleOrientationChange);
-        }
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    self.domRef.player.inView = true;
-                    if (self.displayOptions.layoutControls.autoRotateFullScreen && self.isTouchDevice()) {
-                        window.matchMedia("(orientation: landscape)").addEventListener('change', self.handleOrientationChange);
+        if (self.getMobileOs().userOs === 'iOS') {
+            let orientationListenerAdded = false;
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        self.domRef.player.inView = true;
+                        if (self.displayOptions.layoutControls.autoRotateFullScreen && self.isTouchDevice() && !orientationListenerAdded) {
+                            window.matchMedia("(orientation: landscape)").addEventListener('change', self.handleOrientationChange);
+                            orientationListenerAdded = true;
+                        }
+                    } else {
+                        self.domRef.player.inView = false;
                     }
-                } else {
-                    self.domRef.player.inView = false;
-                }
+                });
             });
-        });
 
-        observer.observe(self.domRef.player);
+            observer.observe(self.domRef.player);
+        }
 
         self.initHtmlOnPauseBlock();
 
@@ -1977,6 +1978,7 @@ const fluidPlayerClass = function () {
 
     // Function to handle fullscreen toggle based on orientation
     self.handleOrientationChange = () => {
+        alert('triggered')
         const isLandscape = window.matchMedia("(orientation: landscape)").matches;
         const videoPlayerTag = self.domRef.player;
         const fullscreenTag = self.domRef.wrapper;
