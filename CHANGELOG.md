@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.46.0 (2024-12-12)
+* [Pull #854](https://github.com/fluid-player/fluid-player/pull/854) Add support for automatic landscape screen orientation
+
 ## 3.45.0 (2024-12-09)
 * [Pull #859](https://github.com/fluid-player/fluid-player/pull/859) Create E2E project for Fluid Player
 * [Pull #857](https://github.com/fluid-player/fluid-player/pull/857) Live Indicator
