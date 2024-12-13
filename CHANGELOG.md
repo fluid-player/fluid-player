@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.47.0 (2024-12-13)
+* [Pull #860](https://github.com/fluid-player/fluid-player/pull/860) Revert "Live Indicator"
+
 ## 3.46.0 (2024-12-12)
 * [Pull #854](https://github.com/fluid-player/fluid-player/pull/854) Add support for automatic landscape screen orientation
 
