@@ -159,6 +159,7 @@ const fluidPlayerClass = function () {
         self.timeSkipOffsetAmount = 10;
         // Only for linear ads, non linear are not taken into account
         self.currentMediaSourceType = 'source';
+        self.isLiveStream = null;
 
         //Default options
         self.displayOptions = {
@@ -419,8 +420,6 @@ const fluidPlayerClass = function () {
         // Previously prevented to be initialized if preRolls were set up
         // but now the streamers support reinitialization
         self.initialiseStreamers();
-        self.detectLiveStream();
-        self.showLiveIndicator();
 
         const _play_videoPlayer = playerNode.play;
 
@@ -886,22 +885,13 @@ const fluidPlayerClass = function () {
         return controls;
     };
 
-    self.detectLiveStream = () => {
-        const sourceElement = this.domRef.player.querySelector('source');
-        const sourceUrl = sourceElement?.src || '';
-        const isLiveAttribute = sourceElement?.getAttribute('data-live') === 'true';
-        const isHLSorDASH = sourceUrl.includes('.m3u8') || sourceUrl.includes('.mpd');
-        this.isLiveStream = isLiveAttribute || isHLSorDASH;
-    };
-
     self.showLiveIndicator = () => {
-        const isLiveStream = this.isLiveStream || false;
-        if (isLiveStream) {
+        const liveIndicatorButton = self.domRef.player.parentNode.getElementsByClassName('fluid_button_live_indicator');
+        if (!liveIndicatorButton.length) {
             const liveIndicator = self.domRef.player.parentNode.getElementsByClassName('fluid_control_live_indicator');
             const liveIndicatorButton = document.createElement('span');
             liveIndicatorButton.className = 'fluid_button_live_indicator';
             liveIndicatorButton.innerHTML = `LIVE<span class="live_circle"></span>`;
-
             liveIndicatorButton.addEventListener('click', () => {
                 self.domRef.player.currentTime = self.currentVideoDuration;
             });
@@ -909,7 +899,14 @@ const fluidPlayerClass = function () {
             for (let i = 0; i < liveIndicator.length; i++) {
                 liveIndicator[i].appendChild(liveIndicatorButton);
             }
+        }
+    };
 
+    self.HideLiveIndicator = () => {
+        const liveIndicatorButton = self.domRef.player.parentNode.getElementsByClassName('fluid_button_live_indicator')[0];
+
+        if (liveIndicatorButton) {
+            liveIndicatorButton.remove();
         }
     };
 
@@ -1019,12 +1016,10 @@ const fluidPlayerClass = function () {
 
         const timePlaceholder = self.domRef.player.parentNode.getElementsByClassName('fluid_control_duration');
 
-        self.detectLiveStream();
-
         for (let i = 0; i < timePlaceholder.length; i++) {
             timePlaceholder[i].innerHTML = '';
 
-            if (this.isLiveStream) {
+            if (self.isLiveStream) {
                 const liveIndicatorButton = document.createElement('span');
                 liveIndicatorButton.className = 'fluid_button_live_indicator';
                 liveIndicatorButton.innerHTML = `LIVE<span class="live_circle"></span>`;
