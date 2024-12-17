@@ -1,0 +1,52 @@
+<VAST xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast4.xsd" version="4.2">
+    <Ad id="1" adType="video">
+        <InLine>
+            <AdSystem version="1">stripcash.com</AdSystem>
+            <AdTitle>HLS test</AdTitle>
+            <Creatives>
+                <Creative sequence="1" id="1">
+                    <Linear skipoffset="00:00:05">
+                        <Duration>00:00:00</Duration>
+                        <MediaFiles>
+                            <MediaFile id="1" delivery="streaming" type="application/vnd.apple.mpegurl" width="480" height="640">
+                                <![CDATA[ https://stream-akamai.castr.com/5b9352dbda7b8c769937e459/live_2361c920455111ea85db6911fe397b9e/index.fmp4.m3u8 ]]>
+                            </MediaFile>
+                        </MediaFiles>
+                        <VideoClicks>
+                            <ClickThrough id="1">
+                                <![CDATA[ http://www.example.com ]]>
+                            </ClickThrough>
+                            <ClickTracking>
+                                <![CDATA[ http://www.example.com/click-tracking ]]>
+                            </ClickTracking>
+                        </VideoClicks>
+                        <TrackingEvents>
+                            <Tracking event="start">http://www.example.com/start</Tracking>
+                            <Tracking event="firstQuartile">http://www.example.com/firstQuartile</Tracking>
+                            <Tracking event="midpoint">http://www.example.com/midpoint</Tracking>
+                            <Tracking event="thirdQuartile">http://www.example.com/thirdQuartile</Tracking>
+                            <Tracking event="complete">http://www.example.com/complete</Tracking>
+                            <Tracking event="mute">http://www.example.com/mute</Tracking>
+                            <Tracking event="rewind">http://www.example.com/rewind</Tracking>
+                            <Tracking event="pause">http://www.example.com/pause</Tracking>
+                            <Tracking event="resume">http://www.example.com/resume</Tracking>
+                            <Tracking event="fullscreen">http://www.example.com/fullscreen</Tracking>
+                            <Tracking event="creativeView">http://www.example.com/creativeView</Tracking>
+                            <Tracking event="acceptInvitation">http://www.example.com/acceptInvitation</Tracking>
+                            <Tracking event="skip">http://www.example.com/skip</Tracking>
+                            <Tracking event="progress" offset="00:00:05">http://www.example.com/progress5</Tracking>
+                            <Tracking event="progress" offset="00:00:10">http://www.example.com/progress10</Tracking>
+                            <Tracking event="progress" offset="00:00:15">http://www.example.com/progress15</Tracking>
+                            <Tracking event="progress" offset="00:00:20">http://www.example.com/progress20</Tracking>
+                            <Tracking event="progress" offset="00:00:25">http://www.example.com/progress25</Tracking>
+                        </TrackingEvents>
+                    </Linear>
+                    <UniversalAdId idRegistry="unknown">unknown</UniversalAdId>
+                </Creative>
+            </Creatives>
+            <Impression id="">
+                <![CDATA[ http://www.example.com/impression ]]>
+            </Impression>
+        </InLine>
+    </Ad>
+</VAST>
