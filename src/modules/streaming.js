@@ -124,6 +124,8 @@ export default function (playerInstance, options) {
                 playerInstance.isLiveStream = !!level.details.live;
                 if (!!level.details.live) {
                     playerInstance.showLiveIndicator();
+                } else {
+                    playerInstance.hideLiveIndicator();
                 }
             });
 
