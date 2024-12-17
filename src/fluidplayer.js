@@ -902,7 +902,7 @@ const fluidPlayerClass = function () {
         }
     };
 
-    self.HideLiveIndicator = () => {
+    self.hideLiveIndicator = () => {
         const liveIndicatorButton = self.domRef.player.parentNode.getElementsByClassName('fluid_button_live_indicator')[0];
 
         if (liveIndicatorButton) {
