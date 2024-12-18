@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.48.0 (2024-12-18)
+* [Pull #862](https://github.com/fluid-player/fluid-player/pull/862) Live Indicator
+
 ## 3.47.0 (2024-12-13)
 * [Pull #860](https://github.com/fluid-player/fluid-player/pull/860) Revert "Live Indicator"
 
