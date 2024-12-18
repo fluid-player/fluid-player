@@ -159,6 +159,7 @@ const fluidPlayerClass = function () {
         self.timeSkipOffsetAmount = 10;
         // Only for linear ads, non linear are not taken into account
         self.currentMediaSourceType = 'source';
+        self.isLiveStream = null;
 
         //Default options
         self.displayOptions = {
@@ -864,13 +865,49 @@ const fluidPlayerClass = function () {
         controls.mute.className = 'fluid_button fluid_button_volume fluid_control_mute';
         controls.rightContainer.appendChild(controls.mute);
 
-        // Right container -> Volume container
+        // Right container -> Volume Control + Live Steam Button
+        const durationContainer = document.createElement('div');
+        durationContainer.className = 'fluid_control_duration';
+
         controls.duration = document.createElement('div');
-        controls.duration.className = 'fluid_control_duration fluid_fluid_control_duration';
+        controls.duration.className = 'fluid_fluid_control_duration';
         controls.duration.innerText = '00:00 / 00:00';
-        controls.rightContainer.appendChild(controls.duration);
+
+        if (!options.displayVolumeBar) {
+            durationContainer.className = durationContainer.className + ' no_volume_bar';
+        }
+
+        controls.live_indicator = document.createElement('div');
+        controls.live_indicator.className = 'fluid_control_live_indicator';
+        durationContainer.append(controls.live_indicator, controls.duration);
+        controls.rightContainer.appendChild(durationContainer);
 
         return controls;
+    };
+
+    self.showLiveIndicator = () => {
+        const liveIndicatorButton = self.domRef.player.parentNode.getElementsByClassName('fluid_button_live_indicator');
+        if (!liveIndicatorButton.length) {
+            const liveIndicator = self.domRef.player.parentNode.getElementsByClassName('fluid_control_live_indicator');
+            const liveIndicatorButton = document.createElement('span');
+            liveIndicatorButton.className = 'fluid_button_live_indicator';
+            liveIndicatorButton.innerHTML = `LIVE<span class="live_circle"></span>`;
+            liveIndicatorButton.addEventListener('click', () => {
+                self.domRef.player.currentTime = self.currentVideoDuration;
+            });
+
+            for (let i = 0; i < liveIndicator.length; i++) {
+                liveIndicator[i].appendChild(liveIndicatorButton);
+            }
+        }
+    };
+
+    self.hideLiveIndicator = () => {
+        const liveIndicatorButton = self.domRef.player.parentNode.getElementsByClassName('fluid_button_live_indicator')[0];
+
+        if (liveIndicatorButton) {
+            liveIndicatorButton.remove();
+        }
     };
 
     self.controlPlayPauseToggle = () => {
@@ -980,7 +1017,22 @@ const fluidPlayerClass = function () {
         const timePlaceholder = self.domRef.player.parentNode.getElementsByClassName('fluid_control_duration');
 
         for (let i = 0; i < timePlaceholder.length; i++) {
-            timePlaceholder[i].innerHTML = durationText;
+            timePlaceholder[i].innerHTML = '';
+
+            if (self.isLiveStream) {
+                const liveIndicatorButton = document.createElement('span');
+                liveIndicatorButton.className = 'fluid_button_live_indicator';
+                liveIndicatorButton.innerHTML = `LIVE<span class="live_circle"></span>`;
+                liveIndicatorButton.addEventListener('pointerdown', () => {
+                    self.domRef.player.currentTime = self.currentVideoDuration;
+                });
+                timePlaceholder[i].appendChild(liveIndicatorButton);
+            }
+
+            const durationTextElement = document.createElement('span');
+            durationTextElement.className = 'fluid_fluid_control_duration';
+            durationTextElement.innerText = durationText;
+            timePlaceholder[i].appendChild(durationTextElement);
         }
     };
 

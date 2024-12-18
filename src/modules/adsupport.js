@@ -5,6 +5,10 @@ export default function (playerInstance, options) {
     playerInstance.renderLinearAd = (ad, backupTheVideoTime) => {
         playerInstance.toggleLoader(false);
 
+        // Reset live indicator
+        playerInstance.hideLiveIndicator();
+        playerInstance.isLiveStream = null;
+
         //get the proper ad
         playerInstance.vastOptions = ad;
 
@@ -185,6 +189,15 @@ export default function (playerInstance, options) {
                     hls.attachMedia(playerInstance.domRef.player);
                     hls.loadSource(selectedMediaFile.src);
                     playerInstance.isCurrentlyPlayingAd = true;
+
+                    hls.once(Hls.Events.LEVEL_LOADED, function (event, level) {
+                        playerInstance.isLiveStream = !!level.details.live;
+                        if (!!level.details.live) {
+                            playerInstance.showLiveIndicator();
+                        } else {
+                            playerInstance.hideLiveIndicator();
+                        }
+                    });
 
                     playerInstance.hlsPlayer = hls;
 
@@ -1274,6 +1287,10 @@ export default function (playerInstance, options) {
     // ADS
     playerInstance.switchToMainVideo = () => {
         playerInstance.debugMessage('starting main video');
+
+        // Reset live indicator
+        playerInstance.hideLiveIndicator();
+        playerInstance.isLiveStream = null;
 
         playerInstance.domRef.player.src = playerInstance.originalSrc;
 

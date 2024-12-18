@@ -83,6 +83,13 @@ export default function (playerInstance, options) {
                 playerInstance.toggleLoader(false);
             });
 
+            dashPlayer.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, () => {
+                playerInstance.isLiveStream = !!dashPlayer.isDynamic()
+                if (!!dashPlayer.isDynamic()) {
+                    playerInstance.showLiveIndicator();
+                }
+            });
+
             playerInstance.displayOptions.modules.onAfterInitDash(dashPlayer);
 
             playerInstance.dashPlayer = dashPlayer;
@@ -112,6 +119,15 @@ export default function (playerInstance, options) {
 
             hls.attachMedia(playerInstance.domRef.player);
             hls.loadSource(playerInstance.originalSrc);
+
+            hls.once(Hls.Events.LEVEL_LOADED, function (event, level) {
+                playerInstance.isLiveStream = !!level.details.live;
+                if (!!level.details.live) {
+                    playerInstance.showLiveIndicator();
+                } else {
+                    playerInstance.hideLiveIndicator();
+                }
+            });
 
             playerInstance.displayOptions.modules.onAfterInitHls(hls);
 

@@ -15,6 +15,8 @@
 </head>
 <body>
 
+<p>First ad is a Live hls file, second ad at 15 seconds is a VOD</p>
+
 <video id="fluid-player-e2e-case">
     <source src="https://cdn.fluidplayer.com/videos/valerian-1080p.mkv" data-fluid-hd title="1080p" type="video/mp4"/>
     <source src="https://cdn.fluidplayer.com/videos/valerian-720p.mkv" data-fluid-hd title="720p" type="video/mp4"/>
@@ -33,7 +35,7 @@
             adList: [
                 {
                     roll: 'preRoll',
-                    vastTag: '/static/vast_hls.xml',
+                    vastTag: '/static/vast_hls_live.xml',
                 },
                 {
                     roll: 'midRoll',
