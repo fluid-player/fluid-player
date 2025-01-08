@@ -173,7 +173,7 @@ export default function (playerInstance, options) {
         const HLSLevels = playerInstance.hlsPlayer.levels
             .map((level, index) => ({
                 id: index,
-                title: String(level.width),
+                title: level.height + 'p',
                 isHD: level.videoRange === 'HDR',
                 bitrate: level.bitrate
             }));
@@ -295,8 +295,8 @@ export default function (playerInstance, options) {
     function sortLevels(levels) {
         return [...levels].sort((a, b) => {
             // First sort by width in descending order
-            if (b.width !== a.width) {
-                return b.width - a.width;
+            if (b.width !== a.height) {
+                return b.width - a.height;
             }
             // If width is the same, sort by bitrate in descending order
             return b.bitrate - a.bitrate;
