@@ -294,11 +294,11 @@ export default function (playerInstance, options) {
 
     function sortLevels(levels) {
         return [...levels].sort((a, b) => {
-            // First sort by width in descending order
-            if (b.width !== a.height) {
-                return b.width - a.height;
+            // First sort by height in descending order
+            if (b.height !== a.height) {
+                return b.height - a.height;
             }
-            // If width is the same, sort by bitrate in descending order
+            // If height is the same, sort by bitrate in descending order
             return b.bitrate - a.bitrate;
         });
     }
