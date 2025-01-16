@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.49.0 (2025-01-16)
+* [Pull #868](https://github.com/fluid-player/fluid-player/pull/868) HLS video quality switcher showing wrong values
+* [Pull #869](https://github.com/fluid-player/fluid-player/pull/869) layoutControls.roundedCorners is not type defined
+
 ## 3.48.0 (2024-12-18)
 * [Pull #862](https://github.com/fluid-player/fluid-player/pull/862) Live Indicator
 
