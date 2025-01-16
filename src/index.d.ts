@@ -7,7 +7,7 @@ declare module 'fluid-player' {
     export default fluidPlayer;
 }
 
-declare type AdditionalEventInfo = { mediaSourceType: 'ad' | 'source' };
+declare type AdditionalEventInfo = { mediaSourceType: 'source' | 'preRoll' | 'midRoll' | 'postRoll' };
 declare type OnPlay = (event: 'play', callback: (additionalInfo: AdditionalEventInfo) => void) => void;
 declare type OnPlaying =
     (event: 'playing', callback: (event: Event, additionalInfo: AdditionalEventInfo) => void) => void;
@@ -121,6 +121,8 @@ declare interface LayoutControls {
     }>;
     showCardBoardView: boolean;
     showCardBoardJoystick: boolean;
+    roundedCorners: number;
+    autoRotateFullScreen: boolean;
 }
 
 declare interface VTTPreviewOptions {
@@ -219,4 +221,10 @@ declare interface FluidPlayerOptions {
         fullscreen: string;
         exitFullscreen: string;
     }>;
+    suggestedVideos?: {
+        configUrl: string | null;
+    };
+    hls?: {
+        overrideNative: boolean;
+    };
 }
