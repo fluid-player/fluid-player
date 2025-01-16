@@ -2118,9 +2118,8 @@ const fluidPlayerClass = function () {
                 return;
             }
 
-            if (!self.isControlBarVisible()) {
-                return;
-            }
+            // Save current state here, if you check the state in the settimeout it will always be true
+            const isControlBarVisible = self.isControlBarVisible();
 
             const { offsetX } = event
             const { clientWidth } = self.domRef.player;
@@ -2128,7 +2127,9 @@ const fluidPlayerClass = function () {
             // Simulates default behaviour if it's a single click
             timeouts.push(setTimeout(() => {
                 hasDoubleClicked = false;
-                self.playPauseToggle();
+                    if (isControlBarVisible) {
+                        self.playPauseToggle();
+                    }
             }, 300));
 
             // Skips video time if it's a double click
