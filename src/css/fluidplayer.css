@@ -616,6 +616,7 @@
     height: auto;
     z-index: 1;
     text-align: center;
+    transition: bottom 0.2s ease;
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .fluid_subtitles_container div {

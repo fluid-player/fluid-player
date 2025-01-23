@@ -222,4 +222,9 @@ export default function (playerInstance, options) {
             playerInstance.createSubtitlesSwitch();
         });
     };
+
+    playerInstance.repositionSubtitlesContainer = (size) => {
+        const subtitlesContainer = playerInstance.domRef.wrapper.querySelector('.fluid_subtitles_container');
+        subtitlesContainer.style.bottom = size;
+    };
 }
