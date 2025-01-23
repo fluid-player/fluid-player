@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.50.0 (2025-01-23)
+* [Pull #871](https://github.com/fluid-player/fluid-player/pull/871) ControlForwardBackward on double click doesnt work on Mobile Devices
+* [Pull #872](https://github.com/fluid-player/fluid-player/pull/872) Subtitles Do Not Adjust Position When Controls Are Hidden
+
 ## 3.49.0 (2025-01-16)
 * [Pull #868](https://github.com/fluid-player/fluid-player/pull/868) HLS video quality switcher showing wrong values
 * [Pull #869](https://github.com/fluid-player/fluid-player/pull/869) layoutControls.roundedCorners is not type defined
