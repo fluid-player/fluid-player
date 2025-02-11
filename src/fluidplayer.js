@@ -1662,9 +1662,16 @@ const fluidPlayerClass = function () {
                     self.resumeVpaidAd();
                 } else {
                     // Check if video has ended. If so, replay
-                    if (Math.floor(self.currentVideoDuration) === Math.floor(self.domRef.player.currentTime)) {
+                    if (
+                        Math.floor(self.domRef.player.currentTime) !== 0 &&
+                        Math.floor(self.currentVideoDuration) === Math.floor(self.domRef.player.currentTime)
+                    ) {
                         self.initialiseStreamers();
                         self.domRef.player.currentTime = 0;
+                    }
+
+                    if (self.hlsPlayer && !self.hlsPlayer.config.autoStartLoad) {
+                        self.hlsPlayer.startLoad();
                     }
 
                     // resume the regular linear vast or content video player

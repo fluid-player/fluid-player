@@ -1298,6 +1298,10 @@ export default function (playerInstance, options) {
 
         playerInstance.initialiseStreamers();
 
+        if (playerInstance.hlsPlayer && !playerInstance.hlsPlayer.config.autoStartLoad) {
+            playerInstance.hlsPlayer.startLoad();
+        }
+
         const newCurrentTime = (typeof playerInstance.domRef.player.mainVideoCurrentTime !== 'undefined')
             ? Math.floor(playerInstance.domRef.player.mainVideoCurrentTime) : 0;
 
