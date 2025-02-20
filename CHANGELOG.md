@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.51.0 (2025-02-20)
+* [Pull #876](https://github.com/fluid-player/fluid-player/pull/876) Preload Ignored with HLS > Manifest and fragments loading twice before preroll, and after preroll
+* [Pull #877](https://github.com/fluid-player/fluid-player/pull/877) Change in quality for hls broke video size
+
 ## 3.50.0 (2025-01-23)
 * [Pull #871](https://github.com/fluid-player/fluid-player/pull/871) ControlForwardBackward on double click doesnt work on Mobile Devices
 * [Pull #872](https://github.com/fluid-player/fluid-player/pull/872) Subtitles Do Not Adjust Position When Controls Are Hidden
