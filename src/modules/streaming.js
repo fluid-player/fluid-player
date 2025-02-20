@@ -245,8 +245,6 @@ export default function (playerInstance, options) {
     function onSourceChangeClick(event, selectedLevel) {
         event.stopPropagation();
 
-        setPlayerDimensions();
-
         const videoChangedTo = event.currentTarget;
         clearSourceSelectedIcons();
 
@@ -260,12 +258,6 @@ export default function (playerInstance, options) {
         });
 
         playerInstance.openCloseVideoSourceSwitch();
-    }
-
-    // While changing source the player size can flash, we want to set the pixel dimensions then back to 100% afterwards
-    function setPlayerDimensions() {
-        playerInstance.domRef.player.style.width = `${playerInstance.domRef.player.clientWidth}px`;
-        playerInstance.domRef.player.style.height = `${playerInstance.domRef.player.clientHeight}px`;
     }
 
     function clearSourceSelectedIcons() {
