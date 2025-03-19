@@ -218,7 +218,7 @@ export default function (playerInstance, options) {
         }
 
         import(/* webpackChunkName: "vttjs" */ 'videojs-vtt.js').then((it) => {
-            window.WebVTT = it.WebVTT;
+            window.WebVTT = it.WebVTT || it.default.WebVTT;
             playerInstance.createSubtitlesSwitch();
         });
     };
@@ -228,4 +228,9 @@ export default function (playerInstance, options) {
         const subtitlesContainer = playerInstance.domRef.wrapper.querySelector('.fluid_subtitles_container');
         subtitlesContainer.style.fontSize = `${size}em`;
     }
+
+    playerInstance.repositionSubtitlesContainer = (size) => {
+        const subtitlesContainer = playerInstance.domRef.wrapper.querySelector('.fluid_subtitles_container');
+        subtitlesContainer.style.bottom = size;
+    };
 }

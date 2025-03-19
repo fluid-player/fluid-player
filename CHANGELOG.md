@@ -1,5 +1,47 @@
 # CHANGELOG
 
+## 3.51.0 (2025-02-20)
+* [Pull #876](https://github.com/fluid-player/fluid-player/pull/876) Preload Ignored with HLS > Manifest and fragments loading twice before preroll, and after preroll
+* [Pull #877](https://github.com/fluid-player/fluid-player/pull/877) Change in quality for hls broke video size
+
+## 3.50.0 (2025-01-23)
+* [Pull #871](https://github.com/fluid-player/fluid-player/pull/871) ControlForwardBackward on double click doesnt work on Mobile Devices
+* [Pull #872](https://github.com/fluid-player/fluid-player/pull/872) Subtitles Do Not Adjust Position When Controls Are Hidden
+
+## 3.49.0 (2025-01-16)
+* [Pull #868](https://github.com/fluid-player/fluid-player/pull/868) HLS video quality switcher showing wrong values
+* [Pull #869](https://github.com/fluid-player/fluid-player/pull/869) layoutControls.roundedCorners is not type defined
+
+## 3.48.0 (2024-12-18)
+* [Pull #862](https://github.com/fluid-player/fluid-player/pull/862) Live Indicator
+
+## 3.47.0 (2024-12-13)
+* [Pull #860](https://github.com/fluid-player/fluid-player/pull/860) Revert "Live Indicator"
+
+## 3.46.0 (2024-12-12)
+* [Pull #854](https://github.com/fluid-player/fluid-player/pull/854) Add support for automatic landscape screen orientation
+
+## 3.45.0 (2024-12-09)
+* [Pull #859](https://github.com/fluid-player/fluid-player/pull/859) Create E2E project for Fluid Player
+* [Pull #857](https://github.com/fluid-player/fluid-player/pull/857) Live Indicator
+
+## 3.44.0 (2024-11-14)
+* [Pull #851](https://github.com/fluid-player/fluid-player/pull/851) Mobile on click show control bar instead of pausing video
+
+## 3.43.0 (2024-11-13)
+* [Pull #855](https://github.com/fluid-player/fluid-player/pull/855) Fluidplayer doesn't play Wrapper ads
+
+## 3.42.0 (2024-11-05)
+* [Pull #836](https://github.com/fluid-player/fluid-player/pull/836) FallbackVastTags may not be working
+
+## 3.41.0 (2024-11-04)
+* [Pull #850](https://github.com/fluid-player/fluid-player/pull/850) New event system breaks current implementations
+
+## 3.40.0 (2024-10-24)
+* [Pull #844](https://github.com/fluid-player/fluid-player/pull/844) MiniPlayer Follow Up > Improving UX and be Google compliant
+* [Pull #846](https://github.com/fluid-player/fluid-player/pull/846) Rounded corners on player
+* [Pull #848](https://github.com/fluid-player/fluid-player/pull/848) Uncaught TypeError: Cannot read properties of undefined (reading 'Parser') when using subtitles
+
 ## 3.39.0 (2024-10-15)
 * [Pull #842](https://github.com/fluid-player/fluid-player/pull/842) Ads events
 * [Pull #843](https://github.com/fluid-player/fluid-player/pull/843) Mid Roll is not working with Live stream videos

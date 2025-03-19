@@ -160,6 +160,7 @@ const fluidPlayerClass = function () {
         // Only for linear ads, non linear are not taken into account
         self.currentMediaSourceType = 'source';
         self.subtitlesSize = 1; // in 'em'
+        self.isLiveStream = null;
 
         //Default options
         self.displayOptions = {
@@ -186,6 +187,7 @@ const fluidPlayerClass = function () {
                 showCardBoardJoystick: false,
                 allowTheatre: true,
                 doubleclickFullscreen: true,
+                autoRotateFullScreen: false,
                 theatreSettings: {
                     width: '100%',
                     height: '60%',
@@ -247,7 +249,8 @@ const fluidPlayerClass = function () {
                     placeholderText: 'Playing in Miniplayer',
                     position: 'bottom right',
                     autoToggle: false,
-                }
+                },
+                roundedCorners: 0
             },
             suggestedVideos: {
                 configUrl: null
@@ -863,13 +866,49 @@ const fluidPlayerClass = function () {
         controls.mute.className = 'fluid_button fluid_button_volume fluid_control_mute';
         controls.rightContainer.appendChild(controls.mute);
 
-        // Right container -> Volume container
+        // Right container -> Volume Control + Live Steam Button
+        const durationContainer = document.createElement('div');
+        durationContainer.className = 'fluid_control_duration';
+
         controls.duration = document.createElement('div');
-        controls.duration.className = 'fluid_control_duration fluid_fluid_control_duration';
+        controls.duration.className = 'fluid_fluid_control_duration';
         controls.duration.innerText = '00:00 / 00:00';
-        controls.rightContainer.appendChild(controls.duration);
+
+        if (!options.displayVolumeBar) {
+            durationContainer.className = durationContainer.className + ' no_volume_bar';
+        }
+
+        controls.live_indicator = document.createElement('div');
+        controls.live_indicator.className = 'fluid_control_live_indicator';
+        durationContainer.append(controls.live_indicator, controls.duration);
+        controls.rightContainer.appendChild(durationContainer);
 
         return controls;
+    };
+
+    self.showLiveIndicator = () => {
+        const liveIndicatorButton = self.domRef.player.parentNode.getElementsByClassName('fluid_button_live_indicator');
+        if (!liveIndicatorButton.length) {
+            const liveIndicator = self.domRef.player.parentNode.getElementsByClassName('fluid_control_live_indicator');
+            const liveIndicatorButton = document.createElement('span');
+            liveIndicatorButton.className = 'fluid_button_live_indicator';
+            liveIndicatorButton.innerHTML = `LIVE<span class="live_circle"></span>`;
+            liveIndicatorButton.addEventListener('click', () => {
+                self.domRef.player.currentTime = self.currentVideoDuration;
+            });
+
+            for (let i = 0; i < liveIndicator.length; i++) {
+                liveIndicator[i].appendChild(liveIndicatorButton);
+            }
+        }
+    };
+
+    self.hideLiveIndicator = () => {
+        const liveIndicatorButton = self.domRef.player.parentNode.getElementsByClassName('fluid_button_live_indicator')[0];
+
+        if (liveIndicatorButton) {
+            liveIndicatorButton.remove();
+        }
     };
 
     self.controlPlayPauseToggle = () => {
@@ -979,7 +1018,22 @@ const fluidPlayerClass = function () {
         const timePlaceholder = self.domRef.player.parentNode.getElementsByClassName('fluid_control_duration');
 
         for (let i = 0; i < timePlaceholder.length; i++) {
-            timePlaceholder[i].innerHTML = durationText;
+            timePlaceholder[i].innerHTML = '';
+
+            if (self.isLiveStream) {
+                const liveIndicatorButton = document.createElement('span');
+                liveIndicatorButton.className = 'fluid_button_live_indicator';
+                liveIndicatorButton.innerHTML = `LIVE<span class="live_circle"></span>`;
+                liveIndicatorButton.addEventListener('pointerdown', () => {
+                    self.domRef.player.currentTime = self.currentVideoDuration;
+                });
+                timePlaceholder[i].appendChild(liveIndicatorButton);
+            }
+
+            const durationTextElement = document.createElement('span');
+            durationTextElement.className = 'fluid_fluid_control_duration';
+            durationTextElement.innerText = durationText;
+            timePlaceholder[i].appendChild(durationTextElement);
         }
     };
 
@@ -1617,9 +1671,16 @@ const fluidPlayerClass = function () {
                     self.resumeVpaidAd();
                 } else {
                     // Check if video has ended. If so, replay
-                    if (Math.floor(self.currentVideoDuration) === Math.floor(self.domRef.player.currentTime)) {
+                    if (
+                        Math.floor(self.domRef.player.currentTime) !== 0 &&
+                        Math.floor(self.currentVideoDuration) === Math.floor(self.domRef.player.currentTime)
+                    ) {
                         self.initialiseStreamers();
                         self.domRef.player.currentTime = 0;
+                    }
+
+                    if (self.hlsPlayer && !self.hlsPlayer.config.autoStartLoad) {
+                        self.hlsPlayer.startLoad();
                     }
 
                     // resume the regular linear vast or content video player
@@ -1928,6 +1989,25 @@ const fluidPlayerClass = function () {
             self.domRef.player.addEventListener('dblclick', self.fullscreenToggle);
         }
 
+        if (self.getMobileOs().userOs === 'iOS') {
+            let orientationListenerAdded = false;
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        self.domRef.player.inView = true;
+                        if (self.displayOptions.layoutControls.autoRotateFullScreen && self.isTouchDevice() && !orientationListenerAdded) {
+                            window.matchMedia("(orientation: landscape)").addEventListener('change', self.handleOrientationChange);
+                            orientationListenerAdded = true;
+                        }
+                    } else {
+                        self.domRef.player.inView = false;
+                    }
+                });
+            });
+
+            observer.observe(self.domRef.player);
+        }
+
         self.initHtmlOnPauseBlock();
 
         self.setCustomControls();
@@ -1963,6 +2043,48 @@ const fluidPlayerClass = function () {
         self.domRef.controls.skipBack.addEventListener('click', self.skipRelative.bind(this, -self.timeSkipOffsetAmount));
         self.domRef.controls.skipForward.addEventListener('click', self.skipRelative.bind(this, self.timeSkipOffsetAmount));
     };
+
+    // Function to handle fullscreen toggle based on orientation
+    self.handleOrientationChange = () => {
+        const isLandscape = window.matchMedia("(orientation: landscape)").matches;
+        const videoPlayerTag = self.domRef.player;
+        const fullscreenTag = self.domRef.wrapper;
+        const requestFullscreenFunctionNames = self.checkFullscreenSupport();
+        const fullscreenButton = videoPlayerTag.parentNode.getElementsByClassName('fluid_control_fullscreen');
+        const menuOptionFullscreen = fullscreenTag.querySelector('.context_option_fullscreen');
+        let functionNameToExecute;
+        if (isLandscape && self.domRef.player.inView) {
+            if (requestFullscreenFunctionNames) {
+                if (requestFullscreenFunctionNames.goFullscreen === 'webkitEnterFullscreen') {
+                    functionNameToExecute = 'videoPlayerTag.' + requestFullscreenFunctionNames.goFullscreen + '();';
+                    self.fullscreenOn(fullscreenButton, menuOptionFullscreen);
+                    new Function('videoPlayerTag', functionNameToExecute)(videoPlayerTag);
+                } else {
+                    if (document[requestFullscreenFunctionNames.isFullscreen] === null) {
+                        functionNameToExecute = 'videoPlayerTag.' + requestFullscreenFunctionNames.goFullscreen + '();';
+                        self.fullscreenOn(fullscreenButton, menuOptionFullscreen);
+                    }
+                    new Function('videoPlayerTag', functionNameToExecute)(fullscreenTag);
+                }
+            } else {
+                fullscreenTag.className += ' pseudo_fullscreen';
+                self.fullscreenOn(fullscreenButton, menuOptionFullscreen);
+            }
+        } else {
+            fullscreenTag.className = fullscreenTag.className.replace(/\bpseudo_fullscreen\b/g, '');
+            if (requestFullscreenFunctionNames) {
+                functionNameToExecute = 'document.' + requestFullscreenFunctionNames.exitFullscreen + '();';
+                self.fullscreenOff(fullscreenButton, menuOptionFullscreen);
+                new Function('videoPlayerTag', functionNameToExecute)(fullscreenTag);
+            }  else {
+                if (fullscreenTag.className.search(/\bpseudo_fullscreen\b/g) !== -1) {
+                    fullscreenTag.className = fullscreenTag.className.replace(/\bpseudo_fullscreen\b/g, '');
+                    self.fullscreenOff(fullscreenButton, menuOptionFullscreen);
+                }
+            }
+        }
+        self.resizeVpaidAuto();
+    }
 
     /**
      * Creates the skip animation elements and appends them to the player
@@ -2006,11 +2128,14 @@ const fluidPlayerClass = function () {
             timeouts = [];
         }
 
-        self.domRef.player.addEventListener('click', (event) => {
+        self.domRef.player.addEventListener('pointerdown', (event) => {
             // Check if it's mobile on the fly and prevent double click skip if it is
             if (!self.isTouchDevice()) {
                 return;
             }
+
+            // Save current state here, if you check the state in the settimeout it will always be true
+            const isControlBarVisible = self.isControlBarVisible();
 
             const { offsetX } = event
             const { clientWidth } = self.domRef.player;
@@ -2018,7 +2143,9 @@ const fluidPlayerClass = function () {
             // Simulates default behaviour if it's a single click
             timeouts.push(setTimeout(() => {
                 hasDoubleClicked = false;
-                self.playPauseToggle();
+                    if (isControlBarVisible) {
+                        self.playPauseToggle();
+                    }
             }, 300));
 
             // Skips video time if it's a double click
@@ -2115,6 +2242,18 @@ const fluidPlayerClass = function () {
             wrapper.style.height = self.domRef.player.clientHeight + 'px';
             wrapper.style.width = self.domRef.player.clientWidth + 'px';
         }
+
+        const parseBorderRadius = () => {
+            const roundedCorners = self.displayOptions.layoutControls.roundedCorners;
+            const parsedValue = Number(roundedCorners);
+
+            return !isNaN(parsedValue) && parsedValue !== 0
+                ? `${parsedValue}px`
+                : roundedCorners;
+        }
+
+        wrapper.style.borderRadius = self.domRef.player.style.borderRadius = parseBorderRadius();
+        wrapper.style.overflow = 'hidden';
 
         self.domRef.player.style.height = '100%';
         self.domRef.player.style.width = '100%';
@@ -2583,6 +2722,8 @@ const fluidPlayerClass = function () {
                 }
             }
         }
+
+        self.repositionSubtitlesContainer('12px');
     };
 
     self.showControlBar = (event) => {
@@ -2622,6 +2763,8 @@ const fluidPlayerClass = function () {
                 }
             }
         }
+
+        self.repositionSubtitlesContainer('46px');
     };
 
     self.linkControlBarUserActivity = () => {
@@ -3069,8 +3212,8 @@ const fluidPlayerClass = function () {
         });
 
         const functionCall = (event, additionalEventData = {}) => {
-            const additionalInfo = Object.assign({}, { event }, getAdditionalInfo(), additionalEventData);
-            return callback(eventCall, additionalInfo);
+            const additionalInfo =  {...getAdditionalInfo(), ...additionalEventData}
+            return callback(event, additionalInfo);
         }
 
         const eventHandlers = {

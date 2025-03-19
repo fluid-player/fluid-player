@@ -83,6 +83,13 @@ export default function (playerInstance, options) {
                 playerInstance.toggleLoader(false);
             });
 
+            dashPlayer.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, () => {
+                playerInstance.isLiveStream = !!dashPlayer.isDynamic()
+                if (!!dashPlayer.isDynamic()) {
+                    playerInstance.showLiveIndicator();
+                }
+            });
+
             playerInstance.displayOptions.modules.onAfterInitDash(dashPlayer);
 
             playerInstance.dashPlayer = dashPlayer;
@@ -112,6 +119,15 @@ export default function (playerInstance, options) {
 
             hls.attachMedia(playerInstance.domRef.player);
             hls.loadSource(playerInstance.originalSrc);
+
+            hls.once(Hls.Events.LEVEL_LOADED, function (event, level) {
+                playerInstance.isLiveStream = !!level.details.live;
+                if (!!level.details.live) {
+                    playerInstance.showLiveIndicator();
+                } else {
+                    playerInstance.hideLiveIndicator();
+                }
+            });
 
             playerInstance.displayOptions.modules.onAfterInitHls(hls);
 
@@ -157,7 +173,7 @@ export default function (playerInstance, options) {
         const HLSLevels = playerInstance.hlsPlayer.levels
             .map((level, index) => ({
                 id: index,
-                title: String(level.width),
+                title: level.height + 'p',
                 isHD: level.videoRange === 'HDR',
                 bitrate: level.bitrate
             }));
@@ -229,8 +245,6 @@ export default function (playerInstance, options) {
     function onSourceChangeClick(event, selectedLevel) {
         event.stopPropagation();
 
-        setPlayerDimensions();
-
         const videoChangedTo = event.currentTarget;
         clearSourceSelectedIcons();
 
@@ -244,12 +258,6 @@ export default function (playerInstance, options) {
         });
 
         playerInstance.openCloseVideoSourceSwitch();
-    }
-
-    // While changing source the player size can flash, we want to set the pixel dimensions then back to 100% afterwards
-    function setPlayerDimensions() {
-        playerInstance.domRef.player.style.width = `${playerInstance.domRef.player.clientWidth}px`;
-        playerInstance.domRef.player.style.height = `${playerInstance.domRef.player.clientHeight}px`;
     }
 
     function clearSourceSelectedIcons() {
@@ -278,11 +286,11 @@ export default function (playerInstance, options) {
 
     function sortLevels(levels) {
         return [...levels].sort((a, b) => {
-            // First sort by width in descending order
-            if (b.width !== a.width) {
-                return b.width - a.width;
+            // First sort by height in descending order
+            if (b.height !== a.height) {
+                return b.height - a.height;
             }
-            // If width is the same, sort by bitrate in descending order
+            // If height is the same, sort by bitrate in descending order
             return b.bitrate - a.bitrate;
         });
     }

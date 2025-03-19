@@ -1,10 +1,9 @@
 {
   "name": "fluid-player",
-  "version": "3.39.0",
+  "version": "3.51.0",
   "description": "Fluid Player is a free HTML5 video player",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --mode=production",
     "build-cdn": "webpack --mode=production --env dist='current' && webpack --mode=production --env dist='versioned'",
     "build-dev": "webpack --mode=development",
@@ -12,7 +11,10 @@
     "dev-server": "webpack serve --mode=development --host 0.0.0.0",
     "dev-server-debug": "webpack serve --mode=development --env debug --host 0.0.0.0",
     "dev-server-test": "webpack serve --mode=production --no-live-reload --host 0.0.0.0",
-    "start": "npm run dev-server-debug"
+    "start": "npm run dev-server-debug",
+    "e2e-ui": "npx playwright test --ui",
+    "e2e-report": "npx playwright show-report",
+    "e2e": "npx playwright test"
   },
   "repository": {
     "type": "git",
@@ -42,6 +44,8 @@
   "devDependencies": {
     "@babel/core": "^7.20.12",
     "@babel/preset-env": "^7.20.2",
+    "@playwright/test": "^1.49.0",
+    "@types/node": "^22.9.1",
     "babel-loader": "^9.1.2",
     "cheerio": "^1.0.0-rc.3",
     "copy-webpack-plugin": "^11.0.0",

@@ -5,6 +5,10 @@ export default function (playerInstance, options) {
     playerInstance.renderLinearAd = (ad, backupTheVideoTime) => {
         playerInstance.toggleLoader(false);
 
+        // Reset live indicator
+        playerInstance.hideLiveIndicator();
+        playerInstance.isLiveStream = null;
+
         //get the proper ad
         playerInstance.vastOptions = ad;
 
@@ -185,6 +189,15 @@ export default function (playerInstance, options) {
                     hls.attachMedia(playerInstance.domRef.player);
                     hls.loadSource(selectedMediaFile.src);
                     playerInstance.isCurrentlyPlayingAd = true;
+
+                    hls.once(Hls.Events.LEVEL_LOADED, function (event, level) {
+                        playerInstance.isLiveStream = !!level.details.live;
+                        if (!!level.details.live) {
+                            playerInstance.showLiveIndicator();
+                        } else {
+                            playerInstance.hideLiveIndicator();
+                        }
+                    });
 
                     playerInstance.hlsPlayer = hls;
 
@@ -1275,11 +1288,19 @@ export default function (playerInstance, options) {
     playerInstance.switchToMainVideo = () => {
         playerInstance.debugMessage('starting main video');
 
+        // Reset live indicator
+        playerInstance.hideLiveIndicator();
+        playerInstance.isLiveStream = null;
+
         playerInstance.domRef.player.src = playerInstance.originalSrc;
 
         playerInstance.currentMediaSourceType = 'source';
 
         playerInstance.initialiseStreamers();
+
+        if (playerInstance.hlsPlayer && !playerInstance.hlsPlayer.config.autoStartLoad) {
+            playerInstance.hlsPlayer.startLoad();
+        }
 
         const newCurrentTime = (typeof playerInstance.domRef.player.mainVideoCurrentTime !== 'undefined')
             ? Math.floor(playerInstance.domRef.player.mainVideoCurrentTime) : 0;
@@ -1621,6 +1642,9 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.decreaseSkipOffset = () => {
+        if (typeof playerInstance.vastOptions === 'undefined' || playerInstance.vastOptions === null) {
+            return;
+        }
         let sec = playerInstance.vastOptions.skipoffset - Math.floor(playerInstance.domRef.player.currentTime);
         const btn = playerInstance.domRef.wrapper.querySelector('.skip_button');
 

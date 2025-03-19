@@ -772,11 +772,62 @@ export default function (playerInstance, options) {
                     playerInstance.debugMessage(`Error when loading Wrapper, will trigger fallback if available`, e);
                 }
             } else if (!vastAdTagUri) {
-                adTree.children.push({ tagType: 'inLine', ...adNode });
+                let mediaFileIsValid = true;
+                let mediaFileUrl = '';
+                if (Array.from(adElement.getElementsByTagName('AdParameters')).length) {
+                    const mediaFiles = Array.from(adElement.getElementsByTagName('AdParameters'));
+                    mediaFileIsValid = false;
+                    for (const mediaFile of mediaFiles) {
+                        mediaFileUrl = mediaFile.textContent.trim();
+                        try {
+                            const mediaFileObj = JSON.parse(mediaFileUrl);
+                            mediaFileUrl = mediaFileObj.videos[0].url;                      
+                        } catch (error) {
+                            console.error("Error parsing media file URL:", error);
+                        }
+                    }
+                } else if (Array.from(adElement.getElementsByTagName('MediaFiles')).length) {
+                    const mediaFiles = Array.from(adElement.getElementsByTagName('MediaFiles'));   
+                    const mediaFile = mediaFiles[0].getElementsByTagName('MediaFile');
+                    mediaFileIsValid = false;
+                    for (const mediaFileTemp of mediaFile) {
+                        mediaFileUrl = mediaFileTemp.textContent.trim();
+                    }
+                };
+                mediaFileIsValid = await validateMediaFile(mediaFileUrl);
+                if (mediaFileIsValid) {
+                    adTree.children.push({ tagType: 'inLine', mediaFileUrl, ...adNode });
+                    break;
+                } else {
+                    adTree.children.push({ tagType: 'inLine', mediaError: true, ...adNode });
+                    playerInstance.debugMessage(`No valid media file found in Inline ad.`);
+                }
             }
         }
 
         return adTree;
+    }
+
+
+    /**
+     * Validate Media File to check if videos play
+     *
+     * @param {mediaFileUrl}
+     */
+    async function validateMediaFile(mediaFileUrl) {
+        try {
+            const response =  await fetch(mediaFileUrl);
+            if (!response.ok || response.headers.get('content-type').indexOf('video') === -1) {
+                return false;
+            }
+            const videoElement = document.createElement('video');
+            videoElement.src = mediaFileUrl;
+            const canPlay = await videoElement.canPlayType(response.headers.get('content-type'));
+            return canPlay !== "";
+        } catch (error) {
+            console.error('Failed to load media file:', error);
+            return false;
+        }
     }
 
     /**
