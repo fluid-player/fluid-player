@@ -223,10 +223,15 @@ export default function (playerInstance, options) {
         });
     };
 
+    /**
+     * 
+     * @param size size in pixels
+     * @description Resize the subtitles font size
+     */
     playerInstance.resizeSubtitles = (size) => {
-        if (size < 0.5) return;
+        if (size < 1) return;
         const subtitlesContainer = playerInstance.domRef.wrapper.querySelector('.fluid_subtitles_container');
-        subtitlesContainer.style.fontSize = `${size}em`;
+        subtitlesContainer.style.fontSize = `${size}px`;
     }
 
     playerInstance.repositionSubtitlesContainer = (size) => {
