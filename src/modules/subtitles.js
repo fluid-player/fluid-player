@@ -224,15 +224,34 @@ export default function (playerInstance, options) {
     };
 
     /**
-     * 
-     * @param size size in pixels
-     * @description Resize the subtitles font size
+     * Resize the subtitles font size
+     *
+     * @param size size in percentage, 100% is the default size
      */
     playerInstance.resizeSubtitles = (size) => {
-        if (size < 1) return;
         const subtitlesContainer = playerInstance.domRef.wrapper.querySelector('.fluid_subtitles_container');
-        subtitlesContainer.style.fontSize = `${size}px`;
+        const fontSizeInEm = size / 100; // Convert percentage to em
+        subtitlesContainer.style.fontSize = `${fontSizeInEm}em`;
     }
+
+    /**
+     * Adjusts the subtitle size to the next or previous level.
+     *
+     * @param {'+'|'-'} operation '+' to increase, '-' to decrease
+     */
+    playerInstance.adjustSubtitleSizeByOperation = (operation) => {
+        // Validate the operation and the current subtitle size index
+        if (operation === '+' && playerInstance.currentSubtitleSizeIndex < playerInstance.subtitleSizeLevels.length - 1) {
+            playerInstance.currentSubtitleSizeIndex++;
+        } else if (operation === '-' && playerInstance.currentSubtitleSizeIndex > 0) {
+            playerInstance.currentSubtitleSizeIndex--;
+        } else {
+            return; // invalid operation
+        }
+
+        const newSize = playerInstance.subtitleSizeLevels[playerInstance.currentSubtitleSizeIndex];
+        playerInstance.resizeSubtitles(newSize);
+    };
 
     playerInstance.repositionSubtitlesContainer = (size) => {
         const subtitlesContainer = playerInstance.domRef.wrapper.querySelector('.fluid_subtitles_container');
