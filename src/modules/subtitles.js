@@ -262,6 +262,36 @@ export default function (playerInstance, options) {
 
         const newSize = playerInstance.subtitleSizeLevels[playerInstance.currentSubtitleSizeIndex];
         playerInstance.resizeSubtitles(newSize);
+
+        // Update the checkmark in the subtitle size menu
+        playerInstance.updateSubtitleSizeMenuSelection();
+    };
+
+    /**
+     * Updates the subtitle size menu to show the correct checkmark
+     * based on the current subtitle size index
+     */
+    playerInstance.updateSubtitleSizeMenuSelection = () => {
+        const sizeMenu = playerInstance.domRef.wrapper.querySelector('.fluid_subtitle_size_menu');
+        if (!sizeMenu) return;
+
+        // Clear all existing checkmarks
+        const sizeIcons = sizeMenu.querySelectorAll('.subtitle_button_icon');
+        for (let i = 0; i < sizeIcons.length; i++) {
+            sizeIcons[i].className = sizeIcons[i].className.replace("subtitle_size_selected", "");
+        }
+
+        // Get all size buttons (skip the back button)
+        const sizeButtons = Array.from(sizeMenu.querySelectorAll('.fluid_subtitle_size_button'))
+            .filter(button => !button.classList.contains('fluid_sub_menu_button'));
+
+        // Add the checkmark to the current size button if it exists
+        if (sizeButtons[playerInstance.currentSubtitleSizeIndex]) {
+            const icon = sizeButtons[playerInstance.currentSubtitleSizeIndex].querySelector('.subtitle_button_icon');
+            if (icon) {
+                icon.className += ' subtitle_size_selected';
+            }
+        }
     };
 
     playerInstance.createSubtitleSizeButton = () => {
@@ -281,7 +311,7 @@ export default function (playerInstance, options) {
         subtitleSizeMenu.className = 'fluid_subtitle_size_menu';
 
         // Add the "Back" button
-        const backButton = playerInstance.createBackButtonForSubtitleSizeMenu(subtitleSizeMenu);
+        const backButton = playerInstance.createBackButtonForSubtitleSizeMenu();
         subtitleSizeMenu.appendChild(backButton);
 
         // Add the font size options
@@ -301,13 +331,7 @@ export default function (playerInstance, options) {
                 playerInstance.currentSubtitleSizeIndex = index;
 
                 // Update the checkmark for all size buttons
-                const sizeIcons = playerInstance.domRef.wrapper.querySelectorAll('.fluid_subtitle_size_menu .subtitle_button_icon');
-                for (let i = 0; i < sizeIcons.length; i++) {
-                    sizeIcons[i].className = sizeIcons[i].className.replace("subtitle_size_selected", "");
-                }
-
-                // Add checkmark to the selected button
-                event.currentTarget.querySelector('.subtitle_button_icon').className += ' subtitle_size_selected';
+                playerInstance.updateSubtitleSizeMenuSelection();
             });
 
             subtitleSizeMenu.appendChild(subtitleSizeButton);
@@ -318,10 +342,8 @@ export default function (playerInstance, options) {
 
     /**
      * Creates a "Back" button for the subtitle size menu.
-     *
-     * @param {HTMLElement} subtitleSizeMenu - The font size menu element.
      */
-    playerInstance.createBackButtonForSubtitleSizeMenu = (subtitleSizeMenu) => {
+    playerInstance.createBackButtonForSubtitleSizeMenu = () => {
         const backButton = document.createElement('div');
         backButton.className = 'fluid_subtitle_size_button fluid_sub_menu_button arrow-left';
         backButton.innerHTML = 'Back';
