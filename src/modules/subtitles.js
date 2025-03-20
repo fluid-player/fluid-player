@@ -93,12 +93,7 @@ export default function (playerInstance, options) {
         subtitlesChangeList.className = 'fluid_subtitles_list';
         subtitlesChangeList.style.display = 'none';
 
-        // TODO: move logic for subtitle layout into different function
-        const subtitlesSizeButton = playerInstance.createSubtitleSizeButton();
-        const subtitlesSizeMenu = playerInstance.createSubtitleSizeMenu();
-        subtitlesSizeMenu.style.display = 'none';
-        subtitlesChangeList.appendChild(subtitlesSizeButton);
-        subtitlesChangeButton.appendChild(subtitlesSizeMenu);
+        playerInstance.addSubtitleSizeControls(subtitlesChangeList, subtitlesChangeButton);
 
         let hasSelectedSubtitle = false;
         const hasDefault = !!playerInstance.subtitlesTracks.find(track => track.default);
@@ -172,6 +167,20 @@ export default function (playerInstance, options) {
     function videoPlayerSubtitlesUpdate() {
         playerInstance.renderSubtitles();
     }
+
+    /**
+     * Creates and appends the subtitle size button and menu
+     *
+     * @param {HTMLElement} subtitlesChangeList The container for the subtitles change list
+     * @param {HTMLElement} subtitlesChangeButton The button to toggle the subtitles menu
+     */
+    playerInstance.addSubtitleSizeControls = (subtitlesChangeList, subtitlesChangeButton) => {
+        const subtitlesSizeButton = playerInstance.createSubtitleSizeButton();
+        const subtitlesSizeMenu = playerInstance.createSubtitleSizeMenu();
+        subtitlesSizeMenu.style.display = 'none';
+        subtitlesChangeList.appendChild(subtitlesSizeButton);
+        subtitlesChangeButton.appendChild(subtitlesSizeMenu);
+    };
 
     playerInstance.renderSubtitles = () => {
         const videoPlayer = playerInstance.domRef.player;
