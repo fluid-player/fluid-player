@@ -322,7 +322,7 @@ export default function (playerInstance, options) {
 
     /**
      * Creates the subtitle size menu element
-     * 
+     *
      * @returns {HTMLElement} The subtitle size menu element
      */
     playerInstance.createSubtitleSizeMenu = () => {
