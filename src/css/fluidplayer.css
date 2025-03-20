@@ -1378,22 +1378,6 @@ _:-ms-lang(x),
     opacity: 1 !important;
 }
 
-.fluid_sub_menu_button {
-    position: relative;
-    cursor: pointer;
-    padding-right: 20px;
-}
-
-.fluid_sub_menu_button::after {
-    content: '▶';
-    position: absolute;
-    right: 5px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 12px;
-    color: #ffffff;
-}
-
 @media only screen and (min-device-width: 375px) {
     .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_control_duration {
         padding-left: 95px;

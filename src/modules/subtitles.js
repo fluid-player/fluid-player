@@ -275,10 +275,16 @@ export default function (playerInstance, options) {
 
         return subtitleSizeMenuButton;
     }
+
     playerInstance.createSubtitleSizeMenu = () => {
         const subtitleSizeMenu = document.createElement('div');
         subtitleSizeMenu.className = 'fluid_subtitle_size_menu';
 
+        // Add the "Back" button
+        const backButton = playerInstance.createBackButtonForSubtitleSizeMenu(subtitleSizeMenu);
+        subtitleSizeMenu.appendChild(backButton);
+
+        // Add the font size options
         playerInstance.subtitleSizeLevels.forEach((size, index) => {
             const subtitleSizeButton = document.createElement('div');
             subtitleSizeButton.className = 'fluid_subtitle_size_button';
@@ -308,7 +314,26 @@ export default function (playerInstance, options) {
         });
 
         return subtitleSizeMenu;
-    }
+    };
+
+    /**
+     * Creates a "Back" button for the subtitle size menu.
+     *
+     * @param {HTMLElement} subtitleSizeMenu - The font size menu element.
+     */
+    playerInstance.createBackButtonForSubtitleSizeMenu = (subtitleSizeMenu) => {
+        const backButton = document.createElement('div');
+        backButton.className = 'fluid_subtitle_size_button fluid_sub_menu_button arrow-left';
+        backButton.innerHTML = 'Back';
+
+        backButton.addEventListener('click', (event) => {
+            event.stopPropagation();
+            playerInstance.toggleSubtitleSizeMenu();
+            playerInstance.openCloseSubtitlesSwitch();
+        });
+
+        return backButton;
+    };
 
     playerInstance.toggleSubtitleSizeMenu = () => {
         const subtitleSizeMenu = playerInstance.domRef.wrapper.querySelector('.fluid_subtitle_size_menu');
