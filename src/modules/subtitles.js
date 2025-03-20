@@ -346,7 +346,7 @@ export default function (playerInstance, options) {
     playerInstance.createBackButtonForSubtitleSizeMenu = () => {
         const backButton = document.createElement('div');
         backButton.className = 'fluid_subtitle_size_button fluid_sub_menu_button arrow-left';
-        backButton.innerHTML = 'Back';
+        backButton.innerHTML = 'Font Size';
 
         backButton.addEventListener('click', (event) => {
             event.stopPropagation();
