@@ -303,6 +303,11 @@ export default function (playerInstance, options) {
         }
     };
 
+    /**
+     * Creates the subtitle size button element
+     *
+     * @returns {HTMLElement} The subtitle size button element
+     */
     playerInstance.createSubtitleSizeButton = () => {
         const subtitleSizeMenuButton = document.createElement('div');
         subtitleSizeMenuButton.className = 'fluid_subtitle_list_item fluid_sub_menu_button arrow-right';
@@ -315,6 +320,11 @@ export default function (playerInstance, options) {
         return subtitleSizeMenuButton;
     }
 
+    /**
+     * Creates the subtitle size menu element
+     * 
+     * @returns {HTMLElement} The subtitle size menu element
+     */
     playerInstance.createSubtitleSizeMenu = () => {
         const subtitleSizeMenu = document.createElement('div');
         subtitleSizeMenu.className = 'fluid_subtitle_size_menu';
@@ -366,6 +376,9 @@ export default function (playerInstance, options) {
         return backButton;
     };
 
+    /**
+     * Toggles the visibility of the subtitle size menu
+     */
     playerInstance.toggleSubtitleSizeMenu = () => {
         const subtitleSizeMenu = playerInstance.domRef.wrapper.querySelector('.fluid_subtitle_size_menu');
 
