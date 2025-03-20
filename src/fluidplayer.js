@@ -801,43 +801,51 @@ const fluidPlayerClass = function () {
         // Right container -> Fullscreen
         controls.fullscreen = document.createElement('div');
         controls.fullscreen.className = 'fluid_button fluid_control_fullscreen fluid_button_fullscreen';
+        controls.fullscreen.title = 'Full Screen';
         controls.rightContainer.appendChild(controls.fullscreen);
 
         if (options.miniPlayer.enabled) {
             // Right container -> MiniPlayer
             controls.miniPlayer = document.createElement('div');
             controls.miniPlayer.className = 'fluid_button fluid_control_mini_player fluid_button_mini_player';
+            controls.miniPlayer.title = 'Mini Player';
             controls.rightContainer.appendChild(controls.miniPlayer);
         }
 
         // Right container -> Theatre
         controls.theatre = document.createElement('div');
         controls.theatre.className = 'fluid_button fluid_control_theatre fluid_button_theatre';
+        controls.theatre.title = 'Theatre Mode';
         controls.rightContainer.appendChild(controls.theatre);
 
         // Right container -> Cardboard
         controls.cardboard = document.createElement('div');
         controls.cardboard.className = 'fluid_button fluid_control_cardboard fluid_button_cardboard';
+        controls.cardboard.title = 'Cardboard';
         controls.rightContainer.appendChild(controls.cardboard);
 
         // Right container -> Subtitles
         controls.subtitles = document.createElement('div');
         controls.subtitles.className = 'fluid_button fluid_control_subtitles fluid_button_subtitles';
+        controls.subtitles.title = 'Captions';
         controls.rightContainer.appendChild(controls.subtitles);
 
         // Right container -> Video source
         controls.videoSource = document.createElement('div');
         controls.videoSource.className = 'fluid_button fluid_control_video_source fluid_button_video_source';
+        controls.videoSource.title = 'Source';
         controls.rightContainer.appendChild(controls.videoSource);
 
         // Right container -> Playback rate
         controls.playbackRate = document.createElement('div');
         controls.playbackRate.className = 'fluid_button fluid_control_playback_rate fluid_button_playback_rate';
+        controls.playbackRate.title = 'Playback Rate';
         controls.rightContainer.appendChild(controls.playbackRate);
 
         // Right container -> Download
         controls.download = document.createElement('div');
         controls.download.className = 'fluid_button fluid_control_download fluid_button_download';
+        controls.download.title = 'Download';
         controls.rightContainer.appendChild(controls.download);
 
         // Right container -> Volume container
