@@ -275,26 +275,38 @@ export default function (playerInstance, options) {
 
         return subtitleSizeMenuButton;
     }
-
     playerInstance.createSubtitleSizeMenu = () => {
         const subtitleSizeMenu = document.createElement('div');
         subtitleSizeMenu.className = 'fluid_subtitle_size_menu';
-
+    
         playerInstance.subtitleSizeLevels.forEach((size, index) => {
             const subtitleSizeButton = document.createElement('div');
             subtitleSizeButton.className = 'fluid_subtitle_size_button';
-            subtitleSizeButton.innerHTML = size + '%';
-
+    
+            const isSelected = size === 100; // Default size is 100%
+            subtitleSizeButton.innerHTML = '<span class="subtitle_button_icon ' + (isSelected ? 'subtitle_size_selected' : '') + '"></span>' + size + '%';
+    
             subtitleSizeButton.addEventListener('click', (event) => {
+                // Stop the click event from propagating to parent elements,
+                // preventing unintended actions like toggling the entire menu.
                 event.stopPropagation();
                 playerInstance.toggleSubtitleSizeMenu();
                 playerInstance.resizeSubtitles(size);
                 playerInstance.currentSubtitleSizeIndex = index;
+    
+                // Update the checkmark for all size buttons
+                const sizeIcons = playerInstance.domRef.wrapper.querySelectorAll('.fluid_subtitle_size_menu .subtitle_button_icon');
+                for (let i = 0; i < sizeIcons.length; i++) {
+                    sizeIcons[i].className = sizeIcons[i].className.replace("subtitle_size_selected", "");
+                }
+    
+                // Add checkmark to the selected button
+                event.currentTarget.querySelector('.subtitle_button_icon').className += ' subtitle_size_selected';
             });
-
+    
             subtitleSizeMenu.appendChild(subtitleSizeButton);
         });
-
+    
         return subtitleSizeMenu;
     }
 

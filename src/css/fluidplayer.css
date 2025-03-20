@@ -1373,7 +1373,7 @@ _:-ms-lang(x),
     opacity: 1 !important;
 }
 
-.subtitle_selected {
+.subtitle_selected, .subtitle_size_selected {
     opacity: 1 !important;
 }
 
