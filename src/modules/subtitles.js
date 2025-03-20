@@ -1,4 +1,8 @@
 export default function (playerInstance, options) {
+    // Define the subtitle size levels
+    playerInstance.subtitleSizeLevels = [50, 75, 100, 150, 200]; // in percentage
+    playerInstance.currentSubtitleSizeIndex = playerInstance.subtitleSizeLevels.indexOf(100); // Default to 100%
+
     playerInstance.subtitleFetchParse = (subtitleItem) => {
         playerInstance.sendRequest(
             subtitleItem.url,
@@ -88,6 +92,13 @@ export default function (playerInstance, options) {
         const subtitlesChangeList = document.createElement('div');
         subtitlesChangeList.className = 'fluid_subtitles_list';
         subtitlesChangeList.style.display = 'none';
+
+        // TODO: move logic for subtitle layout into different function
+        const subtitlesSizeButton = playerInstance.createSubtitleSizeButton();
+        const subtitlesSizeMenu = playerInstance.createSubtitleSizeMenu();
+        subtitlesSizeMenu.style.display = 'none';
+        subtitlesChangeList.appendChild(subtitlesSizeButton);
+        subtitlesChangeButton.appendChild(subtitlesSizeMenu);
 
         let hasSelectedSubtitle = false;
         const hasDefault = !!playerInstance.subtitlesTracks.find(track => track.default);
@@ -252,6 +263,57 @@ export default function (playerInstance, options) {
         const newSize = playerInstance.subtitleSizeLevels[playerInstance.currentSubtitleSizeIndex];
         playerInstance.resizeSubtitles(newSize);
     };
+
+    playerInstance.createSubtitleSizeButton = () => {
+        const subtitleSizeMenuButton = document.createElement('div');
+        subtitleSizeMenuButton.className = 'fluid_subtitle_list_item';
+        subtitleSizeMenuButton.innerHTML = 'subtitle size';
+
+        subtitleSizeMenuButton.addEventListener('click', () => {
+            playerInstance.toggleSubtitleSizeMenu();
+        });
+
+        return subtitleSizeMenuButton;
+    }
+
+    playerInstance.createSubtitleSizeMenu = () => {
+        const subtitleSizeMenu = document.createElement('div');
+        subtitleSizeMenu.className = 'fluid_subtitle_size_menu';
+
+        playerInstance.subtitleSizeLevels.forEach((size, index) => {
+            const subtitleSizeButton = document.createElement('div');
+            subtitleSizeButton.className = 'fluid_subtitle_size_button';
+            subtitleSizeButton.innerHTML = size + '%';
+
+            subtitleSizeButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                playerInstance.toggleSubtitleSizeMenu();
+                playerInstance.resizeSubtitles(size);
+                playerInstance.currentSubtitleSizeIndex = index;
+            });
+
+            subtitleSizeMenu.appendChild(subtitleSizeButton);
+        });
+
+        return subtitleSizeMenu;
+    }
+
+    playerInstance.toggleSubtitleSizeMenu = () => {
+        const subtitleSizeMenu = playerInstance.domRef.wrapper.querySelector('.fluid_subtitle_size_menu');
+
+        const mouseOut = function (event) {
+            subtitleSizeMenu.removeEventListener('mouseleave', mouseOut);
+            subtitleSizeMenu.style.display = 'none';
+        };
+
+        if (subtitleSizeMenu.style.display === 'block') {
+            subtitleSizeMenu.style.display = 'none';
+            subtitleSizeMenu.removeEventListener('mouseleave', mouseOut);
+        } else {
+            subtitleSizeMenu.style.display = 'block';
+            subtitleSizeMenu.addEventListener('mouseleave', mouseOut);
+        }
+    }
 
     playerInstance.repositionSubtitlesContainer = (size) => {
         const subtitlesContainer = playerInstance.domRef.wrapper.querySelector('.fluid_subtitles_container');

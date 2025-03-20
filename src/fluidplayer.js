@@ -159,9 +159,6 @@ const fluidPlayerClass = function () {
         self.timeSkipOffsetAmount = 10;
         // Only for linear ads, non linear are not taken into account
         self.currentMediaSourceType = 'source';
-        // Define the subtitle size levels
-        self.subtitleSizeLevels = [50, 75, 100, 150, 200]; // in percentage
-        self.currentSubtitleSizeIndex = self.subtitleSizeLevels.indexOf(100); // Default to 100%
         self.isLiveStream = null;
 
         //Default options
