@@ -158,8 +158,22 @@ export default function (playerInstance, options) {
         playerInstance.domRef.player.addEventListener('timeupdate', videoPlayerSubtitlesUpdate);
     };
 
-    function handleSubtitlesChange() {
-        playerInstance.openCloseSubtitlesSwitch();
+    function handleSubtitlesChange(event) {
+        const subtitlesChangeButton = playerInstance.domRef.wrapper.querySelector('.fluid_control_subtitles');
+        let hasOpenMenuOrSubMenu = false;
+
+        // Check if menu or any submenu is open
+        for (let i = 0; i < subtitlesChangeButton.children.length; i++) {
+            if (subtitlesChangeButton.children[i].style.display === 'block') {
+                hasOpenMenuOrSubMenu = true;
+                subtitlesChangeButton.children[i].style.display = 'none';
+            }
+        }
+
+        // Only open subtitle menu if no menu or submenu (direct child) is visible
+        if (!hasOpenMenuOrSubMenu) {
+            playerInstance.openCloseSubtitlesSwitch();
+        }
     }
 
     //attach subtitles to show based on time
@@ -313,8 +327,10 @@ export default function (playerInstance, options) {
         subtitleSizeMenuButton.className = 'fluid_subtitle_list_item fluid_sub_menu_button arrow-right';
         subtitleSizeMenuButton.innerHTML = 'Font Size';
 
-        subtitleSizeMenuButton.addEventListener('click', () => {
+        subtitleSizeMenuButton.addEventListener('click', (event) => {
+            event.stopPropagation();
             playerInstance.toggleSubtitleSizeMenu();
+            playerInstance.openCloseSubtitlesSwitch();
         });
 
         return subtitleSizeMenuButton;
