@@ -998,6 +998,7 @@ _:-ms-lang(x),
     text-align: start;
     width: max-content;
     padding: 0.5em;
+    overflow: auto;
 }
 
 .fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_controls_right .fluid_button_subtitles .fluid_subtitles_list .fluid_subtitle_list_item,

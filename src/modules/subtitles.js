@@ -240,6 +240,8 @@ export default function (playerInstance, options) {
         } else {
             subtitleChangeList.style.display = 'none';
         }
+
+        playerInstance.setMenusMaxHeight();
     };
 
     playerInstance.createSubtitles = () => {
@@ -410,7 +412,24 @@ export default function (playerInstance, options) {
             subtitleSizeMenu.style.display = 'block';
             subtitleSizeMenu.addEventListener('mouseleave', mouseOut);
         }
-    }
+
+        playerInstance.setMenusMaxHeight();
+    };
+
+    /**
+     * Calculate and set the max height of the all menus for small screens
+     */
+    playerInstance.setMenusMaxHeight = () => {
+        const playerHeight = playerInstance.domRef.wrapper.offsetHeight;
+        const controlsHeight = playerInstance.domRef.wrapper.querySelector('.fluid_controls_container').offsetHeight;
+
+        const maxHeight = playerHeight - controlsHeight;
+        const subtitleSizeMenu = playerInstance.domRef.wrapper.querySelector('.fluid_subtitle_size_menu');
+        const subtitleChangeList = playerInstance.domRef.wrapper.querySelector('.fluid_subtitles_list');
+
+        subtitleSizeMenu.style.maxHeight = `${maxHeight}px`;
+        subtitleChangeList.style.maxHeight = `${maxHeight}px`;
+    };
 
     playerInstance.repositionSubtitlesContainer = (size) => {
         const subtitlesContainer = playerInstance.domRef.wrapper.querySelector('.fluid_subtitles_container');
