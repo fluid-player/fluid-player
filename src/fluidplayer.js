@@ -1578,16 +1578,19 @@ const fluidPlayerClass = function () {
                 case 73: // i
                     self.toggleMiniPlayer(undefined, true);
                     break;
-                case 187: // + in Chrome/Edge/Safari
-                case 61:  // + in Firefox
-                case 43:  // + in older browsers
+                case 187: // + in Chrome/Edge/Safari on most layouts
+                case 61:  // + in Firefox/some international layouts
+                case 43:  // + in older browsers (ASCII value)
+                case 107: // + on numeric keypad (all browsers)
+                case 171: // + in some European layouts
                     if (self.displayOptions.layoutControls.subtitlesEnabled) {
                         self.adjustSubtitleSizeByOperation('+');
                     }
                     break;
                 case 189: // - in Chrome/Edge/Safari
                 case 173: // - in older Firefox
-                case 45:  // - in older browsers
+                case 45:  // - in older browsers (ASCII value)
+                case 109: // - on numeric keypad (all browsers)
                     if (self.displayOptions.layoutControls.subtitlesEnabled) {
                         self.adjustSubtitleSizeByOperation('-');
                     }
