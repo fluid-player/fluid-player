@@ -1,4 +1,8 @@
 export default function (playerInstance, options) {
+    // Define the subtitle size levels
+    playerInstance.subtitleSizeLevels = [50, 75, 100, 150, 200]; // in percentage
+    playerInstance.currentSubtitleSizeIndex = playerInstance.subtitleSizeLevels.indexOf(100); // Default to 100%
+
     playerInstance.subtitleFetchParse = (subtitleItem) => {
         playerInstance.sendRequest(
             subtitleItem.url,
@@ -89,6 +93,8 @@ export default function (playerInstance, options) {
         subtitlesChangeList.className = 'fluid_subtitles_list';
         subtitlesChangeList.style.display = 'none';
 
+        playerInstance.addSubtitleSizeControls(subtitlesChangeList, subtitlesChangeButton);
+
         let hasSelectedSubtitle = false;
         const hasDefault = !!playerInstance.subtitlesTracks.find(track => track.default);
         playerInstance.subtitlesTracks.forEach(function (subtitle) {
@@ -152,8 +158,22 @@ export default function (playerInstance, options) {
         playerInstance.domRef.player.addEventListener('timeupdate', videoPlayerSubtitlesUpdate);
     };
 
-    function handleSubtitlesChange() {
-        playerInstance.openCloseSubtitlesSwitch();
+    function handleSubtitlesChange(event) {
+        const subtitlesChangeButton = playerInstance.domRef.wrapper.querySelector('.fluid_control_subtitles');
+        let hasOpenMenuOrSubMenu = false;
+
+        // Check if menu or any submenu is open
+        for (let i = 0; i < subtitlesChangeButton.children.length; i++) {
+            if (subtitlesChangeButton.children[i].style.display === 'block') {
+                hasOpenMenuOrSubMenu = true;
+                subtitlesChangeButton.children[i].style.display = 'none';
+            }
+        }
+
+        // Only open subtitle menu if no menu or submenu (direct child) is visible
+        if (!hasOpenMenuOrSubMenu) {
+            playerInstance.openCloseSubtitlesSwitch();
+        }
     }
 
     //attach subtitles to show based on time
@@ -161,6 +181,20 @@ export default function (playerInstance, options) {
     function videoPlayerSubtitlesUpdate() {
         playerInstance.renderSubtitles();
     }
+
+    /**
+     * Creates and appends the subtitle size button and menu
+     *
+     * @param {HTMLElement} subtitlesChangeList The container for the subtitles change list
+     * @param {HTMLElement} subtitlesChangeButton The button to toggle the subtitles menu
+     */
+    playerInstance.addSubtitleSizeControls = (subtitlesChangeList, subtitlesChangeButton) => {
+        const subtitlesSizeButton = playerInstance.createSubtitleSizeButton();
+        const subtitlesSizeMenu = playerInstance.createSubtitleSizeMenu();
+        subtitlesSizeMenu.style.display = 'none';
+        subtitlesChangeList.appendChild(subtitlesSizeButton);
+        subtitlesChangeButton.appendChild(subtitlesSizeMenu);
+    };
 
     playerInstance.renderSubtitles = () => {
         const videoPlayer = playerInstance.domRef.player;
@@ -206,6 +240,8 @@ export default function (playerInstance, options) {
         } else {
             subtitleChangeList.style.display = 'none';
         }
+
+        playerInstance.setMenusMaxHeight();
     };
 
     playerInstance.createSubtitles = () => {
@@ -221,6 +257,178 @@ export default function (playerInstance, options) {
             window.WebVTT = it.WebVTT || it.default.WebVTT;
             playerInstance.createSubtitlesSwitch();
         });
+    };
+
+    /**
+     * Resize the subtitles font size
+     *
+     * @param size size in percentage, 100% is the default size
+     */
+    playerInstance.resizeSubtitles = (size) => {
+        const subtitlesContainer = playerInstance.domRef.wrapper.querySelector('.fluid_subtitles_container');
+        const fontSizeInEm = size / 100; // Convert percentage to em
+        subtitlesContainer.style.fontSize = `${fontSizeInEm}em`;
+    }
+
+    /**
+     * Adjusts the subtitle size to the next or previous level.
+     *
+     * @param {'+'|'-'} operation '+' to increase, '-' to decrease
+     */
+    playerInstance.adjustSubtitleSizeByOperation = (operation) => {
+        // Validate the operation and the current subtitle size index
+        if (operation === '+' && playerInstance.currentSubtitleSizeIndex < playerInstance.subtitleSizeLevels.length - 1) {
+            playerInstance.currentSubtitleSizeIndex++;
+        } else if (operation === '-' && playerInstance.currentSubtitleSizeIndex > 0) {
+            playerInstance.currentSubtitleSizeIndex--;
+        } else {
+            return; // invalid operation
+        }
+
+        const newSize = playerInstance.subtitleSizeLevels[playerInstance.currentSubtitleSizeIndex];
+        playerInstance.resizeSubtitles(newSize);
+
+        // Update the checkmark in the subtitle size menu
+        playerInstance.updateSubtitleSizeMenuSelection();
+    };
+
+    /**
+     * Updates the subtitle size menu to show the correct checkmark
+     * based on the current subtitle size index
+     */
+    playerInstance.updateSubtitleSizeMenuSelection = () => {
+        const sizeMenu = playerInstance.domRef.wrapper.querySelector('.fluid_subtitle_size_menu');
+        if (!sizeMenu) return;
+
+        // Clear all existing checkmarks
+        const sizeIcons = sizeMenu.querySelectorAll('.subtitle_button_icon');
+        for (let i = 0; i < sizeIcons.length; i++) {
+            sizeIcons[i].className = sizeIcons[i].className.replace("subtitle_size_selected", "");
+        }
+
+        // Get all size buttons (skip the back button)
+        const sizeButtons = Array.from(sizeMenu.querySelectorAll('.fluid_subtitle_size_button'))
+            .filter(button => !button.classList.contains('fluid_sub_menu_button'));
+
+        // Add the checkmark to the current size button if it exists
+        if (sizeButtons[playerInstance.currentSubtitleSizeIndex]) {
+            const icon = sizeButtons[playerInstance.currentSubtitleSizeIndex].querySelector('.subtitle_button_icon');
+            if (icon) {
+                icon.className += ' subtitle_size_selected';
+            }
+        }
+    };
+
+    /**
+     * Creates the subtitle size button element
+     *
+     * @returns {HTMLElement} The subtitle size button element
+     */
+    playerInstance.createSubtitleSizeButton = () => {
+        const subtitleSizeMenuButton = document.createElement('div');
+        subtitleSizeMenuButton.className = 'fluid_subtitle_list_item fluid_sub_menu_button arrow-right';
+        subtitleSizeMenuButton.innerHTML = 'Font Size';
+
+        subtitleSizeMenuButton.addEventListener('click', (event) => {
+            event.stopPropagation();
+            playerInstance.toggleSubtitleSizeMenu();
+            playerInstance.openCloseSubtitlesSwitch();
+        });
+
+        return subtitleSizeMenuButton;
+    }
+
+    /**
+     * Creates the subtitle size menu element
+     *
+     * @returns {HTMLElement} The subtitle size menu element
+     */
+    playerInstance.createSubtitleSizeMenu = () => {
+        const subtitleSizeMenu = document.createElement('div');
+        subtitleSizeMenu.className = 'fluid_subtitle_size_menu';
+
+        // Add the "Back" button
+        const backButton = playerInstance.createBackButtonForSubtitleSizeMenu();
+        subtitleSizeMenu.appendChild(backButton);
+
+        // Add the font size options
+        playerInstance.subtitleSizeLevels.forEach((size, index) => {
+            const subtitleSizeButton = document.createElement('div');
+            subtitleSizeButton.className = 'fluid_subtitle_size_button';
+
+            const isSelected = size === 100; // Default size is 100%
+            subtitleSizeButton.innerHTML = '<span class="subtitle_button_icon ' + (isSelected ? 'subtitle_size_selected' : '') + '"></span>' + size + '%';
+
+            subtitleSizeButton.addEventListener('click', (event) => {
+                // Stop the click event from propagating to parent elements,
+                // preventing unintended actions like toggling the entire menu.
+                event.stopPropagation();
+                playerInstance.toggleSubtitleSizeMenu();
+                playerInstance.resizeSubtitles(size);
+                playerInstance.currentSubtitleSizeIndex = index;
+
+                // Update the checkmark for all size buttons
+                playerInstance.updateSubtitleSizeMenuSelection();
+            });
+
+            subtitleSizeMenu.appendChild(subtitleSizeButton);
+        });
+
+        return subtitleSizeMenu;
+    };
+
+    /**
+     * Creates a "Back" button for the subtitle size menu.
+     */
+    playerInstance.createBackButtonForSubtitleSizeMenu = () => {
+        const backButton = document.createElement('div');
+        backButton.className = 'fluid_subtitle_size_button fluid_sub_menu_button arrow-left';
+        backButton.innerHTML = 'Font Size';
+
+        backButton.addEventListener('click', (event) => {
+            event.stopPropagation();
+            playerInstance.toggleSubtitleSizeMenu();
+            playerInstance.openCloseSubtitlesSwitch();
+        });
+
+        return backButton;
+    };
+
+    /**
+     * Toggles the visibility of the subtitle size menu
+     */
+    playerInstance.toggleSubtitleSizeMenu = () => {
+        const subtitleSizeMenu = playerInstance.domRef.wrapper.querySelector('.fluid_subtitle_size_menu');
+
+        const mouseOut = function (event) {
+            subtitleSizeMenu.removeEventListener('mouseleave', mouseOut);
+            subtitleSizeMenu.style.display = 'none';
+        };
+
+        if (subtitleSizeMenu.style.display === 'block') {
+            subtitleSizeMenu.style.display = 'none';
+            subtitleSizeMenu.removeEventListener('mouseleave', mouseOut);
+        } else {
+            subtitleSizeMenu.style.display = 'block';
+            subtitleSizeMenu.addEventListener('mouseleave', mouseOut);
+        }
+
+        playerInstance.setMenusMaxHeight();
+    };
+
+    /**
+     * Calculate and set the max height of the all menus for small screens
+     */
+    playerInstance.setMenusMaxHeight = () => {
+        const playerHeight = playerInstance.domRef.wrapper.offsetHeight;
+        const controlsHeight = playerInstance.domRef.wrapper.querySelector('.fluid_controls_container').offsetHeight;
+
+        const maxHeight = playerHeight - controlsHeight;
+        const subtitleSizeMenu = playerInstance.domRef.wrapper.querySelector('.fluid_subtitle_size_menu');
+        const subtitleChangeList = playerInstance.domRef.wrapper.querySelector('.fluid_subtitles_list');
+
+        subtitleSizeMenu.style.maxHeight = `${maxHeight}px`;
+        subtitleChangeList.style.maxHeight = `${maxHeight}px`;
     };
 
     playerInstance.repositionSubtitlesContainer = (size) => {
