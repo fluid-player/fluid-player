@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.52.0 (2025-04-02)
+* [Pull #882](https://github.com/fluid-player/fluid-player/pull/882) Add an option to set the subtitles' size
+
 ## 3.51.0 (2025-02-20)
 * [Pull #876](https://github.com/fluid-player/fluid-player/pull/876) Preload Ignored with HLS > Manifest and fragments loading twice before preroll, and after preroll
 * [Pull #877](https://github.com/fluid-player/fluid-player/pull/877) Change in quality for hls broke video size
