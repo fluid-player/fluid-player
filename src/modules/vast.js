@@ -574,6 +574,22 @@ export default function (playerInstance, options) {
 
                             if (ad?.mediaFileList?.length && ad.mediaFileList[0]?.apiFramework === 'VPAID') {
                                 ad.vpaid = true;
+                            } else if (!ad?.mediaFileList?.length && ad?.adParameters) {
+                                // Inject adParameters media as mediaFileList
+                                // In VAST, it's also allowed to provide the media in AdParameters, instead of MediaFiles. Although, not industry standard
+                                // This is a workaround, since the player expects VAST to not have adParameters
+                                try {
+                                    const mediaFileObj = JSON.parse(ad?.adParameters?.trim());
+                                    if (mediaFileObj) {
+                                        ad.mediaFileList = [{
+                                            'src': mediaFileObj?.videos?.length ? mediaFileObj?.videos[0]?.url : '',
+                                            'type': mediaFileObj?.videos?.length ? mediaFileObj?.videos[0]?.mimetype : ''
+                                        }];
+                                    }
+                                } catch (error) {
+                                    console.error("Error parsing media file URL:", error);
+                                }
+                                ad.adParameters = null;
                             }
                         }
                     }
@@ -597,6 +613,23 @@ export default function (playerInstance, options) {
 
                             if (ad?.mediaFileList?.length && ad.mediaFileList[0]?.apiFramework === 'VPAID') {
                                 ad.vpaid = true;
+                            } else if (!ad?.mediaFileList?.length && ad?.adParameters) {
+                                // Inject adParameters media as mediaFileList
+                                // In VAST, it's also allowed to provide the media in AdParameters, instead of MediaFiles. Although, not industry standard
+                                // This is a workaround, since the player expects VAST to not have adParameters
+                                // TODO: check this for non linear ads, and it's format
+                                try {
+                                    const mediaFileObj = JSON.parse(ad?.adParameters?.trim());
+                                    if (mediaFileObj) {
+                                        ad.mediaFileList = [{
+                                            'src': mediaFileObj?.videos?.length ? mediaFileObj?.videos[0]?.url : '',
+                                            'type': mediaFileObj?.videos?.length ? mediaFileObj?.videos[0]?.mimetype : ''
+                                        }];
+                                    }
+                                } catch (error) {
+                                    console.error("Error parsing media file URL:", error);
+                                }
+                                ad.adParameters = null;
                             }
                         }
                     }
@@ -785,8 +818,7 @@ export default function (playerInstance, options) {
                             adTree.children.push({ tagType: 'inLine', ...adNode });
                         }
                     }
-                }
-                if (Array.from(adElement.getElementsByTagName('AdParameters')).length) {
+                } else if (Array.from(adElement.getElementsByTagName('AdParameters')).length) {
                     const adParameters = Array.from(adElement.getElementsByTagName('AdParameters'));
                     for (const adParameter of adParameters) {
                         try {
@@ -795,7 +827,6 @@ export default function (playerInstance, options) {
                             const mediaFileIsValid = await validateMediaFile(mediaFileUrl);
                             if (mediaFileIsValid) {
                                 adTree.children.push({ tagType: 'inLine', ...adNode });
-                                console.log(mediaFileUrl)
                             }
                         } catch (error) {
                             console.error("Error parsing media file URL:", error);
