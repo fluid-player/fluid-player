@@ -611,25 +611,8 @@ export default function (playerInstance, options) {
                             ad.creativeType = playerInstance.getCreativeTypeFromStaticResources(creativeNonLinear);
                             ad.adParameters = playerInstance.getAdParametersFromLinear(creativeNonLinear);
 
-                            if (ad?.mediaFileList?.length && ad.mediaFileList[0]?.apiFramework === 'VPAID') {
+                            if (ad.adParameters) {
                                 ad.vpaid = true;
-                            } else if (!ad?.mediaFileList?.length && ad?.adParameters) {
-                                // Inject adParameters media as mediaFileList
-                                // In VAST, it's also allowed to provide the media in AdParameters, instead of MediaFiles. Although, not industry standard
-                                // This is a workaround, since the player expects VAST to not have adParameters
-                                // TODO: check this for non linear ads, and it's format
-                                try {
-                                    const mediaFileObj = JSON.parse(ad?.adParameters?.trim());
-                                    if (mediaFileObj) {
-                                        ad.mediaFileList = [{
-                                            'src': mediaFileObj?.videos?.length ? mediaFileObj?.videos[0]?.url : '',
-                                            'type': mediaFileObj?.videos?.length ? mediaFileObj?.videos[0]?.mimetype : ''
-                                        }];
-                                    }
-                                } catch (error) {
-                                    console.error("Error parsing media file URL:", error);
-                                }
-                                ad.adParameters = null;
                             }
                         }
                     }
@@ -785,6 +768,9 @@ export default function (playerInstance, options) {
             const isAdPod = adElement.attributes.sequence !== undefined;
             const adNode = { data: adElement };
 
+            const adType = (adElement.getElementsByTagName('Linear').length && 'linear') ||
+            (adElement.getElementsByTagName('NonLinearAds').length && 'nonLinear') || '';
+
             if (vastAdTagUri && currentDepth <= maxDepth && followAdditionalWrappers) {
                 const [wrapperElement] = adElement.getElementsByTagName('Wrapper');
                 const disableAdditionalWrappers = wrapperElement.attributes.followAdditionalWrappers && ["false", "0"].includes(wrapperElement.attributes.followAdditionalWrappers.value); // See VAST Wrapper spec
@@ -805,26 +791,35 @@ export default function (playerInstance, options) {
                     playerInstance.debugMessage(`Error when loading Wrapper, will trigger fallback if available`, e);
                 }
             } else if (!vastAdTagUri) {
-                if (Array.from(adElement.getElementsByTagName('MediaFiles')).length) {
+                if (adType === 'nonLinear') {
+                    // No extra checks needed on fallback for non linear ads
+                    adTree.children.push({ tagType: 'inLine', ...adNode });
+                } else if (Array.from(adElement.getElementsByTagName('MediaFiles')).length) {
+                    // Check if there are mediaFiles
                     const mediaFiles = Array.from(adElement.getElementsByTagName('MediaFiles'));
                     const mediaFile = mediaFiles[0]?.getElementsByTagName('MediaFile');
                     const mediaFileUrl = mediaFile[0]?.textContent.trim();
 
+                    // In case of vpaid, no need to check if media file is valid
+                    // VPAID uses a JS file in this attribute, not a media file
                     if (mediaFile[0].getAttribute('apiFramework') === 'VPAID') {
                         adTree.children.push({ tagType: 'inLine', ...adNode });
                     } else {
+                        // If valid, add it to the ad tree
                         const mediaFileIsValid = await validateMediaFile(mediaFileUrl);
                         if (mediaFileIsValid) {
                             adTree.children.push({ tagType: 'inLine', ...adNode });
                         }
                     }
                 } else if (Array.from(adElement.getElementsByTagName('AdParameters')).length) {
+                    // check if there are adParameters
                     const adParameters = Array.from(adElement.getElementsByTagName('AdParameters'));
                     for (const adParameter of adParameters) {
                         try {
                             const mediaFileObj = JSON.parse(adParameter.textContent.trim());
                             const mediaFileUrl = mediaFileObj?.videos?.length ? mediaFileObj?.videos[0]?.url : '';
                             const mediaFileIsValid = await validateMediaFile(mediaFileUrl);
+                            // If valid, add it to the ad tree
                             if (mediaFileIsValid) {
                                 adTree.children.push({ tagType: 'inLine', ...adNode });
                             }
