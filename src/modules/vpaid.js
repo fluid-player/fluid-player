@@ -250,6 +250,19 @@ export default function (playerInstance, options) {
         return playerInstance.vpaidAdUnit.getAdLinear();
     };
 
+    // Custom implementation, not VPAID standard
+    // Pass through for getAdLinear if exists, otherwise fallback to VAST metadata
+    playerInstance.isAdLinear = (ad) => {
+        try {
+            return playerInstance.getVpaidAdLinear();
+        } catch (error) {
+            playerInstance.debugMessage(
+                "Error calling getAdLinear(), falling back to VAST metadata: " + error
+            );
+            return ad.adType && ad.adType.toLowerCase() === 'linear';
+        }
+    };
+
     // Pass through for startAd()
     playerInstance.startVpaidAd = () => {
         playerInstance.debugMessage("startAd");
@@ -474,8 +487,9 @@ export default function (playerInstance, options) {
                     playerInstance.vpaidAdUnit = fn();
                     clearInterval(playerInstance.getVPAIDAdInterval);
                     if (playerInstance.checkVPAIDInterface(playerInstance.vpaidAdUnit)) {
+                        const isLinear = playerInstance.isAdLinear(ad);
 
-                        if (playerInstance.getVpaidAdLinear()) {
+                        if (isLinear) {
                             playerInstance.isCurrentlyPlayingAd = true;
                             playerInstance.switchPlayerToVpaidMode(ad);
                         } else {
