@@ -257,7 +257,7 @@ export default function (playerInstance, options) {
             return playerInstance.getVpaidAdLinear();
         } catch (error) {
             playerInstance.debugMessage(
-                "Error calling getAdLinear(), falling back to VAST metadata: " + error
+                "Error calling getAdLinear(), handshake -> initAd() must be set before calling getAdLinear(). Falling back to VAST metadata: " + error
             );
             return ad.adType && ad.adType.toLowerCase() === 'linear';
         }
