@@ -557,13 +557,13 @@ export default function (playerInstance, options) {
                     if (ad.adType === 'linear') {
                         const linearCreatives = creativeElement.getElementsByTagName('Linear');
                         const creativeLinear = linearCreatives[0];
-    
+
                         //Extract the Ad data if it is actually the Ad (!wrapper)
                         if (!playerInstance.hasVastAdTagUri(adElement) && playerInstance.hasInLine(adElement)) {
                             //Set initial values
                             ad.adFinished = false;
                             ad.vpaid = false;
-    
+
                             //Extract the necessary data from the Linear node
                             ad.skipoffset = playerInstance.convertTimeStringToSeconds(creativeLinear.getAttribute('skipoffset'));
                             ad.clickthroughUrl = playerInstance.getClickThroughUrlFromLinear(creativeLinear);
@@ -571,22 +571,38 @@ export default function (playerInstance, options) {
                             ad.mediaFileList = playerInstance.getMediaFileListFromLinear(creativeLinear);
                             ad.adParameters = playerInstance.getAdParametersFromLinear(creativeLinear);
                             ad.iconClick = ad.iconClick || playerInstance.getIconClickThroughFromLinear(creativeLinear);
-    
-                            if (ad.adParameters) {
+
+                            if (ad?.mediaFileList?.length && ad.mediaFileList[0]?.apiFramework === 'VPAID') {
                                 ad.vpaid = true;
+                            } else if (!ad?.mediaFileList?.length && ad?.adParameters) {
+                                // Inject adParameters media as mediaFileList
+                                // In VAST, it's also allowed to provide the media in AdParameters, instead of MediaFiles. Although, not industry standard
+                                // This is a workaround, since the player expects VAST to not have adParameters
+                                try {
+                                    const mediaFileObj = JSON.parse(ad?.adParameters?.trim());
+                                    if (mediaFileObj) {
+                                        ad.mediaFileList = [{
+                                            'src': mediaFileObj?.videos?.length ? mediaFileObj?.videos[0]?.url : '',
+                                            'type': mediaFileObj?.videos?.length ? mediaFileObj?.videos[0]?.mimetype : ''
+                                        }];
+                                    }
+                                } catch (error) {
+                                    console.error("Error parsing media file URL:", error);
+                                }
+                                ad.adParameters = null;
                             }
                         }
                     }
-    
+
                     if (ad.adType === 'nonLinear') {
                         const nonLinearCreatives = creativeElement.getElementsByTagName('NonLinearAds');
                         const creativeNonLinear = nonLinearCreatives[0];
-    
+
                         //Extract the Ad data if it is actually the Ad (!wrapper)
                         if (!playerInstance.hasVastAdTagUri(adElement) && playerInstance.hasInLine(adElement)) {
                             //Set initial values
                             ad.vpaid = false;
-    
+
                             //Extract the necessary data from the NonLinear node
                             ad.clickthroughUrl = playerInstance.getClickThroughUrlFromNonLinear(creativeNonLinear);
                             ad.duration = playerInstance.getDurationFromNonLinear(creativeNonLinear); // VAST version < 4.0
@@ -594,7 +610,7 @@ export default function (playerInstance, options) {
                             ad.staticResource = playerInstance.getStaticResourceFromNonLinear(creativeNonLinear);
                             ad.creativeType = playerInstance.getCreativeTypeFromStaticResources(creativeNonLinear);
                             ad.adParameters = playerInstance.getAdParametersFromLinear(creativeNonLinear);
-    
+
                             if (ad.adParameters) {
                                 ad.vpaid = true;
                             }
@@ -752,6 +768,9 @@ export default function (playerInstance, options) {
             const isAdPod = adElement.attributes.sequence !== undefined;
             const adNode = { data: adElement };
 
+            const adType = (adElement.getElementsByTagName('Linear').length && 'linear') ||
+            (adElement.getElementsByTagName('NonLinearAds').length && 'nonLinear') || '';
+
             if (vastAdTagUri && currentDepth <= maxDepth && followAdditionalWrappers) {
                 const [wrapperElement] = adElement.getElementsByTagName('Wrapper');
                 const disableAdditionalWrappers = wrapperElement.attributes.followAdditionalWrappers && ["false", "0"].includes(wrapperElement.attributes.followAdditionalWrappers.value); // See VAST Wrapper spec
@@ -772,35 +791,42 @@ export default function (playerInstance, options) {
                     playerInstance.debugMessage(`Error when loading Wrapper, will trigger fallback if available`, e);
                 }
             } else if (!vastAdTagUri) {
-                let mediaFileIsValid = true;
-                let mediaFileUrl = '';
-                if (Array.from(adElement.getElementsByTagName('AdParameters')).length) {
-                    const mediaFiles = Array.from(adElement.getElementsByTagName('AdParameters'));
-                    mediaFileIsValid = false;
-                    for (const mediaFile of mediaFiles) {
-                        mediaFileUrl = mediaFile.textContent.trim();
+                if (adType === 'nonLinear') {
+                    // No extra checks needed on fallback for non linear ads
+                    adTree.children.push({ tagType: 'inLine', ...adNode });
+                } else if (Array.from(adElement.getElementsByTagName('MediaFiles')).length) {
+                    // Check if there are mediaFiles
+                    const mediaFiles = Array.from(adElement.getElementsByTagName('MediaFiles'));
+                    const mediaFile = mediaFiles[0]?.getElementsByTagName('MediaFile');
+                    const mediaFileUrl = mediaFile[0]?.textContent.trim();
+
+                    // In case of vpaid, no need to check if media file is valid
+                    // VPAID uses a JS file in this attribute, not a media file
+                    if (mediaFile[0].getAttribute('apiFramework') === 'VPAID') {
+                        adTree.children.push({ tagType: 'inLine', ...adNode });
+                    } else {
+                        // If valid, add it to the ad tree
+                        const mediaFileIsValid = await validateMediaFile(mediaFileUrl);
+                        if (mediaFileIsValid) {
+                            adTree.children.push({ tagType: 'inLine', ...adNode });
+                        }
+                    }
+                } else if (Array.from(adElement.getElementsByTagName('AdParameters')).length) {
+                    // check if there are adParameters
+                    const adParameters = Array.from(adElement.getElementsByTagName('AdParameters'));
+                    for (const adParameter of adParameters) {
                         try {
-                            const mediaFileObj = JSON.parse(mediaFileUrl);
-                            mediaFileUrl = mediaFileObj.videos[0].url;                      
+                            const mediaFileObj = JSON.parse(adParameter.textContent.trim());
+                            const mediaFileUrl = mediaFileObj?.videos?.length ? mediaFileObj?.videos[0]?.url : '';
+                            const mediaFileIsValid = await validateMediaFile(mediaFileUrl);
+                            // If valid, add it to the ad tree
+                            if (mediaFileIsValid) {
+                                adTree.children.push({ tagType: 'inLine', ...adNode });
+                            }
                         } catch (error) {
                             console.error("Error parsing media file URL:", error);
                         }
                     }
-                } else if (Array.from(adElement.getElementsByTagName('MediaFiles')).length) {
-                    const mediaFiles = Array.from(adElement.getElementsByTagName('MediaFiles'));   
-                    const mediaFile = mediaFiles[0].getElementsByTagName('MediaFile');
-                    mediaFileIsValid = false;
-                    for (const mediaFileTemp of mediaFile) {
-                        mediaFileUrl = mediaFileTemp.textContent.trim();
-                    }
-                };
-                mediaFileIsValid = await validateMediaFile(mediaFileUrl);
-                if (mediaFileIsValid) {
-                    adTree.children.push({ tagType: 'inLine', mediaFileUrl, ...adNode });
-                    break;
-                } else {
-                    adTree.children.push({ tagType: 'inLine', mediaError: true, ...adNode });
-                    playerInstance.debugMessage(`No valid media file found in Inline ad.`);
                 }
             }
         }
@@ -815,6 +841,9 @@ export default function (playerInstance, options) {
      * @param {mediaFileUrl}
      */
     async function validateMediaFile(mediaFileUrl) {
+        if (!mediaFileUrl) {
+            return false;
+        }
         try {
             const response =  await fetch(mediaFileUrl);
             if (!response.ok || response.headers.get('content-type').indexOf('video') === -1) {
