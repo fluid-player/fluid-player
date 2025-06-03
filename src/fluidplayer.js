@@ -1335,11 +1335,17 @@ const fluidPlayerClass = function () {
 
         const shiftTime = timeBarX => {
             const totalWidth = self.domRef.wrapper.querySelector('.fluid_controls_progress_container').clientWidth;
-            if (totalWidth) {
-                const currentTime = Math.abs(self.currentVideoDuration * timeBarX / totalWidth);
-                self.domRef.player.currentTime = currentTime;
-                // workaround to store the main video current time in safari browser when progress bar is moved before initial play and there is a preRoll add.
-                if (self.getBrowserVersion().browserName.toLowerCase() === 'safari') self.domRef.player.safariPlayheadPosition = currentTime;
+            if (!totalWidth) {
+                self.hideSuggestedVideos();
+                return;
+            }
+
+            const currentTime = Math.abs(self.currentVideoDuration * timeBarX / totalWidth);
+            self.domRef.player.currentTime = currentTime;
+            // Workaround for Safari: store main video time when moving progress bar before initial play & preRoll ad
+            const isSafari = self.getBrowserVersion().browserName.toLowerCase() === 'safari';
+            if (isSafari) {
+                self.domRef.player.safariPlayheadPosition = currentTime;
             }
 
             self.hideSuggestedVideos();
