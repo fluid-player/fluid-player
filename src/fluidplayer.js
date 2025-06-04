@@ -1335,8 +1335,17 @@ const fluidPlayerClass = function () {
 
         const shiftTime = timeBarX => {
             const totalWidth = self.domRef.wrapper.querySelector('.fluid_controls_progress_container').clientWidth;
-            if (totalWidth) {
-                self.domRef.player.currentTime = self.currentVideoDuration * timeBarX / totalWidth;
+            if (!totalWidth) {
+                self.hideSuggestedVideos();
+                return;
+            }
+
+            const currentTime = Math.abs(self.currentVideoDuration * timeBarX / totalWidth);
+            self.domRef.player.currentTime = currentTime;
+            // Workaround for Safari: store main video time when moving progress bar before initial play & preRoll ad
+            const isSafari = self.getBrowserVersion().browserName.toLowerCase() === 'safari';
+            if (isSafari) {
+                self.domRef.player.safariPlayheadPosition = currentTime;
             }
 
             self.hideSuggestedVideos();
@@ -2942,7 +2951,7 @@ const fluidPlayerClass = function () {
 
         // Advanced Theatre mode if specified
         if (self.displayOptions.layoutControls.theatreAdvanced) {
-            const elementForTheatre = self.domRef.wrapper.querySelector(`#${self.displayOptions.layoutControls.theatreAdvanced.theatreElement}`); 
+            const elementForTheatre = self.domRef.wrapper.querySelector(`#${self.displayOptions.layoutControls.theatreAdvanced.theatreElement}`);
             const theatreClassToApply = self.displayOptions.layoutControls.theatreAdvanced.classToApply;
             if (elementForTheatre != null && theatreClassToApply != null) {
                 if (!self.theatreMode) {
