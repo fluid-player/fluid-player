@@ -307,8 +307,9 @@ export default function (playerInstance, options) {
                 break;
 
             case 'preRoll':
-                if (playerInstance.domRef.player.currentTime > 0) {
-                    playerInstance.domRef.player.mainVideoCurrentTime = playerInstance.domRef.player.currentTime - 1;
+                if (playerInstance.domRef.player.currentTime > 0 || playerInstance.domRef.player.safariPlayheadPosition) {
+                    const currentTime = playerInstance.domRef.player.safariPlayheadPosition ?? playerInstance.domRef.player.currentTime;
+                    playerInstance.domRef.player.mainVideoCurrentTime = currentTime - 1;
                 }
                 break;
         }
