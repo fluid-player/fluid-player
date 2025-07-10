@@ -1044,7 +1044,7 @@ const fluidPlayerClass = function () {
         }
     };
 
-    self.contolVolumebarUpdate = () => {
+    self.controlVolumebarUpdate = () => {
         const currentVolumeTag = self.domRef.wrapper.querySelector('.fluid_control_currentvolume');
         const volumeposTag = self.domRef.wrapper.querySelector('.fluid_control_volume_currentpos');
         const volumebarTotalWidth = self.domRef.wrapper.querySelector('.fluid_control_volume').clientWidth;
@@ -1800,7 +1800,7 @@ const fluidPlayerClass = function () {
 
         self.domRef.player.addEventListener('play', () => {
             self.controlPlayPauseToggle();
-            self.contolVolumebarUpdate();
+            self.controlVolumebarUpdate();
         }, false);
 
         self.domRef.player.addEventListener('fluidplayerpause', () => {
@@ -1833,7 +1833,7 @@ const fluidPlayerClass = function () {
         self.domRef.wrapper.querySelector('.fluid_control_volume_container')
             .addEventListener(eventOn, event => self.onVolumeBarMouseDown(), { passive: true });
 
-        self.domRef.player.addEventListener('volumechange', () => self.contolVolumebarUpdate());
+        self.domRef.player.addEventListener('volumechange', () => self.controlVolumebarUpdate());
 
         self.trackEvent(self.domRef.player.parentNode, 'click', '.fluid_control_mute', () => self.muteToggle());
 
@@ -2002,7 +2002,7 @@ const fluidPlayerClass = function () {
                 clearInterval(initiateVolumebarTimerId);
             } else if (self.checkIfVolumebarIsRendered()) {
                 clearInterval(initiateVolumebarTimerId);
-                self.contolVolumebarUpdate();
+                self.controlVolumebarUpdate();
             } else {
                 remainingAttemptsToInitiateVolumeBar--;
             }
