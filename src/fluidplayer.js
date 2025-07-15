@@ -1093,6 +1093,8 @@ const fluidPlayerClass = function () {
         // Persistent settings
         self.fluidStorage.fluidVolume = self.latestVolume;
         self.fluidStorage.fluidMute = self.domRef.player.muted;
+
+        self.trackMuteChange();
     };
 
     self.checkFullscreenSupport = () => {

@@ -306,16 +306,16 @@ export default function (playerInstance, options) {
         for (let i = 0; i < trackingEvents.length; i++) {
             eventType = trackingEvents[i].getAttribute('event');
 
+            if (typeof tmpOptions.tracking[eventType] === 'undefined') {
+                tmpOptions.tracking[eventType] = [];
+            }
+
             switch (eventType) {
                 case 'start':
                 case 'firstQuartile':
                 case 'midpoint':
                 case 'thirdQuartile':
                 case 'complete':
-                    if (typeof tmpOptions.tracking[eventType] === 'undefined') {
-                        tmpOptions.tracking[eventType] = [];
-                    }
-
                     if (typeof tmpOptions.stopTracking[eventType] === 'undefined') {
                         tmpOptions.stopTracking[eventType] = [];
                     }
@@ -325,10 +325,6 @@ export default function (playerInstance, options) {
                     break;
 
                 case 'progress':
-                    if (typeof tmpOptions.tracking[eventType] === 'undefined') {
-                        tmpOptions.tracking[eventType] = [];
-                    }
-
                     oneEventOffset = playerInstance.convertTimeStringToSeconds(trackingEvents[i].getAttribute('offset'));
 
                     if (typeof tmpOptions.tracking[eventType][oneEventOffset] === 'undefined') {
@@ -340,6 +336,11 @@ export default function (playerInstance, options) {
 
                     tmpOptions.tracking[eventType][oneEventOffset].elements.push(trackingEvents[i].textContent.trim());
 
+                    break;
+
+                case 'mute':
+                case 'unmute':
+                    tmpOptions.tracking[eventType].push(trackingEvents[i].textContent.trim());
                     break;
 
                 default:

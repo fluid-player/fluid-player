@@ -476,6 +476,14 @@ export default function (playerInstance, options) {
                 }
                 break;
 
+            case 'mute':
+            case 'unmute':
+                if (playerInstance.vastOptions.tracking[eventType] !== null) {
+                    trackingUris = playerInstance.vastOptions.tracking[eventType];
+                }
+                console.log('tracking uris: ', trackingUris);
+                break;
+
             default:
                 break;
         }
@@ -1761,6 +1769,21 @@ export default function (playerInstance, options) {
 
         if (clickthroughLayer) {
             clickthroughLayer.parentNode.removeChild(clickthroughLayer);
+        }
+    };
+
+    /**
+     * Track if the player is muted or unmuted when playing an ad and add tracking to mute/unmute events
+     */
+    playerInstance.trackMuteChange = () => {
+        if (!playerInstance.isCurrentlyPlayingAd || !playerInstance.vastOptions || !playerInstance.vastOptions.tracking || !playerInstance.vastOptions.tracking.mute) {
+            return;
+        }
+
+        if (playerInstance.domRef.player.muted) {
+            playerInstance.trackSingleEvent('mute');
+        } else {
+            playerInstance.trackSingleEvent('unmute');
         }
     };
 }

@@ -27,6 +27,7 @@
                             <Tracking event="thirdQuartile">http://www.example.com/thirdQuartile</Tracking>
                             <Tracking event="complete">http://www.example.com/complete</Tracking>
                             <Tracking event="mute">http://www.example.com/mute</Tracking>
+                            <Tracking event="unmute">http://www.example.com/unmute</Tracking>
                             <Tracking event="rewind">http://www.example.com/rewind</Tracking>
                             <Tracking event="pause">http://www.example.com/pause</Tracking>
                             <Tracking event="resume">http://www.example.com/resume</Tracking>
