@@ -6,7 +6,7 @@ export default function (playerInstance, options) {
     playerInstance.subtitleFetchParse = (subtitleItem) => {
         playerInstance.sendRequest(
             subtitleItem.url,
-            true,
+            false,
             playerInstance.displayOptions.vastOptions.vastTimeout,
             function () {
                 const convertVttRawData = function (vttRawData) {

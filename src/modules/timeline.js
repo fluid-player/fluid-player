@@ -2,7 +2,7 @@ export default function (playerInstance, options) {
     playerInstance.setupThumbnailPreviewVtt = () => {
         playerInstance.sendRequest(
             playerInstance.displayOptions.layoutControls.timelinePreview.file,
-            true,
+            false,
             playerInstance.displayOptions.vastOptions.vastTimeout,
             function () {
                 const convertVttRawData = function (vttRawData) {
