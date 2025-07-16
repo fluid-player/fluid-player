@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.55.0 (2025-07-16)
+* [Pull #901](https://github.com/fluid-player/fluid-player-docs/pull/901) Subtitle vtt files are requested with credentials
+
 ## 3.54.0 (2025-06-18)
 * [Pull #897](https://github.com/fluid-player/fluid-player-docs/pull/897) Video will start from beginning after VAST end
 
