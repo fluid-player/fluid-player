@@ -1140,4 +1140,19 @@ export default function (playerInstance, options) {
         playerInstance.removeCTAButton();
         playerInstance.vastLogoBehaviour(false);
     };
+
+    /**
+     * Track if the player is muted or unmuted when playing an ad and add tracking to mute/unmute events
+     */
+    playerInstance.trackMuteChange = () => {
+        if (!playerInstance.isCurrentlyPlayingAd || !playerInstance.vastOptions || !playerInstance.vastOptions.tracking || (!playerInstance.vastOptions.tracking.mute && !playerInstance.vastOptions.tracking.unmute)) {
+            return;
+        }
+
+        if (playerInstance.domRef.player.muted) {
+            playerInstance.trackSingleEvent('mute');
+        } else {
+            playerInstance.trackSingleEvent('unmute');
+        }
+    };
 }
