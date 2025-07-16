@@ -340,6 +340,8 @@ export default function (playerInstance, options) {
 
                 case 'mute':
                 case 'unmute':
+                case 'pause':
+                case 'resume':
                     tmpOptions.tracking[eventType].push(trackingEvents[i].textContent.trim());
                     break;
 
@@ -1153,6 +1155,21 @@ export default function (playerInstance, options) {
             playerInstance.trackSingleEvent('mute');
         } else {
             playerInstance.trackSingleEvent('unmute');
+        }
+    };
+
+    /**
+     * Track if the player is paused or resumed when playing an ad and add tracking to pause/resume events
+     */
+    playerInstance.trackPlayPauseChange = () => {
+        if (!playerInstance.isCurrentlyPlayingAd || !playerInstance.vastOptions || !playerInstance.vastOptions.tracking || (!playerInstance.vastOptions.tracking.pause && !playerInstance.vastOptions.tracking.resume)) {
+            return;
+        }
+
+        if (playerInstance.domRef.player.paused) {
+            playerInstance.trackSingleEvent('pause');
+        } else {
+            playerInstance.trackSingleEvent('resume');
         }
     };
 }

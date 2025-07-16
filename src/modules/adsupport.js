@@ -478,10 +478,11 @@ export default function (playerInstance, options) {
 
             case 'mute':
             case 'unmute':
+            case 'pause':
+            case 'resume':
                 if (playerInstance.vastOptions.tracking[eventType] !== null) {
                     trackingUris = playerInstance.vastOptions.tracking[eventType];
                 }
-                console.log('tracking uris: ', trackingUris);
                 break;
 
             default:
