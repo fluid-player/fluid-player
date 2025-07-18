@@ -317,6 +317,7 @@ export default function (playerInstance, options) {
                 case 'thirdQuartile':
                 case 'complete':
                 case 'close':
+                case 'skip':
                     if (typeof tmpOptions.stopTracking[eventType] === 'undefined') {
                         tmpOptions.stopTracking[eventType] = [];
                     }
@@ -1175,7 +1176,7 @@ export default function (playerInstance, options) {
     };
 
     /**
-     * Track if the non-linear ad is closed on the 'close' button
+     * Track if the non-linear ad is closed on the 'close' button and add tracking to 'close' event
      */
     playerInstance.trackCloseNonLinearAd = () => {
         if (!playerInstance.vastOptions || !playerInstance.vastOptions.tracking || !playerInstance.vastOptions.tracking.close) {
@@ -1183,5 +1184,16 @@ export default function (playerInstance, options) {
         }
 
         playerInstance.trackSingleEvent('close');
+    };
+
+    /**
+     * Track if the ad is skipped and add tracking to 'skip' event
+     */
+    playerInstance.trackSkipAd = () => {
+        if (!playerInstance.vastOptions || !playerInstance.vastOptions.tracking || !playerInstance.vastOptions.tracking.skip) {
+            return;
+        }
+
+        playerInstance.trackSingleEvent('skip');
     };
 }

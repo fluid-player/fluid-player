@@ -430,6 +430,7 @@ export default function (playerInstance, options) {
             case 'thirdQuartile':
             case 'complete':
             case 'close':
+            case 'skip':
                 if (playerInstance.vastOptions.stopTracking[eventType] === false) {
                     if (playerInstance.vastOptions.tracking[eventType] !== null) {
                         trackingUris = playerInstance.vastOptions.tracking[eventType];
@@ -1395,7 +1396,6 @@ export default function (playerInstance, options) {
      * Adds a Skip Button
      */
     playerInstance.addSkipButton = () => {
-        // TODO: ahh yes, the DIVbutton...
         const divSkipButton = document.createElement('div');
         divSkipButton.className = 'skip_button skip_button_disabled';
         if (playerInstance.vastOptions.skipoffset > 0) {
@@ -1707,6 +1707,7 @@ export default function (playerInstance, options) {
             return;
         }
 
+        playerInstance.trackSkipAd();
         // skip the regular linear vast
         playerInstance.displayOptions.vastOptions.vastAdvanced.vastVideoSkippedCallback();
         const event = document.createEvent('Event');
