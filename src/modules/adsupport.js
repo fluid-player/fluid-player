@@ -429,6 +429,7 @@ export default function (playerInstance, options) {
             case 'midpoint':
             case 'thirdQuartile':
             case 'complete':
+            case 'close':
                 if (playerInstance.vastOptions.stopTracking[eventType] === false) {
                     if (playerInstance.vastOptions.tracking[eventType] !== null) {
                         trackingUris = playerInstance.vastOptions.tracking[eventType];
@@ -759,6 +760,7 @@ export default function (playerInstance, options) {
         closeBtn.title = playerInstance.displayOptions.layoutControls.closeButtonCaption;
         const tempRollListId = ad.rollListId;
         closeBtn.onclick = function (event) {
+            playerInstance.trackCloseNonLinearAd();
             this.parentElement.remove();
             if (typeof event.stopImmediatePropagation !== 'undefined') {
                 event.stopImmediatePropagation();

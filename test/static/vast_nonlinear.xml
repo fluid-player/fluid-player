@@ -25,6 +25,13 @@
             <Creatives>
                 <Creative id="5480" sequence="1">
                     <NonLinearAds>
+                        <TrackingEvents>
+                            <Tracking event="mute">http://www.example.com/mute</Tracking>
+                            <Tracking event="unmute">http://www.example.com/unmute</Tracking>
+                            <Tracking event="pause">http://www.example.com/pause</Tracking>
+                            <Tracking event="resume">http://www.example.com/resume</Tracking>
+                            <Tracking event="close">http://www.example.com/close</Tracking>
+                        </TrackingEvents>
                         <NonLinear width="480" height="90" minSuggestedDuration="00:00:10" scalable="true" maintainAspectRatio="true">
                             <StaticResource creativeType="image/png">
                                 <![CDATA[ https://mms.businesswire.com/media/20150623005446/en/473787/21/iab_tech_lab.jpg ]]>

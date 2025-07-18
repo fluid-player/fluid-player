@@ -316,6 +316,7 @@ export default function (playerInstance, options) {
                 case 'midpoint':
                 case 'thirdQuartile':
                 case 'complete':
+                case 'close':
                     if (typeof tmpOptions.stopTracking[eventType] === 'undefined') {
                         tmpOptions.stopTracking[eventType] = [];
                     }
@@ -1171,5 +1172,16 @@ export default function (playerInstance, options) {
         } else {
             playerInstance.trackSingleEvent('resume');
         }
+    };
+
+    /**
+     * Track if the non-linear ad is closed on the 'close' button
+     */
+    playerInstance.trackCloseNonLinearAd = () => {
+        if (!playerInstance.vastOptions || !playerInstance.vastOptions.tracking || !playerInstance.vastOptions.tracking.close) {
+            return;
+        }
+
+        playerInstance.trackSingleEvent('close');
     };
 }
