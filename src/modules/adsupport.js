@@ -497,6 +497,7 @@ export default function (playerInstance, options) {
         playerInstance.closeNonLinear(ad.id);
         if (playerInstance.adFinished === false) {
             playerInstance.adFinished = true;
+            playerInstance.isCurrentlyShowingNonLinearAd = false;
             playerInstance.trackSingleEvent('complete');
         }
         clearInterval(playerInstance.nonLinearTracking);
@@ -515,6 +516,7 @@ export default function (playerInstance, options) {
             return;
         }
         playerInstance.adFinished = false;
+        playerInstance.isCurrentlyShowingNonLinearAd = true;
         let duration = (playerInstance.rollsById[ad.rollListId].nonLinearDuration) ? playerInstance.rollsById[ad.rollListId].nonLinearDuration : false;
         if (!playerInstance.vastOptions.vpaid) {
             playerInstance.trackSingleEvent('start');
@@ -529,6 +531,7 @@ export default function (playerInstance, options) {
                 playerInstance.scheduleTrackingEvent(currentTime, duration);
                 if (currentTime >= (duration - 1)) {
                     playerInstance.adFinished = true;
+                    playerInstance.isCurrentlyShowingNonLinearAd = false;
                 }
             }, 400);
             playerInstance.destructors.push(() => clearInterval(playerInstance.nonLinearTracking));
@@ -761,6 +764,7 @@ export default function (playerInstance, options) {
                 event.stopImmediatePropagation();
             }
             playerInstance.adFinished = true;
+            playerInstance.isCurrentlyShowingNonLinearAd = false;
             clearInterval(playerInstance.nonLinearTracking);
 
             //if any other onPauseRoll then render it
@@ -814,6 +818,7 @@ export default function (playerInstance, options) {
         const element = playerInstance.domRef.wrapper.querySelector('#fluid_nonLinear_' + adId + ', #fluid_vpaidNonLinear_' + adId);
         if (element) {
             element.remove();
+            playerInstance.isCurrentlyShowingNonLinearAd = false;
         }
     };
 

@@ -104,6 +104,7 @@ const fluidPlayerClass = function () {
         self.videoPlayerId = playerNode.id;
         self.originalSrc = self.getCurrentSrc();
         self.isCurrentlyPlayingAd = false;
+        self.isCurrentlyShowingNonLinearAd = false;
         self.recentWaiting = false;
         self.latestVolume = 1;
         self.currentVideoDuration = 0;
