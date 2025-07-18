@@ -115,7 +115,7 @@ export default function (playerInstance, options) {
         return result;
     };
 
-    playerInstance.getTrackingFromLinear = (linear) => {
+    playerInstance.getTrackingFromCreative = (linear) => {
         const trackingEvents = linear.getElementsByTagName('TrackingEvents');
 
         if (trackingEvents.length) {//There should be no more than one node
@@ -298,8 +298,8 @@ export default function (playerInstance, options) {
         return fallbackStaticResource;
     };
 
-    playerInstance.registerTrackingEvents = (creativeLinear, tmpOptions) => {
-        const trackingEvents = playerInstance.getTrackingFromLinear(creativeLinear);
+    playerInstance.registerTrackingEvents = (creative, tmpOptions) => {
+        const trackingEvents = playerInstance.getTrackingFromCreative(creative);
         let eventType = '';
         let oneEventOffset = 0;
 
