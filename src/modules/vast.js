@@ -344,6 +344,7 @@ export default function (playerInstance, options) {
                 case 'unmute':
                 case 'pause':
                 case 'resume':
+                case 'rewind':
                     tmpOptions.tracking[eventType].push(trackingEvents[i].textContent.trim());
                     break;
 
@@ -1195,5 +1196,16 @@ export default function (playerInstance, options) {
         }
 
         playerInstance.trackSingleEvent('skip');
+    };
+
+    /**
+     * Track if the ad is rewound and add tracking to 'rewind' event
+     */
+    playerInstance.trackRewindAd = () => {
+        if (!playerInstance.isCurrentlyShowingNonLinearAd || !playerInstance.vastOptions || !playerInstance.vastOptions.tracking || !playerInstance.vastOptions.tracking.rewind) {
+            return;
+        }
+
+        playerInstance.trackSingleEvent('rewind');
     };
 }

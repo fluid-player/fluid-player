@@ -161,6 +161,7 @@ const fluidPlayerClass = function () {
         // Only for linear ads, non linear are not taken into account
         self.currentMediaSourceType = 'source';
         self.isLiveStream = null;
+        self.previousTime = 0;
 
         //Default options
         self.displayOptions = {
@@ -362,6 +363,7 @@ const fluidPlayerClass = function () {
         playerNode.addEventListener('durationchange', () => {
             self.currentVideoDuration = self.getCurrentVideoDuration();
         });
+        playerNode.addEventListener('seeked', self.onVideoSeeked);
 
         // 'loadedmetadata' inconsistently fires because the audio can already be loaded when the listener is added.
         // Here we use readystate to see if metadata has already loaded
@@ -1336,6 +1338,8 @@ const fluidPlayerClass = function () {
             self.domRef.player.pause();
         }
 
+        self.updatePreviousTime();
+
         const shiftTime = timeBarX => {
             const totalWidth = self.domRef.wrapper.querySelector('.fluid_controls_progress_container').clientWidth;
             if (!totalWidth) {
@@ -1441,6 +1445,15 @@ const fluidPlayerClass = function () {
         document.addEventListener('touchend', onVolumeBarMouseUp, { passive: true });
         document.addEventListener('mousemove', onVolumeBarMouseMove);
         document.addEventListener('touchmove', onVolumeBarMouseMove, { passive: true });
+    };
+
+    self.onVideoSeeked = () => {
+        // Track rewind events (not forward seeks)
+        if (self.previousTime && self.domRef.player.currentTime < self.previousTime) {
+            self.debugMessage('Video rewound from', self.previousTime, 'to', self.domRef.player.currentTime);
+            self.trackRewindAd();
+        }
+        self.updatePreviousTime();
     };
 
     self.findRoll = (roll) => {
@@ -2115,7 +2128,15 @@ const fluidPlayerClass = function () {
             }
         }
         self.resizeVpaidAuto();
-    }
+    };
+
+    /**
+     * Updates the previous time position of the video player to the current time.
+     * This function should be called before the current time is changed, as a way to store the 'previous' time position.
+     */
+    self.updatePreviousTime = () => {
+        self.previousTime = self.domRef.player.currentTime;
+    };
 
     /**
      * Creates the skip animation elements and appends them to the player
@@ -2200,6 +2221,7 @@ const fluidPlayerClass = function () {
         if (self.isCurrentlyPlayingAd) {
             return;
         }
+        self.updatePreviousTime();
 
         let skipTo = self.domRef.player.currentTime + timeOffset;
         if (skipTo < 0) {

@@ -482,6 +482,7 @@ export default function (playerInstance, options) {
             case 'unmute':
             case 'pause':
             case 'resume':
+            case 'rewind':
                 if (playerInstance.vastOptions.tracking[eventType] !== null) {
                     trackingUris = playerInstance.vastOptions.tracking[eventType];
                 }
