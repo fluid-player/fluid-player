@@ -997,7 +997,7 @@ const fluidPlayerClass = function () {
         );
     };
 
-    self.contolProgressbarUpdate = () => {
+    self.controlProgressbarUpdate = () => {
         const currentProgressTag = self.domRef.player.parentNode.getElementsByClassName('fluid_controls_currentprogress');
 
         for (let i = 0; i < currentProgressTag.length; i++) {
@@ -1358,7 +1358,7 @@ const fluidPlayerClass = function () {
             const currentX = self.getEventOffsetX(event, event.target.parentNode);
             initialPosition = NaN; // mouse up will fire after the move, we don't want to trigger the initial position in the event of iOS
             shiftTime(currentX);
-            self.contolProgressbarUpdate();
+            self.controlProgressbarUpdate();
             self.controlDurationUpdate();
         };
 
@@ -1815,7 +1815,7 @@ const fluidPlayerClass = function () {
 
         //Set the progressbar
         self.domRef.player.addEventListener('timeupdate', () => {
-            self.contolProgressbarUpdate();
+            self.controlProgressbarUpdate();
             self.controlDurationUpdate();
         });
 
