@@ -1161,6 +1161,7 @@ const fluidPlayerClass = function () {
             menuOptionFullscreen.innerHTML = self.displayOptions.captions.exitFullscreen;
         }
         self.fullscreenMode = true;
+        self.trackIsAdFullscreen();
     };
 
     self.fullscreenToggle = () => {

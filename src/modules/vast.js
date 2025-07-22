@@ -346,6 +346,7 @@ export default function (playerInstance, options) {
                 case 'pause':
                 case 'resume':
                 case 'rewind':
+                case 'fullscreen':
                     tmpOptions.tracking[eventType].push(trackingEvents[i].textContent.trim());
                     break;
 
@@ -1184,7 +1185,6 @@ export default function (playerInstance, options) {
         if (!playerInstance.vastOptions || !playerInstance.vastOptions.tracking || !playerInstance.vastOptions.tracking.close) {
             return;
         }
-
         playerInstance.trackSingleEvent('close');
     };
 
@@ -1195,7 +1195,6 @@ export default function (playerInstance, options) {
         if (!playerInstance.vastOptions || !playerInstance.vastOptions.tracking || !playerInstance.vastOptions.tracking.skip) {
             return;
         }
-
         playerInstance.trackSingleEvent('skip');
     };
 
@@ -1206,7 +1205,16 @@ export default function (playerInstance, options) {
         if (!playerInstance.isCurrentlyShowingNonLinearAd || !playerInstance.vastOptions || !playerInstance.vastOptions.tracking || !playerInstance.vastOptions.tracking.rewind) {
             return;
         }
-
         playerInstance.trackSingleEvent('rewind');
+    };
+
+    /**
+     * Track if the video player is set to fullscreen and add tracking to 'fullscreen' event
+     */
+    playerInstance.trackIsAdFullscreen = () => {
+        if (!playerInstance.isCurrentlyPlayingAd || !playerInstance.vastOptions || !playerInstance.vastOptions.tracking || !playerInstance.vastOptions.tracking.fullscreen) {
+            return;
+        }
+        playerInstance.trackSingleEvent('fullscreen');
     };
 }
