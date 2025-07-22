@@ -1161,7 +1161,6 @@ const fluidPlayerClass = function () {
             menuOptionFullscreen.innerHTML = self.displayOptions.captions.exitFullscreen;
         }
         self.fullscreenMode = true;
-        self.trackIsAdFullscreen();
     };
 
     self.fullscreenToggle = () => {
@@ -1171,6 +1170,7 @@ const fluidPlayerClass = function () {
         const requestFullscreenFunctionNames = self.checkFullscreenSupport();
         const fullscreenButton = videoPlayerTag.parentNode.getElementsByClassName('fluid_control_fullscreen');
         const menuOptionFullscreen = fullscreenTag.querySelector('.context_option_fullscreen');
+        const previousDisplayMode = self.getPreviousDisplayMode();
         self.resetDisplayMode('fullScreen');
 
         let functionNameToExecute;
@@ -1212,6 +1212,7 @@ const fluidPlayerClass = function () {
         self.domRef.player.addEventListener('webkitendfullscreen', () => {
             self.fullscreenOff(fullscreenButton, menuOptionFullscreen);
         });
+        self.trackPlayerSizeChanged(previousDisplayMode);
     };
 
     self.findClosestParent = (el, selector) => {
@@ -2140,6 +2141,22 @@ const fluidPlayerClass = function () {
     };
 
     /**
+     * Returns the previous display mode of the player.
+     * @returns {string}
+     */
+    self.getPreviousDisplayMode = () => {
+        if (self.fullscreenMode) {
+            return 'fullScreen';
+        } else if (self.theatreMode) {
+            return 'theaterMode';
+        } else if (self.miniPlayerToggledOn) {
+            return 'miniPlayer';
+        } else {
+            return 'normal';
+        }
+    };
+
+    /**
      * Creates the skip animation elements and appends them to the player
      *
      * @returns {void}
@@ -2975,7 +2992,7 @@ const fluidPlayerClass = function () {
             return;
         }
 
-        // Theatre and fullscreen, it's only one or the other
+        const previousDisplayMode = self.getPreviousDisplayMode();
         this.resetDisplayMode('theaterMode');
 
         // Advanced Theatre mode if specified
@@ -3008,6 +3025,8 @@ const fluidPlayerClass = function () {
         const event = document.createEvent('CustomEvent');
         event.initEvent(theatreEvent, false, true);
         self.domRef.player.dispatchEvent(event);
+
+        self.trackPlayerSizeChanged(previousDisplayMode);
 
         self.resizeVpaidAuto();
     };

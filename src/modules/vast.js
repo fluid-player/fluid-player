@@ -347,6 +347,8 @@ export default function (playerInstance, options) {
                 case 'resume':
                 case 'rewind':
                 case 'fullscreen':
+                case 'playerExpand':
+                case 'playerCollapse':
                     tmpOptions.tracking[eventType].push(trackingEvents[i].textContent.trim());
                     break;
 
@@ -1209,12 +1211,61 @@ export default function (playerInstance, options) {
     };
 
     /**
-     * Track if the video player is set to fullscreen and add tracking to 'fullscreen' event
+     * Track if the video player size has changed and add tracking for related events
+     *
+     * @param previousDisplayMode
      */
-    playerInstance.trackIsAdFullscreen = () => {
-        if (!playerInstance.isCurrentlyPlayingAd || !playerInstance.vastOptions || !playerInstance.vastOptions.tracking || !playerInstance.vastOptions.tracking.fullscreen) {
+    playerInstance.trackPlayerSizeChanged = (previousDisplayMode) => {
+        if (playerInstance.fullscreenMode) {
+            playerInstance.trackPlayerSizeExpanded();
             return;
         }
-        playerInstance.trackSingleEvent('fullscreen');
+
+        if (playerInstance.theatreMode) {
+            if (previousDisplayMode === 'miniPlayer' || previousDisplayMode === 'normal') {
+                playerInstance.trackPlayerSizeExpanded();
+            } else {
+                playerInstance.trackPlayerSizeCollapsed();
+
+            }
+            return;
+        }
+
+        if (playerInstance.miniPlayerToggledOn) {
+            playerInstance.trackPlayerSizeCollapsed();
+            return;
+        }
+
+        if (previousDisplayMode === 'miniPlayer') {
+            playerInstance.trackPlayerSizeExpanded();
+        } else {
+            playerInstance.trackPlayerSizeCollapsed();
+        }
+    };
+
+    /**
+     * Track if the video player size has expanded and add tracking for related events
+     */
+    playerInstance.trackPlayerSizeExpanded = () => {
+        if ((!playerInstance.isCurrentlyPlayingAd && !playerInstance.isCurrentlyShowingNonLinearAd) || !playerInstance.vastOptions || !playerInstance.vastOptions.tracking || (!playerInstance.vastOptions.tracking.fullscreen && !playerInstance.vastOptions.tracking.playerExpand)) {
+            return;
+        }
+        if (playerInstance.fullscreenMode && playerInstance.vastOptions.tracking.fullscreen) {
+            playerInstance.trackSingleEvent('fullscreen');
+            playerInstance.trackSingleEvent('playerExpand');
+        } else {
+            playerInstance.trackSingleEvent('playerExpand');
+        }
+
+    };
+
+    /**
+     * Track if the video player size has collapsed and add tracking for related events
+     */
+    playerInstance.trackPlayerSizeCollapsed = () => {
+        if ((!playerInstance.isCurrentlyPlayingAd && !playerInstance.isCurrentlyShowingNonLinearAd) || !playerInstance.vastOptions || !playerInstance.vastOptions.tracking || !playerInstance.vastOptions.tracking.playerCollapse) {
+            return;
+        }
+        playerInstance.trackSingleEvent('playerCollapse');
     };
 }

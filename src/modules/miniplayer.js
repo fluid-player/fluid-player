@@ -63,6 +63,7 @@ export default function (playerInstance) {
             isMobile = true;
         }
 
+        const previousDisplayMode = playerInstance.getPreviousDisplayMode();
         // Important as the player can be in full screen or theater mode
         playerInstance.resetDisplayMode('miniPlayer');
 
@@ -76,6 +77,8 @@ export default function (playerInstance) {
         } else if (forceToggle === 'on' || !playerInstance.miniPlayerToggledOn) {
             toggleMiniPlayerOn(miniPlayerOptions.width, miniPlayerOptions.height, miniPlayerOptions.widthMobile, miniPlayerOptions.position);
         }
+
+        playerInstance.trackPlayerSizeChanged(previousDisplayMode);
     }
 
     /**
@@ -265,7 +268,7 @@ export default function (playerInstance) {
         disableMiniPlayerMobile.classList.add(DISABLE_MINI_PLAYER_MOBILE_CLASS);
         const closeButton = document.createElement('span');
         closeButton.classList.add(CLOSE_BUTTON_CLASS);
-        disableMiniPlayerMobile.appendChild(closeButton); 
+        disableMiniPlayerMobile.appendChild(closeButton);
 
         disableMiniPlayerMobile.ontouchstart = event => {
             hasTriggeredAnimation = false;

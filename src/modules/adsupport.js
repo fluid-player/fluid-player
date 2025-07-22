@@ -500,6 +500,8 @@ export default function (playerInstance, options) {
             case 'resume':
             case 'rewind':
             case 'fullscreen':
+            case 'playerExpand':
+            case 'playerCollapse':
                 if (playerInstance.vastOptions.tracking[eventType] !== null) {
                     trackingUris = playerInstance.vastOptions.tracking[eventType];
                 }
