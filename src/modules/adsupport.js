@@ -389,11 +389,16 @@ export default function (playerInstance, options) {
             }
         }
 
-        if ((typeof playerInstance.vastOptions.tracking['progress'] !== 'undefined') &&
-            (playerInstance.vastOptions.tracking['progress'].length) &&
-            (typeof playerInstance.vastOptions.tracking['progress'][currentTime] !== 'undefined')) {
-
+        if (typeof playerInstance.vastOptions.tracking['progress'] !== 'undefined' &&
+            playerInstance.vastOptions.tracking['progress'].length &&
+            typeof playerInstance.vastOptions.tracking['progress'][currentTime] !== 'undefined') {
             playerInstance.trackSingleEvent('progress', currentTime);
+        }
+
+        if (typeof playerInstance.vastOptions.tracking['creativeView'] !== 'undefined' &&
+            playerInstance.vastOptions.tracking['creativeView'].length &&
+            typeof playerInstance.vastOptions.tracking['creativeView'][currentTime] !== 'undefined') {
+            playerInstance.trackSingleEvent('creativeView', currentTime);
         }
 
         if (currentTime === (Math.floor(duration / 4))) {
@@ -451,6 +456,17 @@ export default function (playerInstance, options) {
 
                     playerInstance.vastOptions.tracking['progress'][eventSubType].stopTracking = true;
                 });
+                break;
+
+            case 'creativeView':
+                if (!playerInstance.vastOptions.tracking['creativeView'] || playerInstance.vastOptions.tracking['creativeView'][eventSubType].stopTracking === true) {
+                    break;
+                }
+
+                if (playerInstance.vastOptions.tracking['creativeView'][eventSubType].elements.length) {
+                    trackingUris = playerInstance.vastOptions.tracking['creativeView'][eventSubType].elements;
+                }
+                playerInstance.vastOptions.tracking['creativeView'][eventSubType].stopTracking = true;
                 break;
 
             case 'impression':
@@ -523,6 +539,7 @@ export default function (playerInstance, options) {
         let duration = (playerInstance.rollsById[ad.rollListId].nonLinearDuration) ? playerInstance.rollsById[ad.rollListId].nonLinearDuration : false;
         if (!playerInstance.vastOptions.vpaid) {
             playerInstance.trackSingleEvent('start');
+            playerInstance.trackSingleEvent('creativeView', 0);
             duration = duration || playerInstance.vastOptions.duration;
 
             playerInstance.nonLinearTracking = setInterval(function () {

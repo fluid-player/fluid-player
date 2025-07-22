@@ -32,6 +32,7 @@
                             <Tracking event="resume">http://www.example.com/resume</Tracking>
                             <Tracking event="close">http://www.example.com/close</Tracking>
                             <Tracking event="rewind">http://www.example.com/rewind</Tracking>
+                            <Tracking event="creativeView">http://www.example.com/creativeView</Tracking>
                         </TrackingEvents>
                         <NonLinear width="480" height="90" minSuggestedDuration="00:00:10" scalable="true" maintainAspectRatio="true">
                             <StaticResource creativeType="image/png">

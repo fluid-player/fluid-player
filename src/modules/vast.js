@@ -327,7 +327,8 @@ export default function (playerInstance, options) {
                     break;
 
                 case 'progress':
-                    oneEventOffset = playerInstance.convertTimeStringToSeconds(trackingEvents[i].getAttribute('offset'));
+                case 'creativeView':
+                    oneEventOffset = playerInstance.convertTimeStringToSeconds(trackingEvents[i].getAttribute('offset')) || 0;
 
                     if (typeof tmpOptions.tracking[eventType][oneEventOffset] === 'undefined') {
                         tmpOptions.tracking[eventType][oneEventOffset] = {
