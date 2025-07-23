@@ -39,8 +39,9 @@ export default function (playerInstance) {
      *
      * @param {'on'|'off'} [forceToggle]
      * @param {boolean} manualToggle
+     * @param toAnotherDisplayTarget
      */
-    function toggleMiniPlayer(forceToggle, manualToggle = false) {
+    function toggleMiniPlayer(forceToggle, manualToggle = false, toAnotherDisplayTarget = false) {
         playerInstance.debugMessage(`[MiniPlayer] Toggling MiniPlayer, forceToggle: ${forceToggle}`);
 
         const miniPlayerOptions = playerInstance.displayOptions.layoutControls.miniPlayer;
@@ -78,7 +79,9 @@ export default function (playerInstance) {
             toggleMiniPlayerOn(miniPlayerOptions.width, miniPlayerOptions.height, miniPlayerOptions.widthMobile, miniPlayerOptions.position);
         }
 
-        playerInstance.trackPlayerSizeChanged(previousDisplayMode);
+        if (!toAnotherDisplayTarget) {
+            playerInstance.trackPlayerSizeChanged(previousDisplayMode);
+        }
     }
 
     /**

@@ -1163,7 +1163,7 @@ const fluidPlayerClass = function () {
         self.fullscreenMode = true;
     };
 
-    self.fullscreenToggle = () => {
+    self.fullscreenToggle = (toAnotherDisplayTarget = false) => {
         self.debugMessage(`Toggling Full Screen`);
         const videoPlayerTag = self.domRef.player;
         const fullscreenTag = self.domRef.wrapper;
@@ -1212,7 +1212,10 @@ const fluidPlayerClass = function () {
         self.domRef.player.addEventListener('webkitendfullscreen', () => {
             self.fullscreenOff(fullscreenButton, menuOptionFullscreen);
         });
-        self.trackPlayerSizeChanged(previousDisplayMode);
+
+        if (!toAnotherDisplayTarget) {
+            self.trackPlayerSizeChanged(previousDisplayMode);
+        }
     };
 
     self.findClosestParent = (el, selector) => {
@@ -2986,7 +2989,7 @@ const fluidPlayerClass = function () {
         });
     };
 
-    self.theatreToggle = () => {
+    self.theatreToggle = (toAnotherDisplayTarget = false) => {
         self.debugMessage(`Toggling Theater Mode`);
         if (self.isInIframe) {
             return;
@@ -3026,7 +3029,9 @@ const fluidPlayerClass = function () {
         event.initEvent(theatreEvent, false, true);
         self.domRef.player.dispatchEvent(event);
 
-        self.trackPlayerSizeChanged(previousDisplayMode);
+        if (!toAnotherDisplayTarget) {
+            self.trackPlayerSizeChanged(previousDisplayMode);
+        }
 
         self.resizeVpaidAuto();
     };
@@ -3388,15 +3393,15 @@ const fluidPlayerClass = function () {
      */
     self.resetDisplayMode = (displayTarget) => {
         if (self.fullscreenMode && displayTarget !== 'fullScreen') {
-            self.fullscreenToggle();
+            self.fullscreenToggle(true);
         }
 
         if (self.theatreMode && displayTarget !== 'theaterMode') {
-            self.theatreToggle();
+            self.theatreToggle(true);
         }
 
         if (self.miniPlayerToggledOn && displayTarget !== 'miniPlayer') {
-            self.toggleMiniPlayer('off');
+            self.toggleMiniPlayer('off', false, true);
         }
     }
 
