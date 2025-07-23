@@ -1216,56 +1216,58 @@ export default function (playerInstance, options) {
      * @param previousDisplayMode
      */
     playerInstance.trackPlayerSizeChanged = (previousDisplayMode) => {
-        if (playerInstance.fullscreenMode) {
-            playerInstance.trackPlayerSizeExpanded();
+        const {
+            isCurrentlyPlayingAd,
+            isCurrentlyShowingNonLinearAd,
+            fullscreenMode,
+            theatreMode,
+            miniPlayerToggledOn,
+            vastOptions,
+            trackSingleEvent,
+        } = playerInstance;
+
+        if ((!isCurrentlyPlayingAd && !isCurrentlyShowingNonLinearAd) || !vastOptions?.tracking) {
             return;
         }
 
-        if (playerInstance.theatreMode) {
-            if (previousDisplayMode === 'miniPlayer' || previousDisplayMode === 'normal') {
-                playerInstance.trackPlayerSizeExpanded();
-            } else {
-                playerInstance.trackPlayerSizeCollapsed();
+        const { fullscreen, playerExpand, playerCollapse } = vastOptions.tracking;
 
+        if (!fullscreen && !playerExpand && !playerCollapse) {
+            return;
+        }
+
+        // Fullscreen mode - always expansion
+        if (fullscreenMode) {
+            if (fullscreen) {
+                trackSingleEvent('fullscreen');
+            }
+            if (fullscreen || playerExpand) {
+                trackSingleEvent('playerExpand');
             }
             return;
         }
 
-        if (playerInstance.miniPlayerToggledOn) {
-            playerInstance.trackPlayerSizeCollapsed();
+        // Theatre mode - expand from smaller modes, collapse otherwise
+        if (theatreMode) {
+            const isExpandingToTheatre = previousDisplayMode === 'miniPlayer' || previousDisplayMode === 'normal';
+            if (isExpandingToTheatre && playerExpand) {
+                trackSingleEvent('playerExpand');
+            } else if (!isExpandingToTheatre && playerCollapse) {
+                trackSingleEvent('playerCollapse');
+            }
             return;
         }
 
-        if (previousDisplayMode === 'miniPlayer') {
-            playerInstance.trackPlayerSizeExpanded();
-        } else {
-            playerInstance.trackPlayerSizeCollapsed();
-        }
-    };
-
-    /**
-     * Track if the video player size has expanded and add tracking for related events
-     */
-    playerInstance.trackPlayerSizeExpanded = () => {
-        if ((!playerInstance.isCurrentlyPlayingAd && !playerInstance.isCurrentlyShowingNonLinearAd) || !playerInstance.vastOptions || !playerInstance.vastOptions.tracking || (!playerInstance.vastOptions.tracking.fullscreen && !playerInstance.vastOptions.tracking.playerExpand)) {
+        // Mini player mode - always collapse
+        if (miniPlayerToggledOn && playerCollapse) {
+            trackSingleEvent('playerCollapse');
             return;
         }
-        if (playerInstance.fullscreenMode && playerInstance.vastOptions.tracking.fullscreen) {
-            playerInstance.trackSingleEvent('fullscreen');
-            playerInstance.trackSingleEvent('playerExpand');
-        } else {
-            playerInstance.trackSingleEvent('playerExpand');
-        }
 
-    };
-
-    /**
-     * Track if the video player size has collapsed and add tracking for related events
-     */
-    playerInstance.trackPlayerSizeCollapsed = () => {
-        if ((!playerInstance.isCurrentlyPlayingAd && !playerInstance.isCurrentlyShowingNonLinearAd) || !playerInstance.vastOptions || !playerInstance.vastOptions.tracking || !playerInstance.vastOptions.tracking.playerCollapse) {
-            return;
+        if (previousDisplayMode === 'miniPlayer' && playerExpand) {
+            trackSingleEvent('playerExpand');
+        } else if (previousDisplayMode !== 'miniPlayer' && playerCollapse) {
+            trackSingleEvent('playerCollapse');
         }
-        playerInstance.trackSingleEvent('playerCollapse');
     };
 }
