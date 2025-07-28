@@ -48,6 +48,7 @@ export default function (playerInstance, options) {
                     playerInstance.addSkipButton();
                 }
 
+                playerInstance.setVpaidAdVolume(playerInstance.domRef.player.volume);
                 playerInstance.domRef.player.loop = false;
                 playerInstance.domRef.player.removeAttribute('controls'); //Remove the default Controls
 
@@ -436,6 +437,8 @@ export default function (playerInstance, options) {
             case 'complete':
             case 'close':
             case 'skip':
+            case 'acceptInvitation':
+                // currently 'acceptInvitation' can only be triggered by VPAID ads
                 if (playerInstance.vastOptions.stopTracking[eventType] === false) {
                     if (playerInstance.vastOptions.tracking[eventType] !== null) {
                         trackingUris = playerInstance.vastOptions.tracking[eventType];
@@ -459,11 +462,11 @@ export default function (playerInstance, options) {
                 break;
 
             case 'creativeView':
-                if (!playerInstance.vastOptions.tracking['creativeView'] || playerInstance.vastOptions.tracking['creativeView'][eventSubType].stopTracking === true) {
+                if (!playerInstance.vastOptions.tracking['creativeView'] || !playerInstance.vastOptions.tracking['creativeView'][eventSubType] || playerInstance.vastOptions.tracking['creativeView'][eventSubType]?.stopTracking === true) {
                     break;
                 }
 
-                if (playerInstance.vastOptions.tracking['creativeView'][eventSubType].elements.length) {
+                if (playerInstance.vastOptions.tracking['creativeView'][eventSubType]?.elements.length) {
                     trackingUris = playerInstance.vastOptions.tracking['creativeView'][eventSubType].elements;
                 }
                 playerInstance.vastOptions.tracking['creativeView'][eventSubType].stopTracking = true;
@@ -502,7 +505,10 @@ export default function (playerInstance, options) {
             case 'fullscreen':
             case 'playerExpand':
             case 'playerCollapse':
-                if (playerInstance.vastOptions.tracking[eventType] !== null) {
+            case 'collapse':
+            case 'adCollapse':
+                // currently 'collapse'/'adCollapse' can only be triggered by VPAID ads
+                if (!!playerInstance.vastOptions.tracking[eventType]) {
                     trackingUris = playerInstance.vastOptions.tracking[eventType];
                 }
                 break;
@@ -616,6 +622,7 @@ export default function (playerInstance, options) {
                 closeBtn.onclick = function (event) {
 
                     playerInstance.hardStopVpaidAd('');
+                    playerInstance.trackCloseNonLinearAd();
 
                     if (typeof event.stopImmediatePropagation !== 'undefined') {
                         event.stopImmediatePropagation();

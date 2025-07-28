@@ -1088,9 +1088,11 @@ const fluidPlayerClass = function () {
         if (0 !== self.domRef.player.volume && !self.domRef.player.muted) {
             self.domRef.player.volume = 0;
             self.domRef.player.muted = true;
+            self.setVpaidAdVolume(0);
         } else {
             self.domRef.player.volume = self.latestVolume;
             self.domRef.player.muted = false;
+            self.setVpaidAdVolume(self.latestVolume);
         }
 
         // Persistent settings
@@ -3212,6 +3214,7 @@ const fluidPlayerClass = function () {
 
     self.setVolume = (passedVolume) => {
         self.domRef.player.volume = passedVolume;
+        self.setVpaidAdVolume(passedVolume);
 
         // If user scrolls to volume 0, we should not store 0 as
         // latest volume - there is a property called "muted" already

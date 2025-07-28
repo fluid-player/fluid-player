@@ -50,12 +50,18 @@ export default function (playerInstance, options) {
     playerInstance.onVpaidAdPaused = () => {
         playerInstance.vpaidTimeoutTimerClear();
         playerInstance.debugMessage("onAdPaused");
+        if (playerInstance.vastOptions.tracking.pause) {
+            playerInstance.trackSingleEvent('pause');
+        }
     };
 
     // Callback for AdPlaying
     playerInstance.onVpaidAdPlaying = () => {
         playerInstance.vpaidTimeoutTimerClear();
         playerInstance.debugMessage("onAdPlaying");
+        if (playerInstance.vastOptions.tracking.resume) {
+            playerInstance.trackSingleEvent('resume');
+        }
     };
 
     // Callback for AdError
@@ -73,19 +79,32 @@ export default function (playerInstance, options) {
     // Callback for AdUserAcceptInvitation
     playerInstance.onVpaidAdUserAcceptInvitation = () => {
         playerInstance.debugMessage("onAdUserAcceptInvitation");
+        if (playerInstance.vastOptions.tracking.acceptInvitation) {
+            playerInstance.trackSingleEvent('acceptInvitation');
+        }
     };
 
     // Callback for AdUserMinimize
     playerInstance.onVpaidAdUserMinimize = () => {
         playerInstance.debugMessage("onAdUserMinimize");
+        if (playerInstance.vastOptions.tracking.collapse) {
+            playerInstance.trackSingleEvent('collapse');
+        }
+        if (playerInstance.vastOptions.tracking.adCollapse) {
+            playerInstance.trackSingleEvent('adCollapse');
+        }
+
     };
 
     // Callback for AdUserClose
     playerInstance.onVpaidAdUserClose = () => {
         playerInstance.debugMessage("onAdUserClose");
+        if (playerInstance.vastOptions.tracking.close) {
+            playerInstance.trackSingleEvent('close');
+        }
     };
 
-    // Callback for AdUserClose
+    // Callback for AdSkippableStateChange
     playerInstance.onVpaidAdSkippableStateChange = () => {
         if (!playerInstance.vpaidAdUnit) {
             return;
@@ -93,7 +112,7 @@ export default function (playerInstance, options) {
         playerInstance.debugMessage("Ad Skippable State Changed to: " + playerInstance.vpaidAdUnit.getAdSkippableState());
     };
 
-    // Callback for AdUserClose
+    // Callback for AdExpandedChange
     playerInstance.onVpaidAdExpandedChange = () => {
         if (!playerInstance.vpaidAdUnit) {
             return;
@@ -189,19 +208,19 @@ export default function (playerInstance, options) {
         playerInstance.trackSingleEvent('start');
     };
 
-    // Callback for AdUserClose
+    // Callback for AdVideoFirstQuartile
     playerInstance.onVpaidAdVideoFirstQuartile = () => {
         playerInstance.debugMessage("Video 25% completed");
         playerInstance.trackSingleEvent('firstQuartile');
     };
 
-    // Callback for AdUserClose
+    // Callback for AdVideoMidpoint
     playerInstance.onVpaidAdVideoMidpoint = () => {
         playerInstance.debugMessage("Video 50% completed");
         playerInstance.trackSingleEvent('midpoint');
     };
 
-    // Callback for AdUserClose
+    // Callback for AdVideoThirdQuartile
     playerInstance.onVpaidAdVideoThirdQuartile = () => {
         playerInstance.debugMessage("Video 75% completed");
         playerInstance.trackSingleEvent('thirdQuartile');
@@ -281,6 +300,9 @@ export default function (playerInstance, options) {
     // Callback for StartAd()
     playerInstance.onStartVpaidAd = () => {
         playerInstance.debugMessage("Ad has started");
+        if (playerInstance.vastOptions.tracking.creativeView) {
+            playerInstance.trackSingleEvent('creativeView', 0);
+        }
         playerInstance.vpaidTimeoutTimerClear();
     };
 
@@ -330,10 +352,12 @@ export default function (playerInstance, options) {
         playerInstance.onVpaidEnded();
     };
 
-    // Callback for AdUserClose
+    // Callback for AdSkipped
     playerInstance.onSkipVpaidAd = () => {
         playerInstance.debugMessage("Ad was skipped");
-
+        if (playerInstance.vastOptions.tracking.skip) {
+            playerInstance.trackSingleEvent('skip');
+        }
         playerInstance.vpaidTimeoutTimerClear();
         playerInstance.onVpaidEnded();
     };
@@ -344,7 +368,7 @@ export default function (playerInstance, options) {
         if (!playerInstance.vpaidAdUnit) {
             return;
         }
-        playerInstance.vpaidAdUnit.skipAd()
+        playerInstance.vpaidAdUnit.skipAd();
         playerInstance.vpaidTimeoutTimerClear();
         playerInstance.onVpaidEnded();
     };
@@ -354,6 +378,7 @@ export default function (playerInstance, options) {
         if (!playerInstance.vpaidAdUnit) {
             return;
         }
+        playerInstance.vpaidPreviousAdVolume = playerInstance.getVpaidAdVolume();
         playerInstance.vpaidAdUnit.setAdVolume(val);
     };
 
@@ -371,6 +396,13 @@ export default function (playerInstance, options) {
             return;
         }
         playerInstance.debugMessage("Ad Volume has changed to - " + playerInstance.vpaidAdUnit.getAdVolume());
+
+        if (playerInstance.vastOptions.tracking.mute && playerInstance.vpaidAdUnit.getAdVolume() === 0 && playerInstance.vpaidPreviousAdVolume > 0) {
+            playerInstance.trackSingleEvent('mute');
+        }
+        if (playerInstance.vastOptions.tracking.unmute && playerInstance.vpaidAdUnit.getAdVolume() > 0 && playerInstance.vpaidPreviousAdVolume === 0) {
+            playerInstance.trackSingleEvent('unmute');
+        }
     };
 
     playerInstance.resizeVpaidAuto = () => {
