@@ -1702,7 +1702,6 @@ const fluidPlayerClass = function () {
         }
     };
 
-    // @todo Look into this function - it is being called both on pause/resume of video player and also when moving the time slider
     self.playPauseToggle = () => {
         self.hideSuggestedVideos();
         const isFirstStart = !self.firstPlayLaunched;
@@ -1737,7 +1736,9 @@ const fluidPlayerClass = function () {
                         self.dashPlayer.play();
                     } else {
                         self.domRef.player.play();
-                        self.trackPlayPauseChange();
+                        if (!self.fluidPseudoPause) {
+                            self.trackPlayPauseChange();
+                        }
                     }
                 }
 
