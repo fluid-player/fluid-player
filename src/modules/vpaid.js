@@ -1,5 +1,25 @@
 // VPAID support module
+import {trackingEventTypes} from '../constants/constants';
+
 export default function (playerInstance, options) {
+    const {
+        muteEvent,
+        unmuteEvent,
+        pauseEvent,
+        resumeEvent,
+        skipEvent,
+        impressionEvent,
+        startEvent,
+        firstQuartileEvent,
+        midpointEvent,
+        thirdQuartileEvent,
+        completeEvent,
+        creativeViewEvent,
+        collapseEvent,
+        adCollapseEvent,
+        closeEvent
+    } = trackingEventTypes;
+
     const callbacks = {
         AdStarted: () => playerInstance.onStartVpaidAd,
         AdStopped: () => playerInstance.onStopVpaidAd,
@@ -51,7 +71,7 @@ export default function (playerInstance, options) {
         playerInstance.vpaidTimeoutTimerClear();
         playerInstance.debugMessage("onAdPaused");
         if (playerInstance.vastOptions.tracking.pause) {
-            playerInstance.trackSingleEvent('pause');
+            playerInstance.trackSingleEvent(pauseEvent);
         }
     };
 
@@ -60,7 +80,7 @@ export default function (playerInstance, options) {
         playerInstance.vpaidTimeoutTimerClear();
         playerInstance.debugMessage("onAdPlaying");
         if (playerInstance.vastOptions.tracking.resume) {
-            playerInstance.trackSingleEvent('resume');
+            playerInstance.trackSingleEvent(resumeEvent);
         }
     };
 
@@ -80,7 +100,7 @@ export default function (playerInstance, options) {
     playerInstance.onVpaidAdUserAcceptInvitation = () => {
         playerInstance.debugMessage("onAdUserAcceptInvitation");
         if (playerInstance.vastOptions.tracking.acceptInvitation) {
-            playerInstance.trackSingleEvent('acceptInvitation');
+            playerInstance.trackSingleEvent(acceptInvitationevent);
         }
     };
 
@@ -88,10 +108,10 @@ export default function (playerInstance, options) {
     playerInstance.onVpaidAdUserMinimize = () => {
         playerInstance.debugMessage("onAdUserMinimize");
         if (playerInstance.vastOptions.tracking.collapse) {
-            playerInstance.trackSingleEvent('collapse');
+            playerInstance.trackSingleEvent(collapseEvent);
         }
         if (playerInstance.vastOptions.tracking.adCollapse) {
-            playerInstance.trackSingleEvent('adCollapse');
+            playerInstance.trackSingleEvent(adCollapseEvent);
         }
 
     };
@@ -100,7 +120,7 @@ export default function (playerInstance, options) {
     playerInstance.onVpaidAdUserClose = () => {
         playerInstance.debugMessage("onAdUserClose");
         if (playerInstance.vastOptions.tracking.close) {
-            playerInstance.trackSingleEvent('close');
+            playerInstance.trackSingleEvent(closeEvent);
         }
     };
 
@@ -179,7 +199,7 @@ export default function (playerInstance, options) {
         playerInstance.debugMessage("Ad Impression");
 
         //Announce the impressions
-        playerInstance.trackSingleEvent('impression');
+        playerInstance.trackSingleEvent(impressionEvent);
     };
 
     // Callback for AdClickThru
@@ -205,31 +225,31 @@ export default function (playerInstance, options) {
     // Callback for AdVideoStart
     playerInstance.onVpaidAdVideoStart = () => {
         playerInstance.debugMessage("Video 0% completed");
-        playerInstance.trackSingleEvent('start');
+        playerInstance.trackSingleEvent(startEvent);
     };
 
     // Callback for AdVideoFirstQuartile
     playerInstance.onVpaidAdVideoFirstQuartile = () => {
         playerInstance.debugMessage("Video 25% completed");
-        playerInstance.trackSingleEvent('firstQuartile');
+        playerInstance.trackSingleEvent(firstQuartileEvent);
     };
 
     // Callback for AdVideoMidpoint
     playerInstance.onVpaidAdVideoMidpoint = () => {
         playerInstance.debugMessage("Video 50% completed");
-        playerInstance.trackSingleEvent('midpoint');
+        playerInstance.trackSingleEvent(midpointEvent);
     };
 
     // Callback for AdVideoThirdQuartile
     playerInstance.onVpaidAdVideoThirdQuartile = () => {
         playerInstance.debugMessage("Video 75% completed");
-        playerInstance.trackSingleEvent('thirdQuartile');
+        playerInstance.trackSingleEvent(thirdQuartileEvent);
     };
 
     // Callback for AdVideoComplete
     playerInstance.onVpaidAdVideoComplete = () => {
         playerInstance.debugMessage("Video 100% completed");
-        playerInstance.trackSingleEvent('complete');
+        playerInstance.trackSingleEvent(completeEvent);
     };
 
     // Callback for AdLinearChange
@@ -301,7 +321,7 @@ export default function (playerInstance, options) {
     playerInstance.onStartVpaidAd = () => {
         playerInstance.debugMessage("Ad has started");
         if (playerInstance.vastOptions.tracking.creativeView) {
-            playerInstance.trackSingleEvent('creativeView', 0);
+            playerInstance.trackSingleEvent(creativeViewEvent, 0);
         }
         playerInstance.vpaidTimeoutTimerClear();
     };
@@ -356,7 +376,7 @@ export default function (playerInstance, options) {
     playerInstance.onSkipVpaidAd = () => {
         playerInstance.debugMessage("Ad was skipped");
         if (playerInstance.vastOptions.tracking.skip) {
-            playerInstance.trackSingleEvent('skip');
+            playerInstance.trackSingleEvent(skipEvent);
         }
         playerInstance.vpaidTimeoutTimerClear();
         playerInstance.onVpaidEnded();
@@ -398,10 +418,10 @@ export default function (playerInstance, options) {
         playerInstance.debugMessage("Ad Volume has changed to - " + playerInstance.vpaidAdUnit.getAdVolume());
 
         if (playerInstance.vastOptions.tracking.mute && playerInstance.vpaidAdUnit.getAdVolume() === 0 && playerInstance.vpaidPreviousAdVolume > 0) {
-            playerInstance.trackSingleEvent('mute');
+            playerInstance.trackSingleEvent(muteEvent);
         }
         if (playerInstance.vastOptions.tracking.unmute && playerInstance.vpaidAdUnit.getAdVolume() > 0 && playerInstance.vpaidPreviousAdVolume === 0) {
-            playerInstance.trackSingleEvent('unmute');
+            playerInstance.trackSingleEvent(unmuteEvent);
         }
     };
 

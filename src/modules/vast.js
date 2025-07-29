@@ -1,5 +1,7 @@
 // VAST support module
 
+import { trackingEventTypes } from '../constants/constants';
+
 /* Type declarations */
 
 /**
@@ -32,6 +34,25 @@
  */
 
 export default function (playerInstance, options) {
+    const {
+        muteEvent,
+        unmuteEvent,
+        pauseEvent,
+        resumeEvent,
+        rewindEvent,
+        fullscreenEvent,
+        skipEvent,
+        playerExpandEvent,
+        playerCollapseEvent,
+        startEvent,
+        firstQuartileEvent,
+        midpointEvent,
+        thirdQuartileEvent,
+        completeEvent,
+        progressEvent,
+        creativeViewEvent,
+        closeEvent,
+    } = trackingEventTypes;
     /**
      * Gets CTA parameters from VAST and sets them on tempOptions
      *
@@ -311,13 +332,13 @@ export default function (playerInstance, options) {
             }
 
             switch (eventType) {
-                case 'start':
-                case 'firstQuartile':
-                case 'midpoint':
-                case 'thirdQuartile':
-                case 'complete':
-                case 'close':
-                case 'skip':
+                case startEvent:
+                case firstQuartileEvent:
+                case midpointEvent:
+                case thirdQuartileEvent:
+                case completeEvent:
+                case closeEvent:
+                case skipEvent:
                     if (typeof tmpOptions.stopTracking[eventType] === 'undefined') {
                         tmpOptions.stopTracking[eventType] = [];
                     }
@@ -326,8 +347,8 @@ export default function (playerInstance, options) {
 
                     break;
 
-                case 'progress':
-                case 'creativeView':
+                case progressEvent:
+                case creativeViewEvent:
                     oneEventOffset = playerInstance.convertTimeStringToSeconds(trackingEvents[i].getAttribute('offset')) || 0;
 
                     if (typeof tmpOptions.tracking[eventType][oneEventOffset] === 'undefined') {
@@ -341,14 +362,14 @@ export default function (playerInstance, options) {
 
                     break;
 
-                case 'mute':
-                case 'unmute':
-                case 'pause':
-                case 'resume':
-                case 'rewind':
-                case 'fullscreen':
-                case 'playerExpand':
-                case 'playerCollapse':
+                case muteEvent:
+                case unmuteEvent:
+                case pauseEvent:
+                case resumeEvent:
+                case rewindEvent:
+                case fullscreenEvent:
+                case playerExpandEvent:
+                case playerCollapseEvent:
                     tmpOptions.tracking[eventType].push(trackingEvents[i].textContent.trim());
                     break;
 
@@ -1159,9 +1180,9 @@ export default function (playerInstance, options) {
         }
 
         if (playerInstance.domRef.player.muted) {
-            playerInstance.trackSingleEvent('mute');
+            playerInstance.trackSingleEvent(muteEvent);
         } else {
-            playerInstance.trackSingleEvent('unmute');
+            playerInstance.trackSingleEvent(unmuteEvent);
         }
     };
 
@@ -1174,9 +1195,9 @@ export default function (playerInstance, options) {
         }
 
         if (playerInstance.domRef.player.paused) {
-            playerInstance.trackSingleEvent('pause');
+            playerInstance.trackSingleEvent(pauseEvent);
         } else {
-            playerInstance.trackSingleEvent('resume');
+            playerInstance.trackSingleEvent(resumeEvent);
         }
     };
 
@@ -1187,7 +1208,7 @@ export default function (playerInstance, options) {
         if (!playerInstance.vastOptions || !playerInstance.vastOptions.tracking || !playerInstance.vastOptions.tracking.close) {
             return;
         }
-        playerInstance.trackSingleEvent('close');
+        playerInstance.trackSingleEvent(closeEvent);
     };
 
     /**
@@ -1197,7 +1218,7 @@ export default function (playerInstance, options) {
         if (!playerInstance.vastOptions || !playerInstance.vastOptions.tracking || !playerInstance.vastOptions.tracking.skip) {
             return;
         }
-        playerInstance.trackSingleEvent('skip');
+        playerInstance.trackSingleEvent(skipEvent);
     };
 
     /**
@@ -1207,7 +1228,7 @@ export default function (playerInstance, options) {
         if (!playerInstance.isCurrentlyShowingNonLinearAd || !playerInstance.vastOptions || !playerInstance.vastOptions.tracking || !playerInstance.vastOptions.tracking.rewind) {
             return;
         }
-        playerInstance.trackSingleEvent('rewind');
+        playerInstance.trackSingleEvent(rewindEvent);
     };
 
     /**
@@ -1239,10 +1260,10 @@ export default function (playerInstance, options) {
         // Fullscreen mode - always expansion
         if (fullscreenMode) {
             if (fullscreen) {
-                trackSingleEvent('fullscreen');
+                trackSingleEvent(fullscreenEvent);
             }
             if (fullscreen || playerExpand) {
-                trackSingleEvent('playerExpand');
+                trackSingleEvent(playerExpandEvent);
             }
             return;
         }
@@ -1251,23 +1272,23 @@ export default function (playerInstance, options) {
         if (theatreMode) {
             const isExpandingToTheatre = previousDisplayMode === 'miniPlayer' || previousDisplayMode === 'normal';
             if (isExpandingToTheatre && playerExpand) {
-                trackSingleEvent('playerExpand');
+                trackSingleEvent(playerExpandEvent);
             } else if (!isExpandingToTheatre && playerCollapse) {
-                trackSingleEvent('playerCollapse');
+                trackSingleEvent(playerCollapseEvent);
             }
             return;
         }
 
         // Mini player mode - always collapse
         if (miniPlayerToggledOn && playerCollapse) {
-            trackSingleEvent('playerCollapse');
+            trackSingleEvent(playerCollapseEvent);
             return;
         }
 
         if (previousDisplayMode === 'miniPlayer' && playerExpand) {
-            trackSingleEvent('playerExpand');
+            trackSingleEvent(playerExpandEvent);
         } else if (previousDisplayMode !== 'miniPlayer' && playerCollapse) {
-            trackSingleEvent('playerCollapse');
+            trackSingleEvent(playerCollapseEvent);
         }
     };
 }
