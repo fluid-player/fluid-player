@@ -3,8 +3,6 @@ import { displayModes, trackingEventTypes } from '../constants/constants';
 
 export default function (playerInstance, options) {
     const {
-        muteEvent,
-        unmuteEvent,
         pauseEvent,
         resumeEvent,
         skipEvent,
@@ -17,7 +15,8 @@ export default function (playerInstance, options) {
         creativeViewEvent,
         collapseEvent,
         adCollapseEvent,
-        closeEvent
+        closeEvent,
+        acceptInvitationEvent
     } = trackingEventTypes;
 
     const callbacks = {
@@ -100,7 +99,7 @@ export default function (playerInstance, options) {
     playerInstance.onVpaidAdUserAcceptInvitation = () => {
         playerInstance.debugMessage("onAdUserAcceptInvitation");
         if (playerInstance.vastOptions.tracking.acceptInvitation) {
-            playerInstance.trackSingleEvent(acceptInvitationevent);
+            playerInstance.trackSingleEvent(acceptInvitationEvent);
         }
     };
 
