@@ -1,5 +1,5 @@
 // VPAID support module
-import {trackingEventTypes} from '../constants/constants';
+import { displayModes, trackingEventTypes } from '../constants/constants';
 
 export default function (playerInstance, options) {
     const {
@@ -429,7 +429,7 @@ export default function (playerInstance, options) {
         if (playerInstance.vastOptions !== null && playerInstance.vastOptions.vpaid && playerInstance.vastOptions.linear) {
             const adWidth = playerInstance.domRef.player.offsetWidth;
             const adHeight = playerInstance.domRef.player.offsetHeight;
-            const mode = (playerInstance.fullscreenMode ? 'fullscreen' : 'normal');
+            const mode = (playerInstance.fullscreenMode ? displayModes.FULLSCREEN : displayModes.NORMAL);
             playerInstance.resizeVpaidAd(adWidth, adHeight, mode);
         }
     };

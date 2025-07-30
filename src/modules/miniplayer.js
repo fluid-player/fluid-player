@@ -1,3 +1,5 @@
+import { displayModes } from '../constants/constants';
+
 export default function (playerInstance) {
     // Module constants
     const MINIMUM_WIDTH = 400; // Pixels
@@ -66,7 +68,7 @@ export default function (playerInstance) {
 
         const previousDisplayMode = playerInstance.getPreviousDisplayMode();
         // Important as the player can be in full screen or theater mode
-        playerInstance.resetDisplayMode('miniPlayer');
+        playerInstance.resetDisplayMode(displayModes.MINI_PLAYER);
 
         if (!isSetup) {
             // Setups JIT to avoid extra processing

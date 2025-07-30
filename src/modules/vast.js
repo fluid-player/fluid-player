@@ -1,6 +1,6 @@
 // VAST support module
 
-import { trackingEventTypes } from '../constants/constants';
+import { displayModes, trackingEventTypes } from '../constants/constants';
 
 /* Type declarations */
 
@@ -1270,7 +1270,7 @@ export default function (playerInstance, options) {
 
         // Theatre mode - expand from smaller modes, collapse otherwise
         if (theatreMode) {
-            const isExpandingToTheatre = previousDisplayMode === 'miniPlayer' || previousDisplayMode === 'normal';
+            const isExpandingToTheatre = previousDisplayMode === displayModes.MINI_PLAYER || previousDisplayMode === displayModes.NORMAL;
             if (isExpandingToTheatre && playerExpand) {
                 trackSingleEvent(playerExpandEvent);
             } else if (!isExpandingToTheatre && playerCollapse) {
@@ -1285,9 +1285,9 @@ export default function (playerInstance, options) {
             return;
         }
 
-        if (previousDisplayMode === 'miniPlayer' && playerExpand) {
+        if (previousDisplayMode === displayModes.MINI_PLAYER && playerExpand) {
             trackSingleEvent(playerExpandEvent);
-        } else if (previousDisplayMode !== 'miniPlayer' && playerCollapse) {
+        } else if (previousDisplayMode !== displayModes.MINI_PLAYER && playerCollapse) {
             trackSingleEvent(playerCollapseEvent);
         }
     };

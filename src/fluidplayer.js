@@ -1,5 +1,7 @@
 'use strict';
 
+import { displayModes } from './constants/constants';
+
 // Player modules
 import VPAIDModule from './modules/vpaid';
 import VASTModule from './modules/vast';
@@ -1173,7 +1175,7 @@ const fluidPlayerClass = function () {
         const fullscreenButton = videoPlayerTag.parentNode.getElementsByClassName('fluid_control_fullscreen');
         const menuOptionFullscreen = fullscreenTag.querySelector('.context_option_fullscreen');
         const previousDisplayMode = self.getPreviousDisplayMode();
-        self.resetDisplayMode('fullScreen');
+        self.resetDisplayMode(displayModes.FULLSCREEN);
 
         let functionNameToExecute;
 
@@ -2152,13 +2154,13 @@ const fluidPlayerClass = function () {
      */
     self.getPreviousDisplayMode = () => {
         if (self.fullscreenMode) {
-            return 'fullScreen';
+            return displayModes.FULLSCREEN;
         } else if (self.theatreMode) {
-            return 'theaterMode';
+            return displayModes.THEATER;
         } else if (self.miniPlayerToggledOn) {
-            return 'miniPlayer';
+            return displayModes.MINI_PLAYER;
         } else {
-            return 'normal';
+            return displayModes.NORMAL;
         }
     };
 
@@ -2999,7 +3001,7 @@ const fluidPlayerClass = function () {
         }
 
         const previousDisplayMode = self.getPreviousDisplayMode();
-        this.resetDisplayMode('theaterMode');
+        this.resetDisplayMode(displayModes.THEATER);
 
         // Advanced Theatre mode if specified
         if (self.displayOptions.layoutControls.theatreAdvanced) {
@@ -3393,18 +3395,18 @@ const fluidPlayerClass = function () {
     /**
      * Resets all display types that are not the target display mode
      *
-     * @param {'fullScreen'|'theaterMode'|'miniPlayer'} displayTarget
+     * @param {'fullscreen'|'theaterMode'|'miniPlayer'} displayTarget
      */
     self.resetDisplayMode = (displayTarget) => {
-        if (self.fullscreenMode && displayTarget !== 'fullScreen') {
+        if (self.fullscreenMode && displayTarget !== displayModes.FULLSCREEN) {
             self.fullscreenToggle(true);
         }
 
-        if (self.theatreMode && displayTarget !== 'theaterMode') {
+        if (self.theatreMode && displayTarget !== displayModes.THEATER) {
             self.theatreToggle(true);
         }
 
-        if (self.miniPlayerToggledOn && displayTarget !== 'miniPlayer') {
+        if (self.miniPlayerToggledOn && displayTarget !== displayModes.MINI_PLAYER) {
             self.toggleMiniPlayer('off', false, true);
         }
     }

@@ -1,4 +1,4 @@
-import { trackingEventTypes } from '../constants/constants';
+import { displayModes, trackingEventTypes } from '../constants/constants';
 
 export default function (playerInstance, options) {
     const VPAID_VERSION = '2.0';
@@ -78,7 +78,7 @@ export default function (playerInstance, options) {
                 playerInstance.domRef.player.removeAttribute('controls'); //Remove the default Controls
 
                 playerInstance.vpaidCallbackListenersAttach();
-                const mode = (playerInstance.fullscreenMode ? 'fullscreen' : 'normal');
+                const mode = (playerInstance.fullscreenMode ? displayModes.FULLSCREEN : displayModes.NORMAL);
                 const adWidth = playerInstance.domRef.player.offsetWidth;
                 const adHeight = playerInstance.domRef.player.offsetHeight;
                 playerInstance.vpaidAdUnit.initAd(adWidth, adHeight, mode, 3000, creativeData, environmentVars);
@@ -451,6 +451,8 @@ export default function (playerInstance, options) {
             return;
         }
 
+        console.log('event: ', eventType);
+
         let trackingUris = [];
         trackingUris.length = 0;
 
@@ -712,7 +714,7 @@ export default function (playerInstance, options) {
             playerInstance.domRef.player.removeAttribute('controls'); //Remove the default Controls
 
             playerInstance.vpaidCallbackListenersAttach();
-            const mode = (playerInstance.fullscreenMode ? 'fullscreen' : 'normal');
+            const mode = (playerInstance.fullscreenMode ? displayModes.FULLSCREEN : displayModes.NORMAL);
             playerInstance.vpaidAdUnit.initAd(adWidth, adHeight, mode, 3000, creativeData, environmentVars);
 
             playerInstance.toggleLoader(false);

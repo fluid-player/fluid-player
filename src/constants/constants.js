@@ -31,24 +31,8 @@ export const trackingEventTypes = {
 }
 
 export const displayModes = {
-    FULLSCREEN: 'fullScreen',
+    FULLSCREEN: 'fullscreen',
     THEATER: 'theaterMode',
     MINI_PLAYER: 'miniPlayer',
     NORMAL: 'normal',
-}
-
-export const vastTags = {
-    inLineTag: 'InLine',
-    linearTag: 'Linear',
-    nonLinearTag: 'NonLinear',
-    videoClicksTag: 'VideoClicks',
-    clickThroughTag: 'ClickThrough',
-    clickTrackingTag: 'ClickTracking',
-    customClickTag: 'CustomClick',
-    nonLinearClickTrackingTag: 'NonLinearClickTracking',
-    nonLinearClickThroughTag: 'NonLinearClickThrough',
-    impressionTag: 'Impression',
-    viewableTag: 'Viewable',
-    errorTag: 'Error',
-    titleCtaTag: 'TitleCTA',
 }
