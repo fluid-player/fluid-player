@@ -398,7 +398,6 @@ export default function (playerInstance, options) {
         if (!playerInstance.vpaidAdUnit) {
             return;
         }
-        playerInstance.vpaidPreviousAdVolume = playerInstance.getVpaidAdVolume();
         playerInstance.vpaidAdUnit.setAdVolume(val);
     };
 
@@ -416,13 +415,6 @@ export default function (playerInstance, options) {
             return;
         }
         playerInstance.debugMessage("Ad Volume has changed to - " + playerInstance.vpaidAdUnit.getAdVolume());
-
-        if (playerInstance.vastOptions.tracking.mute && playerInstance.vpaidAdUnit.getAdVolume() === 0 && playerInstance.vpaidPreviousAdVolume > 0) {
-            playerInstance.trackSingleEvent(muteEvent);
-        }
-        if (playerInstance.vastOptions.tracking.unmute && playerInstance.vpaidAdUnit.getAdVolume() > 0 && playerInstance.vpaidPreviousAdVolume === 0) {
-            playerInstance.trackSingleEvent(unmuteEvent);
-        }
     };
 
     playerInstance.resizeVpaidAuto = () => {

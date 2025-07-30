@@ -73,7 +73,6 @@ export default function (playerInstance, options) {
                     playerInstance.addSkipButton();
                 }
 
-                playerInstance.setVpaidAdVolume(playerInstance.domRef.player.volume);
                 playerInstance.domRef.player.loop = false;
                 playerInstance.domRef.player.removeAttribute('controls'); //Remove the default Controls
 
@@ -450,8 +449,6 @@ export default function (playerInstance, options) {
         if (typeof playerInstance.vastOptions === 'undefined' || playerInstance.vastOptions === null) {
             return;
         }
-
-        console.log('event: ', eventType);
 
         let trackingUris = [];
         trackingUris.length = 0;
