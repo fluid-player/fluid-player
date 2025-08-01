@@ -51,7 +51,10 @@ export default function (playerInstance, options) {
         completeEvent,
         progressEvent,
         creativeViewEvent,
+        collapseEvent,
+        adCollapseEvent,
         closeEvent,
+        acceptInvitationEvent
     } = trackingEventTypes;
     /**
      * Gets CTA parameters from VAST and sets them on tempOptions
@@ -339,6 +342,7 @@ export default function (playerInstance, options) {
                 case completeEvent:
                 case closeEvent:
                 case skipEvent:
+                case acceptInvitationEvent:
                     if (typeof tmpOptions.stopTracking[eventType] === 'undefined') {
                         tmpOptions.stopTracking[eventType] = [];
                     }
@@ -370,6 +374,8 @@ export default function (playerInstance, options) {
                 case fullscreenEvent:
                 case playerExpandEvent:
                 case playerCollapseEvent:
+                case collapseEvent:
+                case adCollapseEvent:
                     tmpOptions.tracking[eventType].push(trackingEvents[i].textContent.trim());
                     break;
 
