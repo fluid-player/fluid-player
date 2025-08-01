@@ -28,14 +28,12 @@
                             <Tracking event="complete">http://www.example.com/complete</Tracking>
                             <Tracking event="mute">http://www.example.com/mute</Tracking>
                             <Tracking event="unmute">http://www.example.com/unmute</Tracking>
-                            <Tracking event="rewind">http://www.example.com/rewind</Tracking>
                             <Tracking event="pause">http://www.example.com/pause</Tracking>
                             <Tracking event="resume">http://www.example.com/resume</Tracking>
                             <Tracking event="fullscreen">http://www.example.com/fullscreen</Tracking>
                             <Tracking event="playerExpand">http://www.example.com/playerExpand</Tracking>
                             <Tracking event="playerCollapse">http://www.example.com/playerCollapse</Tracking>
                             <Tracking event="creativeView" offset="00:00:05">http://www.example.com/creativeView</Tracking>
-                            <Tracking event="acceptInvitation">http://www.example.com/acceptInvitation</Tracking>
                             <Tracking event="skip">http://www.example.com/skip</Tracking>
                             <Tracking event="progress" offset="00:00:05">http://www.example.com/progress5</Tracking>
                             <Tracking event="progress" offset="00:00:10">http://www.example.com/progress10</Tracking>
