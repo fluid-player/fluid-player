@@ -20,7 +20,7 @@
 			<Creatives>
 				<Creative sequence="1">
 					<Linear skipoffset="00:00:03">
-						<Duration>00:00:10</Duration>
+						<Duration>00:00:00</Duration>
 						<TrackingEvents>
                             <Tracking event="start">http://www.example.com/start</Tracking>
                             <Tracking event="firstQuartile">http://www.example.com/firstQuartile</Tracking>
