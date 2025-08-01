@@ -453,21 +453,10 @@ VpaidVideoPlayer.prototype.callEvent_ = function(eventType) {
     }
 };
 
-VpaidVideoPlayer.prototype.simulateAcceptInvitation = function () {
-    if (this.eventsCallbacks_ && typeof this.eventsCallbacks_['AdUserAcceptInvitation'] === 'function') {
-        this.callEvent_('AdUserAcceptInvitation');
-    } else {
-        console.warn('AdUserAcceptInvitation callback is not defined');
-    }
-};
-
-var vpaidAd;
-
 /**
  * Main function called by wrapper to get the VPAID ad.
  * @return {Object} The VPAID compliant ad.
  */
 var getVPAIDAd = function() {
-    vpaidAd = new VpaidVideoPlayer();
-    return vpaidAd;
+    return new VpaidVideoPlayer();
 };

@@ -29,12 +29,10 @@
                             <Tracking event="complete">http://www.example.com/complete</Tracking>
                             <Tracking event="mute">http://www.example.com/mute</Tracking>
                             <Tracking event="unmute">http://www.example.com/unmute</Tracking>
-                            <Tracking event="rewind">http://www.example.com/rewind</Tracking>
                             <Tracking event="pause">http://www.example.com/pause</Tracking>
                             <Tracking event="resume">http://www.example.com/resume</Tracking>
                             <Tracking event="fullscreen">http://www.example.com/fullscreen</Tracking>
                             <Tracking event="playerExpand">http://www.example.com/playerExpand</Tracking>
-                            <Tracking event="adCollapse">http://www.example.com/adCollapse</Tracking>
                             <Tracking event="playerCollapse">http://www.example.com/playerCollapse</Tracking>
                             <Tracking event="creativeView">http://www.example.com/creativeView</Tracking>
                             <Tracking event="acceptInvitation">http://www.example.com/acceptInvitation</Tracking>
