@@ -105,24 +105,31 @@ export default function (playerInstance, options) {
 
     playerInstance.cardBoardSwitchToNormal = () => {
         const vrJoystickPanel = playerInstance.domRef.wrapper.querySelector('.fluid_vr_joystick_panel');
-        const controlBar = playerInstance.domRef.wrapper.querySelector('.fluid_controls_container')
         const videoPlayerTag = playerInstance.domRef.player;
+        let controlBars = videoPlayerTag.parentNode.getElementsByClassName('fluid_controls_container');
 
         playerInstance.vrViewer.enableEffect(PANOLENS.MODES.NORMAL);
         playerInstance.vrViewer.onWindowResize();
         playerInstance.vrMode = false;
 
+        const controlBarsArr = Array.from(controlBars);
+        const secondControlBarIndex = controlBarsArr.findIndex(control => control.classList.contains('fluid_vr2_controls_container'));
+
         // remove dual control bar
-        const newControlBar = videoPlayerTag.parentNode.getElementsByClassName('fluid_vr2_controls_container')[0];
-        videoPlayerTag.parentNode.removeChild(newControlBar);
+        if (secondControlBarIndex !== -1) {
+            const secondControlBar = controlBars[secondControlBarIndex];
+            const originalControlBar = controlBarsArr.find((el, i) => i !== secondControlBarIndex);
+
+            videoPlayerTag.parentNode.removeChild(secondControlBar);
+            originalControlBar?.classList.remove("fluid_vr_controls_container");
+        }
 
         if (playerInstance.displayOptions.layoutControls.showCardBoardJoystick && vrJoystickPanel) {
             vrJoystickPanel.style.display = "block";
         }
-        controlBar.classList.remove("fluid_vr_controls_container");
 
         // show volume control bar
-        const volumeContainer = playerInstance.domRef.wrapper.getElementById('.fluid_control_volume_container');
+        const volumeContainer = playerInstance.domRef.wrapper.querySelector('.fluid_control_volume_container');
         volumeContainer.style.display = "block";
 
         // show all ads overlays if any
@@ -228,6 +235,7 @@ export default function (playerInstance, options) {
         const controlBar = playerInstance.domRef.wrapper.querySelector('.fluid_controls_container')
 
         timePlaceholder.classList.add("cardboard_time");
+        // @todo this is where the time info is moved above the control bar
         controlBar.appendChild(timePlaceholder);
 
         // override the time display function for this instance
