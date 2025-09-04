@@ -1,14 +1,17 @@
 # CHANGELOG
 
+## 3.56.0 (2025-09-04)
+* [Pull #905](https://github.com/fluid-player/fluid-player/pull/905) Fix control bar width on VR cardboard mode toggle
+
 ## 3.55.0 (2025-07-16)
-* [Pull #901](https://github.com/fluid-player/fluid-player-docs/pull/901) Subtitle vtt files are requested with credentials
+* [Pull #901](https://github.com/fluid-player/fluid-player/pull/901) Subtitle vtt files are requested with credentials
 
 ## 3.54.0 (2025-06-18)
-* [Pull #897](https://github.com/fluid-player/fluid-player-docs/pull/897) Video will start from beginning after VAST end
+* [Pull #897](https://github.com/fluid-player/fluid-player/pull/897) Video will start from beginning after VAST end
 
 ## 3.53.0 (2025-05-13)
-* [Pull #885](https://github.com/fluid-player/fluid-player-docs/pull/885) Trying to download data from AdParameters vast/vpaid tag
-* [Pull #889](https://github.com/fluid-player/fluid-player-docs/pull/889) VPAID not playing (not initialized properly?)
+* [Pull #885](https://github.com/fluid-player/fluid-player/pull/885) Trying to download data from AdParameters vast/vpaid tag
+* [Pull #889](https://github.com/fluid-player/fluid-player/pull/889) VPAID not playing (not initialized properly?)
 
 ## 3.52.0 (2025-04-02)
 * [Pull #882](https://github.com/fluid-player/fluid-player/pull/882) Add an option to set the subtitles' size
