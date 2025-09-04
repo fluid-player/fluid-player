@@ -1,6 +1,31 @@
+import { displayModes, trackingEventTypes } from '../constants/constants';
 
 export default function (playerInstance, options) {
     const VPAID_VERSION = '2.0';
+    const {
+        muteEvent,
+        unmuteEvent,
+        pauseEvent,
+        resumeEvent,
+        rewindEvent,
+        fullscreenEvent,
+        skipEvent,
+        playerExpandEvent,
+        playerCollapseEvent,
+        impressionEvent,
+        viewImpressionEvent,
+        startEvent,
+        firstQuartileEvent,
+        midpointEvent,
+        thirdQuartileEvent,
+        completeEvent,
+        progressEvent,
+        creativeViewEvent,
+        collapseEvent,
+        adCollapseEvent,
+        closeEvent,
+        acceptInvitationEvent
+    } = trackingEventTypes;
 
     playerInstance.renderLinearAd = (ad, backupTheVideoTime) => {
         playerInstance.toggleLoader(false);
@@ -52,7 +77,7 @@ export default function (playerInstance, options) {
                 playerInstance.domRef.player.removeAttribute('controls'); //Remove the default Controls
 
                 playerInstance.vpaidCallbackListenersAttach();
-                const mode = (playerInstance.fullscreenMode ? 'fullscreen' : 'normal');
+                const mode = (playerInstance.fullscreenMode ? displayModes.FULLSCREEN : displayModes.NORMAL);
                 const adWidth = playerInstance.domRef.player.offsetWidth;
                 const adHeight = playerInstance.domRef.player.offsetHeight;
                 playerInstance.vpaidAdUnit.initAd(adWidth, adHeight, mode, 3000, creativeData, environmentVars);
@@ -127,7 +152,7 @@ export default function (playerInstance, options) {
                 playerInstance.domRef.player.play();
 
                 //Announce the impressions
-                playerInstance.trackSingleEvent('impression');
+                playerInstance.trackSingleEvent(impressionEvent);
 
                 playerInstance.domRef.player.removeEventListener('loadedmetadata', playerInstance.switchPlayerToVastMode);
 
@@ -375,7 +400,7 @@ export default function (playerInstance, options) {
 
     playerInstance.scheduleTrackingEvent = (currentTime, duration) => {
         if (currentTime === 0) {
-            playerInstance.trackSingleEvent('start');
+            playerInstance.trackSingleEvent(startEvent);
             playerInstance.observe();
             playerInstance.domRef.player.timeInView = 0;
         }
@@ -383,33 +408,38 @@ export default function (playerInstance, options) {
         // View Impression is defined by IAB as: Watching at least 2 seconds of the video where at least 50% of the ad’s pixels are visible on the screen
         if (playerInstance.domRef.player.inView) {
             if (playerInstance.domRef.player.timeInView > 2) {
-                playerInstance.trackSingleEvent('viewImpression');
+                playerInstance.trackSingleEvent(viewImpressionEvent);
             } else {
                 playerInstance.domRef.player.timeInView += currentTime;
             }
         }
 
-        if ((typeof playerInstance.vastOptions.tracking['progress'] !== 'undefined') &&
-            (playerInstance.vastOptions.tracking['progress'].length) &&
-            (typeof playerInstance.vastOptions.tracking['progress'][currentTime] !== 'undefined')) {
+        if (typeof playerInstance.vastOptions.tracking.progress !== 'undefined' &&
+            playerInstance.vastOptions.tracking.progress.length &&
+            typeof playerInstance.vastOptions.tracking.progress[currentTime] !== 'undefined') {
+            playerInstance.trackSingleEvent(progressEvent, currentTime);
+        }
 
-            playerInstance.trackSingleEvent('progress', currentTime);
+        if (typeof playerInstance.vastOptions.tracking.creativeView !== 'undefined' &&
+            playerInstance.vastOptions.tracking.creativeView.length &&
+            typeof playerInstance.vastOptions.tracking.creativeView[currentTime] !== 'undefined') {
+            playerInstance.trackSingleEvent(creativeViewEvent, currentTime);
         }
 
         if (currentTime === (Math.floor(duration / 4))) {
-            playerInstance.trackSingleEvent('firstQuartile');
+            playerInstance.trackSingleEvent(firstQuartileEvent);
         }
 
         if (currentTime === (Math.floor(duration / 2))) {
-            playerInstance.trackSingleEvent('midpoint');
+            playerInstance.trackSingleEvent(midpointEvent);
         }
 
         if (currentTime === (Math.floor(duration * 3 / 4))) {
-            playerInstance.trackSingleEvent('thirdQuartile');
+            playerInstance.trackSingleEvent(thirdQuartileEvent);
         }
 
         if (currentTime >= (duration - 1)) {
-            playerInstance.trackSingleEvent('complete');
+            playerInstance.trackSingleEvent(completeEvent);
         }
     };
 
@@ -424,11 +454,15 @@ export default function (playerInstance, options) {
         trackingUris.length = 0;
 
         switch (eventType) {
-            case 'start':
-            case 'firstQuartile':
-            case 'midpoint':
-            case 'thirdQuartile':
-            case 'complete':
+            case startEvent:
+            case firstQuartileEvent:
+            case midpointEvent:
+            case thirdQuartileEvent:
+            case completeEvent:
+            case closeEvent:
+            case skipEvent:
+            case acceptInvitationEvent:
+                // currently 'acceptInvitation' can only be triggered by VPAID ads
                 if (playerInstance.vastOptions.stopTracking[eventType] === false) {
                     if (playerInstance.vastOptions.tracking[eventType] !== null) {
                         trackingUris = playerInstance.vastOptions.tracking[eventType];
@@ -438,20 +472,31 @@ export default function (playerInstance, options) {
                 }
                 break;
 
-            case 'progress':
-                playerInstance.vastOptions.tracking['progress'][eventSubType].elements.forEach(function (currentValue, index) {
+            case progressEvent:
+                playerInstance.vastOptions.tracking.progress[eventSubType].elements.forEach(function (currentValue, index) {
                     if (
-                        (playerInstance.vastOptions.tracking['progress'][eventSubType].stopTracking === false) &&
-                        (playerInstance.vastOptions.tracking['progress'][eventSubType].elements.length)
+                        (playerInstance.vastOptions.tracking.progress[eventSubType].stopTracking === false) &&
+                        (playerInstance.vastOptions.tracking.progress[eventSubType].elements.length)
                     ) {
-                        trackingUris = playerInstance.vastOptions.tracking['progress'][eventSubType].elements;
+                        trackingUris = playerInstance.vastOptions.tracking.progress[eventSubType].elements;
                     }
 
-                    playerInstance.vastOptions.tracking['progress'][eventSubType].stopTracking = true;
+                    playerInstance.vastOptions.tracking.progress[eventSubType].stopTracking = true;
                 });
                 break;
 
-            case 'impression':
+            case creativeViewEvent:
+                if (!playerInstance.vastOptions.tracking.creativeView || !playerInstance.vastOptions.tracking.creativeView[eventSubType] || playerInstance.vastOptions.tracking.creativeView[eventSubType]?.stopTracking === true) {
+                    break;
+                }
+
+                if (playerInstance.vastOptions.tracking.creativeView[eventSubType]?.elements.length) {
+                    trackingUris = playerInstance.vastOptions.tracking.creativeView[eventSubType].elements;
+                }
+                playerInstance.vastOptions.tracking.creativeView[eventSubType].stopTracking = true;
+                break;
+
+            case impressionEvent:
                 if (
                     (typeof playerInstance.vastOptions.impression !== 'undefined') &&
                     (playerInstance.vastOptions.impression !== null) &&
@@ -461,8 +506,8 @@ export default function (playerInstance, options) {
                 }
                 break;
 
-            case 'viewImpression':
-                if (playerInstance.vastOptions.stopTracking['viewImpression'] === true) {
+            case viewImpressionEvent:
+                if (playerInstance.vastOptions.stopTracking.viewImpression === true) {
                     break;
                 }
 
@@ -472,7 +517,23 @@ export default function (playerInstance, options) {
                     (typeof playerInstance.vastOptions.viewImpression.length !== 'undefined')
                 ) {
                     trackingUris = playerInstance.vastOptions.viewImpression;
-                    playerInstance.vastOptions.stopTracking['viewImpression'] = true;
+                    playerInstance.vastOptions.stopTracking.viewImpression = true;
+                }
+                break;
+
+            case muteEvent:
+            case unmuteEvent:
+            case pauseEvent:
+            case resumeEvent:
+            case rewindEvent:
+            case fullscreenEvent:
+            case playerExpandEvent:
+            case playerCollapseEvent:
+            case collapseEvent:
+            case adCollapseEvent:
+                // currently 'collapse'/'adCollapse' can only be triggered by VPAID ads
+                if (!!playerInstance.vastOptions.tracking[eventType]) {
+                    trackingUris = playerInstance.vastOptions.tracking[eventType];
                 }
                 break;
 
@@ -488,7 +549,8 @@ export default function (playerInstance, options) {
         playerInstance.closeNonLinear(ad.id);
         if (playerInstance.adFinished === false) {
             playerInstance.adFinished = true;
-            playerInstance.trackSingleEvent('complete');
+            playerInstance.isCurrentlyShowingNonLinearAd = false;
+            playerInstance.trackSingleEvent(completeEvent);
         }
         clearInterval(playerInstance.nonLinearTracking);
     };
@@ -506,9 +568,11 @@ export default function (playerInstance, options) {
             return;
         }
         playerInstance.adFinished = false;
+        playerInstance.isCurrentlyShowingNonLinearAd = true;
         let duration = (playerInstance.rollsById[ad.rollListId].nonLinearDuration) ? playerInstance.rollsById[ad.rollListId].nonLinearDuration : false;
         if (!playerInstance.vastOptions.vpaid) {
-            playerInstance.trackSingleEvent('start');
+            playerInstance.trackSingleEvent(startEvent);
+            playerInstance.trackSingleEvent(creativeViewEvent, 0);
             duration = duration || playerInstance.vastOptions.duration;
 
             playerInstance.nonLinearTracking = setInterval(function () {
@@ -520,6 +584,7 @@ export default function (playerInstance, options) {
                 playerInstance.scheduleTrackingEvent(currentTime, duration);
                 if (currentTime >= (duration - 1)) {
                     playerInstance.adFinished = true;
+                    playerInstance.isCurrentlyShowingNonLinearAd = false;
                 }
             }, 400);
             playerInstance.destructors.push(() => clearInterval(playerInstance.nonLinearTracking));
@@ -581,6 +646,7 @@ export default function (playerInstance, options) {
                 closeBtn.onclick = function (event) {
 
                     playerInstance.hardStopVpaidAd('');
+                    playerInstance.trackCloseNonLinearAd();
 
                     if (typeof event.stopImmediatePropagation !== 'undefined') {
                         event.stopImmediatePropagation();
@@ -645,7 +711,7 @@ export default function (playerInstance, options) {
             playerInstance.domRef.player.removeAttribute('controls'); //Remove the default Controls
 
             playerInstance.vpaidCallbackListenersAttach();
-            const mode = (playerInstance.fullscreenMode ? 'fullscreen' : 'normal');
+            const mode = (playerInstance.fullscreenMode ? displayModes.FULLSCREEN : displayModes.NORMAL);
             playerInstance.vpaidAdUnit.initAd(adWidth, adHeight, mode, 3000, creativeData, environmentVars);
 
             playerInstance.toggleLoader(false);
@@ -716,7 +782,7 @@ export default function (playerInstance, options) {
             img.width = newBannerWidth;
             img.height = newBannerHeight;
 
-            playerInstance.trackSingleEvent('impression');
+            playerInstance.trackSingleEvent(impressionEvent);
         };
 
         board.id = 'fluid_nonLinear_' + ad.id;
@@ -747,11 +813,13 @@ export default function (playerInstance, options) {
         closeBtn.title = playerInstance.displayOptions.layoutControls.closeButtonCaption;
         const tempRollListId = ad.rollListId;
         closeBtn.onclick = function (event) {
+            playerInstance.trackCloseNonLinearAd();
             this.parentElement.remove();
             if (typeof event.stopImmediatePropagation !== 'undefined') {
                 event.stopImmediatePropagation();
             }
             playerInstance.adFinished = true;
+            playerInstance.isCurrentlyShowingNonLinearAd = false;
             clearInterval(playerInstance.nonLinearTracking);
 
             //if any other onPauseRoll then render it
@@ -805,6 +873,7 @@ export default function (playerInstance, options) {
         const element = playerInstance.domRef.wrapper.querySelector('#fluid_nonLinear_' + adId + ', #fluid_vpaidNonLinear_' + adId);
         if (element) {
             element.remove();
+            playerInstance.isCurrentlyShowingNonLinearAd = false;
         }
     };
 
@@ -1050,12 +1119,12 @@ export default function (playerInstance, options) {
                 setTimeout(function () {
                     onPauseAd.style.display = 'flex';
                     ad.played = false;
-                    playerInstance.trackingOnPauseNonLinearAd(ad, 'start');
+                    playerInstance.trackingOnPauseNonLinearAd(ad, startEvent);
                 }, 500);
             } else if (onPauseAd && !playerInstance.domRef.player.paused) {
                 onPauseAd.style.display = 'none';
                 playerInstance.adFinished = true;
-                playerInstance.trackingOnPauseNonLinearAd(ad, 'complete');
+                playerInstance.trackingOnPauseNonLinearAd(ad, completeEvent);
             }
         }
     };
@@ -1379,7 +1448,6 @@ export default function (playerInstance, options) {
      * Adds a Skip Button
      */
     playerInstance.addSkipButton = () => {
-        // TODO: ahh yes, the DIVbutton...
         const divSkipButton = document.createElement('div');
         divSkipButton.className = 'skip_button skip_button_disabled';
         if (playerInstance.vastOptions.skipoffset > 0) {
@@ -1691,6 +1759,7 @@ export default function (playerInstance, options) {
             return;
         }
 
+        playerInstance.trackSkipAd();
         // skip the regular linear vast
         playerInstance.displayOptions.vastOptions.vastAdvanced.vastVideoSkippedCallback();
         const event = document.createEvent('Event');

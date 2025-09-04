@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+          name="viewport">
+    <meta content="ie=edge" http-equiv="X-UA-Compatible">
+    <title>VOD with Event Tracking on Non-Linear Ads</title>
+    <%= htmlWebpackPlugin.tags.headTags %>
+    <style lang="css">
+        .multi-video-container {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            gap: 20px;
+        }
+        #fluid-player-e2e-case-vast-non-linear,
+        #fluid-player-e2e-case-vpaid-non-linear {
+            height: 40vh;
+            width: 40vw;
+        }
+    </style>
+</head>
+<body>
+<div class="multi-video-container">
+    <div>
+        <p>VAST</p>
+        <video id="fluid-player-e2e-case-vast-non-linear">
+            <source src="https://cdn.fluidplayer.com/videos/valerian-720p.mkv" data-fluid-hd title="720p" type="video/mp4"/>
+        </video>
+    </div>
+
+    <div>
+        <p>VPAID</p>
+        <video id="fluid-player-e2e-case-vpaid-non-linear">
+            <source src="https://cdn.fluidplayer.com/videos/valerian-720p.mkv" data-fluid-hd title="720p" type="video/mp4"/>
+        </video>
+    </div>
+</div>
+
+<div>
+    <h3>Non-linear Tracking Events</h3>
+    <ul>
+        <li>Start</li>
+        <li>First Quartile</li>
+        <li>Midpoint</li>
+        <li>Midpoint</li>
+        <li>Third Quartile</li>
+        <li>Complete</li>
+        <li>Progress</li>
+        <li>Impression</li>
+        <li>Mute</li>
+        <li>Unmute</li>
+        <li>Pause</li>
+        <li>Resume</li>
+        <li>Close</li>
+        <li>Rewind</li>
+        <li>Creative View</li>
+        <li>Player Expand</li>
+        <li>Player Collapse</li>
+        <li>Ad Collapse (i.e. Collapse in VAST 3.x) - VPAID only</li>
+        <li>Accept Invitation - VPAID only</li>
+
+    </ul>
+</div>
+
+<%= htmlWebpackPlugin.tags.bodyTags %>
+
+<script>
+    var instance_vast_non_linear = fluidPlayer('fluid-player-e2e-case-vast-non-linear', {
+        vastOptions: {
+            allowVPAID: true, // Default false.
+            adList: [
+                {
+                    roll: 'preRoll',
+                    vastTag: '/static/vast_nonlinear.xml',
+                },
+            ]
+        },
+    });
+
+    var instance_vpaid_non_linear = fluidPlayer('fluid-player-e2e-case-vpaid-non-linear', {
+        vastOptions: {
+            allowVPAID: true, // Default false.
+            adList: [
+                {
+                    roll: 'preRoll',
+                    vastTag: '/static/vpaid_nonlinear_local_ad_tracking.xml',
+                },
+            ]
+        },
+    });
+</script>
+
+</body>
+</html>

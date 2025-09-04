@@ -1,3 +1,5 @@
+import { displayModes } from '../constants/constants';
+
 export default function (playerInstance) {
     // Module constants
     const MINIMUM_WIDTH = 400; // Pixels
@@ -39,8 +41,9 @@ export default function (playerInstance) {
      *
      * @param {'on'|'off'} [forceToggle]
      * @param {boolean} manualToggle
+     * @param toAnotherDisplayTarget
      */
-    function toggleMiniPlayer(forceToggle, manualToggle = false) {
+    function toggleMiniPlayer(forceToggle, manualToggle = false, toAnotherDisplayTarget = false) {
         playerInstance.debugMessage(`[MiniPlayer] Toggling MiniPlayer, forceToggle: ${forceToggle}`);
 
         const miniPlayerOptions = playerInstance.displayOptions.layoutControls.miniPlayer;
@@ -63,8 +66,9 @@ export default function (playerInstance) {
             isMobile = true;
         }
 
+        const previousDisplayMode = playerInstance.getPreviousDisplayMode();
         // Important as the player can be in full screen or theater mode
-        playerInstance.resetDisplayMode('miniPlayer');
+        playerInstance.resetDisplayMode(displayModes.MINI_PLAYER);
 
         if (!isSetup) {
             // Setups JIT to avoid extra processing
@@ -75,6 +79,10 @@ export default function (playerInstance) {
             toggleMiniPlayerOff();
         } else if (forceToggle === 'on' || !playerInstance.miniPlayerToggledOn) {
             toggleMiniPlayerOn(miniPlayerOptions.width, miniPlayerOptions.height, miniPlayerOptions.widthMobile, miniPlayerOptions.position);
+        }
+
+        if (!toAnotherDisplayTarget) {
+            playerInstance.trackPlayerSizeChanged(previousDisplayMode);
         }
     }
 
@@ -265,7 +273,7 @@ export default function (playerInstance) {
         disableMiniPlayerMobile.classList.add(DISABLE_MINI_PLAYER_MOBILE_CLASS);
         const closeButton = document.createElement('span');
         closeButton.classList.add(CLOSE_BUTTON_CLASS);
-        disableMiniPlayerMobile.appendChild(closeButton); 
+        disableMiniPlayerMobile.appendChild(closeButton);
 
         disableMiniPlayerMobile.ontouchstart = event => {
             hasTriggeredAnimation = false;

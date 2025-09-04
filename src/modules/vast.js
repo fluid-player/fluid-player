@@ -1,5 +1,7 @@
 // VAST support module
 
+import { displayModes, trackingEventTypes } from '../constants/constants';
+
 /* Type declarations */
 
 /**
@@ -32,6 +34,28 @@
  */
 
 export default function (playerInstance, options) {
+    const {
+        muteEvent,
+        unmuteEvent,
+        pauseEvent,
+        resumeEvent,
+        rewindEvent,
+        fullscreenEvent,
+        skipEvent,
+        playerExpandEvent,
+        playerCollapseEvent,
+        startEvent,
+        firstQuartileEvent,
+        midpointEvent,
+        thirdQuartileEvent,
+        completeEvent,
+        progressEvent,
+        creativeViewEvent,
+        collapseEvent,
+        adCollapseEvent,
+        closeEvent,
+        acceptInvitationEvent
+    } = trackingEventTypes;
     /**
      * Gets CTA parameters from VAST and sets them on tempOptions
      *
@@ -115,7 +139,7 @@ export default function (playerInstance, options) {
         return result;
     };
 
-    playerInstance.getTrackingFromLinear = (linear) => {
+    playerInstance.getTrackingFromCreative = (linear) => {
         const trackingEvents = linear.getElementsByTagName('TrackingEvents');
 
         if (trackingEvents.length) {//There should be no more than one node
@@ -298,24 +322,27 @@ export default function (playerInstance, options) {
         return fallbackStaticResource;
     };
 
-    playerInstance.registerTrackingEvents = (creativeLinear, tmpOptions) => {
-        const trackingEvents = playerInstance.getTrackingFromLinear(creativeLinear);
+    playerInstance.registerTrackingEvents = (creative, tmpOptions) => {
+        const trackingEvents = playerInstance.getTrackingFromCreative(creative);
         let eventType = '';
         let oneEventOffset = 0;
 
         for (let i = 0; i < trackingEvents.length; i++) {
             eventType = trackingEvents[i].getAttribute('event');
 
-            switch (eventType) {
-                case 'start':
-                case 'firstQuartile':
-                case 'midpoint':
-                case 'thirdQuartile':
-                case 'complete':
-                    if (typeof tmpOptions.tracking[eventType] === 'undefined') {
-                        tmpOptions.tracking[eventType] = [];
-                    }
+            if (typeof tmpOptions.tracking[eventType] === 'undefined') {
+                tmpOptions.tracking[eventType] = [];
+            }
 
+            switch (eventType) {
+                case startEvent:
+                case firstQuartileEvent:
+                case midpointEvent:
+                case thirdQuartileEvent:
+                case completeEvent:
+                case closeEvent:
+                case skipEvent:
+                case acceptInvitationEvent:
                     if (typeof tmpOptions.stopTracking[eventType] === 'undefined') {
                         tmpOptions.stopTracking[eventType] = [];
                     }
@@ -324,12 +351,9 @@ export default function (playerInstance, options) {
 
                     break;
 
-                case 'progress':
-                    if (typeof tmpOptions.tracking[eventType] === 'undefined') {
-                        tmpOptions.tracking[eventType] = [];
-                    }
-
-                    oneEventOffset = playerInstance.convertTimeStringToSeconds(trackingEvents[i].getAttribute('offset'));
+                case progressEvent:
+                case creativeViewEvent:
+                    oneEventOffset = playerInstance.convertTimeStringToSeconds(trackingEvents[i].getAttribute('offset')) || 0;
 
                     if (typeof tmpOptions.tracking[eventType][oneEventOffset] === 'undefined') {
                         tmpOptions.tracking[eventType][oneEventOffset] = {
@@ -340,6 +364,19 @@ export default function (playerInstance, options) {
 
                     tmpOptions.tracking[eventType][oneEventOffset].elements.push(trackingEvents[i].textContent.trim());
 
+                    break;
+
+                case muteEvent:
+                case unmuteEvent:
+                case pauseEvent:
+                case resumeEvent:
+                case rewindEvent:
+                case fullscreenEvent:
+                case playerExpandEvent:
+                case playerCollapseEvent:
+                case collapseEvent:
+                case adCollapseEvent:
+                    tmpOptions.tracking[eventType].push(trackingEvents[i].textContent.trim());
                     break;
 
                 default:
@@ -1138,5 +1175,126 @@ export default function (playerInstance, options) {
         playerInstance.removeAdPlayingText();
         playerInstance.removeCTAButton();
         playerInstance.vastLogoBehaviour(false);
+    };
+
+    /**
+     * Track if the player is muted or unmuted when playing an ad and add tracking to mute/unmute events
+     */
+    playerInstance.trackMuteChange = () => {
+        if ((!playerInstance.isCurrentlyPlayingAd && !playerInstance.isCurrentlyShowingNonLinearAd) || !playerInstance.vastOptions || !playerInstance.vastOptions.tracking || (!playerInstance.vastOptions.tracking.mute && !playerInstance.vastOptions.tracking.unmute)) {
+            return;
+        }
+
+        if (playerInstance.domRef.player.muted) {
+            playerInstance.trackSingleEvent(muteEvent);
+        } else {
+            playerInstance.trackSingleEvent(unmuteEvent);
+        }
+    };
+
+    /**
+     * Track if the player is paused or resumed when playing an ad and add tracking to pause/resume events
+     */
+    playerInstance.trackPlayPauseChange = () => {
+        if ((!playerInstance.isCurrentlyPlayingAd && !playerInstance.isCurrentlyShowingNonLinearAd) || !playerInstance.vastOptions || !playerInstance.vastOptions.tracking || (!playerInstance.vastOptions.tracking.pause && !playerInstance.vastOptions.tracking.resume)) {
+            return;
+        }
+
+        if (playerInstance.domRef.player.paused) {
+            playerInstance.trackSingleEvent(pauseEvent);
+        } else {
+            playerInstance.trackSingleEvent(resumeEvent);
+        }
+    };
+
+    /**
+     * Track if the non-linear ad is closed on the 'close' button and add tracking to 'close' event
+     */
+    playerInstance.trackCloseNonLinearAd = () => {
+        if (!playerInstance.vastOptions || !playerInstance.vastOptions.tracking || !playerInstance.vastOptions.tracking.close) {
+            return;
+        }
+        playerInstance.trackSingleEvent(closeEvent);
+    };
+
+    /**
+     * Track if the ad is skipped and add tracking to 'skip' event
+     */
+    playerInstance.trackSkipAd = () => {
+        if (!playerInstance.vastOptions || !playerInstance.vastOptions.tracking || !playerInstance.vastOptions.tracking.skip) {
+            return;
+        }
+        playerInstance.trackSingleEvent(skipEvent);
+    };
+
+    /**
+     * Track if the ad is rewound and add tracking to 'rewind' event
+     */
+    playerInstance.trackRewindAd = () => {
+        if (!playerInstance.isCurrentlyShowingNonLinearAd || !playerInstance.vastOptions || !playerInstance.vastOptions.tracking || !playerInstance.vastOptions.tracking.rewind) {
+            return;
+        }
+        playerInstance.trackSingleEvent(rewindEvent);
+    };
+
+    /**
+     * Track if the video player size has changed and add tracking for related events
+     *
+     * @param previousDisplayMode
+     */
+    playerInstance.trackPlayerSizeChanged = (previousDisplayMode) => {
+        const {
+            isCurrentlyPlayingAd,
+            isCurrentlyShowingNonLinearAd,
+            fullscreenMode,
+            theatreMode,
+            miniPlayerToggledOn,
+            vastOptions,
+            trackSingleEvent,
+        } = playerInstance;
+
+        if ((!isCurrentlyPlayingAd && !isCurrentlyShowingNonLinearAd) || !vastOptions?.tracking) {
+            return;
+        }
+
+        const { fullscreen, playerExpand, playerCollapse } = vastOptions.tracking;
+
+        if (!fullscreen && !playerExpand && !playerCollapse) {
+            return;
+        }
+
+        // Fullscreen mode - always expansion
+        if (fullscreenMode) {
+            if (fullscreen) {
+                trackSingleEvent(fullscreenEvent);
+            }
+            if (fullscreen || playerExpand) {
+                trackSingleEvent(playerExpandEvent);
+            }
+            return;
+        }
+
+        // Theatre mode - expand from smaller modes, collapse otherwise
+        if (theatreMode) {
+            const isExpandingToTheatre = previousDisplayMode === displayModes.MINI_PLAYER || previousDisplayMode === displayModes.NORMAL;
+            if (isExpandingToTheatre && playerExpand) {
+                trackSingleEvent(playerExpandEvent);
+            } else if (!isExpandingToTheatre && playerCollapse) {
+                trackSingleEvent(playerCollapseEvent);
+            }
+            return;
+        }
+
+        // Mini player mode - always collapse
+        if (miniPlayerToggledOn && playerCollapse) {
+            trackSingleEvent(playerCollapseEvent);
+            return;
+        }
+
+        if (previousDisplayMode === displayModes.MINI_PLAYER && playerExpand) {
+            trackSingleEvent(playerExpandEvent);
+        } else if (previousDisplayMode !== displayModes.MINI_PLAYER && playerCollapse) {
+            trackSingleEvent(playerCollapseEvent);
+        }
     };
 }
