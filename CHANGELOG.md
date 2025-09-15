@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 3.57.0 (2025-09-15)
+* [Pull #904](https://github.com/fluid-player/fluid-player/pull/904) Add custom tracking events to Fluid Player
+
 ## 3.56.0 (2025-09-04)
 * [Pull #905](https://github.com/fluid-player/fluid-player/pull/905) Fix control bar width on VR cardboard mode toggle
 
