@@ -1,5 +1,24 @@
 // VPAID support module
+import { displayModes, trackingEventTypes } from '../constants/constants';
+
 export default function (playerInstance, options) {
+    const {
+        pauseEvent,
+        resumeEvent,
+        skipEvent,
+        impressionEvent,
+        startEvent,
+        firstQuartileEvent,
+        midpointEvent,
+        thirdQuartileEvent,
+        completeEvent,
+        creativeViewEvent,
+        collapseEvent,
+        adCollapseEvent,
+        closeEvent,
+        acceptInvitationEvent
+    } = trackingEventTypes;
+
     const callbacks = {
         AdStarted: () => playerInstance.onStartVpaidAd,
         AdStopped: () => playerInstance.onStopVpaidAd,
@@ -50,12 +69,18 @@ export default function (playerInstance, options) {
     playerInstance.onVpaidAdPaused = () => {
         playerInstance.vpaidTimeoutTimerClear();
         playerInstance.debugMessage("onAdPaused");
+        if (playerInstance.vastOptions.tracking.pause) {
+            playerInstance.trackSingleEvent(pauseEvent);
+        }
     };
 
     // Callback for AdPlaying
     playerInstance.onVpaidAdPlaying = () => {
         playerInstance.vpaidTimeoutTimerClear();
         playerInstance.debugMessage("onAdPlaying");
+        if (playerInstance.vastOptions.tracking.resume) {
+            playerInstance.trackSingleEvent(resumeEvent);
+        }
     };
 
     // Callback for AdError
@@ -73,19 +98,32 @@ export default function (playerInstance, options) {
     // Callback for AdUserAcceptInvitation
     playerInstance.onVpaidAdUserAcceptInvitation = () => {
         playerInstance.debugMessage("onAdUserAcceptInvitation");
+        if (playerInstance.vastOptions.tracking.acceptInvitation) {
+            playerInstance.trackSingleEvent(acceptInvitationEvent);
+        }
     };
 
     // Callback for AdUserMinimize
     playerInstance.onVpaidAdUserMinimize = () => {
         playerInstance.debugMessage("onAdUserMinimize");
+        if (playerInstance.vastOptions.tracking.collapse) {
+            playerInstance.trackSingleEvent(collapseEvent);
+        }
+        if (playerInstance.vastOptions.tracking.adCollapse) {
+            playerInstance.trackSingleEvent(adCollapseEvent);
+        }
+
     };
 
     // Callback for AdUserClose
     playerInstance.onVpaidAdUserClose = () => {
         playerInstance.debugMessage("onAdUserClose");
+        if (playerInstance.vastOptions.tracking.close) {
+            playerInstance.trackSingleEvent(closeEvent);
+        }
     };
 
-    // Callback for AdUserClose
+    // Callback for AdSkippableStateChange
     playerInstance.onVpaidAdSkippableStateChange = () => {
         if (!playerInstance.vpaidAdUnit) {
             return;
@@ -93,7 +131,7 @@ export default function (playerInstance, options) {
         playerInstance.debugMessage("Ad Skippable State Changed to: " + playerInstance.vpaidAdUnit.getAdSkippableState());
     };
 
-    // Callback for AdUserClose
+    // Callback for AdExpandedChange
     playerInstance.onVpaidAdExpandedChange = () => {
         if (!playerInstance.vpaidAdUnit) {
             return;
@@ -160,7 +198,7 @@ export default function (playerInstance, options) {
         playerInstance.debugMessage("Ad Impression");
 
         //Announce the impressions
-        playerInstance.trackSingleEvent('impression');
+        playerInstance.trackSingleEvent(impressionEvent);
     };
 
     // Callback for AdClickThru
@@ -186,31 +224,31 @@ export default function (playerInstance, options) {
     // Callback for AdVideoStart
     playerInstance.onVpaidAdVideoStart = () => {
         playerInstance.debugMessage("Video 0% completed");
-        playerInstance.trackSingleEvent('start');
+        playerInstance.trackSingleEvent(startEvent);
     };
 
-    // Callback for AdUserClose
+    // Callback for AdVideoFirstQuartile
     playerInstance.onVpaidAdVideoFirstQuartile = () => {
         playerInstance.debugMessage("Video 25% completed");
-        playerInstance.trackSingleEvent('firstQuartile');
+        playerInstance.trackSingleEvent(firstQuartileEvent);
     };
 
-    // Callback for AdUserClose
+    // Callback for AdVideoMidpoint
     playerInstance.onVpaidAdVideoMidpoint = () => {
         playerInstance.debugMessage("Video 50% completed");
-        playerInstance.trackSingleEvent('midpoint');
+        playerInstance.trackSingleEvent(midpointEvent);
     };
 
-    // Callback for AdUserClose
+    // Callback for AdVideoThirdQuartile
     playerInstance.onVpaidAdVideoThirdQuartile = () => {
         playerInstance.debugMessage("Video 75% completed");
-        playerInstance.trackSingleEvent('thirdQuartile');
+        playerInstance.trackSingleEvent(thirdQuartileEvent);
     };
 
     // Callback for AdVideoComplete
     playerInstance.onVpaidAdVideoComplete = () => {
         playerInstance.debugMessage("Video 100% completed");
-        playerInstance.trackSingleEvent('complete');
+        playerInstance.trackSingleEvent(completeEvent);
     };
 
     // Callback for AdLinearChange
@@ -281,6 +319,9 @@ export default function (playerInstance, options) {
     // Callback for StartAd()
     playerInstance.onStartVpaidAd = () => {
         playerInstance.debugMessage("Ad has started");
+        if (playerInstance.vastOptions.tracking.creativeView) {
+            playerInstance.trackSingleEvent(creativeViewEvent, 0);
+        }
         playerInstance.vpaidTimeoutTimerClear();
     };
 
@@ -330,10 +371,12 @@ export default function (playerInstance, options) {
         playerInstance.onVpaidEnded();
     };
 
-    // Callback for AdUserClose
+    // Callback for AdSkipped
     playerInstance.onSkipVpaidAd = () => {
         playerInstance.debugMessage("Ad was skipped");
-
+        if (playerInstance.vastOptions.tracking.skip) {
+            playerInstance.trackSingleEvent(skipEvent);
+        }
         playerInstance.vpaidTimeoutTimerClear();
         playerInstance.onVpaidEnded();
     };
@@ -344,7 +387,7 @@ export default function (playerInstance, options) {
         if (!playerInstance.vpaidAdUnit) {
             return;
         }
-        playerInstance.vpaidAdUnit.skipAd()
+        playerInstance.vpaidAdUnit.skipAd();
         playerInstance.vpaidTimeoutTimerClear();
         playerInstance.onVpaidEnded();
     };
@@ -377,7 +420,7 @@ export default function (playerInstance, options) {
         if (playerInstance.vastOptions !== null && playerInstance.vastOptions.vpaid && playerInstance.vastOptions.linear) {
             const adWidth = playerInstance.domRef.player.offsetWidth;
             const adHeight = playerInstance.domRef.player.offsetHeight;
-            const mode = (playerInstance.fullscreenMode ? 'fullscreen' : 'normal');
+            const mode = (playerInstance.fullscreenMode ? displayModes.FULLSCREEN : displayModes.NORMAL);
             playerInstance.resizeVpaidAd(adWidth, adHeight, mode);
         }
     };

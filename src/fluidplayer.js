@@ -1,5 +1,7 @@
 'use strict';
 
+import { displayModes } from './constants/constants';
+
 // Player modules
 import VPAIDModule from './modules/vpaid';
 import VASTModule from './modules/vast';
@@ -104,6 +106,7 @@ const fluidPlayerClass = function () {
         self.videoPlayerId = playerNode.id;
         self.originalSrc = self.getCurrentSrc();
         self.isCurrentlyPlayingAd = false;
+        self.isCurrentlyShowingNonLinearAd = false;
         self.recentWaiting = false;
         self.latestVolume = 1;
         self.currentVideoDuration = 0;
@@ -160,6 +163,7 @@ const fluidPlayerClass = function () {
         // Only for linear ads, non linear are not taken into account
         self.currentMediaSourceType = 'source';
         self.isLiveStream = null;
+        self.previousTime = 0;
 
         //Default options
         self.displayOptions = {
@@ -361,6 +365,7 @@ const fluidPlayerClass = function () {
         playerNode.addEventListener('durationchange', () => {
             self.currentVideoDuration = self.getCurrentVideoDuration();
         });
+        playerNode.addEventListener('seeked', self.onVideoSeeked);
 
         // 'loadedmetadata' inconsistently fires because the audio can already be loaded when the listener is added.
         // Here we use readystate to see if metadata has already loaded
@@ -996,7 +1001,7 @@ const fluidPlayerClass = function () {
         );
     };
 
-    self.contolProgressbarUpdate = () => {
+    self.controlProgressbarUpdate = () => {
         const currentProgressTag = self.domRef.player.parentNode.getElementsByClassName('fluid_controls_currentprogress');
 
         for (let i = 0; i < currentProgressTag.length; i++) {
@@ -1044,7 +1049,7 @@ const fluidPlayerClass = function () {
         }
     };
 
-    self.contolVolumebarUpdate = () => {
+    self.controlVolumebarUpdate = () => {
         const currentVolumeTag = self.domRef.wrapper.querySelector('.fluid_control_currentvolume');
         const volumeposTag = self.domRef.wrapper.querySelector('.fluid_control_volume_currentpos');
         const volumebarTotalWidth = self.domRef.wrapper.querySelector('.fluid_control_volume').clientWidth;
@@ -1093,6 +1098,8 @@ const fluidPlayerClass = function () {
         // Persistent settings
         self.fluidStorage.fluidVolume = self.latestVolume;
         self.fluidStorage.fluidMute = self.domRef.player.muted;
+
+        self.trackMuteChange();
     };
 
     self.checkFullscreenSupport = () => {
@@ -1158,14 +1165,15 @@ const fluidPlayerClass = function () {
         self.fullscreenMode = true;
     };
 
-    self.fullscreenToggle = () => {
+    self.fullscreenToggle = (toAnotherDisplayTarget = false) => {
         self.debugMessage(`Toggling Full Screen`);
         const videoPlayerTag = self.domRef.player;
         const fullscreenTag = self.domRef.wrapper;
         const requestFullscreenFunctionNames = self.checkFullscreenSupport();
         const fullscreenButton = videoPlayerTag.parentNode.getElementsByClassName('fluid_control_fullscreen');
         const menuOptionFullscreen = fullscreenTag.querySelector('.context_option_fullscreen');
-        self.resetDisplayMode('fullScreen');
+        const previousDisplayMode = self.getPreviousDisplayMode();
+        self.resetDisplayMode(displayModes.FULLSCREEN);
 
         let functionNameToExecute;
 
@@ -1206,6 +1214,10 @@ const fluidPlayerClass = function () {
         self.domRef.player.addEventListener('webkitendfullscreen', () => {
             self.fullscreenOff(fullscreenButton, menuOptionFullscreen);
         });
+
+        if (!toAnotherDisplayTarget) {
+            self.trackPlayerSizeChanged(previousDisplayMode);
+        }
     };
 
     self.findClosestParent = (el, selector) => {
@@ -1333,6 +1345,8 @@ const fluidPlayerClass = function () {
             self.domRef.player.pause();
         }
 
+        self.updatePreviousTime();
+
         const shiftTime = timeBarX => {
             const totalWidth = self.domRef.wrapper.querySelector('.fluid_controls_progress_container').clientWidth;
             if (!totalWidth) {
@@ -1355,7 +1369,7 @@ const fluidPlayerClass = function () {
             const currentX = self.getEventOffsetX(event, event.target.parentNode);
             initialPosition = NaN; // mouse up will fire after the move, we don't want to trigger the initial position in the event of iOS
             shiftTime(currentX);
-            self.contolProgressbarUpdate();
+            self.controlProgressbarUpdate();
             self.controlDurationUpdate();
         };
 
@@ -1438,6 +1452,15 @@ const fluidPlayerClass = function () {
         document.addEventListener('touchend', onVolumeBarMouseUp, { passive: true });
         document.addEventListener('mousemove', onVolumeBarMouseMove);
         document.addEventListener('touchmove', onVolumeBarMouseMove, { passive: true });
+    };
+
+    self.onVideoSeeked = () => {
+        // Track rewind events (not forward seeks)
+        if (self.previousTime && self.domRef.player.currentTime < self.previousTime) {
+            self.debugMessage('Video rewound from', self.previousTime, 'to', self.domRef.player.currentTime);
+            self.trackRewindAd();
+        }
+        self.updatePreviousTime();
     };
 
     self.findRoll = (roll) => {
@@ -1713,6 +1736,9 @@ const fluidPlayerClass = function () {
                         self.dashPlayer.play();
                     } else {
                         self.domRef.player.play();
+                        if (!self.fluidPseudoPause) {
+                            self.trackPlayPauseChange();
+                        }
                     }
                 }
 
@@ -1725,6 +1751,7 @@ const fluidPlayerClass = function () {
                 } else {
                     // pause the regular linear vast or content video player
                     self.domRef.player.pause();
+                    self.trackPlayPauseChange();
                 }
 
                 self.playPauseAnimationToggle(false);
@@ -1800,7 +1827,7 @@ const fluidPlayerClass = function () {
 
         self.domRef.player.addEventListener('play', () => {
             self.controlPlayPauseToggle();
-            self.contolVolumebarUpdate();
+            self.controlVolumebarUpdate();
         }, false);
 
         self.domRef.player.addEventListener('fluidplayerpause', () => {
@@ -1809,7 +1836,7 @@ const fluidPlayerClass = function () {
 
         //Set the progressbar
         self.domRef.player.addEventListener('timeupdate', () => {
-            self.contolProgressbarUpdate();
+            self.controlProgressbarUpdate();
             self.controlDurationUpdate();
         });
 
@@ -1833,7 +1860,7 @@ const fluidPlayerClass = function () {
         self.domRef.wrapper.querySelector('.fluid_control_volume_container')
             .addEventListener(eventOn, event => self.onVolumeBarMouseDown(), { passive: true });
 
-        self.domRef.player.addEventListener('volumechange', () => self.contolVolumebarUpdate());
+        self.domRef.player.addEventListener('volumechange', () => self.controlVolumebarUpdate());
 
         self.trackEvent(self.domRef.player.parentNode, 'click', '.fluid_control_mute', () => self.muteToggle());
 
@@ -2002,7 +2029,7 @@ const fluidPlayerClass = function () {
                 clearInterval(initiateVolumebarTimerId);
             } else if (self.checkIfVolumebarIsRendered()) {
                 clearInterval(initiateVolumebarTimerId);
-                self.contolVolumebarUpdate();
+                self.controlVolumebarUpdate();
             } else {
                 remainingAttemptsToInitiateVolumeBar--;
             }
@@ -2109,7 +2136,31 @@ const fluidPlayerClass = function () {
             }
         }
         self.resizeVpaidAuto();
-    }
+    };
+
+    /**
+     * Updates the previous time position of the video player to the current time.
+     * This function should be called before the current time is changed, as a way to store the 'previous' time position.
+     */
+    self.updatePreviousTime = () => {
+        self.previousTime = self.domRef.player.currentTime;
+    };
+
+    /**
+     * Returns the previous display mode of the player.
+     * @returns {string}
+     */
+    self.getPreviousDisplayMode = () => {
+        if (self.fullscreenMode) {
+            return displayModes.FULLSCREEN;
+        } else if (self.theatreMode) {
+            return displayModes.THEATER;
+        } else if (self.miniPlayerToggledOn) {
+            return displayModes.MINI_PLAYER;
+        } else {
+            return displayModes.NORMAL;
+        }
+    };
 
     /**
      * Creates the skip animation elements and appends them to the player
@@ -2194,6 +2245,7 @@ const fluidPlayerClass = function () {
         if (self.isCurrentlyPlayingAd) {
             return;
         }
+        self.updatePreviousTime();
 
         let skipTo = self.domRef.player.currentTime + timeOffset;
         if (skipTo < 0) {
@@ -2940,14 +2992,14 @@ const fluidPlayerClass = function () {
         });
     };
 
-    self.theatreToggle = () => {
+    self.theatreToggle = (toAnotherDisplayTarget = false) => {
         self.debugMessage(`Toggling Theater Mode`);
         if (self.isInIframe) {
             return;
         }
 
-        // Theatre and fullscreen, it's only one or the other
-        this.resetDisplayMode('theaterMode');
+        const previousDisplayMode = self.getPreviousDisplayMode();
+        this.resetDisplayMode(displayModes.THEATER);
 
         // Advanced Theatre mode if specified
         if (self.displayOptions.layoutControls.theatreAdvanced) {
@@ -2979,6 +3031,10 @@ const fluidPlayerClass = function () {
         const event = document.createEvent('CustomEvent');
         event.initEvent(theatreEvent, false, true);
         self.domRef.player.dispatchEvent(event);
+
+        if (!toAnotherDisplayTarget) {
+            self.trackPlayerSizeChanged(previousDisplayMode);
+        }
 
         self.resizeVpaidAuto();
     };
@@ -3336,19 +3392,19 @@ const fluidPlayerClass = function () {
     /**
      * Resets all display types that are not the target display mode
      *
-     * @param {'fullScreen'|'theaterMode'|'miniPlayer'} displayTarget
+     * @param {'fullscreen'|'theaterMode'|'miniPlayer'} displayTarget
      */
     self.resetDisplayMode = (displayTarget) => {
-        if (self.fullscreenMode && displayTarget !== 'fullScreen') {
-            self.fullscreenToggle();
+        if (self.fullscreenMode && displayTarget !== displayModes.FULLSCREEN) {
+            self.fullscreenToggle(true);
         }
 
-        if (self.theatreMode && displayTarget !== 'theaterMode') {
-            self.theatreToggle();
+        if (self.theatreMode && displayTarget !== displayModes.THEATER) {
+            self.theatreToggle(true);
         }
 
-        if (self.miniPlayerToggledOn && displayTarget !== 'miniPlayer') {
-            self.toggleMiniPlayer('off');
+        if (self.miniPlayerToggledOn && displayTarget !== displayModes.MINI_PLAYER) {
+            self.toggleMiniPlayer('off', false, true);
         }
     }
 

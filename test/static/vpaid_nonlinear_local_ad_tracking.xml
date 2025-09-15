@@ -16,6 +16,7 @@
 							<Tracking event="thirdQuartile">http://www.example.com/thirdQuartile</Tracking>
 							<Tracking event="complete">http://www.example.com/complete</Tracking>
 							<Tracking event="mute">http://www.example.com/mute</Tracking>
+                            <Tracking event="unmute">http://www.example.com/unmute</Tracking>
 							<Tracking event="rewind">http://www.example.com/rewind</Tracking>
 							<Tracking event="pause">http://www.example.com/pause</Tracking>
 							<Tracking event="resume">http://www.example.com/resume</Tracking>
@@ -23,17 +24,18 @@
 							<Tracking event="fullscreen">http://www.example.com/fullscreen</Tracking>
                             <Tracking event="playerExpand">http://www.example.com/playerExpand</Tracking>
                             <Tracking event="playerCollapse">http://www.example.com/playerCollapse</Tracking>
+                            <Tracking event="adCollapse">http://www.example.com/adCollapse</Tracking>
 							<Tracking event="creativeView">http://www.example.com/creativeView</Tracking>
 							<Tracking event="acceptInvitation">http://www.example.com/acceptInvitation</Tracking>
 						</TrackingEvents>
-						<NonLinear apiFramework="VPAID" width="480" height="90" id="overlay-1">
+						<NonLinear apiFramework="VPAID" width="150" height="90" id="overlay-1">
 							<AdParameters>
 								<![CDATA[{"overlays":["https://googleads.github.io/googleads-ima-html5/media/NonLinearVpaid.png"], "videos":[ {"url":"https://iab-publicfiles.s3.amazonaws.com/vast/VAST-4.0-Short-Intro.mp4","mimetype":"video/mp4"}]} ]]>
 							</AdParameters>
 							<StaticResource creativeType="application/javascript">
-								<![CDATA[https://googleads.github.io/googleads-ima-html5/vpaid/nonlinear/VpaidNonLinear.js]]>
+								<![CDATA[http://localhost:8080/static/myVpaidNonLinearAd.js]]>
 							</StaticResource>
-							<NonLinearClickThrough id="GDFP">
+							<NonLinearClickThrough>
 								<![CDATA[ http://google.com ]]>
 							</NonLinearClickThrough>
 						</NonLinear>

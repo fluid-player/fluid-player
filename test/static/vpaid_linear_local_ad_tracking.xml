@@ -20,7 +20,7 @@
 			<Creatives>
 				<Creative sequence="1">
 					<Linear skipoffset="00:00:03">
-						<Duration>00:00:10</Duration>
+						<Duration>00:00:00</Duration>
 						<TrackingEvents>
                             <Tracking event="start">http://www.example.com/start</Tracking>
                             <Tracking event="firstQuartile">http://www.example.com/firstQuartile</Tracking>
@@ -29,7 +29,6 @@
                             <Tracking event="complete">http://www.example.com/complete</Tracking>
                             <Tracking event="mute">http://www.example.com/mute</Tracking>
                             <Tracking event="unmute">http://www.example.com/unmute</Tracking>
-                            <Tracking event="rewind">http://www.example.com/rewind</Tracking>
                             <Tracking event="pause">http://www.example.com/pause</Tracking>
                             <Tracking event="resume">http://www.example.com/resume</Tracking>
                             <Tracking event="fullscreen">http://www.example.com/fullscreen</Tracking>
@@ -38,28 +37,21 @@
                             <Tracking event="creativeView">http://www.example.com/creativeView</Tracking>
                             <Tracking event="acceptInvitation">http://www.example.com/acceptInvitation</Tracking>
                             <Tracking event="skip">http://www.example.com/skip</Tracking>
+                            <Tracking event="progress" offset="00:00:05">http://www.example.com/progress5</Tracking>
 						</TrackingEvents>
 						<AdParameters>
 							<![CDATA[
-{"videos":[ {"url":"https://cdn.jsdelivr.net/npm/big-buck-bunny-1080p@0.0.6/video.mp4","mimetype":"video/mp4"}]}
-]]>
+							{"videos":[ {"url":"https://cdn.jsdelivr.net/npm/big-buck-bunny-1080p@0.0.6/video.mp4","mimetype":"video/mp4"}]}
+                            ]]>
 						</AdParameters>
 						<VideoClicks>
 							<ClickThrough id="123">http://google.com</ClickThrough>
 							<ClickTracking id="123">http://www.example.com/click</ClickTracking>
 						</VideoClicks>
 						<MediaFiles>
-
-							<!--
-						<MediaFile apiFramework="VPAID" type="application/javascript">
-							https://secure-ds.serving-sys.com/BurstingCachedScripts/VPAID/HTML5_1_40_0_0/VPAIDAPI.js
+						<MediaFile apiFramework="VPAID" type="application/javascript" delivery="progressive" height="400" width="600" scalable="true" maintainAspectRatio="true">
+                            http://localhost:8080/static/myVpaidLinearAd.js
 						</MediaFile>
-						 -->
-
-						<MediaFile apiFramework="VPAID" type="application/javascript">
-							https://googleads.github.io/googleads-ima-html5/vpaid/linear/VpaidVideoAd.js
-						</MediaFile>
-
 						</MediaFiles>
 					</Linear>
 				</Creative>
