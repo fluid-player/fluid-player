@@ -1,0 +1,8 @@
+fluidPlayer(
+    'my-video',
+    {
+        layoutControls: {
+            allowDownload: true // Default false
+        }
+    }
+);
