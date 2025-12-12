@@ -8,7 +8,7 @@ e2e/
 .project
 .classpath
 .c9/
-*.launch
+*.launch polski
 .settings/
 *.sublime-workspace
 
