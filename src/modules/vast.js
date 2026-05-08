@@ -722,7 +722,7 @@ export default function (playerInstance, options) {
 
                 playerInstance.rollsById[rollListId].vastLoaded = true;
 
-                const event = document.createEvent('Event');
+                const event = playerInstance.ownerDocument.createEvent('Event');
 
                 event.initEvent('adId_' + rollListId, false, true);
                 playerInstance.domRef.player.dispatchEvent(event);
@@ -886,7 +886,7 @@ export default function (playerInstance, options) {
             if (!response.ok || response.headers.get('content-type').indexOf('video') === -1) {
                 return false;
             }
-            const videoElement = document.createElement('video');
+            const videoElement = playerInstance.ownerDocument.createElement('video');
             videoElement.src = mediaFileUrl;
             const canPlay = await videoElement.canPlayType(response.headers.get('content-type'));
             return canPlay !== "";

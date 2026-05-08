@@ -175,11 +175,13 @@ export default function (playerInstance, options) {
         if (!element) { return null; }
 
         const rect = element.getBoundingClientRect();
+        const view = playerInstance.ownerWindow || window;
+        const root = playerInstance.ownerDocument || document;
         return (
             rect.top >= 0 &&
             rect.left >= 0 &&
-            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+            rect.bottom <= (view.innerHeight || root.documentElement.clientHeight) &&
+            rect.right <= (view.innerWidth || root.documentElement.clientWidth)
         );
     }
 
@@ -232,7 +234,7 @@ export default function (playerInstance, options) {
             img.src = imageUrl;
 
             img.onload = () => {
-                const canvas = document.createElement('canvas');
+                const canvas = playerInstance.ownerDocument.createElement('canvas');
                 const ctx = canvas.getContext('2d');
                 canvas.width = img.width;
                 canvas.height = img.height;

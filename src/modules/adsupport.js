@@ -47,7 +47,7 @@ export default function (playerInstance, options) {
                 const vpaidIframe = "fp_" + ad.id + "_fluid_vpaid_iframe";
                 const creativeData = {};
                 creativeData.AdParameters = ad.adParameters;
-                const slotElement = document.createElement('div');
+                const slotElement = playerInstance.ownerDocument.createElement('div');
                 slotElement.className = 'fluid_vpaid_slot';
                 slotElement.setAttribute('adListId', ad.id);
 
@@ -392,7 +392,7 @@ export default function (playerInstance, options) {
             return null;
         }
 
-        const tmpVideo = document.createElement('video');
+        const tmpVideo = playerInstance.ownerDocument.createElement('video');
         let response = tmpVideo.canPlayType(mediaType);
 
         return !response ? "no" : response;
@@ -608,7 +608,7 @@ export default function (playerInstance, options) {
             const vpaidIframe = "fp_" + ad.id + "_fluid_vpaid_iframe";
             const creativeData = {};
             creativeData.AdParameters = ad.adParameters;
-            const slotWrapper = document.createElement('div');
+            const slotWrapper = playerInstance.ownerDocument.createElement('div');
             slotWrapper.id = 'fluid_vpaidNonLinear_' + ad.id;
             slotWrapper.className = 'fluid_vpaidNonLinear_' + vAlign;
             slotWrapper.className += ' fluid_vpaidNonLinear_ad';
@@ -632,13 +632,13 @@ export default function (playerInstance, options) {
 
             let slotFrame;
             if (showCloseButton) {
-                const slotFrame = document.createElement('div');
+                const slotFrame = playerInstance.ownerDocument.createElement('div');
                 slotFrame.className = 'fluid_vpaidNonLinear_frame';
                 slotFrame.style.width = adWidth + 'px';
                 slotFrame.style.height = adHeight + 'px';
                 slotWrapper.appendChild(slotFrame);
 
-                const closeBtn = document.createElement('div');
+                const closeBtn = playerInstance.ownerDocument.createElement('div');
                 closeBtn.className = 'close_button';
                 closeBtn.innerHTML = '';
                 closeBtn.title = playerInstance.displayOptions.layoutControls.closeButtonCaption;
@@ -672,7 +672,7 @@ export default function (playerInstance, options) {
 
             }
 
-            const slotIframe = document.createElement('iframe');
+            const slotIframe = playerInstance.ownerDocument.createElement('iframe');
             slotIframe.id = playerInstance.videoPlayerId + 'non_linear_vapid_slot_iframe';
             slotIframe.className = 'fluid_vpaid_nonlinear_slot_iframe';
             slotIframe.setAttribute('width', adWidth + 'px');
@@ -731,7 +731,7 @@ export default function (playerInstance, options) {
     // ADS
     playerInstance.createNonLinearBoard = (ad) => {
         ad.played = true;
-        const board = document.createElement('div');
+        const board = playerInstance.ownerDocument.createElement('div');
         const vAlign = (playerInstance.rollsById[ad.rollListId].vAlign) ? playerInstance.rollsById[ad.rollListId].vAlign : playerInstance.nonLinearVerticalAlign;
 
         const creative = new Image();
@@ -811,7 +811,7 @@ export default function (playerInstance, options) {
             board.style.cursor = 'pointer';
         }
 
-        const closeBtn = document.createElement('div');
+        const closeBtn = playerInstance.ownerDocument.createElement('div');
         closeBtn.className = 'close_button';
         closeBtn.innerHTML = '';
         closeBtn.title = playerInstance.displayOptions.layoutControls.closeButtonCaption;
@@ -984,7 +984,7 @@ export default function (playerInstance, options) {
 
     playerInstance.createAdMarker = (adListId, time) => {
         const markersHolder = playerInstance.domRef.wrapper.querySelector('.fluid_controls_ad_markers_holder');
-        const adMarker = document.createElement('div');
+        const adMarker = playerInstance.ownerDocument.createElement('div');
         adMarker.className = 'fluid_controls_ad_marker fluid_controls_ad_marker_' + adListId;
         adMarker.dataset.adListId = adListId;
         adMarker.style.left = (time / playerInstance.mainVideoDuration * 100) + '%';
@@ -1461,7 +1461,7 @@ export default function (playerInstance, options) {
      * Adds a Skip Button
      */
     playerInstance.addSkipButton = () => {
-        const divSkipButton = document.createElement('div');
+        const divSkipButton = playerInstance.ownerDocument.createElement('div');
         divSkipButton.className = 'skip_button skip_button_disabled';
         if (playerInstance.vastOptions.skipoffset > 0) {
             divSkipButton.innerHTML = playerInstance.displayOptions.vastOptions.skipButtonCaption.replace('[seconds]', playerInstance.vastOptions.skipoffset);
@@ -1485,7 +1485,7 @@ export default function (playerInstance, options) {
         }
 
         const videoWrapper = playerInstance.domRef.wrapper;
-        const divAdCountdown = document.createElement('div');
+        const divAdCountdown = playerInstance.ownerDocument.createElement('div');
 
         // Create element
         const adCountdown = playerInstance.pad(parseInt(playerInstance.currentVideoDuration / 60)) + ':' + playerInstance.pad(parseInt(playerInstance.currentVideoDuration % 60));
@@ -1536,7 +1536,7 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.addAdPlayingText = (textToShow) => {
-        const adPlayingDiv = document.createElement('div');
+        const adPlayingDiv = playerInstance.ownerDocument.createElement('div');
 
         if (playerInstance.displayOptions.layoutControls.primaryColor) {
             adPlayingDiv.style.backgroundColor = playerInstance.displayOptions.layoutControls.primaryColor;
@@ -1687,10 +1687,10 @@ export default function (playerInstance, options) {
      * @param {string} trackingUrl
      */
     playerInstance.createAndAppendCTAButton = (adCTAText, displayUrl, trackingUrl) => {
-        const ctaButton = document.createElement('div');
+        const ctaButton = playerInstance.ownerDocument.createElement('div');
         ctaButton.className = 'fluid_ad_cta';
 
-        const link = document.createElement('span');
+        const link = playerInstance.ownerDocument.createElement('span');
         let innerHTML = adCTAText;
 
         if (displayUrl) {
@@ -1742,7 +1742,7 @@ export default function (playerInstance, options) {
         }
 
         // TODO: refactored, but this is still terrible - remove all this and just make the button clickable...
-        const skipLink = document.createElement('a');
+        const skipLink = playerInstance.ownerDocument.createElement('a');
         skipLink.href = '#';
         skipLink.className = 'js-skipHref';
         skipLink.innerHTML = playerInstance.displayOptions.vastOptions.skipButtonClickCaption;
@@ -1775,7 +1775,7 @@ export default function (playerInstance, options) {
         playerInstance.trackSkipAd();
         // skip the regular linear vast
         playerInstance.displayOptions.vastOptions.vastAdvanced.vastVideoSkippedCallback();
-        const event = document.createEvent('Event');
+        const event = playerInstance.ownerDocument.createEvent('Event');
         event.initEvent('ended', false, true);
         playerInstance.domRef.player.dispatchEvent(event);
     };
@@ -1793,7 +1793,7 @@ export default function (playerInstance, options) {
     playerInstance.addClickthroughLayer = () => {
         const divWrapper = playerInstance.domRef.wrapper;
 
-        const divClickThrough = document.createElement('div');
+        const divClickThrough = playerInstance.ownerDocument.createElement('div');
         divClickThrough.className = 'vast_clickthrough_layer';
         divClickThrough.setAttribute(
             'style',

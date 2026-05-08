@@ -20,7 +20,7 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.generateSuggestedVideoGrid = (config) => {
-        const suggestedVideosGrid = document.createElement('div');
+        const suggestedVideosGrid = playerInstance.ownerDocument.createElement('div');
         suggestedVideosGrid.className = 'suggested_tile_grid';
 
         for (let i = 0; i < 12; i++) {
@@ -83,7 +83,7 @@ export default function (playerInstance, options) {
     }
 
     playerInstance.createVideoTile = (config) => {
-        const videoTile = document.createElement('div');
+        const videoTile = playerInstance.ownerDocument.createElement('div');
         videoTile.addEventListener('click', function () {
             playerInstance.clickSuggestedVideo(config.sources, config.subtitles, config.configUrl);
         }, false);
@@ -96,13 +96,13 @@ export default function (playerInstance, options) {
             }
         });
 
-        const videoImage = document.createElement('img');
+        const videoImage = playerInstance.ownerDocument.createElement('img');
         videoImage.src = config.thumbnailUrl;
         videoImage.className = 'suggested_tile_image';
 
-        const videoTileOverlay = document.createElement('div');
+        const videoTileOverlay = playerInstance.ownerDocument.createElement('div');
         videoTileOverlay.className='suggested_tile_overlay';
-        const title = document.createElement('p');
+        const title = playerInstance.ownerDocument.createElement('p');
         title.className = 'suggested_tile_title';
         title.innerText = config.title;
         videoTileOverlay.appendChild(title);

@@ -89,7 +89,7 @@ export default function (playerInstance, options) {
         subtitlesChangeButton.style.display = 'inline-block';
         let appendSubtitleChange = false;
 
-        const subtitlesChangeList = document.createElement('div');
+        const subtitlesChangeList = playerInstance.ownerDocument.createElement('div');
         subtitlesChangeList.className = 'fluid_subtitles_list';
         subtitlesChangeList.style.display = 'none';
 
@@ -112,7 +112,7 @@ export default function (playerInstance, options) {
                 hasSelectedSubtitle = true;
             }
 
-            const subtitlesChangeDiv = document.createElement('div');
+            const subtitlesChangeDiv = playerInstance.ownerDocument.createElement('div');
             subtitlesChangeDiv.className = 'fluid_subtitle_list_item';
             subtitlesChangeDiv.innerHTML = '<span class="subtitle_button_icon ' + subtitleSelected + '"></span>' + subtitle.label;
 
@@ -245,7 +245,7 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.createSubtitles = () => {
-        const divSubtitlesContainer = document.createElement('div');
+        const divSubtitlesContainer = playerInstance.ownerDocument.createElement('div');
         divSubtitlesContainer.className = 'fluid_subtitles_container';
         playerInstance.domRef.player.parentNode.insertBefore(divSubtitlesContainer, playerInstance.domRef.player.nextSibling);
 
@@ -325,7 +325,7 @@ export default function (playerInstance, options) {
      * @returns {HTMLElement} The subtitle size button element
      */
     playerInstance.createSubtitleSizeButton = () => {
-        const subtitleSizeMenuButton = document.createElement('div');
+        const subtitleSizeMenuButton = playerInstance.ownerDocument.createElement('div');
         subtitleSizeMenuButton.className = 'fluid_subtitle_list_item fluid_sub_menu_button arrow-right';
         subtitleSizeMenuButton.innerHTML = 'Font Size';
 
@@ -344,7 +344,7 @@ export default function (playerInstance, options) {
      * @returns {HTMLElement} The subtitle size menu element
      */
     playerInstance.createSubtitleSizeMenu = () => {
-        const subtitleSizeMenu = document.createElement('div');
+        const subtitleSizeMenu = playerInstance.ownerDocument.createElement('div');
         subtitleSizeMenu.className = 'fluid_subtitle_size_menu';
 
         // Add the "Back" button
@@ -353,7 +353,7 @@ export default function (playerInstance, options) {
 
         // Add the font size options
         playerInstance.subtitleSizeLevels.forEach((size, index) => {
-            const subtitleSizeButton = document.createElement('div');
+            const subtitleSizeButton = playerInstance.ownerDocument.createElement('div');
             subtitleSizeButton.className = 'fluid_subtitle_size_button';
 
             const isSelected = size === 100; // Default size is 100%
@@ -381,7 +381,7 @@ export default function (playerInstance, options) {
      * Creates a "Back" button for the subtitle size menu.
      */
     playerInstance.createBackButtonForSubtitleSizeMenu = () => {
-        const backButton = document.createElement('div');
+        const backButton = playerInstance.ownerDocument.createElement('div');
         backButton.className = 'fluid_subtitle_size_button fluid_sub_menu_button arrow-left';
         backButton.innerHTML = 'Font Size';
 

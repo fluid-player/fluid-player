@@ -37,6 +37,11 @@ const FP_RUNTIME_DEBUG = typeof FP_DEBUG !== 'undefined' && FP_DEBUG === true;
 
 let playerInstances = 0;
 
+function isHTMLVideoElement(node) {
+    if (typeof node !== 'object' || node == null) return false
+    return node.nodeType === Node.ELEMENT_NODE && node.localName === 'video'
+}
+
 const fluidPlayerClass = function () {
     // "self" always points to current instance of the player within the scope of the instance
     // This should help readability and context awareness slightly...
@@ -66,7 +71,7 @@ const fluidPlayerClass = function () {
         }
 
         let playerNode;
-        if (playerTarget instanceof HTMLVideoElement) {
+        if (isHTMLVideoElement(playerTarget)) {
             playerNode = playerTarget;
 
             // Automatically assign ID if none exists
@@ -92,6 +97,7 @@ const fluidPlayerClass = function () {
         playerNode.classList.add('js-fluid-player');
 
         self.domRef.player = playerNode;
+        self.ownerDocument = playerNode.ownerDocument;
         self.vrROTATION_POSITION = 0.1;
         self.vrROTATION_SPEED = 80;
         self.vrMode = false;
@@ -715,7 +721,7 @@ const fluidPlayerClass = function () {
                 return;
             }
 
-            const event = document.createEvent('CustomEvent');
+            const event = self.ownerDocument.createEvent('CustomEvent');
             event.initEvent('fluidplayerpause', false, true);
             self.domRef.player.dispatchEvent(event);
         }, 100);
@@ -729,12 +735,12 @@ const fluidPlayerClass = function () {
         const controls = {};
 
         // Loader
-        controls.loader = document.createElement('div');
+        controls.loader = self.ownerDocument.createElement('div');
         controls.loader.className = 'vast_video_loading';
         controls.loader.style.display = 'none';
 
         // Root element
-        controls.root = document.createElement('div');
+        controls.root = self.ownerDocument.createElement('div');
         controls.root.className = 'fluid_controls_container';
 
         if (!options.displayVolumeBar) {
@@ -746,143 +752,143 @@ const fluidPlayerClass = function () {
         }
 
         // Left container
-        controls.leftContainer = document.createElement('div');
+        controls.leftContainer = self.ownerDocument.createElement('div');
         controls.leftContainer.className = 'fluid_controls_left';
         controls.root.appendChild(controls.leftContainer);
 
         // Left container -> Play/Pause
-        controls.playPause = document.createElement('div');
+        controls.playPause = self.ownerDocument.createElement('div');
         controls.playPause.className = 'fluid_button fluid_button_play fluid_control_playpause';
         controls.leftContainer.appendChild(controls.playPause);
 
         if (options.controlForwardBackward) {
             // Left container -> Skip backwards
-            controls.skipBack = document.createElement('div');
+            controls.skipBack = self.ownerDocument.createElement('div');
             controls.skipBack.className = 'fluid_button fluid_button_skip_back';
             controls.leftContainer.appendChild(controls.skipBack);
 
             // Left container -> Skip forward
-            controls.skipForward = document.createElement('div');
+            controls.skipForward = self.ownerDocument.createElement('div');
             controls.skipForward.className = 'fluid_button fluid_button_skip_forward';
             controls.leftContainer.appendChild(controls.skipForward);
         }
 
         // Progress container
-        controls.progressContainer = document.createElement('div');
+        controls.progressContainer = self.ownerDocument.createElement('div');
         controls.progressContainer.className = 'fluid_controls_progress_container fluid_slider';
         controls.root.appendChild(controls.progressContainer);
 
         // Progress container -> Progress wrapper
-        controls.progressWrapper = document.createElement('div');
+        controls.progressWrapper = self.ownerDocument.createElement('div');
         controls.progressWrapper.className = 'fluid_controls_progress';
         controls.progressContainer.appendChild(controls.progressWrapper);
 
         // Progress container -> Progress wrapper -> Current progress
-        controls.progressCurrent = document.createElement('div');
+        controls.progressCurrent = self.ownerDocument.createElement('div');
         controls.progressCurrent.className = 'fluid_controls_currentprogress';
         controls.progressCurrent.style.backgroundColor = options.primaryColor;
         controls.progressWrapper.appendChild(controls.progressCurrent);
 
         // Progress container -> Progress wrapper -> Current progress -> Marker
-        controls.progress_current_marker = document.createElement('div');
+        controls.progress_current_marker = self.ownerDocument.createElement('div');
         controls.progress_current_marker.className = 'fluid_controls_currentpos';
         controls.progressCurrent.appendChild(controls.progress_current_marker);
 
         // Progress container -> Buffered indicator
-        controls.bufferedIndicator = document.createElement('div');
+        controls.bufferedIndicator = self.ownerDocument.createElement('div');
         controls.bufferedIndicator.className = 'fluid_controls_buffered';
         controls.progressContainer.appendChild(controls.bufferedIndicator);
 
         // Progress container -> Ad markers
-        controls.adMarkers = document.createElement('div');
+        controls.adMarkers = self.ownerDocument.createElement('div');
         controls.adMarkers.className = 'fluid_controls_ad_markers_holder';
         controls.progressContainer.appendChild(controls.adMarkers);
 
         // Right container
-        controls.rightContainer = document.createElement('div');
+        controls.rightContainer = self.ownerDocument.createElement('div');
         controls.rightContainer.className = 'fluid_controls_right';
         controls.root.appendChild(controls.rightContainer);
 
         // Right container -> Fullscreen
-        controls.fullscreen = document.createElement('div');
+        controls.fullscreen = self.ownerDocument.createElement('div');
         controls.fullscreen.className = 'fluid_button fluid_control_fullscreen fluid_button_fullscreen';
         controls.fullscreen.title = 'Full Screen';
         controls.rightContainer.appendChild(controls.fullscreen);
 
         if (options.miniPlayer.enabled) {
             // Right container -> MiniPlayer
-            controls.miniPlayer = document.createElement('div');
+            controls.miniPlayer = self.ownerDocument.createElement('div');
             controls.miniPlayer.className = 'fluid_button fluid_control_mini_player fluid_button_mini_player';
             controls.miniPlayer.title = 'Mini Player';
             controls.rightContainer.appendChild(controls.miniPlayer);
         }
 
         // Right container -> Theatre
-        controls.theatre = document.createElement('div');
+        controls.theatre = self.ownerDocument.createElement('div');
         controls.theatre.className = 'fluid_button fluid_control_theatre fluid_button_theatre';
         controls.theatre.title = 'Theatre Mode';
         controls.rightContainer.appendChild(controls.theatre);
 
         // Right container -> Cardboard
-        controls.cardboard = document.createElement('div');
+        controls.cardboard = self.ownerDocument.createElement('div');
         controls.cardboard.className = 'fluid_button fluid_control_cardboard fluid_button_cardboard';
         controls.cardboard.title = 'Cardboard';
         controls.rightContainer.appendChild(controls.cardboard);
 
         // Right container -> Subtitles
-        controls.subtitles = document.createElement('div');
+        controls.subtitles = self.ownerDocument.createElement('div');
         controls.subtitles.className = 'fluid_button fluid_control_subtitles fluid_button_subtitles';
         controls.subtitles.title = 'Captions';
         controls.rightContainer.appendChild(controls.subtitles);
 
         // Right container -> Video source
-        controls.videoSource = document.createElement('div');
+        controls.videoSource = self.ownerDocument.createElement('div');
         controls.videoSource.className = 'fluid_button fluid_control_video_source fluid_button_video_source';
         controls.videoSource.title = 'Source';
         controls.rightContainer.appendChild(controls.videoSource);
 
         // Right container -> Playback rate
-        controls.playbackRate = document.createElement('div');
+        controls.playbackRate = self.ownerDocument.createElement('div');
         controls.playbackRate.className = 'fluid_button fluid_control_playback_rate fluid_button_playback_rate';
         controls.playbackRate.title = 'Playback Rate';
         controls.rightContainer.appendChild(controls.playbackRate);
 
         // Right container -> Download
-        controls.download = document.createElement('div');
+        controls.download = self.ownerDocument.createElement('div');
         controls.download.className = 'fluid_button fluid_control_download fluid_button_download';
         controls.download.title = 'Download';
         controls.rightContainer.appendChild(controls.download);
 
         // Right container -> Volume container
-        controls.volumeContainer = document.createElement('div');
+        controls.volumeContainer = self.ownerDocument.createElement('div');
         controls.volumeContainer.className = 'fluid_control_volume_container fluid_slider';
         controls.rightContainer.appendChild(controls.volumeContainer);
 
         // Right container -> Volume container -> Volume
-        controls.volume = document.createElement('div');
+        controls.volume = self.ownerDocument.createElement('div');
         controls.volume.className = 'fluid_control_volume';
         controls.volumeContainer.appendChild(controls.volume);
 
         // Right container -> Volume container -> Volume -> Current
-        controls.volumeCurrent = document.createElement('div');
+        controls.volumeCurrent = self.ownerDocument.createElement('div');
         controls.volumeCurrent.className = 'fluid_control_currentvolume';
         controls.volume.appendChild(controls.volumeCurrent);
 
         // Right container -> Volume container -> Volume -> Current -> position
-        controls.volumeCurrentPos = document.createElement('div');
+        controls.volumeCurrentPos = self.ownerDocument.createElement('div');
         controls.volumeCurrentPos.className = 'fluid_control_volume_currentpos';
         controls.volumeCurrent.appendChild(controls.volumeCurrentPos);
 
         // Right container -> Volume container
-        controls.mute = document.createElement('div');
+        controls.mute = self.ownerDocument.createElement('div');
         controls.mute.className = 'fluid_button fluid_button_volume fluid_control_mute';
         controls.rightContainer.appendChild(controls.mute);
 
         // Right container -> Volume Control + Live Steam Button
-        const durationContainer = document.createElement('div');
+        const durationContainer = self.ownerDocument.createElement('div');
         durationContainer.className = 'fluid_control_duration';
 
-        controls.duration = document.createElement('div');
+        controls.duration = self.ownerDocument.createElement('div');
         controls.duration.className = 'fluid_fluid_control_duration';
         controls.duration.innerText = '00:00 / 00:00';
 
@@ -890,7 +896,7 @@ const fluidPlayerClass = function () {
             durationContainer.className = durationContainer.className + ' no_volume_bar';
         }
 
-        controls.live_indicator = document.createElement('div');
+        controls.live_indicator = self.ownerDocument.createElement('div');
         controls.live_indicator.className = 'fluid_control_live_indicator';
         durationContainer.append(controls.live_indicator, controls.duration);
         controls.rightContainer.appendChild(durationContainer);
@@ -902,7 +908,7 @@ const fluidPlayerClass = function () {
         const liveIndicatorButton = self.domRef.player.parentNode.getElementsByClassName('fluid_button_live_indicator');
         if (!liveIndicatorButton.length) {
             const liveIndicator = self.domRef.player.parentNode.getElementsByClassName('fluid_control_live_indicator');
-            const liveIndicatorButton = document.createElement('span');
+            const liveIndicatorButton = self.ownerDocument.createElement('span');
             liveIndicatorButton.className = 'fluid_button_live_indicator';
             liveIndicatorButton.innerHTML = `LIVE<span class="live_circle"></span>`;
             liveIndicatorButton.addEventListener('click', () => {
@@ -1033,7 +1039,7 @@ const fluidPlayerClass = function () {
             timePlaceholder[i].innerHTML = '';
 
             if (self.isLiveStream) {
-                const liveIndicatorButton = document.createElement('span');
+                const liveIndicatorButton = self.ownerDocument.createElement('span');
                 liveIndicatorButton.className = 'fluid_button_live_indicator';
                 liveIndicatorButton.innerHTML = `LIVE<span class="live_circle"></span>`;
                 liveIndicatorButton.addEventListener('pointerdown', () => {
@@ -1042,7 +1048,7 @@ const fluidPlayerClass = function () {
                 timePlaceholder[i].appendChild(liveIndicatorButton);
             }
 
-            const durationTextElement = document.createElement('span');
+            const durationTextElement = self.ownerDocument.createElement('span');
             durationTextElement.className = 'fluid_fluid_control_duration';
             durationTextElement.innerText = durationText;
             timePlaceholder[i].appendChild(durationTextElement);
@@ -1183,19 +1189,19 @@ const fluidPlayerClass = function () {
                 if (!videoPlayerTag[requestFullscreenFunctionNames.isFullscreen]) {
                     functionNameToExecute = 'videoPlayerTag.' + requestFullscreenFunctionNames.goFullscreen + '();';
                     self.fullscreenOn(fullscreenButton, menuOptionFullscreen);
-                    new Function('videoPlayerTag', functionNameToExecute)(videoPlayerTag);
+                    new Function('videoPlayerTag', 'playerDocument', functionNameToExecute)(videoPlayerTag, self.ownerDocument);
                 }
             } else {
-                if (document[requestFullscreenFunctionNames.isFullscreen] === null) {
+                if (self.ownerDocument[requestFullscreenFunctionNames.isFullscreen] === null) {
                     //Go fullscreen
                     functionNameToExecute = 'videoPlayerTag.' + requestFullscreenFunctionNames.goFullscreen + '();';
                     self.fullscreenOn(fullscreenButton, menuOptionFullscreen);
                 } else {
                     //Exit fullscreen
-                    functionNameToExecute = 'document.' + requestFullscreenFunctionNames.exitFullscreen + '();';
+                    functionNameToExecute = 'playerDocument.' + requestFullscreenFunctionNames.exitFullscreen + '();';
                     self.fullscreenOff(fullscreenButton, menuOptionFullscreen);
                 }
-                new Function('videoPlayerTag', functionNameToExecute)(fullscreenTag);
+                new Function('videoPlayerTag', 'playerDocument', functionNameToExecute)(fullscreenTag, self.ownerDocument);
             }
         } else {
             //The browser does not support the Fullscreen API, so a pseudo-fullscreen implementation is used
@@ -1225,7 +1231,7 @@ const fluidPlayerClass = function () {
 
         // find vendor prefix
         ['matches', 'webkitMatchesSelector', 'mozMatchesSelector', 'msMatchesSelector', 'oMatchesSelector'].some(function (fn) {
-            if (typeof document.body[fn] == 'function') {
+            if (typeof self.ownerDocument.body[fn] == 'function') {
                 matchesFn = fn;
                 return true;
             }
@@ -1281,7 +1287,7 @@ const fluidPlayerClass = function () {
             translateX = self.getTranslateX(el);
 
             if (el.tagName === 'BODY') {
-                x += el.offsetLeft + el.clientLeft + translateX - (el.scrollLeft || document.documentElement.scrollLeft);
+                x += el.offsetLeft + el.clientLeft + translateX - (el.scrollLeft || self.ownerDocument.documentElement.scrollLeft);
             } else {
                 x += el.offsetLeft + el.clientLeft + translateX - el.scrollLeft;
             }
@@ -1303,7 +1309,7 @@ const fluidPlayerClass = function () {
         let fullscreenMultiplier = 1;
 
         const requestFullscreenFunctionNames = self.checkFullscreenSupport();
-        if (requestFullscreenFunctionNames && document[requestFullscreenFunctionNames.isFullscreen]) {
+        if (requestFullscreenFunctionNames && self.ownerDocument[requestFullscreenFunctionNames.isFullscreen]) {
             fullscreenMultiplier = 0;
         }
 
@@ -1311,7 +1317,7 @@ const fluidPlayerClass = function () {
 
         while (el && !isNaN(el.offsetTop)) {
             if (el.tagName === 'BODY') {
-                y += el.offsetTop - ((el.scrollTop || document.documentElement.scrollTop) * fullscreenMultiplier);
+                y += el.offsetTop - ((el.scrollTop || self.ownerDocument.documentElement.scrollTop) * fullscreenMultiplier);
 
             } else {
                 y += el.offsetTop - (el.scrollTop * fullscreenMultiplier);
@@ -1374,10 +1380,10 @@ const fluidPlayerClass = function () {
         };
 
         const onProgressbarMouseUp = event => {
-            document.removeEventListener('mousemove', onProgressbarMouseMove);
-            document.removeEventListener('touchmove', onProgressbarMouseMove);
-            document.removeEventListener('mouseup', onProgressbarMouseUp);
-            document.removeEventListener('touchend', onProgressbarMouseUp);
+            self.ownerDocument.removeEventListener('mousemove', onProgressbarMouseMove);
+            self.ownerDocument.removeEventListener('touchmove', onProgressbarMouseMove);
+            self.ownerDocument.removeEventListener('mouseup', onProgressbarMouseUp);
+            self.ownerDocument.removeEventListener('touchend', onProgressbarMouseUp);
 
             let clickedX = self.getEventOffsetX(event, event.target.parentNode);
 
@@ -1402,10 +1408,10 @@ const fluidPlayerClass = function () {
             self.fluidPseudoPause = false;
         };
 
-        document.addEventListener('mouseup', onProgressbarMouseUp);
-        document.addEventListener('touchend', onProgressbarMouseUp, { passive: true });
-        document.addEventListener('mousemove', onProgressbarMouseMove);
-        document.addEventListener('touchmove', onProgressbarMouseMove, { passive: true });
+        self.ownerDocument.addEventListener('mouseup', onProgressbarMouseUp);
+        self.ownerDocument.addEventListener('touchend', onProgressbarMouseUp, { passive: true });
+        self.ownerDocument.addEventListener('mousemove', onProgressbarMouseMove);
+        self.ownerDocument.addEventListener('touchmove', onProgressbarMouseMove, { passive: true });
     };
 
     self.onVolumeBarMouseDown = () => {
@@ -1436,10 +1442,10 @@ const fluidPlayerClass = function () {
         }
 
         const onVolumeBarMouseUp = event => {
-            document.removeEventListener('mousemove', onVolumeBarMouseMove);
-            document.removeEventListener('touchmove', onVolumeBarMouseMove);
-            document.removeEventListener('mouseup', onVolumeBarMouseUp);
-            document.removeEventListener('touchend', onVolumeBarMouseUp);
+            self.ownerDocument.removeEventListener('mousemove', onVolumeBarMouseMove);
+            self.ownerDocument.removeEventListener('touchmove', onVolumeBarMouseMove);
+            self.ownerDocument.removeEventListener('mouseup', onVolumeBarMouseUp);
+            self.ownerDocument.removeEventListener('touchend', onVolumeBarMouseUp);
 
             const currentX = self.getEventOffsetX(event, self.domRef.controls.volumeContainer);
 
@@ -1448,10 +1454,10 @@ const fluidPlayerClass = function () {
             }
         }
 
-        document.addEventListener('mouseup', onVolumeBarMouseUp);
-        document.addEventListener('touchend', onVolumeBarMouseUp, { passive: true });
-        document.addEventListener('mousemove', onVolumeBarMouseMove);
-        document.addEventListener('touchmove', onVolumeBarMouseMove, { passive: true });
+        self.ownerDocument.addEventListener('mouseup', onVolumeBarMouseUp);
+        self.ownerDocument.addEventListener('touchend', onVolumeBarMouseUp, { passive: true });
+        self.ownerDocument.addEventListener('mousemove', onVolumeBarMouseMove);
+        self.ownerDocument.addEventListener('touchmove', onVolumeBarMouseMove, { passive: true });
     };
 
     self.onVideoSeeked = () => {
@@ -1546,7 +1552,7 @@ const fluidPlayerClass = function () {
 
     self.handleMouseleave = (event) => {
         if (typeof event.clientX !== 'undefined'
-            && self.domRef.wrapper.contains(document.elementFromPoint(event.clientX, event.clientY))) {
+            && self.domRef.wrapper.contains(self.ownerDocument.elementFromPoint(event.clientX, event.clientY))) {
             //false positive; we didn't actually leave the player
             return;
         }
@@ -1633,7 +1639,7 @@ const fluidPlayerClass = function () {
 
         };
 
-        document.addEventListener('keydown', self.captureKey, true);
+        self.ownerDocument.addEventListener('keydown', self.captureKey, true);
     };
 
     self.keyboardControl = () => {
@@ -1662,7 +1668,7 @@ const fluidPlayerClass = function () {
             return;
         }
 
-        document.removeEventListener('keydown', self.captureKey, true);
+        self.ownerDocument.removeEventListener('keydown', self.captureKey, true);
         delete self['captureKey'];
 
         if (self.theatreMode && !self.theatreModeAdvanced) {
@@ -1896,7 +1902,7 @@ const fluidPlayerClass = function () {
         }
 
         const progressContainer = self.domRef.wrapper.querySelector('.fluid_controls_progress_container');
-        const previewContainer = document.createElement('div');
+        const previewContainer = self.ownerDocument.createElement('div');
 
         previewContainer.className = 'fluid_timeline_preview';
         previewContainer.style.display = 'none';
@@ -1934,17 +1940,17 @@ const fluidPlayerClass = function () {
         const extraLinks = self.displayOptions.layoutControls.contextMenu.links;
 
         //Create own context menu
-        const divContextMenu = document.createElement('div');
+        const divContextMenu = self.ownerDocument.createElement('div');
         divContextMenu.className = 'fluid_context_menu';
         divContextMenu.style.display = 'none';
         divContextMenu.style.position = 'absolute';
 
-        const contextMenuList = document.createElement('ul');
+        const contextMenuList = self.ownerDocument.createElement('ul');
         divContextMenu.appendChild(contextMenuList);
 
         if (Array.isArray(extraLinks)) {
             extraLinks.forEach(function appendExtraLinks(link, index) {
-                const linkItem = document.createElement('li');
+                const linkItem = self.ownerDocument.createElement('li');
                 linkItem.innerHTML = link.label;
                 linkItem.addEventListener('click', () => window.open(link.href, '_blank'), false);
                 contextMenuList.appendChild(linkItem);
@@ -1952,26 +1958,26 @@ const fluidPlayerClass = function () {
         }
 
         if (showDefaultControls) {
-            const menuItemPlay = document.createElement('li');
+            const menuItemPlay = self.ownerDocument.createElement('li');
             menuItemPlay.className = 'context_option_play';
             menuItemPlay.innerHTML = self.displayOptions.captions.play;
             menuItemPlay.addEventListener('click', () => self.playPauseToggle(), false);
             contextMenuList.appendChild(menuItemPlay);
 
-            const menuItemMute = document.createElement('li');
+            const menuItemMute = self.ownerDocument.createElement('li');
             menuItemMute.className = 'context_option_mute';
             menuItemMute.innerHTML = self.displayOptions.captions.mute;
             menuItemMute.addEventListener('click', () => self.muteToggle(), false);
             contextMenuList.appendChild(menuItemMute);
 
-            const menuItemFullscreen = document.createElement('li');
+            const menuItemFullscreen = self.ownerDocument.createElement('li');
             menuItemFullscreen.className = 'context_option_fullscreen';
             menuItemFullscreen.innerHTML = self.displayOptions.captions.fullscreen;
             menuItemFullscreen.addEventListener('click', () => self.fullscreenToggle(), false);
             contextMenuList.appendChild(menuItemFullscreen);
         }
 
-        const menuItemVersion = document.createElement('li');
+        const menuItemVersion = self.ownerDocument.createElement('li');
         menuItemVersion.innerHTML = 'Fluid Player ' + self.version;
         menuItemVersion.addEventListener('click', () => window.open(self.homepage, '_blank'), false)
         contextMenuList.appendChild(menuItemVersion);
@@ -1988,7 +1994,7 @@ const fluidPlayerClass = function () {
         }, false);
 
         //Hide the context menu on clicking elsewhere
-        document.addEventListener('click', e => {
+        self.ownerDocument.addEventListener('click', e => {
             if ((e.target !== self.domRef.player) || e.button !== 2) {
                 divContextMenu.style.display = 'none';
             }
@@ -2110,13 +2116,13 @@ const fluidPlayerClass = function () {
                 if (requestFullscreenFunctionNames.goFullscreen === 'webkitEnterFullscreen') {
                     functionNameToExecute = 'videoPlayerTag.' + requestFullscreenFunctionNames.goFullscreen + '();';
                     self.fullscreenOn(fullscreenButton, menuOptionFullscreen);
-                    new Function('videoPlayerTag', functionNameToExecute)(videoPlayerTag);
+                    new Function('videoPlayerTag', 'playerDocument', functionNameToExecute)(videoPlayerTag, self.ownerDocument);
                 } else {
-                    if (document[requestFullscreenFunctionNames.isFullscreen] === null) {
+                    if (self.ownerDocument[requestFullscreenFunctionNames.isFullscreen] === null) {
                         functionNameToExecute = 'videoPlayerTag.' + requestFullscreenFunctionNames.goFullscreen + '();';
                         self.fullscreenOn(fullscreenButton, menuOptionFullscreen);
                     }
-                    new Function('videoPlayerTag', functionNameToExecute)(fullscreenTag);
+                    new Function('videoPlayerTag', 'playerDocument', functionNameToExecute)(fullscreenTag, self.ownerDocument);
                 }
             } else {
                 fullscreenTag.className += ' pseudo_fullscreen';
@@ -2125,9 +2131,9 @@ const fluidPlayerClass = function () {
         } else {
             fullscreenTag.className = fullscreenTag.className.replace(/\bpseudo_fullscreen\b/g, '');
             if (requestFullscreenFunctionNames) {
-                functionNameToExecute = 'document.' + requestFullscreenFunctionNames.exitFullscreen + '();';
+                functionNameToExecute = 'playerDocument.' + requestFullscreenFunctionNames.exitFullscreen + '();';
                 self.fullscreenOff(fullscreenButton, menuOptionFullscreen);
-                new Function('videoPlayerTag', functionNameToExecute)(fullscreenTag);
+                new Function('videoPlayerTag', 'playerDocument', functionNameToExecute)(fullscreenTag, self.ownerDocument);
             }  else {
                 if (fullscreenTag.className.search(/\bpseudo_fullscreen\b/g) !== -1) {
                     fullscreenTag.className = fullscreenTag.className.replace(/\bpseudo_fullscreen\b/g, '');
@@ -2168,23 +2174,23 @@ const fluidPlayerClass = function () {
      * @returns {void}
      */
     self.initSkipAnimationElements = function initSkipAnimationElements() {
-        const skipAnimationWrapper = document.createElement('div');
+        const skipAnimationWrapper = self.ownerDocument.createElement('div');
         skipAnimationWrapper.classList.add('fluid_player_skip_offset');
 
-        const skipAnimationBackward = document.createElement('div');
+        const skipAnimationBackward = self.ownerDocument.createElement('div');
         skipAnimationBackward.classList.add('fluid_player_skip_offset__backward');
         skipAnimationWrapper.appendChild(skipAnimationBackward);
 
-        const skipAnimationBackwardIcon = document.createElement('div');
+        const skipAnimationBackwardIcon = self.ownerDocument.createElement('div');
         skipAnimationBackwardIcon.classList.add('fluid_player_skip_offset__backward-icon');
         skipAnimationBackwardIcon.ontransitionend = () => skipAnimationBackwardIcon.classList.remove('animate');
         skipAnimationBackward.appendChild(skipAnimationBackwardIcon);
 
-        const skipAnimationForward = document.createElement('div');
+        const skipAnimationForward = self.ownerDocument.createElement('div');
         skipAnimationForward.classList.add('fluid_player_skip_offset__forward');
         skipAnimationWrapper.appendChild(skipAnimationForward);
 
-        const skipAnimationForwardIcon = document.createElement('div');
+        const skipAnimationForwardIcon = self.ownerDocument.createElement('div');
         skipAnimationForwardIcon.classList.add('fluid_player_skip_offset__forward-icon');
         skipAnimationForwardIcon.ontransitionend = () => skipAnimationForwardIcon.classList.remove('animate');
         skipAnimationForward.appendChild(skipAnimationForwardIcon);
@@ -2288,23 +2294,23 @@ const fluidPlayerClass = function () {
     };
 
     self.handleFullscreen = () => {
-        if (typeof document.vastFullsreenChangeEventListenersAdded !== 'undefined') {
+        if (typeof self.ownerDocument.vastFullsreenChangeEventListenersAdded !== 'undefined') {
             return;
         }
 
         ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'msfullscreenchange'].forEach(eventType => {
-            if (typeof (document['on' + eventType]) === 'object') {
-                document.addEventListener(eventType, function (ev) {
+            if (typeof (self.ownerDocument['on' + eventType]) === 'object') {
+                self.ownerDocument.addEventListener(eventType, function (ev) {
                     self.recalculateAdDimensions();
                 }, false);
             }
         });
 
-        document.vastFullsreenChangeEventListenersAdded = true;
+        self.ownerDocument.vastFullsreenChangeEventListenersAdded = true;
     };
 
     self.setupPlayerWrapper = () => {
-        const wrapper = document.createElement('div');
+        const wrapper = self.ownerDocument.createElement('div');
 
         wrapper.id = 'fluid_video_wrapper_' + self.videoPlayerId;
         wrapper.className = self.isTouchDevice()
@@ -2376,7 +2382,7 @@ const fluidPlayerClass = function () {
 
         let appendSourceChange = false;
 
-        const sourceChangeList = document.createElement('div');
+        const sourceChangeList = self.ownerDocument.createElement('div');
         sourceChangeList.className = 'fluid_video_sources_list';
         sourceChangeList.style.display = 'none';
 
@@ -2397,7 +2403,7 @@ const fluidPlayerClass = function () {
             const sourceSelected = (firstSource) ? "source_selected" : "";
             const hdElement = (source.isHD) ? '<sup style="color:' + self.displayOptions.layoutControls.primaryColor + '" class="fp_hd_source"></sup>' : '';
             firstSource = false;
-            const sourceChangeDiv = document.createElement('div');
+            const sourceChangeDiv = self.ownerDocument.createElement('div');
             sourceChangeDiv.className = 'fluid_video_source_list_item js-source_' + source.title;
             sourceChangeDiv.innerHTML = '<span class="source_button_icon ' + sourceSelected + '"></span>' + source.title + hdElement;
 
@@ -2523,7 +2529,7 @@ const fluidPlayerClass = function () {
             return;
         }
 
-        const titleHolder = document.createElement('div');
+        const titleHolder = self.ownerDocument.createElement('div');
         self.domRef.player.parentNode.insertBefore(titleHolder, null);
         titleHolder.innerHTML += self.displayOptions.layoutControls.title;
         titleHolder.classList.add('fp_title');
@@ -2562,7 +2568,7 @@ const fluidPlayerClass = function () {
 
         // Container div for the logo
         // This is to allow for fade in and out logo_maintain_display
-        const logoHolder = document.createElement('div');
+        const logoHolder = self.ownerDocument.createElement('div');
         logoHolder.className = 'logo_holder';
         if (self.displayOptions.layoutControls.logo.hideWithControls) {
             logoHolder.classList.add('initial_controls_show', 'fp_logo');
@@ -2570,7 +2576,7 @@ const fluidPlayerClass = function () {
             logoHolder.classList.add('logo_maintain_display');
         }
         // The logo itself
-        const logoImage = document.createElement('img');
+        const logoImage = self.ownerDocument.createElement('img');
         if (self.displayOptions.layoutControls.logo.imageUrl) {
             logoImage.src = self.displayOptions.layoutControls.logo.imageUrl;
         }
@@ -2625,7 +2631,7 @@ const fluidPlayerClass = function () {
             return;
         }
 
-        const containerDiv = document.createElement('div');
+        const containerDiv = self.ownerDocument.createElement('div');
         containerDiv.className = 'fluid_html_on_pause_container';
         containerDiv.style.display = 'none';
         containerDiv.innerHTML = self.displayOptions.layoutControls.htmlOnPauseBlock.html;
@@ -2649,7 +2655,7 @@ const fluidPlayerClass = function () {
      */
     self.initPlayButton = () => {
         // Create the html for the play button
-        const containerDiv = document.createElement('div');
+        const containerDiv = self.ownerDocument.createElement('div');
         containerDiv.className = 'fluid_html_on_pause fluid_initial_play_button_container';
         const backgroundColor = (self.displayOptions.layoutControls.primaryColor) ? self.displayOptions.layoutControls.primaryColor : "#333333";
         containerDiv.innerHTML = '<div class="fluid_initial_play" style="background-color:' + backgroundColor + '"><div class="fluid_initial_play_button"></div></div>';
@@ -2910,7 +2916,7 @@ const fluidPlayerClass = function () {
         const sourceChangeButton = self.domRef.wrapper.querySelector('.fluid_control_playback_rate');
         sourceChangeButton.style.display = 'inline-block';
 
-        const sourceChangeList = document.createElement('div');
+        const sourceChangeList = self.ownerDocument.createElement('div');
         sourceChangeList.className = 'fluid_video_playback_rates';
         sourceChangeList.style.display = 'none';
 
@@ -2924,7 +2930,7 @@ const fluidPlayerClass = function () {
         }
 
         self.displayOptions.layoutControls.controlBar.playbackRates.forEach(function (rate) {
-            const sourceChangeDiv = document.createElement('div');
+            const sourceChangeDiv = self.ownerDocument.createElement('div');
             sourceChangeDiv.className = 'fluid_video_playback_rates_item';
             sourceChangeDiv.innerText = rate;
 
@@ -2967,7 +2973,7 @@ const fluidPlayerClass = function () {
         }
         downloadOption.style.display = 'inline-block';
 
-        let downloadClick = document.createElement('a');
+        let downloadClick = self.ownerDocument.createElement('a');
         downloadClick.className = 'fp_download_click';
         downloadClick.onclick = function (e) {
             const linkItem = this;
@@ -3028,7 +3034,7 @@ const fluidPlayerClass = function () {
 
         // Trigger theatre event
         const theatreEvent = (self.theatreMode) ? 'theatreModeOn' : 'theatreModeOff';
-        const event = document.createEvent('CustomEvent');
+        const event = self.ownerDocument.createEvent('CustomEvent');
         event.initEvent(theatreEvent, false, true);
         self.domRef.player.dispatchEvent(event);
 
@@ -3098,7 +3104,7 @@ const fluidPlayerClass = function () {
             return;
         }
 
-        const containerDiv = document.createElement('div');
+        const containerDiv = self.ownerDocument.createElement('div');
         containerDiv.className = 'fluid_pseudo_poster';
         if (['auto', 'contain', 'cover'].indexOf(self.displayOptions.layoutControls.posterImageSize) === -1) {
             console.log('[FP_ERROR] Not allowed value in posterImageSize');
@@ -3240,7 +3246,7 @@ const fluidPlayerClass = function () {
 
         // We create the HTML block from scratch if it doesn't already exist
         if (!htmlBlock) {
-            const containerDiv = document.createElement('div');
+            const containerDiv = self.ownerDocument.createElement('div');
             containerDiv.className = 'fluid_html_on_pause';
             containerDiv.style.display = 'none';
             containerDiv.innerHTML = passedHtml.html;

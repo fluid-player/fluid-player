@@ -86,7 +86,7 @@ export default function (playerInstance, options) {
 
     playerInstance.generateTimelinePreviewTags = () => {
         const progressContainer = playerInstance.domRef.wrapper.querySelector('.fluid_controls_progress_container');
-        const previewContainer = document.createElement('div');
+        const previewContainer = playerInstance.ownerDocument.createElement('div');
 
         previewContainer.className = 'fluid_timeline_preview_container';
         previewContainer.style.display = 'none';
@@ -95,7 +95,7 @@ export default function (playerInstance, options) {
         progressContainer.appendChild(previewContainer);
 
         //Shadow is needed to not trigger mouseleave event, that stops showing thumbnails, in case one scrubs a bit too fast and leaves current thumb before new one drawn.
-        const previewContainerShadow = document.createElement('div');
+        const previewContainerShadow = playerInstance.ownerDocument.createElement('div');
         previewContainerShadow.className = 'fluid_timeline_preview_container_shadow';
         previewContainerShadow.style.position = 'absolute';
         previewContainerShadow.style.display = 'none';
@@ -176,7 +176,7 @@ export default function (playerInstance, options) {
         playerInstance.domRef.wrapper.querySelector('.fluid_controls_progress_container')
             .addEventListener(eventOff, function (event) {
                 const progress = playerInstance.domRef.wrapper.querySelector('.fluid_controls_progress_container');
-                if (typeof event.clientX !== 'undefined' && progress.contains(document.elementFromPoint(event.clientX, event.clientY))) {
+                if (typeof event.clientX !== 'undefined' && progress.contains(playerInstance.ownerDocument.elementFromPoint(event.clientX, event.clientY))) {
                     //False positive (Chrome bug when fast click causes leave event)
                     return;
                 }
