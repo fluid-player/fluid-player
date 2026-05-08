@@ -501,7 +501,7 @@ export default function (playerInstance, options) {
     };
 
     playerInstance.loadVpaid = (ad, vpaidJsUrl) => {
-        const vpaidIframe = document.createElement('iframe');
+        const vpaidIframe = playerInstance.ownerDocument.createElement('iframe');
         vpaidIframe.id = "fp_" + ad.id + "_fluid_vpaid_iframe";
         vpaidIframe.className = 'fluid_vpaid_iframe';
         vpaidIframe.setAttribute('adListId', ad.id);
@@ -509,10 +509,11 @@ export default function (playerInstance, options) {
 
         playerInstance.domRef.player.parentNode.insertBefore(vpaidIframe, playerInstance.domRef.player.nextSibling);
 
-        const vpaidJsScriptElement = document.createElement('script');
+        const vpaidDoc = vpaidIframe.contentWindow.document;
+        const vpaidJsScriptElement = vpaidDoc.createElement('script');
         vpaidJsScriptElement.src = vpaidJsUrl;
 
-        vpaidIframe.contentWindow.document.head.append(vpaidJsScriptElement);
+        vpaidDoc.head.append(vpaidJsScriptElement);
 
         // set interval with timeout
         playerInstance.tempVpaidCounter = 0;

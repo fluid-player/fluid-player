@@ -197,7 +197,7 @@ export default function (playerInstance, options) {
     }
 
     function createSourceChangeList(levels) {
-        const sourceChangeList = document.createElement('div');
+        const sourceChangeList = playerInstance.ownerDocument.createElement('div');
         sourceChangeList.className = 'fluid_video_sources_list';
         sourceChangeList.style.display = 'none';
 
@@ -213,7 +213,7 @@ export default function (playerInstance, options) {
         const sourceSelectedClass = getSourceSelectedClass(level);
         const hdIndicator = level.isHD ? `<sup style="color:${playerInstance.displayOptions.layoutControls.primaryColor}" class="fp_hd_source"></sup>` : '';
 
-        const sourceChangeDiv = document.createElement('div');
+        const sourceChangeDiv = playerInstance.ownerDocument.createElement('div');
         sourceChangeDiv.className = `fluid_video_source_list_item js-source_${level.title}`;
         sourceChangeDiv.innerHTML = `<span class="source_button_icon ${sourceSelectedClass}"></span>${level.title}${hdIndicator}`;
 

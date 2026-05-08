@@ -93,10 +93,10 @@ export default function (playerInstance) {
         const hasCloseButton = Boolean(playerInstance.domRef.player.parentNode.querySelector(`.${CLOSE_BUTTON_CLASS}`));
 
         if (!hasCloseButton) {
-            const closeButtonWrapper = document.createElement('div');
+            const closeButtonWrapper = playerInstance.ownerDocument.createElement('div');
             closeButtonWrapper.classList.add(CLOSE_BUTTON_WRAPPER_CLASS);
 
-            const closeButton = document.createElement('span');
+            const closeButton = playerInstance.ownerDocument.createElement('span');
             closeButton.classList.add(CLOSE_BUTTON_CLASS);
             closeButton.addEventListener('click', () => {
                 toggleMiniPlayer('off', true);
@@ -180,8 +180,9 @@ export default function (playerInstance) {
      * Emits event to Fluid Player Event API
      */
     function emitToggleEvent() {
+        const view = playerInstance.ownerWindow || window;
         playerInstance.domRef.player.dispatchEvent(
-            new CustomEvent(MINI_PLAYER_TOGGLE_EVENT, { detail: { isToggledOn: playerInstance.miniPlayerToggledOn } })
+            new view.CustomEvent(MINI_PLAYER_TOGGLE_EVENT, { detail: { isToggledOn: playerInstance.miniPlayerToggledOn } })
         );
     }
 
@@ -265,13 +266,13 @@ export default function (playerInstance) {
      * Setups mobile disable element
      */
     function setupMobile() {
-        const disableMiniPlayerMobile = document.createElement('div');
+        const disableMiniPlayerMobile = playerInstance.ownerDocument.createElement('div');
         let animationAmount = 0;
         let startTimestamp = 0;
         let startScreenX = 0;
         let hasTriggeredAnimation;
         disableMiniPlayerMobile.classList.add(DISABLE_MINI_PLAYER_MOBILE_CLASS);
-        const closeButton = document.createElement('span');
+        const closeButton = playerInstance.ownerDocument.createElement('span');
         closeButton.classList.add(CLOSE_BUTTON_CLASS);
         disableMiniPlayerMobile.appendChild(closeButton);
 
@@ -336,7 +337,7 @@ export default function (playerInstance) {
      * @param {number} placeholderHeight
      */
     function createPlayerPlaceholder(placeholderWidth, placeholderHeight) {
-        placeholderElement = document.createElement('div');
+        placeholderElement = playerInstance.ownerDocument.createElement('div');
         placeholderElement.classList.add(PLACEHOLDER_CLASS);
         placeholderElement.style.height = `${placeholderHeight}px`;
         placeholderElement.style.width = `${placeholderWidth}px`;
@@ -359,14 +360,15 @@ export default function (playerInstance) {
      */
     function toggleScreenDetection() {
         const autoToggle = playerInstance.displayOptions.layoutControls.miniPlayer.autoToggle;
+        const view = playerInstance.ownerWindow || window;
 
         if (toggleByVisibilityControl || !autoToggle) {
-            document.removeEventListener('scroll', toggleMiniPlayerByVisibility);
+            view.removeEventListener('scroll', toggleMiniPlayerByVisibility);
             return;
         }
 
         toggleByVisibilityControl = true;
-        document.addEventListener('scroll', toggleMiniPlayerByVisibility, { passive: true });
+        view.addEventListener('scroll', toggleMiniPlayerByVisibility, { passive: true });
     }
 
     /**

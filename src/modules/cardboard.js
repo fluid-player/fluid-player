@@ -1,7 +1,7 @@
 export default function (playerInstance, options) {
     playerInstance.createCardboardJoystickButton = (identity) => {
         const vrJoystickPanel = playerInstance.domRef.wrapper.querySelector('.fluid_vr_joystick_panel');
-        const joystickButton = document.createElement('div');
+        const joystickButton = playerInstance.ownerDocument.createElement('div');
 
         joystickButton.className = 'fluid_vr_button fluid_vr_joystick_' + identity;
         vrJoystickPanel.appendChild(joystickButton);
@@ -39,7 +39,7 @@ export default function (playerInstance, options) {
         const vrContainer = playerInstance.domRef.wrapper.querySelector('.fluid_vr_container');
 
         // Create a JoyStick and append to VR container
-        const vrJoystickPanel = document.createElement('div');
+        const vrJoystickPanel = playerInstance.ownerDocument.createElement('div');
         vrJoystickPanel.className = 'fluid_vr_joystick_panel';
         vrContainer.appendChild(vrJoystickPanel);
 
@@ -274,7 +274,7 @@ export default function (playerInstance, options) {
 
     playerInstance.createCardboardView = () => {
         // Create a container for 360degree
-        const vrContainer = document.createElement('div');
+        const vrContainer = playerInstance.ownerDocument.createElement('div');
         vrContainer.className = 'fluid_vr_container';
         playerInstance.domRef.player.parentNode.insertBefore(vrContainer, playerInstance.domRef.player.nextSibling);
 
