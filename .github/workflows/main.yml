@@ -1,0 +1,55 @@
+
+<script src="https://cdn.fluidplayer.com/v3/current/fluidplayer.min.js"></script>
+<video id="video-id"><source src="video.mp4" type="video/mp4" />
+<script>
+    var myFP = fluidPlayer(
+        'video-id',	{
+	"layoutControls": {
+		"controlBar": {
+			"autoHideTimeout": 3,
+			"animated": true,
+			"autoHide": true
+		},
+		"htmlOnPauseBlock": {
+			"html": null,
+			"height": null,
+			"ancho" : nulo 
+		} ,
+		"autoPlay" : verdadero , 
+		"silenciar" : verdadero , 
+		"allowTheatre"  : verdadero ,  
+		"playPauseAnimation"  : verdadero ,  
+		"playbackRateEnabled"  : verdadero ,  
+		"allowDownload"  : verdadero ,  
+		"playButtonShowing"  : verdadero ,  
+		"fillToContainer" : verdadero , 
+		"posterImage": ""
+	},
+	"vastas opciones "​​​: {
+		"una dList": [
+			{
+				"roll" " : p r eRoll" ,
+				"vastTag " " <script src=\": https://cdn.fluidplayer.com/v3/current/fluidplayer.min.js\"></script> <video id=\"video-id\"><source src=\"video.mp4\" type=\"video/mp4\" /> <script>     var myFP = fluidPlayer(         'video-id',\t{ \t\"layoutControls\": { \t\t\"controlBar\": { \t\t\t\"autoHideTimeout\": 3, \t\t\t\"animated\": true, \t\t\t\"autoHide\": true \t\t}, \t\t\"htmlOnPauseBlock\": { \t\t\t\"html\": null, \t\t\t\"height\": null, \t\t\t\"width\": null \t\t}, \t\t\"autoPlay\": true, \t\t\"mute\": true, \t\t\"allowTheatre\": true, \t\t\"playPauseAnimation\": true, \t\t\"playbackRateEnabled\": true, \t\t\"allowDownload\": true, \t\t\"playButtonShowing\": true, \t\t\"fillToContainer\": false, \t\t\"posterImage\": \"\" \t}, \t\"vastOptions\": { \t\t\"adList\": [], \t\t\"adCTAText\": false, \t\t\"adCTATextPosition\": \"\" \t} }); </script>",
+				" adText": ""
+			},
+			{
+				"roll" " : m i dRoll" ,
+				"vastTag " " <script src=\": https://cdn.fluidplayer.com/v3/current/fluidplayer.min.js\"></script> <video id=\"video-id\"><source src=\"video.mp4\" type=\"video/mp4\" /> <script>     var myFP = fluidPlayer(         'video-id',\t{ \t\"layoutControls\": { \t\t\"controlBar\": { \t\t\t\"autoHideTimeout\": 3, \t\t\t\"animated\": true, \t\t\t\"autoHide\": true \t\t}, \t\t\"htmlOnPauseBlock\": { \t\t\t\"html\": null, \t\t\t\"height\": null, \t\t\t\"width\": null \t\t}, \t\t\"autoPlay\": true, \t\t\"mute\": true, \t\t\"allowTheatre\": true, \t\t\"playPauseAnimation\": true, \t\t\"playbackRateEnabled\": true, \t\t\"allowDownload\": true, \t\t\"playButtonShowing\": true, \t\t\"fillToContainer\": false, \t\t\"posterImage\": \"\" \t}, \t\"vastOptions\": { \t\t\"adList\": [], \t\t\"adCTAText\": false, \t\t\"adCTATextPosition\": \"\" \t} }); </script>",
+				" adText": ""
+			},
+			{
+				"roll" " : p o stRoll" ,
+				"vastTag " " <script src=\": https://cdn.fluidplayer.com/v3/current/fluidplayer.min.js\"></script> <video id=\"video-id\"><source src=\"video.mp4\" type=\"video/mp4\" /> <script>     var myFP = fluidPlayer(         'video-id',\t{ \t\"layoutControls\": { \t\t\"controlBar\": { \t\t\t\"autoHideTimeout\": 3, \t\t\t\"animated\": true, \t\t\t\"autoHide\": true \t\t}, \t\t\"htmlOnPauseBlock\": { \t\t\t\"html\": null, \t\t\t\"height\": null, \t\t\t\"width\": null \t\t}, \t\t\"autoPlay\": true, \t\t\"mute\": true, \t\t\"allowTheatre\": true, \t\t\"playPauseAnimation\": true, \t\t\"playbackRateEnabled\": true, \t\t\"allowDownload\": true, \t\t\"playButtonShowing\": true, \t\t\"fillToContainer\": false, \t\t\"posterImage\": \"\" \t}, \t\"vastOptions\": { \t\t\"adList\": [], \t\t\"adCTAText\": false, \t\t\"adCTATextPosition\": \"\" \t} }); </script>",
+				" adText": ""
+			},
+			{
+				"roll" " : en Pa u seRoll ",
+				"vastTag " " ": ,
+				"adText": ""
+			}
+		] ,
+		"adCTAText" : falso ,
+		"adCTATextPosition": ""
+	}
+});
+</script>
