@@ -959,6 +959,9 @@ export default function (playerInstance, options) {
         if (adsByType.linear.length > 0) {
             playerInstance.toggleLoader(false);
             playerInstance.playRoll(adsByType.linear);
+        } else if (adsByType.nonLinear.length > 0) {
+            playerInstance.toggleLoader(false);
+            playerInstance.switchToMainVideo();
         } else {
             playerInstance.playMainVideoWhenVastFails(900);
         }
