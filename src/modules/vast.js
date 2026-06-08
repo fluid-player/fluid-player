@@ -163,7 +163,9 @@ export default function (playerInstance, options) {
     playerInstance.getDurationFromNonLinear = (tag) => {
         let result = 0;
         const nonLinear = tag.getElementsByTagName('NonLinear');
-        if (nonLinear.length && (typeof nonLinear[0].getAttribute('minSuggestedDuration') !== 'undefined')) {
+        if (nonLinear.length 
+            && nonLinear[0].getAttribute('minSuggestedDuration') !== null 
+            && typeof nonLinear[0].getAttribute('minSuggestedDuration') !== 'undefined') {
             result = playerInstance.convertTimeStringToSeconds(nonLinear[0].getAttribute('minSuggestedDuration'));
         }
         return result;
@@ -707,6 +709,12 @@ export default function (playerInstance, options) {
                             tmpOptions.mediaType = selectedMediaFile.mediaType;
                         }
 
+                    }
+
+                    if (tmpOptions.adType === 'nonLinear') {
+                        if (!playerInstance.rollsById[rollListId].nonLinearDuration) {
+                            playerInstance.rollsById[rollListId].nonLinearDuration = tmpOptions.duration || playerInstance.nonLinearDuration;
+                        }
                     }
 
                     tmpOptions.adType = tmpOptions.adType ? tmpOptions.adType : 'unknown';
