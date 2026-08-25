@@ -1,0 +1,33 @@
+<VAST xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast4.xsd" version="4.2">
+    <Ad id="1" adType="video">
+        <InLine>
+            <AdSystem version="1">Test</AdSystem>
+            <AdTitle>Vast Linear Tracking Order</AdTitle>
+            <Creatives>
+                <Creative sequence="1" id="1">
+                    <Linear>
+                        <Duration>00:00:00</Duration>
+                        <MediaFiles>
+                            <MediaFile id="1" delivery="progressive" type="video/mp4" bitrate="2000" width="1280" height="720" minBitrate="2000" maxBitrate="2000" scalable="1" maintainAspectRatio="1" codec="0">
+                                <![CDATA[ https://www.fluidplayer.com/videos/Pre-Roll_intro_Giles.mp4 ]]>
+                            </MediaFile>
+                        </MediaFiles>
+                        <TrackingEvents>
+                            <Tracking event="start">http://www.example.com/tracking/start</Tracking>
+                            <Tracking event="firstQuartile">http://www.example.com/tracking/firstQuartile</Tracking>
+                            <Tracking event="midpoint">http://www.example.com/tracking/midpoint</Tracking>
+                            <Tracking event="thirdQuartile">http://www.example.com/tracking/thirdQuartile</Tracking>
+                            <Tracking event="complete">http://www.example.com/tracking/complete</Tracking>
+                        </TrackingEvents>
+                    </Linear>
+                    <UniversalAdId idRegistry="unknown">unknown</UniversalAdId>
+                </Creative>
+            </Creatives>
+            <Extensions>
+            </Extensions>
+            <Impression id="">
+                <![CDATA[ http://www.example.com/tracking/impression ]]>
+            </Impression>
+        </InLine>
+    </Ad>
+</VAST>
