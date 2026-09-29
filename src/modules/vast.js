@@ -890,18 +890,59 @@ export default function (playerInstance, options) {
             return false;
         }
         try {
-            const response =  await fetch(mediaFileUrl);
-            if (!response.ok || response.headers.get('content-type').indexOf('video') === -1) {
-                return false;
+            const response = await fetch(mediaFileUrl);
+            if (response.ok) {
+                const contentType = response.headers.get('content-type') || '';
+                return contentType.indexOf('video') !== -1
+                    && document.createElement('video').canPlayType(contentType) !== '';
             }
-            const videoElement = document.createElement('video');
-            videoElement.src = mediaFileUrl;
-            const canPlay = await videoElement.canPlayType(response.headers.get('content-type'));
-            return canPlay !== "";
-        } catch (error) {
-            console.error('Failed to load media file:', error);
+            // Definite HTTP error status, not a CORS artifact - fail closed.
             return false;
+        } catch (error) {
+            // fetch() throws a TypeError both for a genuinely dead URL and for a
+            // cross-origin media file served without CORS headers - the two are
+            // indistinguishable here. Actual ad playback assigns the URL to a
+            // <video> element's src, which doesn't require CORS, so fall back to
+            // probing it the same way instead of failing closed on an ambiguous error.
+            return await canVideoElementPlay(mediaFileUrl);
         }
+    }
+
+    /**
+     * Probes whether a URL can be played by a <video> element, the same way
+     * actual ad playback loads media - without requiring CORS.
+     *
+     * @param {string} mediaFileUrl
+     * @param {number} timeoutMs
+     * @returns {Promise<boolean>}
+     */
+    function canVideoElementPlay(mediaFileUrl, timeoutMs = 8000) {
+        return new Promise((resolve) => {
+            const videoElement = document.createElement('video');
+
+            const cleanup = () => {
+                clearTimeout(timer);
+                videoElement.removeEventListener('loadedmetadata', onLoad);
+                videoElement.removeEventListener('error', onError);
+                videoElement.src = '';
+            };
+            const onLoad = () => {
+                cleanup();
+                resolve(true);
+            };
+            const onError = () => {
+                cleanup();
+                resolve(false);
+            };
+            const timer = setTimeout(onError, timeoutMs);
+
+            // Match the player element (crossOrigin is set in cardboard mode), so the probe loads like playback does
+            videoElement.crossOrigin = playerInstance.domRef.player.crossOrigin;
+            videoElement.preload = 'metadata';
+            videoElement.addEventListener('loadedmetadata', onLoad);
+            videoElement.addEventListener('error', onError);
+            videoElement.src = mediaFileUrl;
+        });
     }
 
     /**
