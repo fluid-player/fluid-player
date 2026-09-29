@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>VAST timeout regression</title>
+    <%= htmlWebpackPlugin.tags.headTags %>
+</head>
+<body>
+<video id="vast-timeout-player" preload="none"></video>
+<%= htmlWebpackPlugin.tags.bodyTags %>
+<script>
+    window.vastCallbacks = { loaded: 0, noVideo: 0 };
+    var fallbackMode = new URLSearchParams(window.location.search).get('fallback');
+    var fallbackTags = [];
+    if (fallbackMode === 'true') {
+        fallbackTags = ['/static/vast_timeout_valid.xml'];
+    } else if (fallbackMode === 'exhaustion') {
+        fallbackTags = ['/vast-timeout-fail-one', '/vast-timeout-fail-two'];
+    }
+    window.fluidPlayerInstance = fluidPlayer('vast-timeout-player', {
+        vastOptions: {
+            vastTimeout: 700,
+            adList: [{
+                roll: 'preRoll',
+                vastTag: '/vast-timeout-hang',
+                fallbackVastTags: fallbackTags,
+            }],
+            vastAdvanced: {
+                vastLoadedCallback: function () { window.vastCallbacks.loaded++; },
+                noVastVideoCallback: function () { window.vastCallbacks.noVideo++; },
+            },
+        },
+    });
+</script>
+</body>
+</html>
