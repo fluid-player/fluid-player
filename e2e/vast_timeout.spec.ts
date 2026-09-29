@@ -41,6 +41,10 @@ test.describe('VAST request timeout', () => {
         await expect.poll(() => page.evaluate(() => window.vastCallbacks.noVideo)).toBe(1);
         await expect(page.locator('#fluid_video_wrapper_vast-timeout-player .vast_video_loading')).toBeHidden();
         await expect.poll(() => page.evaluate(() => window.vastCallbacks.loaded)).toBe(0);
+        await page.waitForFunction(() => {
+            const video = document.querySelector('video');
+            return video && video.currentSrc.endsWith('/static/vast_timeout_main.mp4') && video.duration > 0;
+        });
     });
 
     test('continues through failed fallbacks and recovers after the final VAST failure', async ({ page }) => {
@@ -57,5 +61,9 @@ test.describe('VAST request timeout', () => {
         await expect.poll(() => page.evaluate(() => window.vastCallbacks.noVideo)).toBe(1);
         await expect(page.locator('#fluid_video_wrapper_vast-timeout-player .vast_video_loading')).toBeHidden();
         await expect.poll(() => page.evaluate(() => window.vastCallbacks.loaded)).toBe(0);
+        await page.waitForFunction(() => {
+            const video = document.querySelector('video');
+            return video && video.currentSrc.endsWith('/static/vast_timeout_main.mp4') && video.duration > 0;
+        });
     });
 });

@@ -6,7 +6,9 @@
     <%= htmlWebpackPlugin.tags.headTags %>
 </head>
 <body>
-<video id="vast-timeout-player" preload="none"></video>
+<video id="vast-timeout-player" preload="none">
+    <source src="/static/vast_timeout_main.mp4" type="video/mp4" />
+</video>
 <%= htmlWebpackPlugin.tags.bodyTags %>
 <script>
     window.vastCallbacks = { loaded: 0, noVideo: 0 };
