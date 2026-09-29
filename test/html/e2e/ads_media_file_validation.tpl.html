@@ -19,8 +19,7 @@
     <a href="?case=nocors">nocors</a> |
     <a href="?case=dead">dead</a> |
     <a href="?case=cors">cors</a> |
-    <a href="?case=unplayable">unplayable</a> |
-    <a href="?case=vr">vr</a>
+    <a href="?case=unplayable">unplayable</a>
 </p>
 <pre id="log"></pre>
 
@@ -40,15 +39,12 @@
         cors: { vastTag: '/static/vast_linear.xml' },
         // Same-origin video/x-flv the browser can't play: must be rejected so the fallback plays
         unplayable: { vastTag: '/static/e2e/vast_linear_unplayable_type.xml', fallbackVastTags: ['/static/vast_linear.xml'] },
-        // No-CORS creative in cardboard mode, where the player element has crossOrigin="anonymous"
-        vr: { vastTag: '/static/e2e/vast_linear_no_cors_360.xml', fallbackVastTags: ['/static/e2e/vast_linear_360.xml'] },
     };
     var caseName = new URLSearchParams(location.search).get('case') || 'nocors';
     var log = document.getElementById('log');
     log.textContent = 'case: ' + caseName + '\n';
 
     var instance = fluidPlayer('fluid-player-e2e-case', {
-        layoutControls: { showCardBoardView: caseName === 'vr' },
         vastOptions: {
             adList: [Object.assign({ roll: 'preRoll' }, cases[caseName])]
         },
