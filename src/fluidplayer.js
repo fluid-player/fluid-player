@@ -2735,9 +2735,7 @@ const fluidPlayerClass = function () {
 
         self.destructors.push(() => clearInterval(intervalId));
 
-        const listenTo = (self.isTouchDevice())
-            ? ['touchstart', 'touchmove', 'touchend']
-            : ['mousemove', 'mousedown', 'mouseup'];
+        const listenTo = ['mousemove', 'mousedown', 'mouseup', 'touchstart', 'touchmove', 'touchend'];
 
         for (let i = 0; i < listenTo.length; i++) {
             videoPlayer.addEventListener(listenTo[i], activity, { passive: true });
