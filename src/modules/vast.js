@@ -23,7 +23,7 @@ import { displayModes, trackingEventTypes } from '../constants/constants';
 /**
  * @typedef {Object & RawAd} Ad
  * @property {Array<string>} clicktracking
- * @property {string} errorUrl
+ * @property {Array<string>} errorUrls
  * @property {Array<string>} impressions
  * @property {Array<string>} viewImpression
  * @property {Array<any>} stopTracking
@@ -424,25 +424,24 @@ export default function (playerInstance, options) {
         }
     };
 
+    // Collects the <Error> URIs of the ad and of every wrapper in its chain (VAST 4.2, 2.3.6.2)
     playerInstance.registerErrorEvents = (errorTags, tmpOptions) => {
-        if ((typeof errorTags !== 'undefined') &&
-            (errorTags !== null) &&
-            (errorTags.length === 1) && //Only 1 Error tag is expected
-            (errorTags[0].childNodes.length === 1)) {
-            tmpOptions.errorUrl = errorTags[0].childNodes[0].nodeValue;
+        const errorUris = getErrorUris(errorTags || []);
+
+        if (errorUris.length) {
+            tmpOptions.errorUrls = [...(tmpOptions.errorUrls || []), ...errorUris];
         }
     };
 
     playerInstance.announceError = (code) => {
-        if (typeof playerInstance.vastOptions.errorUrl === 'undefined' || !playerInstance.vastOptions.errorUrl) {
+        if (!playerInstance.vastOptions || !playerInstance.vastOptions.errorUrls) {
             return;
         }
 
         const parsedCode = typeof code !== 'undefined' ? parseInt(code) : 900;
-        const errorUrl = playerInstance.vastOptions.errorUrl.replace('[ERRORCODE]', parsedCode);
 
         //Send the error request
-        playerInstance.callUris([errorUrl]);
+        trackErrorUris(playerInstance.vastOptions.errorUrls, parsedCode);
     };
 
     playerInstance.getClickTrackingEvents = (linear) => {
@@ -561,7 +560,7 @@ export default function (playerInstance, options) {
         playerInstance.toggleLoader(false);
         playerInstance.displayOptions.vastOptions.vastAdvanced.noVastVideoCallback();
 
-        if (!playerInstance.vastOptions || typeof playerInstance.vastOptions.errorUrl === 'undefined') {
+        if (!playerInstance.vastOptions || typeof playerInstance.vastOptions.errorUrls === 'undefined') {
             playerInstance.announceLocalError(errorCode);
         } else {
             playerInstance.announceError(errorCode);
@@ -801,9 +800,10 @@ export default function (playerInstance, options) {
      * @param {Partial<RawAdTree>} baseNode used for recursive calls as base node
      * @param {number} currentDepth used internally to track depth
      * @param {boolean} followAdditionalWrappers used internally to track nested wrapper calls
+     * @param {Array<string>} wrapperErrorUris used internally to track the <Error> URIs of the parent wrappers
      * @returns {Promise<RawAdTree>}
      */
-    async function resolveAdTreeRequests(url, maxDepth, baseNode = {}, currentDepth = 0, followAdditionalWrappers = true) {
+    async function resolveAdTreeRequests(url, maxDepth, baseNode = {}, currentDepth = 0, followAdditionalWrappers = true, wrapperErrorUris = []) {
         const adTree = { ...baseNode, children: [] };
         const { responseXML } = await playerInstance.sendRequestAsync(url, true, playerInstance.displayOptions.vastOptions.vastTimeout);
         const adElements = Array.from(responseXML.getElementsByTagName('Ad'));
@@ -812,6 +812,7 @@ export default function (playerInstance, options) {
             const vastAdTagUri = playerInstance.getVastAdTagUriFromWrapper(adElement);
             const isAdPod = adElement.attributes.sequence !== undefined;
             const adNode = { data: adElement };
+            const errorUris = [...wrapperErrorUris, ...getErrorUris(adElement.getElementsByTagName('Error'))];
 
             const adType = (adElement.getElementsByTagName('Linear').length && 'linear') ||
             (adElement.getElementsByTagName('NonLinearAds').length && 'nonLinear') || '';
@@ -823,7 +824,7 @@ export default function (playerInstance, options) {
                 const fallbackOnNoAd = wrapperElement.attributes.fallbackOnNoAd && ["true", "1"].includes(wrapperElement.attributes.fallbackOnNoAd.value);
 
                 try {
-                    const wrapperResponse = await resolveAdTreeRequests(vastAdTagUri, maxDepth, { tagType: 'wrapper', ...adNode, fallbackOnNoAd }, currentDepth+1, !disableAdditionalWrappers);
+                    const wrapperResponse = await resolveAdTreeRequests(vastAdTagUri, maxDepth, { tagType: 'wrapper', ...adNode, fallbackOnNoAd }, currentDepth+1, !disableAdditionalWrappers, errorUris);
                     wrapperResponse.fallbackOnNoAd = fallbackOnNoAd;
 
                     if (!allowMultipleAds || isAdPod) {
@@ -851,8 +852,10 @@ export default function (playerInstance, options) {
                         adTree.children.push({ tagType: 'inLine', ...adNode });
                     } else {
                         // If valid, add it to the ad tree
-                        const mediaFileIsValid = await validateMediaFile(mediaFileUrl);
-                        if (mediaFileIsValid) {
+                        const mediaFileError = await getMediaFileError(mediaFileUrl);
+                        if (mediaFileError) {
+                            trackErrorUris(errorUris, mediaFileError);
+                        } else {
                             adTree.children.push({ tagType: 'inLine', ...adNode });
                         }
                     }
@@ -863,9 +866,11 @@ export default function (playerInstance, options) {
                         try {
                             const mediaFileObj = JSON.parse(adParameter.textContent.trim());
                             const mediaFileUrl = mediaFileObj?.videos?.length ? mediaFileObj?.videos[0]?.url : '';
-                            const mediaFileIsValid = await validateMediaFile(mediaFileUrl);
+                            const mediaFileError = await getMediaFileError(mediaFileUrl);
                             // If valid, add it to the ad tree
-                            if (mediaFileIsValid) {
+                            if (mediaFileError) {
+                                trackErrorUris(errorUris, mediaFileError);
+                            } else {
                                 adTree.children.push({ tagType: 'inLine', ...adNode });
                             }
                         } catch (error) {
@@ -881,26 +886,53 @@ export default function (playerInstance, options) {
 
 
     /**
-     * Validate Media File to check if videos play
+     * Gets the URIs of <Error> elements, whitespace around CDATA included
      *
-     * @param {mediaFileUrl}
+     * @param {HTMLCollection} errorTags
+     * @returns {Array<string>}
      */
-    async function validateMediaFile(mediaFileUrl) {
+    function getErrorUris(errorTags) {
+        return Array.from(errorTags)
+            .map(errorElement => errorElement.textContent.trim())
+            .filter(Boolean);
+    }
+
+    /**
+     * Calls the <Error> URIs of an ad and its wrappers with a VAST error code (VAST 4.2, 2.3.6.2)
+     *
+     * @param {Array<string>} errorUris
+     * @param {number} errorCode
+     */
+    function trackErrorUris(errorUris, errorCode) {
+        playerInstance.callUris(errorUris.map(uri => uri.replace('[ERRORCODE]', errorCode)));
+    }
+
+    /**
+     * Checks if a Media File can be played
+     *
+     * @param {string} mediaFileUrl
+     * @returns {Promise<number|null>} null if the media file can be played, otherwise the VAST error code
+     */
+    async function getMediaFileError(mediaFileUrl) {
         if (!mediaFileUrl) {
-            return false;
+            return 401;
         }
         try {
             const response =  await fetch(mediaFileUrl);
-            if (!response.ok || response.headers.get('content-type').indexOf('video') === -1) {
-                return false;
+            if (!response.ok) {
+                return 401;
+            }
+            const contentType = response.headers.get('content-type') || '';
+            if (contentType.indexOf('video') === -1) {
+                return 405;
             }
             const videoElement = document.createElement('video');
             videoElement.src = mediaFileUrl;
-            const canPlay = await videoElement.canPlayType(response.headers.get('content-type'));
-            return canPlay !== "";
+            const canPlay = await videoElement.canPlayType(contentType);
+            return canPlay !== "" ? null : 405;
         } catch (error) {
             console.error('Failed to load media file:', error);
-            return false;
+            return 401;
         }
     }
 
