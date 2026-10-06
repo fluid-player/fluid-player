@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VAST version="4.2">
+    <Ad id="1">
+        <!-- No allowMultipleAds, so it defaults to false and only stand-alone ads are allowed -->
+        <Wrapper>
+            <AdSystem>Test</AdSystem>
+            <VASTAdTagURI><![CDATA[/static/e2e/vast_error_pod.xml]]></VASTAdTagURI>
+            <Impression><![CDATA[/wrapper_impression]]></Impression>
+            <Error><![CDATA[/wrapper_error?code=[ERRORCODE]]]></Error>
+        </Wrapper>
+    </Ad>
+</VAST>

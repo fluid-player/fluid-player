@@ -828,7 +828,14 @@ export default function (playerInstance, options) {
                     wrapperResponse.fallbackOnNoAd = fallbackOnNoAd;
 
                     if (!allowMultipleAds || isAdPod) {
-                        wrapperResponse.children = getFirstStandAloneAd(wrapperResponse.children);
+                        const standAloneAds = getFirstStandAloneAd(wrapperResponse.children);
+
+                        // Pod ads aren't allowed through this wrapper (VAST 4.2, 3.19), report them as a trafficking error
+                        wrapperResponse.children
+                            .filter(child => child.data?.attributes.sequence !== undefined)
+                            .forEach(child => trackErrorUris([...errorUris, ...getErrorUris(child.data.getElementsByTagName('Error'))], 200));
+
+                        wrapperResponse.children = standAloneAds;
                     }
 
                     adTree.children.push(wrapperResponse);
@@ -852,7 +859,10 @@ export default function (playerInstance, options) {
                         adTree.children.push({ tagType: 'inLine', ...adNode });
                     } else {
                         // If valid, add it to the ad tree
-                        const mediaFileError = await getMediaFileError(mediaFileUrl);
+                        const mediaFileError = await getMediaFileError(mediaFileUrl, {
+                            type: mediaFile[0].getAttribute('type'),
+                            delivery: mediaFile[0].getAttribute('delivery'),
+                        });
                         if (mediaFileError) {
                             trackErrorUris(errorUris, mediaFileError);
                         } else {
@@ -866,7 +876,7 @@ export default function (playerInstance, options) {
                         try {
                             const mediaFileObj = JSON.parse(adParameter.textContent.trim());
                             const mediaFileUrl = mediaFileObj?.videos?.length ? mediaFileObj?.videos[0]?.url : '';
-                            const mediaFileError = await getMediaFileError(mediaFileUrl);
+                            const mediaFileError = await getMediaFileError(mediaFileUrl, { type: mediaFileObj?.videos?.[0]?.mimetype });
                             // If valid, add it to the ad tree
                             if (mediaFileError) {
                                 trackErrorUris(errorUris, mediaFileError);
@@ -911,25 +921,20 @@ export default function (playerInstance, options) {
      * Checks if a Media File can be played
      *
      * @param {string} mediaFileUrl
+     * @param {{type: string, delivery?: string}} mediaFile MediaFile attributes
      * @returns {Promise<number|null>} null if the media file can be played, otherwise the VAST error code
      */
-    async function getMediaFileError(mediaFileUrl) {
+    async function getMediaFileError(mediaFileUrl, mediaFile) {
         if (!mediaFileUrl) {
             return 401;
         }
+        // Support is decided by the MediaFile attributes, like at play time, not by the server's Content-Type (VAST 4.2, 3.9.1 and error 403)
+        if (!playerInstance.getSupportedMediaFileObject([mediaFile])) {
+            return 403;
+        }
         try {
-            const response =  await fetch(mediaFileUrl);
-            if (!response.ok) {
-                return 401;
-            }
-            const contentType = response.headers.get('content-type') || '';
-            if (contentType.indexOf('video') === -1) {
-                return 405;
-            }
-            const videoElement = document.createElement('video');
-            videoElement.src = mediaFileUrl;
-            const canPlay = await videoElement.canPlayType(contentType);
-            return canPlay !== "" ? null : 405;
+            const response = await fetch(mediaFileUrl);
+            return response.ok ? null : 401;
         } catch (error) {
             console.error('Failed to load media file:', error);
             return 401;

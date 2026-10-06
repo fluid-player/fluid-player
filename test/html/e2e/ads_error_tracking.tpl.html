@@ -20,6 +20,7 @@
     <a href="?case=unplayable">unplayable</a> |
     <a href="?case=wrapper">wrapper</a> |
     <a href="?case=playbackerror">playbackerror</a> |
+    <a href="?case=pod">pod</a> |
     <a href="?case=noerror">noerror</a>
 </p>
 <pre id="log"></pre>
@@ -34,12 +35,14 @@
     var cases = {
         // Media file returns 404: the ad's Error URI is called with 401 and the fallback plays
         dead: { vastTag: '/static/e2e/vast_error_dead_media.xml', fallbackVastTags: ['/static/vast_linear.xml'] },
-        // Media file served as video/x-flv, which the browser can't play: Error URI called with 405
+        // MediaFile type is video/x-flv, which the browser can't play: Error URI called with 403
         unplayable: { vastTag: '/static/e2e/vast_error_unplayable_media.xml', fallbackVastTags: ['/static/vast_linear.xml'] },
         // Dead media inside a wrapper: the Error URIs of the ad and of the wrapper are both called
         wrapper: { vastTag: '/static/e2e/vast_error_wrapper_dead_media.xml', fallbackVastTags: ['/static/vast_linear.xml'] },
-        // Passes the pre-check but fails at play time: the Error URIs of the ad and of the wrapper are both called
+        // MediaFile type is video/x-flv but the file is a playable mp4: the type attribute decides, Error URIs of the ad and of the wrapper called with 403
         playbackerror: { vastTag: '/static/e2e/vast_error_wrapper_playback.xml' },
+        // Ad with sequence="1" behind a wrapper without allowMultipleAds: dropped, Error URIs of the ad and of the wrapper called with 200
+        pod: { vastTag: '/static/e2e/vast_error_wrapper_pod.xml', fallbackVastTags: ['/static/vast_linear.xml'] },
         // Working ad: no Error URI is called
         noerror: { vastTag: '/static/vast_linear.xml' },
     };

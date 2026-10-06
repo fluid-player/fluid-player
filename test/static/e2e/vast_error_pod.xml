@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VAST version="4.2">
+    <Ad id="1" sequence="1">
+        <InLine>
+            <AdSystem>Test</AdSystem>
+            <AdTitle>Pod ad of one</AdTitle>
+            <Impression><![CDATA[/inline_impression]]></Impression>
+            <Error><![CDATA[/inline_error?code=[ERRORCODE]]]></Error>
+            <Creatives>
+                <Creative id="1">
+                    <Linear>
+                        <Duration>00:00:10</Duration>
+                        <MediaFiles>
+                            <MediaFile delivery="progressive" type="video/mp4" width="400" height="300">
+                                <![CDATA[ https://cdn.jsdelivr.net/npm/big-buck-bunny-1080p@0.0.6/video.mp4 ]]>
+                            </MediaFile>
+                        </MediaFiles>
+                    </Linear>
+                </Creative>
+            </Creatives>
+        </InLine>
+    </Ad>
+</VAST>
