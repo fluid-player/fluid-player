@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.61.0 (2026-10-21)
+*  [Pull #943](https://github.com/fluid-player/fluid-player/pull/943) [GitHub_940] VAST media pre-check drops playable ads when the creative CDN sends no CORS headers
+*  [Pull #942](https://github.com/fluid-player/fluid-player/pull/942) [GitHub_808] controls don't autohide from mouse input if device also has touch input
+
 ## 3.60.0 (2026-07-29)
 * [Pull #936](https://github.com/fluid-player/fluid-player/pull/936) Console returns '[Error] (900): Failed to load Vast' when using VAST Banner zone as 'preRoll'
 
