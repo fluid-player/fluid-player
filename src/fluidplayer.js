@@ -588,16 +588,39 @@ const fluidPlayerClass = function () {
     self.sendRequestAsync = async (url, withCredentials, timeout) => {
         return await new Promise((resolve, reject) => {
             const xmlHttpReq = new XMLHttpRequest();
+            let requestSettled = false;
 
-            xmlHttpReq.onreadystatechange = (event) => {
-                const response = event.target;
+            const resolveRequest = () => {
+                if (requestSettled) {
+                    return;
+                }
 
-                if (response.readyState === 4 && response.status >= 200 && response.status < 300) {
-                    resolve(response);
-                } else if (response.readyState === 4) {
-                    reject(response);
+                requestSettled = true;
+                resolve(xmlHttpReq);
+            };
+
+            const rejectRequest = () => {
+                if (requestSettled) {
+                    return;
+                }
+
+                requestSettled = true;
+                reject(xmlHttpReq);
+            };
+
+            xmlHttpReq.onreadystatechange = () => {
+                if (xmlHttpReq.readyState === 4) {
+                    if (xmlHttpReq.status >= 200 && xmlHttpReq.status < 300) {
+                        resolveRequest();
+                    } else {
+                        rejectRequest();
+                    }
                 }
             };
+
+            xmlHttpReq.onerror = rejectRequest;
+            xmlHttpReq.ontimeout = rejectRequest;
+            xmlHttpReq.onabort = rejectRequest;
 
             self.displayOptions.onBeforeXMLHttpRequestOpen(xmlHttpReq);
 
