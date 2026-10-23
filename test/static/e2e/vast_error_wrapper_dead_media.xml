@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VAST xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast4.xsd" version="4.2">
+    <Ad id="1">
+        <Wrapper>
+            <AdSystem>Test</AdSystem>
+            <VASTAdTagURI><![CDATA[/static/e2e/vast_error_dead_media.xml]]></VASTAdTagURI>
+            <Impression><![CDATA[/wrapper_impression]]></Impression>
+            <Error><![CDATA[/wrapper_error?code=[ERRORCODE]]]></Error>
+            <Creatives>
+                <Creative sequence="1" id="1">
+                    <Linear>
+                        <TrackingEvents/>
+                    </Linear>
+                </Creative>
+            </Creatives>
+        </Wrapper>
+    </Ad>
+</VAST>

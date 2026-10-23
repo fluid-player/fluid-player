@@ -867,7 +867,7 @@ export default function (playerInstance, options) {
                 // Couldn’t find NonLinear resource with supported type.
                 ad.error = true;
 
-                if (!playerInstance.vastOptions || typeof playerInstance.vastOptions.errorUrl === 'undefined') {
+                if (!playerInstance.vastOptions || typeof playerInstance.vastOptions.errorUrls === 'undefined') {
                     playerInstance.announceLocalError(503);
                 } else {
                     playerInstance.announceError(503);
