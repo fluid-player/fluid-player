@@ -237,7 +237,7 @@ export default function (playerInstance, options) {
                     playerInstance.domRef.player.play();
                 });
             } else if (!isVpaid) {
-                if (selectedMediaFile.src === false) {
+                if (!selectedMediaFile) {
                     // Couldn’t find MediaFile that is supported by this video player, based on the attributes of the MediaFile element.
                     ad.error = true;
                     playerInstance.playMainVideoWhenVastFails(403);
@@ -309,11 +309,10 @@ export default function (playerInstance, options) {
         const adToPlay = playerInstance.getNextAdPod();
 
         if (adToPlay !== null) {
+            // Set before rendering, so an ad that fails right away and switches to the main video leaves it as 'source'
+            playerInstance.currentMediaSourceType = playerInstance.rollsById[adToPlay.rollListId].roll;
             playerInstance.renderLinearAd(adToPlay, true);
         }
-
-        const roll = playerInstance.rollsById[adToPlay.rollListId].roll;
-        playerInstance.currentMediaSourceType = roll;
     };
 
     playerInstance.backupMainVideoContentTime = (rollListId) => {

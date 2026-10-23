@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+          name="viewport">
+    <meta content="ie=edge" http-equiv="X-UA-Compatible">
+    <title>VOD with VAST Linear - unsupported media type</title>
+    <%= htmlWebpackPlugin.tags.headTags %>
+    <style lang="css">
+        #fluid-player-e2e-case {
+            width: 90%;
+        }
+    </style>
+</head>
+<body>
+
+<p>MediaFile type is video/x-flv, which the browser can't play, but the file is a playable mp4: Error URI called with 403, no request to "undefined", the main video plays</p>
+<pre id="log"></pre>
+
+<video id="fluid-player-e2e-case">
+    <source src="https://cdn.fluidplayer.com/videos/valerian-480p.mkv" title="480p" type="video/mp4"/>
+</video>
+
+<%= htmlWebpackPlugin.tags.bodyTags %>
+
+<script>
+    var log = document.getElementById('log');
+
+    var instance = fluidPlayer('fluid-player-e2e-case', {
+        vastOptions: {
+            adList: [{ roll: 'preRoll', vastTag: '/static/e2e/vast_linear_unsupported_type.xml' }]
+        },
+    });
+
+    instance.on('playing', function (event, info) {
+        log.textContent += 'playing: ' + info.mediaSourceType + ' ' + event.target.currentSrc + '\n';
+    });
+
+    // Shows the VAST <Error> URI calls and requests to "undefined"
+    new PerformanceObserver(function (list) {
+        list.getEntries().forEach(function (entry) {
+            if (/_error\?code=|\/undefined$/.test(entry.name)) {
+                log.textContent += 'request: ' + entry.name.replace(location.origin, '') + '\n';
+            }
+        });
+    }).observe({ type: 'resource', buffered: true });
+</script>
+
+</body>
+</html>
