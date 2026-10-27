@@ -73,14 +73,17 @@ export async function getVideoCurrentTime(video: Locator): Promise<number> {
 }
 
 /**
- * Waits until the given video element starts playing.
+ * Waits until the given video element is playing.
+ * Checks the element state instead of the 'playing' event, so it doesn't hang when playback already started.
  *
  * @param video - The Playwright Locator for the video element.
  */
 export async function waitForVideoToPlay(video: Locator): Promise<void> {
-    await video.evaluate((vid) => {
-        return new Promise<void>((resolve) => {
-            vid.addEventListener('playing', () => resolve(), { once: true });
-        });
-    });
+    await video.page().waitForFunction(
+        (vid) => {
+            const videoElement = vid as HTMLVideoElement | null;
+            return videoElement && !videoElement.paused && videoElement.readyState >= 3;
+        },
+        await video.elementHandle()
+    );
 }

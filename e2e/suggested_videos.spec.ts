@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { waitForVideoToPlay, setVideoCurrentTime, getVideoDuration } from './functions/video';
+import { skipAd } from './functions/ads';
 
 test.describe('suggested videos', () => {
 
@@ -12,26 +13,22 @@ test.describe('suggested videos', () => {
 
         const fullPlayer = page.locator('#fluid_video_wrapper_fluid-player-e2e-case');
         const video = page.locator('video');
-
-        fullPlayer.click();
-        await waitForVideoToPlay(video);
-
-        const videoDuration = await getVideoDuration(video);
-        await setVideoCurrentTime(video, videoDuration - 5);
-
-        await waitForVideoToPlay(video);
-        await page.waitForTimeout(5500);
-
         const suggestedVideosGrid = page.locator('.suggested_tile_grid');
+
+        await fullPlayer.click();
+        await waitForVideoToPlay(video);
+
+        // Skip to the last 5 seconds: the player loads the postRoll during the last vastTimeout (5s) of the video
+        await setVideoCurrentTime(video, (await getVideoDuration(video)) - 5);
+
+        // The postRoll plays before the suggested videos
+        await page.locator('.skip_button').waitFor({ timeout: 15000 });
         await expect(suggestedVideosGrid).not.toBeVisible();
+        await skipAd(page);
 
-        await page.waitForTimeout(3000);
-        const skipButton = page.locator('.skip_button');
-        skipButton.click();
-
-        await expect(suggestedVideosGrid).toBeVisible();
-        expect(await suggestedVideosGrid.screenshot()).toMatchSnapshot('baseline-sv-grid.png', { threshold: 0.02 });
+        // Keep the mouse off the tiles so no hover state ends up in the screenshot
+        await page.mouse.move(0, 0);
+        await expect(suggestedVideosGrid).toHaveScreenshot('baseline-sv-grid.png', { threshold: 0.02 });
     });
 
 });
-
