@@ -1,0 +1,68 @@
+<VAST version="4.0">
+    <Ad id="pod2" sequence="2">
+        <InLine>
+            <AdSystem version="1">Test</AdSystem>
+            <AdTitle>Pod ad 2</AdTitle>
+            <Impression><![CDATA[ http://e2e-track.test/impression/pod2 ]]></Impression>
+            <Creatives>
+                <Creative id="pod2">
+                    <Linear>
+                        <Duration>00:00:00</Duration>
+                        <TrackingEvents>
+                            <Tracking event="complete"><![CDATA[ http://e2e-track.test/complete/pod2 ]]></Tracking>
+                        </TrackingEvents>
+                        <MediaFiles>
+                            <MediaFile id="pod2" delivery="progressive" type="video/webm" width="320" height="180">
+                                <![CDATA[ /static/e2e/video_3s.webm ]]>
+                            </MediaFile>
+                        </MediaFiles>
+                    </Linear>
+                </Creative>
+            </Creatives>
+        </InLine>
+    </Ad>
+    <Ad id="standalone">
+        <InLine>
+            <AdSystem version="1">Test</AdSystem>
+            <AdTitle>Standalone ad</AdTitle>
+            <Impression><![CDATA[ http://e2e-track.test/impression/standalone ]]></Impression>
+            <Creatives>
+                <Creative id="standalone">
+                    <Linear>
+                        <Duration>00:00:00</Duration>
+                        <TrackingEvents>
+                            <Tracking event="complete"><![CDATA[ http://e2e-track.test/complete/standalone ]]></Tracking>
+                        </TrackingEvents>
+                        <MediaFiles>
+                            <MediaFile id="standalone" delivery="progressive" type="video/webm" width="320" height="180">
+                                <![CDATA[ /static/e2e/video_3s.webm ]]>
+                            </MediaFile>
+                        </MediaFiles>
+                    </Linear>
+                </Creative>
+            </Creatives>
+        </InLine>
+    </Ad>
+    <Ad id="pod1" sequence="1">
+        <InLine>
+            <AdSystem version="1">Test</AdSystem>
+            <AdTitle>Pod ad 1</AdTitle>
+            <Impression><![CDATA[ http://e2e-track.test/impression/pod1 ]]></Impression>
+            <Creatives>
+                <Creative id="pod1">
+                    <Linear>
+                        <Duration>00:00:00</Duration>
+                        <TrackingEvents>
+                            <Tracking event="complete"><![CDATA[ http://e2e-track.test/complete/pod1 ]]></Tracking>
+                        </TrackingEvents>
+                        <MediaFiles>
+                            <MediaFile id="pod1" delivery="progressive" type="video/webm" width="320" height="180">
+                                <![CDATA[ /static/e2e/video_3s.webm ]]>
+                            </MediaFile>
+                        </MediaFiles>
+                    </Linear>
+                </Creative>
+            </Creatives>
+        </InLine>
+    </Ad>
+</VAST>
