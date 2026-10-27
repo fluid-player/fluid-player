@@ -1,0 +1,19 @@
+<VAST xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast4.xsd" version="4.2">
+    <Ad id="middle">
+        <Wrapper followAdditionalWrappers="true">
+            <AdSystem>Middle wrapper</AdSystem>
+            <VASTAdTagURI><![CDATA[/static/e2e/vast_wrapper_chain_inline.xml]]></VASTAdTagURI>
+            <Impression><![CDATA[/e2e-track/middle/impression]]></Impression>
+            <Creatives>
+                <Creative>
+                    <Linear>
+                        <TrackingEvents>
+                            <Tracking event="start"><![CDATA[/e2e-track/middle/start]]></Tracking>
+                            <Tracking event="complete"><![CDATA[/e2e-track/middle/complete]]></Tracking>
+                        </TrackingEvents>
+                    </Linear>
+                </Creative>
+            </Creatives>
+        </Wrapper>
+    </Ad>
+</VAST>
