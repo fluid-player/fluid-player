@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+          name="viewport">
+    <meta content="ie=edge" http-equiv="X-UA-Compatible">
+    <title>VOD with VAST Linear - media file selection</title>
+    <%= htmlWebpackPlugin.tags.headTags %>
+    <style lang="css">
+        #fluid-player-e2e-case {
+            width: 90%;
+        }
+    </style>
+</head>
+<body>
+
+<p>
+    <a href="?case=hls_then_mp4">hls_then_mp4</a> |
+    <a href="?case=mp4_then_hls">mp4_then_hls</a> |
+    <a href="?case=hls_only">hls_only</a>
+</p>
+
+<video id="fluid-player-e2e-case">
+    <source src="/static/e2e/ad_fallback.mp4?content" title="main" type="video/mp4"/>
+</video>
+
+<%= htmlWebpackPlugin.tags.bodyTags %>
+
+<script>
+    var cases = {
+        hls_then_mp4: '/static/e2e/vast_media_hls_then_mp4.xml',
+        mp4_then_hls: '/static/e2e/vast_media_mp4_then_hls.xml',
+        hls_only: '/static/e2e/vast_media_hls_only.xml',
+    };
+    var caseName = new URLSearchParams(location.search).get('case') || 'hls_then_mp4';
+
+    var instance = fluidPlayer('fluid-player-e2e-case', {
+        vastOptions: {
+            adList: [{ roll: 'preRoll', vastTag: cases[caseName] }]
+        },
+    });
+</script>
+
+</body>
+</html>
