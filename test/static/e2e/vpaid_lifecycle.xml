@@ -1,0 +1,29 @@
+<VAST version="4.2">
+    <Ad id="vpaid-lifecycle">
+        <InLine>
+            <AdSystem>E2E</AdSystem>
+            <AdTitle>VPAID lifecycle</AdTitle>
+            <Impression><![CDATA[ http://www.example.com/vpaid/impression ]]></Impression>
+            <Error><![CDATA[ http://www.example.com/vpaid/error?code=[ERRORCODE] ]]></Error>
+            <Creatives>
+                <Creative sequence="1">
+                    <Linear>
+                        <Duration>00:00:02</Duration>
+                        <TrackingEvents>
+                            <Tracking event="creativeView">http://www.example.com/vpaid/creativeView</Tracking>
+                            <Tracking event="start">http://www.example.com/vpaid/start</Tracking>
+                            <Tracking event="firstQuartile">http://www.example.com/vpaid/firstQuartile</Tracking>
+                            <Tracking event="midpoint">http://www.example.com/vpaid/midpoint</Tracking>
+                            <Tracking event="thirdQuartile">http://www.example.com/vpaid/thirdQuartile</Tracking>
+                            <Tracking event="complete">http://www.example.com/vpaid/complete</Tracking>
+                        </TrackingEvents>
+                        <AdParameters><![CDATA[ {} ]]></AdParameters>
+                        <MediaFiles>
+                            <MediaFile apiFramework="VPAID" type="application/javascript" delivery="progressive" width="640" height="360"><![CDATA[ /static/e2e/vpaid_lifecycle_ad.js ]]></MediaFile>
+                        </MediaFiles>
+                    </Linear>
+                </Creative>
+            </Creatives>
+        </InLine>
+    </Ad>
+</VAST>
