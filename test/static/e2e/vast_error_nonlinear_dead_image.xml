@@ -1,0 +1,19 @@
+<VAST version="4.0">
+    <Ad id="1">
+        <InLine>
+            <AdSystem version="1">Test</AdSystem>
+            <AdTitle>NonLinear with a dead image</AdTitle>
+            <Error><![CDATA[ http://e2e-track.test/error?code=[ERRORCODE] ]]></Error>
+            <Impression><![CDATA[ http://e2e-track.test/impression ]]></Impression>
+            <Creatives>
+                <Creative sequence="1" id="1">
+                    <NonLinearAds>
+                        <NonLinear width="300" height="50" minSuggestedDuration="00:00:05">
+                            <StaticResource creativeType="image/png"><![CDATA[ /static/e2e/does-not-exist.png ]]></StaticResource>
+                        </NonLinear>
+                    </NonLinearAds>
+                </Creative>
+            </Creatives>
+        </InLine>
+    </Ad>
+</VAST>
