@@ -1,0 +1,28 @@
+<VAST xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast4.xsd" version="4.2">
+    <Ad id="1" adType="video">
+        <InLine>
+            <AdSystem version="1">Test</AdSystem>
+            <AdTitle>HLS only</AdTitle>
+            <Creatives>
+                <Creative sequence="1" id="1">
+                    <Linear>
+                        <Duration>00:00:00</Duration>
+                        <MediaFiles>
+                            <MediaFile id="1" delivery="streaming" type="application/vnd.apple.mpegurl" width="320" height="180">
+                                <![CDATA[ /static/e2e/hls/ad_fallback.m3u8 ]]>
+                            </MediaFile>
+                        </MediaFiles>
+                        <VideoClicks>
+                            <ClickThrough id="1">
+                                <![CDATA[ http://www.example.com ]]>
+                            </ClickThrough>
+                        </VideoClicks>
+                    </Linear>
+                </Creative>
+            </Creatives>
+            <Impression id="">
+                <![CDATA[ http://www.example.com/impression ]]>
+            </Impression>
+        </InLine>
+    </Ad>
+</VAST>
