@@ -1,0 +1,63 @@
+<VAST xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast4.xsd" version="4.2">
+    <Ad id="20005">
+        <InLine>
+            <AdSystem version="4.0">iabtechlab</AdSystem>
+            <AdTitle>
+                NonLinear Image
+            </AdTitle>
+            <Description>
+                <![CDATA[VAST 3.0 sample tag for Non Linear ad (i.e Overlay ad). Change the StaticResources to have a tag with your own content. Change NonLinear tag's parameters accordingly to view desired results. ]]>
+            </Description>
+            <Pricing model="cpm" currency="USD">
+                <![CDATA[ 25.00 ]]>
+            </Pricing>
+            <Error>
+                <![CDATA[
+            http://www.example.com/nonlinear/error
+            ]]>
+            </Error>
+            <Impression id="Impression-ID">
+                <![CDATA[
+            http://www.example.com/nonlinear/impression
+            ]]>
+            </Impression>
+
+            <Creatives>
+                <Creative id="5480" sequence="1">
+                    <NonLinearAds>
+                        <TrackingEvents>
+                            <Tracking event="start">http://www.example.com/nonlinear/start</Tracking>
+                            <Tracking event="firstQuartile">http://www.example.com/nonlinear/firstQuartile</Tracking>
+                            <Tracking event="midpoint">http://www.example.com/nonlinear/midpoint</Tracking>
+                            <Tracking event="thirdQuartile">http://www.example.com/nonlinear/thirdQuartile</Tracking>
+                            <Tracking event="complete">http://www.example.com/nonlinear/complete</Tracking>
+                            <Tracking event="mute">http://www.example.com/nonlinear/mute</Tracking>
+                            <Tracking event="unmute">http://www.example.com/nonlinear/unmute</Tracking>
+                            <Tracking event="pause">http://www.example.com/nonlinear/pause</Tracking>
+                            <Tracking event="resume">http://www.example.com/nonlinear/resume</Tracking>
+                            <Tracking event="close">http://www.example.com/nonlinear/close</Tracking>
+                            <Tracking event="rewind">http://www.example.com/nonlinear/rewind</Tracking>
+                            <Tracking event="creativeView">http://www.example.com/nonlinear/creativeView</Tracking>
+                            <Tracking event="fullscreen">http://www.example.com/nonlinear/fullscreen</Tracking>
+                            <Tracking event="playerExpand">http://www.example.com/nonlinear/playerExpand</Tracking>
+                            <Tracking event="playerCollapse">http://www.example.com/nonlinear/playerCollapse</Tracking>
+                        </TrackingEvents>
+                        <NonLinear width="480" height="90" minSuggestedDuration="00:00:06" scalable="true" maintainAspectRatio="true">
+                            <StaticResource creativeType="image/png">
+                                <![CDATA[ /static/logo.png ]]>
+                            </StaticResource>
+
+                            <NonLinearClickTracking>
+                                <![CDATA[http://www.example.com/nonlinear/clickTracking]]>
+                            </NonLinearClickTracking>
+                            <NonLinearClickThrough>
+                                <![CDATA[http://www.example.com/nonlinear-landing]]>
+                            </NonLinearClickThrough>
+
+                        </NonLinear>
+                    </NonLinearAds>
+                </Creative>
+            </Creatives>
+        </InLine>
+    </Ad>
+</VAST>
