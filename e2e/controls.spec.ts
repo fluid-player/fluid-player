@@ -18,7 +18,7 @@ test.describe('desktop controls', () => {
         await expect(pauseButton).not.toBeVisible();
 
         // Video player should start playing
-        fullPlayer.click();
+        await fullPlayer.click();
 
         // Wait for video to start playing
         await page.waitForFunction(() => {
@@ -33,7 +33,7 @@ test.describe('desktop controls', () => {
         // Wait for 500ms so the browser doesn't reject the click
         await page.waitForTimeout(1000);
         // Video player should pause
-        fullPlayer.click();
+        await fullPlayer.click();
 
         // Wait for video to pause
         await page.waitForFunction(() => {
@@ -55,15 +55,8 @@ test.describe('desktop controls', () => {
         // Hover over the video
         await video.hover();
 
-        await page.waitForTimeout(1500);
-
-        // Evaluate the cursor CSS property of the video element or its parent
-        const isCursorHidden = await video.evaluate((vid) => {
-            const computedStyle = window.getComputedStyle(vid);
-            return computedStyle.cursor === 'none';
-        });
-
-        expect(isCursorHidden).toBeTruthy(); // Assert that the cursor is hidden
+        // Cursor hides after the 1 second autoHideTimeout
+        await expect(video).toHaveCSS('cursor', 'none');
     });
 });
 

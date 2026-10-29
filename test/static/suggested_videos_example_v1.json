@@ -3,18 +3,18 @@
         "id": 0,
         "sources": [
             {
-                "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+                "url": "https://cdn.fluidplayer.com/videos/valerian-480p.mkv",
                 "mimeType": "video/mp4",
                 "resolution": "720p",
                 "hd": "true"
             },
             {
-                "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+                "url": "https://cdn.fluidplayer.com/videos/valerian-480p.mkv",
                 "mimeType": "video/mp4",
                 "resolution": "480p"
             }
         ],
-        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg",
+        "thumbnailUrl": "https://picsum.photos/id/10/640/360",
         "title": "Big Buck Bunny",
         "subtitles": [
             {
@@ -40,13 +40,13 @@
         "id": 1,
         "sources": [
             {
-                "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+                "url": "https://cdn.fluidplayer.com/videos/valerian-480p.mkv",
                 "mimeType": "video/mp4",
                 "resolution": "720p",
                 "hd": "true"
             },
             {
-                "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+                "url": "https://cdn.fluidplayer.com/videos/valerian-480p.mkv",
                 "mimeType": "video/mp4",
                 "resolution": "1080p",
                 "hd": "true"
@@ -65,7 +65,7 @@
                 "default": true
             }
         ],
-        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ElephantsDream.jpg",
+        "thumbnailUrl": "https://picsum.photos/id/20/640/360",
         "title": "Elephant Dream",
         "configUrl" : "/static/suggested_videos_example_v2.json"
     },
@@ -73,13 +73,13 @@
         "id": 2,
         "sources": [
             {
-                "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+                "url": "https://cdn.fluidplayer.com/videos/valerian-480p.mkv",
                 "mimeType": "video/mp4",
                 "resolution": "720p",
                 "hd": "true"
             }
         ],
-        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerBlazes.jpg",
+        "thumbnailUrl": "https://picsum.photos/id/29/640/360",
         "title": "For Bigger Blazes",
         "subtitles": [
             {
@@ -100,13 +100,13 @@
         "id": 3,
         "sources": [
             {
-                "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+                "url": "https://cdn.fluidplayer.com/videos/valerian-480p.mkv",
                 "mimeType": "video/mp4",
                 "resolution": "720p",
                 "hd": "true"
             }
         ],
-        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerEscapes.jpg",
+        "thumbnailUrl": "https://picsum.photos/id/37/640/360",
         "title": "For Bigger Escape",
         "subtitles": [
             {
@@ -132,13 +132,13 @@
         "id": 4,
         "sources": [
             {
-                "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+                "url": "https://cdn.fluidplayer.com/videos/valerian-480p.mkv",
                 "mimeType": "video/mp4",
                 "resolution": "720p",
                 "hd": "true"
             }
         ],
-        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerFun.jpg",
+        "thumbnailUrl": "https://picsum.photos/id/42/640/360",
         "title": "For Bigger Fun",
         "configUrl" : "/static/suggested_videos_example_v2.json"
     },
@@ -146,13 +146,13 @@
         "id": 5,
         "sources": [
             {
-                "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+                "url": "https://cdn.fluidplayer.com/videos/valerian-480p.mkv",
                 "mimeType": "video/mp4",
                 "resolution": "720p",
                 "hd": "true"
             }
         ],
-        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerJoyrides.jpg",
+        "thumbnailUrl": "https://picsum.photos/id/48/640/360",
         "title": "For Bigger Joyrides",
         "subtitles": [
             {
@@ -173,13 +173,13 @@
         "id": 6,
         "sources": [
             {
-                "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+                "url": "https://cdn.fluidplayer.com/videos/valerian-480p.mkv",
                 "mimeType": "video/mp4",
                 "resolution": "720p",
                 "hd": "true"
             }
         ],
-        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerMeltdowns.jpg",
+        "thumbnailUrl": "https://picsum.photos/id/54/640/360",
         "title": "For Bigger Meltdowns",
         "subtitles": [
             {
@@ -205,13 +205,13 @@
         "id": 7,
         "sources": [
             {
-                "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+                "url": "https://cdn.fluidplayer.com/videos/valerian-480p.mkv",
                 "mimeType": "video/mp4",
                 "resolution": "720p",
                 "hd": "true"
             }
         ],
-        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/Sintel.jpg",
+        "thumbnailUrl": "https://picsum.photos/id/64/640/360",
         "title": "Sintel",
         "subtitles": [
             {
@@ -237,13 +237,13 @@
         "id": 8,
         "sources": [
             {
-                "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4",
+                "url": "https://cdn.fluidplayer.com/videos/valerian-480p.mkv",
                 "mimeType": "video/mp4",
                 "resolution": "720p",
                 "hd": "true"
             }
         ],
-        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/SubaruOutbackOnStreetAndDirt.jpg",
+        "thumbnailUrl": "https://picsum.photos/id/76/640/360",
         "title": "Subaru Outback On Street And Dirt",
         "subtitles": [
             {
@@ -269,13 +269,13 @@
         "id": 9,
         "sources": [
             {
-                "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+                "url": "https://cdn.fluidplayer.com/videos/valerian-480p.mkv",
                 "mimeType": "video/mp4",
                 "resolution": "720p",
                 "hd": "true"
             }
         ],
-        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/TearsOfSteel.jpg",
+        "thumbnailUrl": "https://picsum.photos/id/88/640/360",
         "title": "Tears of Steel",
         "subtitles": [
             {
@@ -301,13 +301,13 @@
         "id": 10,
         "sources": [
             {
-                "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4",
+                "url": "https://cdn.fluidplayer.com/videos/valerian-480p.mkv",
                 "mimeType": "video/mp4",
                 "resolution": "720p",
                 "hd": "true"
             }
         ],
-        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/VolkswagenGTIReview.jpg",
+        "thumbnailUrl": "https://picsum.photos/id/96/640/360",
         "title": "Volkswagen GTI Review",
         "subtitles": [
             {
@@ -333,13 +333,13 @@
         "id": 11,
         "sources": [
             {
-                "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
+                "url": "https://cdn.fluidplayer.com/videos/valerian-480p.mkv",
                 "mimeType": "video/mp4",
                 "resolution": "720p",
                 "hd": "true"
             }
         ],
-        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/WeAreGoingOnBullrun.jpg",
+        "thumbnailUrl": "https://picsum.photos/id/101/640/360",
         "title": "We Are Going On Bullrun",
         "subtitles": [
             {
@@ -365,13 +365,13 @@
         "id": 12,
         "sources": [
             {
-                "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4",
+                "url": "https://cdn.fluidplayer.com/videos/valerian-480p.mkv",
                 "mimeType": "video/mp4",
                 "resolution": "720p",
                 "hd": "true"
             }
         ],
-        "thumbnailUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/WhatCarCanYouGetForAGrand.jpg",
+        "thumbnailUrl": "https://picsum.photos/id/110/640/360",
         "title": "What care can you get for a grand?",
         "subtitles": [
             {
