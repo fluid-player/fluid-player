@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Miniplayer</title>
+    <%= htmlWebpackPlugin.tags.headTags %>
+    <style lang="css">
+        #fluid-player-e2e-case {
+            width: 90%;
+        }
+
+        body {
+            height: 300vh;
+        }
+    </style>
+</head>
+<body>
+
+<video id="fluid-player-e2e-case">
+    <source src="/static/e2e/miniplayer_30s.webm" title="240p" type="video/webm"/>
+</video>
+
+<%= htmlWebpackPlugin.tags.bodyTags %>
+
+<script>
+    var miniPlayerEvents = [];
+    var instance = fluidPlayer('fluid-player-e2e-case', {
+        layoutControls: {
+            miniPlayer: {
+                enabled: true,
+                width: 400,
+                height: 225,
+                placeholderText: 'Playing in Miniplayer',
+                position: 'bottom right',
+                autoToggle: true
+            }
+        }
+    });
+    instance.on('miniPlayerToggle', function (event) {
+        miniPlayerEvents.push(event.detail.isToggledOn);
+    });
+</script>
+
+</body>
+</html>
