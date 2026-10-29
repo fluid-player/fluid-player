@@ -65,7 +65,12 @@ test.describe('VPAID linear ad lifecycle', () => {
 
         // Tracking URLs: each fired exactly once, in lifecycle order
         await expect.poll(() => hits.length, { timeout: 10000 }).toBeGreaterThanOrEqual(TRACKING_ORDER.length);
-        expect(hits.filter((h) => h !== 'error')).toEqual(TRACKING_ORDER);
+        const tracked = hits.filter((h) => h !== 'error');
+        expect(tracked).toHaveLength(TRACKING_ORDER.length);
+        // The creative fires AdStarted, AdImpression and AdVideoStart in the same tick, so the browser may send
+        // those three pixel requests in any order; the quartiles and complete come 300ms apart
+        expect(tracked.slice(0, 3)).toEqual(expect.arrayContaining(TRACKING_ORDER.slice(0, 3)));
+        expect(tracked.slice(3)).toEqual(TRACKING_ORDER.slice(3));
     });
 
     test('should remove the VPAID slot and play the main video after AdStopped', async ({ page }) => {

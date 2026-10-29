@@ -507,12 +507,16 @@ export default function (playerInstance, options) {
         vpaidIframe.setAttribute('adListId', ad.id);
         vpaidIframe.setAttribute('frameborder', '0');
 
-        playerInstance.domRef.player.parentNode.insertBefore(vpaidIframe, playerInstance.domRef.player.nextSibling);
-
         const vpaidJsScriptElement = document.createElement('script');
         vpaidJsScriptElement.src = vpaidJsUrl;
 
-        vpaidIframe.contentWindow.document.head.append(vpaidJsScriptElement);
+        // Firefox replaces the iframe's initial about:blank document once it loads, dropping a script added before that.
+        // Listen before inserting: Chrome fires this load synchronously on insert, Firefox fires it after the replacement.
+        vpaidIframe.addEventListener('load', () => {
+            vpaidIframe.contentWindow.document.head.append(vpaidJsScriptElement);
+        }, { once: true });
+
+        playerInstance.domRef.player.parentNode.insertBefore(vpaidIframe, playerInstance.domRef.player.nextSibling);
 
         // set interval with timeout
         playerInstance.tempVpaidCounter = 0;

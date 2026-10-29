@@ -33,7 +33,16 @@ export default defineConfig({
 
     {
       name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      use: {
+        ...devices['Desktop Firefox'],
+        launchOptions: {
+          firefoxUserPrefs: {
+            // Firefox shows its Picture-in-Picture toggle while the mouse is over a video, even under player controls,
+            // and it swallows clicks on those controls (e.g. the top item of the playback rate menu)
+            'media.videocontrols.picture-in-picture.video-toggle.enabled': false,
+          },
+        },
+      },
     },
 
     // {
