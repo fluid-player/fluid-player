@@ -1,0 +1,25 @@
+<VAST xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast4.xsd" version="4.2">
+    <Ad id="inline">
+        <InLine>
+            <AdSystem>Inline</AdSystem>
+            <AdTitle>Wrapper chain inline ad</AdTitle>
+            <Impression><![CDATA[/e2e-track/inline/impression]]></Impression>
+            <Creatives>
+                <Creative>
+                    <Linear>
+                        <Duration>00:00:00</Duration>
+                        <MediaFiles>
+                            <MediaFile delivery="progressive" type="video/mp4" width="400" height="300">
+                                <![CDATA[ https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4 ]]>
+                            </MediaFile>
+                        </MediaFiles>
+                        <TrackingEvents>
+                            <Tracking event="start"><![CDATA[/e2e-track/inline/start]]></Tracking>
+                            <Tracking event="complete"><![CDATA[/e2e-track/inline/complete]]></Tracking>
+                        </TrackingEvents>
+                    </Linear>
+                </Creative>
+            </Creatives>
+        </InLine>
+    </Ad>
+</VAST>

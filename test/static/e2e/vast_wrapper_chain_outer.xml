@@ -1,0 +1,19 @@
+<VAST xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast4.xsd" version="4.2">
+    <Ad id="outer">
+        <Wrapper followAdditionalWrappers="true">
+            <AdSystem>Outer wrapper</AdSystem>
+            <VASTAdTagURI><![CDATA[/static/e2e/vast_wrapper_chain_middle.xml]]></VASTAdTagURI>
+            <Impression><![CDATA[/e2e-track/outer/impression]]></Impression>
+            <Creatives>
+                <Creative>
+                    <Linear>
+                        <TrackingEvents>
+                            <Tracking event="start"><![CDATA[/e2e-track/outer/start]]></Tracking>
+                            <Tracking event="complete"><![CDATA[/e2e-track/outer/complete]]></Tracking>
+                        </TrackingEvents>
+                    </Linear>
+                </Creative>
+            </Creatives>
+        </Wrapper>
+    </Ad>
+</VAST>
