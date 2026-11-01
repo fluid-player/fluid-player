@@ -851,7 +851,10 @@ export default function (playerInstance, options) {
                         adTree.children.push({ tagType: 'inLine', ...adNode });
                     } else {
                         // If valid, add it to the ad tree
-                        const mediaFileIsValid = await validateMediaFile(mediaFileUrl);
+                        const mediaFileIsValid = await validateMediaFile(mediaFileUrl, {
+                            type: mediaFile[0].getAttribute('type'),
+                            delivery: mediaFile[0].getAttribute('delivery'),
+                        });
                         if (mediaFileIsValid) {
                             adTree.children.push({ tagType: 'inLine', ...adNode });
                         }
@@ -863,7 +866,7 @@ export default function (playerInstance, options) {
                         try {
                             const mediaFileObj = JSON.parse(adParameter.textContent.trim());
                             const mediaFileUrl = mediaFileObj?.videos?.length ? mediaFileObj?.videos[0]?.url : '';
-                            const mediaFileIsValid = await validateMediaFile(mediaFileUrl);
+                            const mediaFileIsValid = await validateMediaFile(mediaFileUrl, { type: mediaFileObj?.videos?.[0]?.mimetype });
                             // If valid, add it to the ad tree
                             if (mediaFileIsValid) {
                                 adTree.children.push({ tagType: 'inLine', ...adNode });
@@ -883,21 +886,21 @@ export default function (playerInstance, options) {
     /**
      * Validate Media File to check if videos play
      *
-     * @param {mediaFileUrl}
+     * @param {string} mediaFileUrl
+     * @param {{type: string, delivery?: string}} mediaFile MediaFile attributes
      */
-    async function validateMediaFile(mediaFileUrl) {
+    async function validateMediaFile(mediaFileUrl, mediaFile) {
         if (!mediaFileUrl) {
+            return false;
+        }
+        // Support is decided by the MediaFile attributes, like at play time, not by the server's Content-Type (VAST 4.2, 3.9.1)
+        if (!playerInstance.getSupportedMediaFileObject([mediaFile])) {
             return false;
         }
         try {
             const response = await fetch(mediaFileUrl);
-            if (response.ok) {
-                const contentType = response.headers.get('content-type') || '';
-                return contentType.indexOf('video') !== -1
-                    && document.createElement('video').canPlayType(contentType) !== '';
-            }
-            // Definite HTTP error status, not a CORS artifact - fail closed.
-            return false;
+            // Only checks that the file exists, a definite HTTP error status is not a CORS artifact - fail closed.
+            return response.ok;
         } catch (error) {
             // fetch() throws a TypeError both for a genuinely dead URL and for a
             // cross-origin media file served without CORS headers - the two are
