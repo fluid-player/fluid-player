@@ -2423,12 +2423,6 @@ const fluidPlayerClass = function () {
 
         let firstSource = true;
         for (const source of self.videoSources) {
-            // Fix for issues occurring on iOS with mkv files
-            const getTheType = source.url.split(".").pop();
-            if (self.mobileInfo.userOs === 'iOS' && getTheType === 'mkv') {
-                continue;
-            }
-
             // On suggested videos, if the resolution doesn't exist in the new source list, use the first one in the list
             // This gets overwritten if it's needed by setPersistentSettings()
             if(firstSource && !initialLoad) {
@@ -2503,9 +2497,12 @@ const fluidPlayerClass = function () {
     };
 
     self.setVideoSource = (url) => {
-        if (self.mobileInfo.userOs === 'iOS' && url.indexOf('.mkv') > 0) {
-            console.log('[FP_ERROR] .mkv files not supported by iOS devices.');
-            return false;
+        // Asks the browser whether it can play the source's declared type (untyped and HLS/DASH sources can't be judged)
+        const source = [].find.call(self.domRef.player.querySelectorAll('source'),
+            source => source.src === url || source.getAttribute('src') === url);
+        const type = source ? source.type.toLowerCase() : '';
+        if (type && type !== 'application/x-mpegurl' && type !== 'application/dash+xml' && !self.domRef.player.canPlayType(type)) {
+            console.log('[FP_ERROR] ' + type + ' files not supported by this browser.');
         }
 
         if (self.isCurrentlyPlayingAd) {
