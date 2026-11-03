@@ -13,6 +13,7 @@ import StreamingModule from './modules/streaming';
 import UtilsModule from './modules/utils';
 import SuggestedVideosModule from './modules/suggestedVideos';
 import MiniPlayerModule from './modules/miniplayer';
+import SettingsMenuModule from './modules/settingsMenu';
 
 const FP_MODULES = [
     VPAIDModule,
@@ -24,7 +25,8 @@ const FP_MODULES = [
     StreamingModule,
     UtilsModule,
     SuggestedVideosModule,
-    MiniPlayerModule
+    MiniPlayerModule,
+    SettingsMenuModule
 ];
 
 // Determine build mode
@@ -809,6 +811,14 @@ const fluidPlayerClass = function () {
         controls.fullscreen.title = 'Full Screen';
         controls.rightContainer.appendChild(controls.fullscreen);
 
+        // Right container -> Settings (compact layout only, see settingsMenu.js)
+        controls.settings = document.createElement('div');
+        controls.settings.className = 'fluid_button fluid_control_settings fluid_button_settings';
+        controls.settings.title = 'Settings';
+        controls.settings.setAttribute('aria-haspopup', 'dialog');
+        controls.settings.setAttribute('aria-expanded', 'false');
+        controls.rightContainer.appendChild(controls.settings);
+
         if (options.miniPlayer.enabled) {
             // Right container -> MiniPlayer
             controls.miniPlayer = document.createElement('div');
@@ -1561,6 +1571,11 @@ const fluidPlayerClass = function () {
         }
 
         self.captureKey = event => {
+            // Leave all keys to the open settings menu
+            if (self.isSettingsMenuOpen()) {
+                return;
+            }
+
             event.stopPropagation();
             const keyCode = event.keyCode;
 
@@ -2077,6 +2092,8 @@ const fluidPlayerClass = function () {
         self.createPlaybackList();
 
         self.createDownload();
+
+        self.createSettingsMenu();
 
         self.toggleMiniPlayerScreenDetection();
 
@@ -2840,7 +2857,8 @@ const fluidPlayerClass = function () {
             }
         }
 
-        self.repositionSubtitlesContainer('46px');
+        // Clears the control bar, whose height depends on the layout (--fluid-subtitles-bottom in fluidplayer.css)
+        self.repositionSubtitlesContainer('var(--fluid-subtitles-bottom)');
     };
 
     self.linkControlBarUserActivity = () => {

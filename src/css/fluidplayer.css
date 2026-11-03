@@ -1661,3 +1661,221 @@ _:-ms-lang(x),
         padding: 5px;
     }
 }
+
+/**
+* Compact (mobile) layout, see settingsMenu.js.
+* Touch devices and players narrower than 640px get one row of core controls (play/pause, time, mute, settings,
+* fullscreen) above a full-width seek bar. The other controls move into the settings menu.
+*/
+.fluid_video_wrapper.fluid_mobile_layout {
+    --fluid-subtitles-bottom: calc(var(--fluid-mobile-bar-height) + 4px);
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container {
+    height: var(--fluid-mobile-bar-height);
+    container: fluid-controls / inline-size;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_progress_container {
+    top: auto;
+    bottom: 8px;
+    left: var(--fluid-mobile-bar-padding);
+    right: var(--fluid-mobile-bar-padding);
+}
+
+/* Taller touch target for the seek bar, below the buttons' targets */
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_progress_container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: -8px;
+    left: 0;
+}
+
+/* Timeline thumbnails float above the whole bar instead of over its buttons (the seek bar sits 8px from its bottom) */
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_progress_container .fluid_timeline_preview_container,
+.fluid_video_wrapper.fluid_mobile_layout .fluid_timeline_preview_container_shadow {
+    bottom: calc(var(--fluid-mobile-bar-height) - 4px);
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_left,
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right {
+    top: 10px;
+    display: flex;
+    align-items: center;
+    gap: var(--fluid-control-gap);
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_left {
+    left: var(--fluid-mobile-bar-padding);
+    width: auto;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right {
+    left: calc(var(--fluid-mobile-bar-padding) + var(--fluid-icon-size) + var(--fluid-control-gap));
+    right: var(--fluid-mobile-bar-padding);
+    justify-content: flex-end;
+}
+
+/* VR content moves the time out of the right side (cardboard.js), keep it in the row after the play button */
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container > .fluid_control_duration {
+    position: absolute;
+    top: 10px;
+    left: calc(var(--fluid-mobile-bar-padding) + var(--fluid-icon-size) + var(--fluid-control-gap));
+    display: flex;
+    align-items: center;
+    height: var(--fluid-icon-size);
+    font-variant-numeric: tabular-nums;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container.skip_controls > .fluid_control_duration {
+    left: calc(var(--fluid-mobile-bar-padding) + 3 * (var(--fluid-icon-size) + var(--fluid-control-gap)));
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container.skip_controls .fluid_controls_right {
+    left: calc(var(--fluid-mobile-bar-padding) + 3 * (var(--fluid-icon-size) + var(--fluid-control-gap)));
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_button {
+    flex: none;
+    float: none;
+    position: relative;
+    left: auto;
+    margin: 0;
+    padding: 0;
+}
+
+/* Centre each glyph in its button and give it a 44px touch target */
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_button::before {
+    top: 0;
+    left: 0;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_button::after {
+    content: '';
+    position: absolute;
+    top: calc((var(--fluid-icon-size) - var(--fluid-touch-target)) / 2);
+    right: calc((var(--fluid-icon-size) - var(--fluid-touch-target)) / 2);
+    bottom: calc((var(--fluid-icon-size) - var(--fluid-touch-target)) / 2);
+    left: calc((var(--fluid-icon-size) - var(--fluid-touch-target)) / 2);
+}
+
+/* Right side, in this order: time, mute, settings, fullscreen */
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right .fluid_control_duration,
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right .fluid_control_duration.no_volume_bar {
+    margin-right: auto;
+    padding-left: 0;
+    font-variant-numeric: tabular-nums;
+    /* One line, clipped rather than overlapping the buttons (the container queries below drop it before that) */
+    white-space: nowrap;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right .fluid_button_volume,
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right .fluid_button_mute {
+    order: 1;
+    position: relative;
+    left: auto;
+}
+
+/* Phones and small players: mute button only. Where there's room (tablets, wider players) the slider follows it */
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right .fluid_control_volume_container {
+    display: none;
+}
+
+/* Fits next to an hour-long time, also with skip buttons; wider than phones in portrait */
+@container fluid-controls (min-width: 496px) {
+    /* Not where master hides it (no_volume_bar: iOS ignores the page's volume) */
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container:not(.no_volume_bar) .fluid_controls_right .fluid_control_volume_container {
+        display: block;
+        order: 2;
+        flex: none;
+        position: relative;
+        left: auto;
+        top: auto;
+        margin-left: calc(8px - var(--fluid-control-gap));
+    }
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right .fluid_button_settings {
+    order: 3;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right .fluid_button_fullscreen,
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right .fluid_button_fullscreen_exit {
+    order: 4;
+}
+
+/* In the settings menu instead: out of the bar and the accessibility tree, but still enabled and clickable */
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_button.fluid_button_in_settings {
+    position: absolute;
+    visibility: hidden;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_button_live_indicator {
+    position: static;
+    margin: 0 8px 0 0;
+    font-size: 11px;
+}
+
+/*
+* Narrow players: tighter spacing (touch targets overlap a little), and as a last resort no time readout. Every
+* button stays. Measured with an hour-long time ("1:00:00 / 1:00:00") plus some slack for platform fonts; with skip
+* buttons the left side is two buttons wider.
+*/
+@container fluid-controls (max-width: 343px) {
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_left,
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right {
+        --fluid-control-gap: 12px;
+    }
+}
+
+@container fluid-controls (max-width: 311px) {
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right .fluid_control_duration {
+        display: none;
+    }
+}
+
+@container fluid-controls (max-width: 431px) {
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container.skip_controls .fluid_controls_left,
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container.skip_controls .fluid_controls_right {
+        --fluid-control-gap: 12px;
+    }
+}
+
+@container fluid-controls (max-width: 383px) {
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container.skip_controls .fluid_controls_right .fluid_control_duration {
+        display: none;
+    }
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_settings {
+    display: none;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_button.fluid_button_settings {
+    display: inline-block;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_settings::before {
+    content: '';
+    position: absolute;
+    width: var(--fluid-icon-size);
+    height: var(--fluid-icon-size);
+    background: url('../static/settings.svg') no-repeat center / 22px;
+    opacity: var(--fluid-icon-opacity);
+    transition: opacity 0.3s ease-in-out;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_settings:hover::before {
+    opacity: 1;
+}
+
+/* Ad overlays anchored to the bottom (skip button, CTA, ad text) sit 50px up, which clears the desktop bar only */
+.fluid_video_wrapper.fluid_mobile_layout .skip_button,
+.fluid_video_wrapper.fluid_mobile_layout .fluid_ad_cta.bottom,
+.fluid_video_wrapper.fluid_mobile_layout .fluid_ad_playing[style*="bottom"] {
+    transform: translateY(calc(50px - var(--fluid-mobile-bar-height)));
+}
