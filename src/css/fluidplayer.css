@@ -1873,6 +1873,11 @@ _:-ms-lang(x),
     opacity: 1;
 }
 
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button:focus-visible {
+    outline: 2px solid var(--fluid-text-color);
+    outline-offset: 2px;
+}
+
 /* Ad overlays anchored to the bottom (skip button, CTA, ad text) sit 50px up, which clears the desktop bar only */
 .fluid_video_wrapper.fluid_mobile_layout .skip_button,
 .fluid_video_wrapper.fluid_mobile_layout .fluid_ad_cta.bottom,
