@@ -184,8 +184,11 @@
 
     /* Control bar */
     --fluid-subtitles-bottom: 46px; /* keeps subtitles above the visible control bar */
+    --fluid-bar-clearance: 4px; /* space between the compact bar and what floats above it (subtitles, thumbnails) */
     --fluid-mobile-bar-height: 66px;
     --fluid-mobile-bar-padding: 16px;
+    --fluid-mobile-row-top: 10px; /* button row, from the top of the compact bar */
+    --fluid-mobile-seek-offset: 8px; /* seek bar, from the bottom of the compact bar */
     --fluid-icon-size: 24px;
     --fluid-touch-target: 44px;
     --fluid-control-gap: calc(var(--fluid-touch-target) - var(--fluid-icon-size));
@@ -1668,7 +1671,7 @@ _:-ms-lang(x),
 * fullscreen) above a full-width seek bar. The other controls move into the settings menu.
 */
 .fluid_video_wrapper.fluid_mobile_layout {
-    --fluid-subtitles-bottom: calc(var(--fluid-mobile-bar-height) + 4px);
+    --fluid-subtitles-bottom: calc(var(--fluid-mobile-bar-height) + var(--fluid-bar-clearance));
 }
 
 .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container {
@@ -1678,7 +1681,7 @@ _:-ms-lang(x),
 
 .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_progress_container {
     top: auto;
-    bottom: 8px;
+    bottom: var(--fluid-mobile-seek-offset);
     left: var(--fluid-mobile-bar-padding);
     right: var(--fluid-mobile-bar-padding);
 }
@@ -1689,19 +1692,19 @@ _:-ms-lang(x),
     position: absolute;
     top: 0;
     right: 0;
-    bottom: -8px;
+    bottom: calc(-1 * var(--fluid-mobile-seek-offset));
     left: 0;
 }
 
-/* Timeline thumbnails float above the whole bar instead of over its buttons (the seek bar sits 8px from its bottom) */
+/* Timeline thumbnails float above the whole bar instead of over its buttons (offset from the seek bar) */
 .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_progress_container .fluid_timeline_preview_container,
 .fluid_video_wrapper.fluid_mobile_layout .fluid_timeline_preview_container_shadow {
-    bottom: calc(var(--fluid-mobile-bar-height) - 4px);
+    bottom: calc(var(--fluid-mobile-bar-height) - var(--fluid-mobile-seek-offset) + var(--fluid-bar-clearance));
 }
 
 .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_left,
 .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right {
-    top: 10px;
+    top: var(--fluid-mobile-row-top);
     display: flex;
     align-items: center;
     gap: var(--fluid-control-gap);
@@ -1721,7 +1724,7 @@ _:-ms-lang(x),
 /* VR content moves the time out of the right side (cardboard.js), keep it in the row after the play button */
 .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container > .fluid_control_duration {
     position: absolute;
-    top: 10px;
+    top: var(--fluid-mobile-row-top);
     left: calc(var(--fluid-mobile-bar-padding) + var(--fluid-icon-size) + var(--fluid-control-gap));
     display: flex;
     align-items: center;
