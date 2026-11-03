@@ -79,7 +79,7 @@
     empty-cells: show;
     float: none;
     font: normal;
-    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    font-family: var(--fluid-font-family);
     font-size: medium;
     font-style: normal;
     font-variant: normal;
@@ -175,6 +175,54 @@
     display: inline-block;
 }
 
+/* Design tokens. Override them on the wrapper to theme a player. */
+.fluid_video_wrapper {
+    --fluid-font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    --fluid-primary-color: red; /* layoutControls.primaryColor, set by settingsMenu.js */
+    --fluid-text-color: #ffffff; /* text and icons drawn over the video, in both colour schemes */
+    --fluid-icon-opacity: 0.8;
+
+    /* Control bar */
+    --fluid-subtitles-bottom: 46px; /* keeps subtitles above the visible control bar */
+    --fluid-mobile-bar-height: 66px;
+    --fluid-mobile-bar-padding: 16px;
+    --fluid-icon-size: 24px;
+    --fluid-touch-target: 44px;
+    --fluid-control-gap: calc(var(--fluid-touch-target) - var(--fluid-icon-size));
+
+    /* Settings menu (bottom sheet): dark skin, light skin below */
+    --fluid-menu-color-scheme: dark;
+    --fluid-menu-bg: #212121;
+    --fluid-menu-inset-bg: #181818;
+    --fluid-menu-text-color: #ffffff;
+    --fluid-menu-text-secondary-color: rgba(255, 255, 255, 0.7);
+    --fluid-menu-divider-color: rgba(255, 255, 255, 0.1);
+    --fluid-menu-highlight-bg: rgba(255, 255, 255, 0.08);
+    --fluid-scrim-color: rgba(0, 0, 0, 0.5);
+    --fluid-switch-off-color: #5f5f5f;
+    --fluid-switch-knob-color: #ffffff;
+    --fluid-menu-radius: 12px;
+    --fluid-menu-max-width: 480px;
+    --fluid-menu-padding: 16px;
+    --fluid-sheet-duration: 220ms;
+    --fluid-sheet-easing: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Light skin, following the viewer's system/browser colour scheme */
+@media (prefers-color-scheme: light) {
+    .fluid_video_wrapper {
+        --fluid-menu-color-scheme: light;
+        --fluid-menu-bg: #ffffff;
+        --fluid-menu-inset-bg: #f2f2f2;
+        --fluid-menu-text-color: #0f0f0f;
+        --fluid-menu-text-secondary-color: rgba(0, 0, 0, 0.6);
+        --fluid-menu-divider-color: rgba(0, 0, 0, 0.1);
+        --fluid-menu-highlight-bg: rgba(0, 0, 0, 0.05);
+        --fluid-scrim-color: rgba(0, 0, 0, 0.4);
+        --fluid-switch-off-color: #b9b9b9;
+    }
+}
+
 .fluid_video_wrapper video {
     position: relative;
     background-color: #000000;
@@ -219,7 +267,7 @@
     cursor: pointer;
     z-index: 10;
     font-size: 13px;
-    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    font-family: var(--fluid-font-family);
     font-weight: normal;
     white-space: nowrap;
     text-align: start;
@@ -289,7 +337,7 @@
     border-radius: 1px;
     color: #ffffff;
     font-size: 13px;
-    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    font-family: var(--fluid-font-family);
     font-weight: normal;
     white-space: nowrap;
     text-align: start;
@@ -303,7 +351,7 @@
     background-color: rgba(0, 0, 0, 0.7);
     color: #ffffff;
     font-size: 13px;
-    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    font-family: var(--fluid-font-family);
     font-weight: normal;
     text-align: right;
     cursor: pointer;
@@ -389,7 +437,7 @@
     color: #ffffff;
     font-size: 13px;
     line-height: 18px;
-    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    font-family: var(--fluid-font-family);
     font-weight: normal;
     text-align: start;
     padding: 13px 21px 13px 21px;
@@ -402,7 +450,7 @@
     display: inline-block;
     white-space: nowrap;
     height: 24px;
-    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    font-family: var(--fluid-font-family);
     font-size: 13px;
     font-weight: normal;
     font-style: normal;
@@ -432,7 +480,7 @@
     bottom: 5px;
     height: 24px;
     color: red;
-    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    font-family: var(--fluid-font-family);
     font-size: 13px;
     font-weight: normal;
     font-style: normal;
@@ -643,7 +691,7 @@
     background: black;
     color: white;
     font-size: 1em;
-    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    font-family: var(--fluid-font-family);
     padding: 0.25em;
     border-radius: 4px;
 }
@@ -689,7 +737,7 @@
     background-color: #000000;
     color: #ffffff;
     font-size: 13px;
-    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    font-family: var(--fluid-font-family);
     font-weight: normal;
     white-space: nowrap;
     text-align: start;
@@ -1010,7 +1058,7 @@ _:-ms-lang(x),
     border-radius: 2px;
     color: #ffffff;
     font-size: 13px;
-    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    font-family: var(--fluid-font-family);
     font-weight: normal;
     white-space: nowrap;
     text-align: start;
@@ -1196,7 +1244,7 @@ _:-ms-lang(x),
     left: 10px;
     color: #ffffff;
     font-size: 15px;
-    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    font-family: var(--fluid-font-family);
     font-weight: normal;
     white-space: nowrap;
 }
