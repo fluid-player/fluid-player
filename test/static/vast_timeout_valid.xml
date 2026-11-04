@@ -1,0 +1,17 @@
+<VAST version="4.2">
+    <Ad id="timeout-fallback">
+        <InLine>
+            <AdSystem>Fluid Player E2E</AdSystem>
+            <AdTitle>Local timeout fallback</AdTitle>
+            <Creatives>
+                <Creative>
+                    <NonLinearAds>
+                        <NonLinear width="320" height="50" minSuggestedDuration="00:00:15">
+                            <StaticResource creativeType="image/png">/vast-timeout-image.png</StaticResource>
+                        </NonLinear>
+                    </NonLinearAds>
+                </Creative>
+            </Creatives>
+        </InLine>
+    </Ad>
+</VAST>
