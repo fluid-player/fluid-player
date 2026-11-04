@@ -388,6 +388,31 @@ test.describe('compact (mobile) layout and settings menu', () => {
         await expect(wrapper(page)).toHaveClass(/fluid_theatre_mode/);
     });
 
+    test('during an ad the sheet\'s option lists stay closed, like the desktop menus', async ({ page }) => {
+        await useCoarsePointer(page);
+        await page.goto('/controls.html');
+        await page.evaluate(() => {
+            const src = '/static/e2e/subtitles_30s.webm';
+            document.body.innerHTML = `<video id="with-ad" style="width:100%">
+                <source src="${src}?720" title="720p" type="video/webm">
+                <source src="${src}?480" title="480p" type="video/webm"></video>`;
+            (window as any).fluidPlayer('with-ad', {
+                layoutControls: { playbackRateEnabled: true },
+                vastOptions: { adList: [{ roll: 'preRoll', vastTag: '/static/vast_linear_e2e.xml' }] },
+            });
+        });
+
+        await page.locator('.fluid_initial_play_button_container').click();
+        await page.locator('.vast_clickthrough_layer').waitFor();
+        await openSettings(page);
+        await expect(rows(page)).toHaveText([/Playback Speed/, /Quality/, /Theatre Mode/, /Mini Player/]);
+        for (const row of ['Quality', 'Playback Speed']) {
+            await page.getByRole('button', { name: row }).click();
+            await expect(page.getByRole('button', { name: row })).toHaveAttribute('aria-expanded', 'false');
+        }
+        await expect(page.getByRole('radio')).toHaveCount(0);
+    });
+
     test('the settings button and sheet work with the keyboard', async ({ page }) => {
         await page.setViewportSize({ width: 480, height: 720 });
         await page.goto('/playback_seek.html');

@@ -19,6 +19,7 @@ export default function (playerInstance) {
      *
      * - `items`: the row expands to the button's option elements; picking one clicks that option.
      *   `isSelected` overrides how the current option is found (default: the option's selected icon).
+     *   Like the desktop menus, lists don't open during an ad; `isBlocked` adds the menu's other conditions.
      * - `isOn`: the row is a switch showing that state; tapping it clicks the button.
      * - neither: the row is a plain action; tapping it clicks the button.
      */
@@ -29,7 +30,12 @@ export default function (playerInstance) {
             items: '.fluid_video_playback_rates_item',
             isSelected: option => Number(option.textContent.replace('x', '')) === playerInstance.domRef.player.playbackRate
         },
-        {label: 'Quality', button: '.fluid_control_video_source', items: '.fluid_video_source_list_item'},
+        {
+            label: 'Quality',
+            button: '.fluid_control_video_source',
+            items: '.fluid_video_source_list_item',
+            isBlocked: () => playerInstance.isShowingSuggestedVideos()
+        },
         {label: 'Subtitles', button: '.fluid_control_subtitles', items: '.fluid_subtitle_list_item:not(.fluid_sub_menu_button)'},
         {label: 'Subtitle Size', button: '.fluid_control_subtitles', items: '.fluid_subtitle_size_button:not(.fluid_sub_menu_button)'},
         {label: 'VR', button: '.fluid_control_cardboard', isOn: () => !!playerInstance.vrMode},
@@ -280,6 +286,10 @@ export default function (playerInstance) {
 
         // One expanded list at a time
         row.addEventListener('click', () => {
+            if (playerInstance.isCurrentlyPlayingAd || (item.isBlocked && item.isBlocked())) {
+                return;
+            }
+
             const expand = list.hidden;
 
             rows.querySelectorAll('.fluid_settings_row[aria-expanded]').forEach(otherRow => {
