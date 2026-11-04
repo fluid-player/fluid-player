@@ -1783,16 +1783,21 @@ _:-ms-lang(x),
     left: auto;
 }
 
-/* Phones and small players: mute button only. Where there's room (tablets, wider players) the slider follows it */
-.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right .fluid_control_volume_container {
-    display: none;
+/*
+* Phones and small players: mute button only. Where there's room (tablets, wider players) the slider follows it.
+* 516px fits it next to an hour-long time ("01:00:00 / 01:00:00"), also with skip buttons, and is wider than phones
+* in portrait.
+*/
+@container fluid-controls (max-width: 515px) {
+    /* !important: leaving VR sets an inline display on the slider (cardboard.js) */
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right .fluid_control_volume_container {
+        display: none !important;
+    }
 }
 
-/* Fits next to an hour-long time, also with skip buttons; wider than phones in portrait */
-@container fluid-controls (min-width: 496px) {
-    /* Not where master hides it (no_volume_bar: iOS ignores the page's volume) */
-    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container:not(.no_volume_bar) .fluid_controls_right .fluid_control_volume_container {
-        display: block;
+/* Where it's shown is left to the desktop rules (e.g. no_volume_bar on iOS, hidden in VR on phones) */
+@container fluid-controls (min-width: 516px) {
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right .fluid_control_volume_container {
         order: 2;
         flex: none;
         position: relative;
@@ -1825,31 +1830,63 @@ _:-ms-lang(x),
 
 /*
 * Narrow players: tighter spacing (touch targets overlap a little), and as a last resort no time readout. Every
-* button stays. Measured with an hour-long time ("1:00:00 / 1:00:00") plus some slack for platform fonts; with skip
-* buttons the left side is two buttons wider.
+* button stays. Widths measured for the time of videos under an hour ("00:00 / 00:00") and of an hour or more
+* ("01:00:00 / 01:00:00", fluid_long_time, see settingsMenu.js), plus 8px slack for platform fonts. Skip buttons
+* make the left side two buttons wider. The hide rules also cover the time VR moves out of the right side (each VR
+* half is its own, narrower bar).
 */
-@container fluid-controls (max-width: 343px) {
+@container fluid-controls (max-width: 315px) {
     .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_left,
     .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right {
         --fluid-control-gap: 12px;
     }
 }
 
-@container fluid-controls (max-width: 311px) {
-    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right .fluid_control_duration {
+@container fluid-controls (max-width: 363px) {
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout.fluid_long_time .fluid_controls_container .fluid_controls_left,
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout.fluid_long_time .fluid_controls_container .fluid_controls_right {
+        --fluid-control-gap: 12px;
+    }
+}
+
+@container fluid-controls (max-width: 283px) {
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right .fluid_control_duration,
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container > .fluid_control_duration {
         display: none;
     }
 }
 
-@container fluid-controls (max-width: 431px) {
+@container fluid-controls (max-width: 331px) {
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout.fluid_long_time .fluid_controls_container .fluid_controls_right .fluid_control_duration,
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout.fluid_long_time .fluid_controls_container > .fluid_control_duration {
+        display: none;
+    }
+}
+
+@container fluid-controls (max-width: 403px) {
     .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container.skip_controls .fluid_controls_left,
     .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container.skip_controls .fluid_controls_right {
         --fluid-control-gap: 12px;
     }
 }
 
-@container fluid-controls (max-width: 383px) {
-    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container.skip_controls .fluid_controls_right .fluid_control_duration {
+@container fluid-controls (max-width: 451px) {
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout.fluid_long_time .fluid_controls_container.skip_controls .fluid_controls_left,
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout.fluid_long_time .fluid_controls_container.skip_controls .fluid_controls_right {
+        --fluid-control-gap: 12px;
+    }
+}
+
+@container fluid-controls (max-width: 355px) {
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container.skip_controls .fluid_controls_right .fluid_control_duration,
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container.skip_controls > .fluid_control_duration {
+        display: none;
+    }
+}
+
+@container fluid-controls (max-width: 403px) {
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout.fluid_long_time .fluid_controls_container.skip_controls .fluid_controls_right .fluid_control_duration,
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout.fluid_long_time .fluid_controls_container.skip_controls > .fluid_control_duration {
         display: none;
     }
 }

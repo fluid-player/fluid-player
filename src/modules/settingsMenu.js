@@ -9,6 +9,7 @@ export default function (playerInstance) {
     const COARSE_POINTER_QUERY = '(pointer: coarse)';
     const COMPACT_MAX_WIDTH = 640; // px, below this the full desktop control bar no longer fits
     const MOBILE_LAYOUT_CLASS = 'fluid_mobile_layout';
+    const LONG_TIME_CLASS = 'fluid_long_time'; // video of an hour or more: wider time readout ("01:00:00 / 01:00:00")
     const IN_SETTINGS_CLASS = 'fluid_button_in_settings';
     const OPEN_CLASS = 'fluid_settings_menu_open';
 
@@ -74,6 +75,9 @@ export default function (playerInstance) {
         return label;
     };
 
+    // From the player's own control bar: VR adds a copy of it (before it, and without its listeners)
+    const findButton = selector => playerInstance.domRef.controls.root.querySelector(selector);
+
     playerInstance.isSettingsMenuOpen = () => !!menu && menu.classList.contains(OPEN_CLASS);
 
     playerInstance.createSettingsMenu = () => {
@@ -85,7 +89,7 @@ export default function (playerInstance) {
 
         // Lets the compact layout take these buttons out of the control bar
         SETTINGS_ITEMS.forEach(item => {
-            const button = wrapper.querySelector(item.button);
+            const button = findButton(item.button);
             if (button) {
                 button.classList.add(IN_SETTINGS_CLASS);
             }
@@ -135,9 +139,16 @@ export default function (playerInstance) {
         const resizeObserver = new ResizeObserver(updateLayout);
         resizeObserver.observe(wrapper);
 
+        // The compact bar keeps the time readout down to narrower widths when it's short (container queries in CSS)
+        const player = playerInstance.domRef.player;
+        const updateTimeLength = () => wrapper.classList.toggle(LONG_TIME_CLASS, isFinite(player.duration) && player.duration >= 3600);
+        updateTimeLength();
+        player.addEventListener('durationchange', updateTimeLength);
+
         playerInstance.destructors.push(() => {
             coarsePointer.removeEventListener('change', updateLayout);
             resizeObserver.disconnect();
+            player.removeEventListener('durationchange', updateTimeLength);
         });
     };
 
@@ -195,7 +206,7 @@ export default function (playerInstance) {
     // The SETTINGS_ITEMS whose control is currently enabled, with their options
     const getAvailableItems = () => SETTINGS_ITEMS
         .map(item => {
-            const button = playerInstance.domRef.wrapper.querySelector(item.button);
+            const button = findButton(item.button);
             const isEnabled = !!button && getComputedStyle(button).display !== 'none';
             const options = isEnabled && item.items ? Array.from(button.querySelectorAll(item.items)) : [];
 
@@ -227,7 +238,7 @@ export default function (playerInstance) {
         const observer = new MutationObserver(update);
 
         SETTINGS_ITEMS.forEach(item => {
-            const button = playerInstance.domRef.wrapper.querySelector(item.button);
+            const button = findButton(item.button);
             if (button) {
                 observer.observe(button, {attributes: true, attributeFilter: ['style'], childList: true});
             }

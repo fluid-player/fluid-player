@@ -266,6 +266,80 @@ test.describe('compact (mobile) layout and settings menu', () => {
         await context.close();
     });
 
+    test('in VR the sheet options still work (VR adds a copy of the bar without its listeners)', async ({ browser }) => {
+        const context = await browser.newContext({
+            userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Mobile Safari/537.36',
+            viewport: { width: 844, height: 390 },
+            hasTouch: true,
+        });
+        const page = await context.newPage();
+        await useCoarsePointer(page);
+        await page.goto('/controls.html');
+        await page.evaluate(() => {
+            document.body.innerHTML = '<video id="vr-sheet" style="width:420px"><source src="/static/e2e/vr_30s.webm" type="video/webm"></video>';
+            (window as any).fluidPlayer('vr-sheet', { layoutControls: { showCardBoardView: true, playbackRateEnabled: true } });
+        });
+        await page.waitForFunction(() => (window as any).fluidPlayerDebug.some((p: any) => p.internals.vrViewer));
+        const player = page.locator('#fluid_video_wrapper_vr-sheet');
+
+        await player.tap({ position: { x: 10, y: 10 } });
+        await player.locator('.fluid_control_settings').first().tap();
+        await page.getByRole('switch', { name: 'VR' }).tap();
+        await expect(page.locator('.fluid_vr2_controls_container')).toHaveCount(1);
+
+        await player.tap({ position: { x: 10, y: 10 } });
+        await player.locator('.fluid_control_settings').first().tap();
+        await page.getByRole('button', { name: 'Playback Speed' }).tap();
+        await page.getByRole('radio', { name: 'x1.5', exact: true }).tap();
+        await expect.poll(() => page.locator('#vr-sheet').evaluate(v => (v as HTMLVideoElement).playbackRate)).toBe(1.5);
+        await context.close();
+    });
+
+    test('in VR on a phone held upright, the mute and settings buttons stay reachable', async ({ browser }) => {
+        const context = await browser.newContext({
+            userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Mobile Safari/537.36',
+            viewport: { width: 390, height: 844 },
+            hasTouch: true,
+        });
+        const page = await context.newPage();
+        await useCoarsePointer(page);
+        await page.goto('/vr.html');
+        await page.waitForFunction(() => !!(window as any).fluidPlayerDebug[0].internals.vrViewer);
+
+        await page.locator('#fluid_video_wrapper_fluid-player-e2e-case').tap({ position: { x: 10, y: 10 } });
+        await page.locator('.fluid_control_settings').first().tap();
+        await page.getByRole('switch', { name: 'VR' }).tap();
+        await expect(page.locator('.fluid_vr2_controls_container')).toHaveCount(1);
+
+        // Each VR half is a narrow bar: the time VR moves out of the right side must not cover the buttons
+        const covered = await page.evaluate(() => [...document.querySelectorAll('.fluid_control_mute, .fluid_control_settings')]
+            .filter(button => {
+                const box = button.getBoundingClientRect();
+                return box.width && !button.contains(document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2));
+            })
+            .map(button => button.className));
+        expect(covered).toEqual([]);
+        await context.close();
+    });
+
+    test('leaving VR keeps the volume slider hidden in a narrow compact bar', async ({ page }) => {
+        await page.goto('/vr.html');
+        await page.waitForFunction(() => !!(window as any).fluidPlayerDebug[0].internals.vrViewer);
+        await wrapper(page).evaluate(el => { (el as HTMLElement).style.width = '420px'; });
+        await expect(wrapper(page)).toHaveClass(/fluid_mobile_layout/);
+
+        await wrapper(page).hover();
+        await openSettings(page);
+        await page.getByRole('switch', { name: 'VR' }).click();
+        await expect(page.locator('.fluid_vr2_controls_container')).toHaveCount(1);
+
+        // On desktop VR fills the window (desktop bar); leave it with the cardboard button
+        await page.locator('.fluid_control_cardboard').first().click();
+        await expect(page.locator('.fluid_vr2_controls_container')).toHaveCount(0);
+        await expect(wrapper(page)).toHaveClass(/fluid_mobile_layout/);
+        await expect(page.locator('.fluid_control_volume_container')).toBeHidden();
+    });
+
     test('narrow players keep every bar control inside the player, with the mute button but no volume slider', async ({ page }) => {
         // A small sidebar player, narrow enough for the tighter spacing
         await page.goto('/playback_seek.html');
@@ -281,6 +355,39 @@ test.describe('compact (mobile) layout and settings menu', () => {
         // The time still fits whole on one line, and there's no room for the volume slider
         expect(await page.locator('.fluid_control_duration').evaluate(el => el.scrollWidth <= el.clientWidth && el.clientHeight < 30)).toBe(true);
         await expect(page.locator('.fluid_control_volume_container')).toBeHidden();
+    });
+
+    test('with skip buttons, phones keep the time readout, and hour-long videos only drop it where it cannot fit', async ({ page }) => {
+        await page.goto('/controls.html');
+        await page.evaluate(() => {
+            document.body.innerHTML = '<video id="skip" style="width:100%"><source src="/static/e2e/subtitles_30s.webm" type="video/webm"></video>';
+            (window as any).fluidPlayer('skip', { layoutControls: { fillToContainer: false, controlForwardBackward: { show: true } } });
+        });
+        const player = page.locator('#fluid_video_wrapper_skip');
+        const time = player.locator('.fluid_controls_right .fluid_control_duration');
+        const resize = (width: string) => player.evaluate((el, w) => { (el as HTMLElement).style.width = w; }, width);
+        const fitsWhole = () => time.evaluate(el => el.scrollWidth <= el.clientWidth && el.clientHeight < 30);
+        await expect(time).toHaveText(/^\d\d:\d\d \/ \d\d:\d\d$/);
+
+        // Common phone widths in portrait (360px Android, 375px iPhone)
+        for (const width of ['360px', '375px']) {
+            await resize(width);
+            await expect(player).toHaveClass(/fluid_mobile_layout/);
+            await expect(time).toBeVisible();
+            expect(await fitsWhole()).toBe(true);
+        }
+
+        // An hour-long video has a wider time: dropped at 375px, shown whole from about 412px
+        await page.locator('#skip').evaluate(v => {
+            Object.defineProperty(v, 'duration', { get: () => 4000 });
+            v.dispatchEvent(new Event('durationchange'));
+        });
+        await expect(player).toHaveClass(/fluid_long_time/);
+        await expect(time).toBeHidden();
+        await resize('412px');
+        await time.evaluate(el => { el.textContent = '01:00:00 / 01:00:00'; });
+        await expect(time).toBeVisible();
+        expect(await fitsWhole()).toBe(true);
     });
 
     test('tablets get the volume slider in the compact bar, where there is room for it', async ({ page }) => {
