@@ -520,11 +520,15 @@ test.describe('compact (mobile) layout and settings menu', () => {
         await expect(page.getByRole('radio')).toHaveCount(0);
     });
 
-    test('the settings button and sheet work with the keyboard', async ({ page }) => {
+    test('the open sheet works with the keyboard and the player\'s shortcuts are back once it closes', async ({ page }) => {
         await page.setViewportSize({ width: 480, height: 720 });
-        await page.goto('/playback_seek.html');
+        await page.goto('/controls.html');
+        await page.evaluate(() => {
+            document.body.innerHTML = '<video id="keys" style="width:90%"><source src="/static/e2e/subtitles_30s.webm" type="video/webm"></video>';
+            (window as any).fluidPlayer('keys', { layoutControls: { playbackRateEnabled: true, controlBar: { autoHide: false } } });
+        });
         await expect(wrapper(page)).toHaveClass(/fluid_mobile_layout/);
-        const video = page.locator('video');
+        const video = page.locator('#keys');
 
         // Clicking inside the player turns its keyboard shortcuts on
         await openSettings(page);
@@ -537,13 +541,9 @@ test.describe('compact (mobile) layout and settings menu', () => {
 
         await page.keyboard.press('Escape');
         await expect(sheet(page)).toBeHidden();
-        await expect(settingsButton(page)).toBeFocused();
 
-        // Enter on the focused button opens the sheet instead of toggling playback
-        await page.keyboard.press('Enter');
-        await expect(sheet(page)).toBeVisible();
-        expect(await video.evaluate(v => (v as HTMLVideoElement).paused)).toBe(true);
-
+        // Tab moves through the sheet; Enter and Space work its rows and options
+        await openSettings(page);
         await page.keyboard.press('Tab');
         await page.keyboard.press('Tab');
         await expect(page.getByRole('button', { name: 'Playback Speed' })).toBeFocused();
@@ -552,6 +552,25 @@ test.describe('compact (mobile) layout and settings menu', () => {
         await page.keyboard.press('Space');
         await expect(sheet(page)).toBeHidden();
         expect(await video.evaluate(v => (v as HTMLVideoElement).playbackRate)).toBe(2);
-        await expect(settingsButton(page)).toBeFocused();
+
+        // Closed: Space plays/pauses again, as on master
+        await page.keyboard.press('Space');
+        await expect.poll(() => video.evaluate(v => (v as HTMLVideoElement).paused)).toBe(false);
+    });
+
+    test('after clicking a bar button with the mouse, Space still plays and pauses as before', async ({ page }) => {
+        await page.goto('/playback_seek.html');
+        await expect(wrapper(page)).not.toHaveClass(/fluid_mobile_layout/);
+        const video = page.locator('video');
+        const sound = () => video.evaluate(v => `${(v as HTMLVideoElement).muted}/${(v as HTMLVideoElement).volume}`);
+
+        await wrapper(page).hover();
+        await page.locator('.fluid_control_mute').click();
+        const afterClick = await sound();
+
+        // Space goes to play/pause, not to the mute button that was clicked
+        await page.keyboard.press('Space');
+        await expect.poll(() => video.evaluate(v => (v as HTMLVideoElement).paused)).toBe(false);
+        expect(await sound()).toBe(afterClick);
     });
 });

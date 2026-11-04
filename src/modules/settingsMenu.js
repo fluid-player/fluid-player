@@ -169,18 +169,17 @@ export default function (playerInstance) {
             return;
         }
 
-        const hadFocus = menu.contains(document.activeElement);
-
         menu.classList.remove(OPEN_CLASS);
         playerInstance.domRef.controls.settings.setAttribute('aria-expanded', 'false');
-
-        if (hadFocus) {
-            playerInstance.domRef.controls.settings.focus({preventScroll: true});
-        }
     };
 
-    // Escape closes the sheet; Tab cycles through it
+    // While open: Escape closes the sheet; Tab cycles through it. (Once closed, keys are left alone: focus may stay
+    // on the hidden sheet, and the player's keyboard shortcuts listen on the whole document anyway.)
     const onMenuKeydown = event => {
+        if (!playerInstance.isSettingsMenuOpen()) {
+            return;
+        }
+
         if (event.key === 'Escape') {
             playerInstance.closeSettingsMenu();
             return;

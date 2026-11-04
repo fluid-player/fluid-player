@@ -905,11 +905,10 @@ const fluidPlayerClass = function () {
         durationContainer.append(controls.live_indicator, controls.duration);
         controls.rightContainer.appendChild(durationContainer);
 
-        // Accessible names and keyboard focus for the icon-only buttons
+        // Accessible names for the icon-only buttons
         controls.root.querySelectorAll('.fluid_button').forEach(button => {
             button.setAttribute('role', 'button');
             button.setAttribute('aria-label', button.title);
-            button.tabIndex = 0;
         });
         controls.playPause.setAttribute('aria-label', 'Play/Pause');
         controls.mute.setAttribute('aria-label', 'Mute/Unmute');
@@ -1584,15 +1583,13 @@ const fluidPlayerClass = function () {
         }
 
         self.captureKey = event => {
-            const keyCode = event.keyCode;
-
-            // Leave Enter/Space to a focused control button, and all keys to the open settings menu
-            const isControlKey = (keyCode === 13 || keyCode === 32) && event.target.closest && event.target.closest('.fluid_button');
-            if (isControlKey || self.isSettingsMenuOpen()) {
+            // While the settings menu is open, its keys (Escape, Tab, Enter, Space) are for the menu, not the video
+            if (self.isSettingsMenuOpen()) {
                 return;
             }
 
             event.stopPropagation();
+            const keyCode = event.keyCode;
 
             switch (keyCode) {
                 case 70://f
@@ -1915,14 +1912,6 @@ const fluidPlayerClass = function () {
         self.domRef.player.addEventListener('ratechange', () => {
             if (self.isCurrentlyPlayingAd) {
                 self.playbackRate = 1;
-            }
-        });
-
-        // Enter/Space activate the focused control button
-        self.trackEvent(self.domRef.player.parentNode, 'keydown', '.fluid_button', event => {
-            if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
-                event.currentTarget.click();
             }
         });
     };
