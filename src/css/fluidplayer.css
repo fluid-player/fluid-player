@@ -1887,3 +1887,10 @@ _:-ms-lang(x),
 .fluid_video_wrapper.fluid_mobile_layout .fluid_ad_playing[style*="bottom"] {
     transform: translateY(calc(50px - var(--fluid-mobile-bar-height)));
 }
+
+/* Bottom banners too (compact bar only). Low specificity on purpose: the phone mini player (no bar) keeps master's own
+   offsets, which win on specificity there */
+.fluid_mobile_layout .fluid_nonLinear_bottom,
+.fluid_mobile_layout .fluid_vpaidNonLinear_bottom {
+    bottom: var(--fluid-mobile-bar-height);
+}
