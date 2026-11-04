@@ -201,19 +201,28 @@ test.describe('compact (mobile) layout and settings menu', () => {
             const src = '/static/e2e/subtitles_30s.webm';
             document.body.innerHTML = `<video id="formats">
                 <source src="${src}?720" title="720p" type="video/webm">
-                <source src="${src}?1080" title="1080p" type="video/x-unplayable"></video>`;
+                <source src="${src}?1080" title="1080p" type="video/x-unplayable">
+                <source src="${src}?av1" title="2160p" type='video/mp4; codecs="av01.0.04M.08"'></video>`;
             (window as any).fluidPlayer('formats', { layoutControls: { fillToContainer: false } });
         });
         const player = page.locator('#fluid_video_wrapper_formats');
         await player.evaluate(el => { (el as HTMLElement).style.width = '1000px'; });
+        const pick = async (title: string) => {
+            await player.hover();
+            await player.locator('.fluid_control_video_source').click();
+            await player.locator('.js-source_' + title).click();
+        };
 
-        await player.hover();
-        await player.locator('.fluid_control_video_source').click();
-        await player.locator('.js-source_1080p').click();
-
+        await pick('1080p');
         await expect.poll(() => logs).toContain('[FP_ERROR] video/x-unplayable files not supported by this browser.');
         expect(await page.locator('#formats').evaluate(v => (v as HTMLVideoElement).src)).toContain('?1080');
         await expect(player.locator('.js-source_1080p .source_button_icon')).toHaveClass(/source_selected/);
+
+        // Codec strings are case sensitive: a playable AV1 source must not be reported
+        expect(await page.locator('#formats').evaluate(v => (v as HTMLVideoElement).canPlayType('video/mp4; codecs="av01.0.04M.08"'))).not.toBe('');
+        await pick('2160p');
+        await expect.poll(() => page.locator('#formats').evaluate(v => (v as HTMLVideoElement).src)).toContain('?av1');
+        expect(logs.filter(log => log.includes('av01'))).toEqual([]);
     });
 
     test('timeline thumbnails show above the compact bar, not over its buttons', async ({ page }) => {

@@ -2500,8 +2500,10 @@ const fluidPlayerClass = function () {
         // Asks the browser whether it can play the source's declared type (untyped and HLS/DASH sources can't be judged)
         const source = [].find.call(self.domRef.player.querySelectorAll('source'),
             source => source.src === url || source.getAttribute('src') === url);
-        const type = source ? source.type.toLowerCase() : '';
-        if (type && type !== 'application/x-mpegurl' && type !== 'application/dash+xml' && !self.domRef.player.canPlayType(type)) {
+        const type = source ? source.type : '';
+        // Lowercased for the comparisons only: codec strings are case sensitive (e.g. codecs="av01.0.04M.08")
+        const mimeType = type.split(';')[0].trim().toLowerCase();
+        if (mimeType.includes('/') && mimeType !== 'application/x-mpegurl' && mimeType !== 'application/dash+xml' && !self.domRef.player.canPlayType(type)) {
             console.log('[FP_ERROR] ' + type + ' files not supported by this browser.');
         }
 
