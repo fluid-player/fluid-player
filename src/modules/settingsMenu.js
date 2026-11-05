@@ -42,6 +42,7 @@ export default function (playerInstance) {
         {label: 'VR', button: '.fluid_control_cardboard', isOn: () => !!playerInstance.vrMode},
         {label: 'Theatre Mode', button: '.fluid_control_theatre', isOn: () => !!playerInstance.theatreMode},
         {label: 'Mini Player', button: '.fluid_control_mini_player', isOn: () => !!playerInstance.miniPlayerToggledOn},
+        {label: 'Autoplay', button: '.fluid_control_autoplay', isOn: () => !!playerInstance.autoPlayToggledOn},
         {label: 'Download', button: '.fluid_control_download'},
     ];
 

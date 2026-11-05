@@ -1,5 +1,6 @@
 @import "./suggestedVideos.css";
 @import "./menus.css";
+@import "./autoplay.css";
 
 .fluid_video_wrapper {
     animation: none;
