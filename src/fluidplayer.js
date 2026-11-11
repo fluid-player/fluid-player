@@ -13,6 +13,7 @@ import StreamingModule from './modules/streaming';
 import UtilsModule from './modules/utils';
 import SuggestedVideosModule from './modules/suggestedVideos';
 import MiniPlayerModule from './modules/miniplayer';
+import SettingsMenuModule from './modules/settingsMenu';
 
 const FP_MODULES = [
     VPAIDModule,
@@ -24,7 +25,8 @@ const FP_MODULES = [
     StreamingModule,
     UtilsModule,
     SuggestedVideosModule,
-    MiniPlayerModule
+    MiniPlayerModule,
+    SettingsMenuModule
 ];
 
 // Determine build mode
@@ -809,6 +811,14 @@ const fluidPlayerClass = function () {
         controls.fullscreen.title = 'Full Screen';
         controls.rightContainer.appendChild(controls.fullscreen);
 
+        // Right container -> Settings (compact layout only, see settingsMenu.js)
+        controls.settings = document.createElement('div');
+        controls.settings.className = 'fluid_button fluid_control_settings fluid_button_settings';
+        controls.settings.title = 'Settings';
+        controls.settings.setAttribute('aria-haspopup', 'dialog');
+        controls.settings.setAttribute('aria-expanded', 'false');
+        controls.rightContainer.appendChild(controls.settings);
+
         if (options.miniPlayer.enabled) {
             // Right container -> MiniPlayer
             controls.miniPlayer = document.createElement('div');
@@ -894,6 +904,18 @@ const fluidPlayerClass = function () {
         controls.live_indicator.className = 'fluid_control_live_indicator';
         durationContainer.append(controls.live_indicator, controls.duration);
         controls.rightContainer.appendChild(durationContainer);
+
+        // Accessible names for the icon-only buttons
+        controls.root.querySelectorAll('.fluid_button').forEach(button => {
+            button.setAttribute('role', 'button');
+            button.setAttribute('aria-label', button.title);
+        });
+        controls.playPause.setAttribute('aria-label', 'Play/Pause');
+        controls.mute.setAttribute('aria-label', 'Mute/Unmute');
+        if (options.controlForwardBackward) {
+            controls.skipBack.setAttribute('aria-label', 'Skip back');
+            controls.skipForward.setAttribute('aria-label', 'Skip forward');
+        }
 
         return controls;
     };
@@ -1561,6 +1583,11 @@ const fluidPlayerClass = function () {
         }
 
         self.captureKey = event => {
+            // While the settings menu is open, its keys (Escape, Tab, Enter, Space) are for the menu, not the video
+            if (self.isSettingsMenuOpen()) {
+                return;
+            }
+
             event.stopPropagation();
             const keyCode = event.keyCode;
 
@@ -2078,6 +2105,8 @@ const fluidPlayerClass = function () {
 
         self.createDownload();
 
+        self.createSettingsMenu();
+
         self.toggleMiniPlayerScreenDetection();
 
         if (!!self.displayOptions.layoutControls.controlForwardBackward.show) {
@@ -2383,12 +2412,6 @@ const fluidPlayerClass = function () {
 
         let firstSource = true;
         for (const source of self.videoSources) {
-            // Fix for issues occurring on iOS with mkv files
-            const getTheType = source.url.split(".").pop();
-            if (self.mobileInfo.userOs === 'iOS' && getTheType === 'mkv') {
-                continue;
-            }
-
             // On suggested videos, if the resolution doesn't exist in the new source list, use the first one in the list
             // This gets overwritten if it's needed by setPersistentSettings()
             if(firstSource && !initialLoad) {
@@ -2463,9 +2486,14 @@ const fluidPlayerClass = function () {
     };
 
     self.setVideoSource = (url) => {
-        if (self.mobileInfo.userOs === 'iOS' && url.indexOf('.mkv') > 0) {
-            console.log('[FP_ERROR] .mkv files not supported by iOS devices.');
-            return false;
+        // Asks the browser whether it can play the source's declared type (untyped and HLS/DASH sources can't be judged)
+        const source = [].find.call(self.domRef.player.querySelectorAll('source'),
+            source => source.src === url || source.getAttribute('src') === url);
+        const type = source ? source.type : '';
+        // Lowercased for the comparisons only: codec strings are case sensitive (e.g. codecs="av01.0.04M.08")
+        const mimeType = type.split(';')[0].trim().toLowerCase();
+        if (mimeType.includes('/') && mimeType !== 'application/x-mpegurl' && mimeType !== 'application/dash+xml' && !self.domRef.player.canPlayType(type)) {
+            console.log('[FP_ERROR] ' + type + ' files not supported by this browser.');
         }
 
         if (self.isCurrentlyPlayingAd) {
@@ -2840,7 +2868,8 @@ const fluidPlayerClass = function () {
             }
         }
 
-        self.repositionSubtitlesContainer('46px');
+        // Clears the control bar, whose height depends on the layout (--fluid-subtitles-bottom in fluidplayer.css)
+        self.repositionSubtitlesContainer('var(--fluid-subtitles-bottom)');
     };
 
     self.linkControlBarUserActivity = () => {

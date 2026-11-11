@@ -79,7 +79,7 @@
     empty-cells: show;
     float: none;
     font: normal;
-    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    font-family: var(--fluid-font-family);
     font-size: medium;
     font-style: normal;
     font-variant: normal;
@@ -175,6 +175,57 @@
     display: inline-block;
 }
 
+/* Design tokens. Override them on the wrapper to theme a player. */
+.fluid_video_wrapper {
+    --fluid-font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    --fluid-primary-color: red; /* layoutControls.primaryColor, set by settingsMenu.js */
+    --fluid-text-color: #ffffff; /* text and icons drawn over the video, in both colour schemes */
+    --fluid-icon-opacity: 0.8;
+
+    /* Control bar */
+    --fluid-subtitles-bottom: 46px; /* keeps subtitles above the visible control bar */
+    --fluid-bar-clearance: 4px; /* space between the compact bar and what floats above it (subtitles, thumbnails) */
+    --fluid-mobile-bar-height: 66px;
+    --fluid-mobile-bar-padding: 16px;
+    --fluid-mobile-row-top: 10px; /* button row, from the top of the compact bar */
+    --fluid-mobile-seek-offset: 8px; /* seek bar, from the bottom of the compact bar */
+    --fluid-icon-size: 24px;
+    --fluid-touch-target: 44px;
+    --fluid-control-gap: calc(var(--fluid-touch-target) - var(--fluid-icon-size));
+
+    /* Settings menu (bottom sheet): dark skin, light skin below */
+    --fluid-menu-color-scheme: dark;
+    --fluid-menu-bg: #212121;
+    --fluid-menu-inset-bg: #181818;
+    --fluid-menu-text-color: #ffffff;
+    --fluid-menu-text-secondary-color: rgba(255, 255, 255, 0.7);
+    --fluid-menu-divider-color: rgba(255, 255, 255, 0.1);
+    --fluid-menu-highlight-bg: rgba(255, 255, 255, 0.08);
+    --fluid-scrim-color: rgba(0, 0, 0, 0.5);
+    --fluid-switch-off-color: #5f5f5f;
+    --fluid-switch-knob-color: #ffffff;
+    --fluid-menu-radius: 12px;
+    --fluid-menu-max-width: 480px;
+    --fluid-menu-padding: 16px;
+    --fluid-sheet-duration: 220ms;
+    --fluid-sheet-easing: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Light skin, following the viewer's system/browser colour scheme */
+@media (prefers-color-scheme: light) {
+    .fluid_video_wrapper {
+        --fluid-menu-color-scheme: light;
+        --fluid-menu-bg: #ffffff;
+        --fluid-menu-inset-bg: #f2f2f2;
+        --fluid-menu-text-color: #0f0f0f;
+        --fluid-menu-text-secondary-color: rgba(0, 0, 0, 0.6);
+        --fluid-menu-divider-color: rgba(0, 0, 0, 0.1);
+        --fluid-menu-highlight-bg: rgba(0, 0, 0, 0.05);
+        --fluid-scrim-color: rgba(0, 0, 0, 0.4);
+        --fluid-switch-off-color: #b9b9b9;
+    }
+}
+
 .fluid_video_wrapper video {
     position: relative;
     background-color: #000000;
@@ -219,7 +270,7 @@
     cursor: pointer;
     z-index: 10;
     font-size: 13px;
-    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    font-family: var(--fluid-font-family);
     font-weight: normal;
     white-space: nowrap;
     text-align: start;
@@ -289,7 +340,7 @@
     border-radius: 1px;
     color: #ffffff;
     font-size: 13px;
-    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    font-family: var(--fluid-font-family);
     font-weight: normal;
     white-space: nowrap;
     text-align: start;
@@ -303,7 +354,7 @@
     background-color: rgba(0, 0, 0, 0.7);
     color: #ffffff;
     font-size: 13px;
-    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    font-family: var(--fluid-font-family);
     font-weight: normal;
     text-align: right;
     cursor: pointer;
@@ -389,7 +440,7 @@
     color: #ffffff;
     font-size: 13px;
     line-height: 18px;
-    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    font-family: var(--fluid-font-family);
     font-weight: normal;
     text-align: start;
     padding: 13px 21px 13px 21px;
@@ -402,7 +453,7 @@
     display: inline-block;
     white-space: nowrap;
     height: 24px;
-    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    font-family: var(--fluid-font-family);
     font-size: 13px;
     font-weight: normal;
     font-style: normal;
@@ -432,7 +483,7 @@
     bottom: 5px;
     height: 24px;
     color: red;
-    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    font-family: var(--fluid-font-family);
     font-size: 13px;
     font-weight: normal;
     font-style: normal;
@@ -643,7 +694,7 @@
     background: black;
     color: white;
     font-size: 1em;
-    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    font-family: var(--fluid-font-family);
     padding: 0.25em;
     border-radius: 4px;
 }
@@ -689,7 +740,7 @@
     background-color: #000000;
     color: #ffffff;
     font-size: 13px;
-    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    font-family: var(--fluid-font-family);
     font-weight: normal;
     white-space: nowrap;
     text-align: start;
@@ -1010,7 +1061,7 @@ _:-ms-lang(x),
     border-radius: 2px;
     color: #ffffff;
     font-size: 13px;
-    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    font-family: var(--fluid-font-family);
     font-weight: normal;
     white-space: nowrap;
     text-align: start;
@@ -1196,7 +1247,7 @@ _:-ms-lang(x),
     left: 10px;
     color: #ffffff;
     font-size: 15px;
-    font-family: -apple-system, BlinkMacSystemFont, 'segoe ui', roboto, oxygen-sans, ubuntu, cantarell, 'helvetica neue', 'arial', sans-serif, 'apple color emoji', 'segoe ui emoji', 'segoe ui symbol';
+    font-family: var(--fluid-font-family);
     font-weight: normal;
     white-space: nowrap;
 }
@@ -1612,4 +1663,283 @@ _:-ms-lang(x),
         background-position-y: 0;
         padding: 5px;
     }
+}
+
+/**
+* Compact (mobile) layout, see settingsMenu.js.
+* Touch devices and players narrower than 640px get one row of core controls (play/pause, time, mute, settings,
+* fullscreen) above a full-width seek bar. The other controls move into the settings menu.
+*/
+.fluid_video_wrapper.fluid_mobile_layout {
+    --fluid-subtitles-bottom: calc(var(--fluid-mobile-bar-height) + var(--fluid-bar-clearance));
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container {
+    height: var(--fluid-mobile-bar-height);
+    container: fluid-controls / inline-size;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_progress_container {
+    top: auto;
+    bottom: var(--fluid-mobile-seek-offset);
+    left: var(--fluid-mobile-bar-padding);
+    right: var(--fluid-mobile-bar-padding);
+}
+
+/* Taller touch target for the seek bar, below the buttons' targets */
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_progress_container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: calc(-1 * var(--fluid-mobile-seek-offset));
+    left: 0;
+}
+
+/* Timeline thumbnails float above the whole bar instead of over its buttons (offset from the seek bar) */
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_progress_container .fluid_timeline_preview_container,
+.fluid_video_wrapper.fluid_mobile_layout .fluid_timeline_preview_container_shadow {
+    bottom: calc(var(--fluid-mobile-bar-height) - var(--fluid-mobile-seek-offset) + var(--fluid-bar-clearance));
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_left,
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right {
+    top: var(--fluid-mobile-row-top);
+    display: flex;
+    align-items: center;
+    gap: var(--fluid-control-gap);
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_left {
+    left: var(--fluid-mobile-bar-padding);
+    width: auto;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right {
+    left: calc(var(--fluid-mobile-bar-padding) + var(--fluid-icon-size) + var(--fluid-control-gap));
+    right: var(--fluid-mobile-bar-padding);
+    justify-content: flex-end;
+}
+
+/* VR content moves the time out of the right side (cardboard.js), keep it in the row after the play button */
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container > .fluid_control_duration {
+    position: absolute;
+    top: var(--fluid-mobile-row-top);
+    left: calc(var(--fluid-mobile-bar-padding) + var(--fluid-icon-size) + var(--fluid-control-gap));
+    display: flex;
+    align-items: center;
+    height: var(--fluid-icon-size);
+    font-variant-numeric: tabular-nums;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container.skip_controls > .fluid_control_duration {
+    left: calc(var(--fluid-mobile-bar-padding) + 3 * (var(--fluid-icon-size) + var(--fluid-control-gap)));
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container.skip_controls .fluid_controls_right {
+    left: calc(var(--fluid-mobile-bar-padding) + 3 * (var(--fluid-icon-size) + var(--fluid-control-gap)));
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_button {
+    flex: none;
+    float: none;
+    position: relative;
+    left: auto;
+    margin: 0;
+    padding: 0;
+}
+
+/*
+* Centre each glyph in its button and give it a 44px touch target. The sprite glyphs sit near the top of their cell,
+* so they move down 3px; the fullscreen glyphs sit half a pixel lower in the sprite, so they're read half a pixel
+* higher. settings.svg is centred and its viewBox carries its own half-pixel nudge. Half pixels live inside the
+* images on purpose: browsers round half-pixel box positions differently
+*/
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_button::before {
+    top: 3px;
+    left: 0;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_button.fluid_button_fullscreen::before {
+    background-position: -88px -19.5px;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_button.fluid_button_fullscreen_exit::before {
+    background-position: -88px -57.5px;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_button.fluid_button_settings::before {
+    top: 0;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_button::after {
+    content: '';
+    position: absolute;
+    top: calc((var(--fluid-icon-size) - var(--fluid-touch-target)) / 2);
+    right: calc((var(--fluid-icon-size) - var(--fluid-touch-target)) / 2);
+    bottom: calc((var(--fluid-icon-size) - var(--fluid-touch-target)) / 2);
+    left: calc((var(--fluid-icon-size) - var(--fluid-touch-target)) / 2);
+}
+
+/* Right side, in this order: time, mute, settings, fullscreen */
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right .fluid_control_duration,
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right .fluid_control_duration.no_volume_bar {
+    margin-right: auto;
+    padding-left: 0;
+    font-variant-numeric: tabular-nums;
+    /* One line, clipped rather than overlapping the buttons (the container queries below drop it before that) */
+    white-space: nowrap;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right .fluid_button_volume,
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right .fluid_button_mute {
+    order: 1;
+    position: relative;
+    left: auto;
+}
+
+/*
+* Phones and small players: mute button only. Where there's room (tablets, wider players) the slider follows it.
+* 516px fits it next to an hour-long time ("01:00:00 / 01:00:00"), also with skip buttons, and is wider than phones
+* in portrait.
+*/
+@container fluid-controls (max-width: 515px) {
+    /* !important: leaving VR sets an inline display on the slider (cardboard.js) */
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right .fluid_control_volume_container {
+        display: none !important;
+    }
+}
+
+/* Where it's shown is left to the desktop rules (e.g. no_volume_bar on iOS, hidden in VR on phones) */
+@container fluid-controls (min-width: 516px) {
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right .fluid_control_volume_container {
+        order: 2;
+        flex: none;
+        position: relative;
+        left: auto;
+        top: 1px; /* puts the track and knob on the same line as the icons' centres */
+        margin-left: calc(8px - var(--fluid-control-gap));
+    }
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right .fluid_button_settings {
+    order: 3;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right .fluid_button_fullscreen,
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right .fluid_button_fullscreen_exit {
+    order: 4;
+}
+
+/* In the settings menu instead: out of the bar and the accessibility tree, but still enabled and clickable */
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_button.fluid_button_in_settings {
+    position: absolute;
+    visibility: hidden;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_button_live_indicator {
+    position: static;
+    margin: 0 8px 0 0;
+    font-size: 11px;
+}
+
+/*
+* Narrow players: tighter spacing (touch targets overlap a little), and as a last resort no time readout. Every
+* button stays. Widths measured for the time of videos under an hour ("00:00 / 00:00") and of an hour or more
+* ("01:00:00 / 01:00:00", fluid_long_time, see settingsMenu.js), plus 8px slack for platform fonts. Skip buttons
+* make the left side two buttons wider. The hide rules also cover the time VR moves out of the right side (each VR
+* half is its own, narrower bar).
+*/
+@container fluid-controls (max-width: 315px) {
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_left,
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right {
+        --fluid-control-gap: 12px;
+    }
+}
+
+@container fluid-controls (max-width: 363px) {
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout.fluid_long_time .fluid_controls_container .fluid_controls_left,
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout.fluid_long_time .fluid_controls_container .fluid_controls_right {
+        --fluid-control-gap: 12px;
+    }
+}
+
+@container fluid-controls (max-width: 283px) {
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_controls_right .fluid_control_duration,
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container > .fluid_control_duration {
+        display: none;
+    }
+}
+
+@container fluid-controls (max-width: 331px) {
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout.fluid_long_time .fluid_controls_container .fluid_controls_right .fluid_control_duration,
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout.fluid_long_time .fluid_controls_container > .fluid_control_duration {
+        display: none;
+    }
+}
+
+@container fluid-controls (max-width: 403px) {
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container.skip_controls .fluid_controls_left,
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container.skip_controls .fluid_controls_right {
+        --fluid-control-gap: 12px;
+    }
+}
+
+@container fluid-controls (max-width: 451px) {
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout.fluid_long_time .fluid_controls_container.skip_controls .fluid_controls_left,
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout.fluid_long_time .fluid_controls_container.skip_controls .fluid_controls_right {
+        --fluid-control-gap: 12px;
+    }
+}
+
+@container fluid-controls (max-width: 355px) {
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container.skip_controls .fluid_controls_right .fluid_control_duration,
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container.skip_controls > .fluid_control_duration {
+        display: none;
+    }
+}
+
+@container fluid-controls (max-width: 403px) {
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout.fluid_long_time .fluid_controls_container.skip_controls .fluid_controls_right .fluid_control_duration,
+    .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout.fluid_long_time .fluid_controls_container.skip_controls > .fluid_control_duration {
+        display: none;
+    }
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_settings {
+    display: none;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_button.fluid_button_settings {
+    display: inline-block;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_settings::before {
+    content: '';
+    position: absolute;
+    width: var(--fluid-icon-size);
+    height: var(--fluid-icon-size);
+    background: url('../static/settings.svg') no-repeat center / 22px;
+    opacity: var(--fluid-icon-opacity);
+    transition: opacity 0.3s ease-in-out;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_settings:hover::before {
+    opacity: 1;
+}
+
+/* Ad overlays anchored to the bottom (skip button, CTA, ad text) sit 50px up, which clears the desktop bar only */
+.fluid_video_wrapper.fluid_mobile_layout .skip_button,
+.fluid_video_wrapper.fluid_mobile_layout .fluid_ad_cta.bottom,
+.fluid_video_wrapper.fluid_mobile_layout .fluid_ad_playing[style*="bottom"] {
+    transform: translateY(calc(50px - var(--fluid-mobile-bar-height)));
+}
+
+/* Bottom banners too (compact bar only). Low specificity on purpose: the phone mini player (no bar) keeps master's own
+   offsets, which win on specificity there */
+.fluid_mobile_layout .fluid_nonLinear_bottom,
+.fluid_mobile_layout .fluid_vpaidNonLinear_bottom {
+    bottom: var(--fluid-mobile-bar-height);
 }
