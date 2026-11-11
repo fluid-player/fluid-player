@@ -1749,10 +1749,27 @@ _:-ms-lang(x),
     padding: 0;
 }
 
-/* Centre each glyph in its button and give it a 44px touch target */
+/*
+* Centre each glyph in its button and give it a 44px touch target. The sprite glyphs sit near the top of their cell,
+* so they move down 3px; the fullscreen glyphs sit half a pixel lower in the sprite, so they're read half a pixel
+* higher. settings.svg is centred and its viewBox carries its own half-pixel nudge. Half pixels live inside the
+* images on purpose: browsers round half-pixel box positions differently
+*/
 .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_button::before {
-    top: 0;
+    top: 3px;
     left: 0;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_button.fluid_button_fullscreen::before {
+    background-position: -88px -19.5px;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_button.fluid_button_fullscreen_exit::before {
+    background-position: -88px -57.5px;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_button.fluid_button_settings::before {
+    top: 0;
 }
 
 .fluid_video_wrapper.fluid_player_layout_default.fluid_mobile_layout .fluid_controls_container .fluid_button::after {
@@ -1802,7 +1819,7 @@ _:-ms-lang(x),
         flex: none;
         position: relative;
         left: auto;
-        top: auto;
+        top: 1px; /* puts the track and knob on the same line as the icons' centres */
         margin-left: calc(8px - var(--fluid-control-gap));
     }
 }
