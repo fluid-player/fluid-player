@@ -139,8 +139,12 @@ export default function (playerInstance, options) {
                     progressbarContainer[i].style.backgroundColor = playerInstance.displayOptions.layoutControls.adProgressColor;
                 }
 
-                if (playerInstance.rollsById[ad.rollListId].adText || ad.adText) {
-                    const adTextToShow = ad.adText ? ad.adText : playerInstance.rollsById[ad.rollListId].adText;
+                // Per-ad text first, then the adList entry, then the player-wide vastOptions.adText
+                const adTextToShow = ad.adText
+                    || playerInstance.rollsById[ad.rollListId].adText
+                    || playerInstance.displayOptions.vastOptions.adText;
+
+                if (adTextToShow) {
                     playerInstance.addAdPlayingText(adTextToShow);
                 }
 
