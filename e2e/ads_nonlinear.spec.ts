@@ -6,6 +6,7 @@ import { waitForVideoToPlay } from './functions/video';
 // <Impression> is requested once the creative is displayed, the NonLinear TrackingEvents
 // (start, creativeView, close, complete) fire for the matching lifecycle moments, and
 // <NonLinearClickThrough> opens when the user clicks the overlay. minSuggestedDuration is how long the overlay is suggested to stay visible.
+// <NonLinearClickTracking> (VAST 4.3 section 3.12.3) is requested when the overlay is clicked.
 const TRACKING_BASE = 'http://www.example.com/nonlinear/';
 
 /**
@@ -14,6 +15,25 @@ const TRACKING_BASE = 'http://www.example.com/nonlinear/';
  */
 async function recordTracking(page: Page): Promise<string[]> {
     const seen: string[] = [];
+
+    // The player sends tracking requests through Image.src. Browsers merge identical image requests made
+    // at the same time, so the network alone can't show whether the player asked for a URL more than once.
+    await page.addInitScript((base) => {
+        const requested: string[] = [];
+        (window as any).__trackingRequested = requested;
+        const src = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src')!;
+        Object.defineProperty(HTMLImageElement.prototype, 'src', {
+            set(value) {
+                if (String(value).startsWith(base)) {
+                    requested.push(String(value).replace(base, ''));
+                }
+                src.set!.call(this, value);
+            },
+            get() {
+                return src.get!.call(this);
+            },
+        });
+    }, TRACKING_BASE);
 
     await page.route(`${TRACKING_BASE}*`, async (route) => {
         seen.push(route.request().url().replace(TRACKING_BASE, ''));
@@ -76,6 +96,23 @@ test.describe('VAST non-linear (overlay) ad', () => {
 
         await expect(popup).toHaveURL('http://www.example.com/nonlinear-landing');
         await popup.close();
+
+        // The NonLinearClickTracking URL itself is requested, exactly once
+        await expect.poll(() => seen).toContain('clickTracking');
+        expect(seen.filter((e) => e.startsWith('clickTracking'))).toEqual(['clickTracking']);
+    });
+
+    test('should ask for each impression and tracking URL only once', async ({ page }) => {
+        const video = page.locator('video');
+        await page.locator('#fluid_video_wrapper_fluid-player-e2e-case').click();
+        await waitForVideoToPlay(video);
+        await expect(page.locator('.fluid_nonLinear_ad img')).toBeVisible();
+        await expect.poll(() => seen).toEqual(expect.arrayContaining(['impression', 'start', 'creativeView']));
+
+        const requested: string[] = await page.evaluate(() => (window as any).__trackingRequested);
+        for (const event of ['impression', 'start', 'creativeView']) {
+            expect(requested.filter((e) => e === event), `${event} requests`).toHaveLength(1);
+        }
     });
 
     test('should remove the overlay and fire the close event when the close button is clicked', async ({ page }) => {

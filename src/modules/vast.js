@@ -961,7 +961,9 @@ export default function (playerInstance, options) {
         }
 
         if (root.tagType === 'inLine') {
-            ads.push({ ...root, wrappers: currentWrappers.filter(Boolean) });
+            // Only the wrappers above this InLine: its own data is read separately (registerAdProperties),
+            // and listing it here too registered every impression and tracking URL twice
+            ads.push({ ...root, wrappers: wrappers.filter(Boolean) });
         }
 
         return ads;
