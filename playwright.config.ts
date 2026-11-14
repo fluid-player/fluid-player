@@ -1,4 +1,17 @@
 import { defineConfig, devices } from '@playwright/test';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+
+/**
+ * On macOS 27, Playwright's Firefox exits with "Could not find profile folder" because it reads
+ * ~/Library/Application Support/Firefox, which macOS privacy protection blocks. Pointing
+ * CFFIXED_USER_HOME at an empty folder avoids it. The config is loaded by every worker, so each
+ * worker gets its own folder. See https://github.com/microsoft/playwright/issues/42768
+ */
+const firefoxEnv = process.platform === 'darwin'
+  ? { ...process.env, CFFIXED_USER_HOME: fs.mkdtempSync(path.join(os.tmpdir(), 'pw-firefox-home-')) }
+  : undefined;
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -33,7 +46,7 @@ export default defineConfig({
 
     {
       name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      use: { ...devices['Desktop Firefox'], launchOptions: { env: firefoxEnv } },
     },
 
     {
