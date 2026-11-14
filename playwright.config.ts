@@ -27,9 +27,8 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      // Branded Chrome rather than Playwright's Chromium, which ships without the H.264/AAC codecs used by MP4 and HLS
-      name: 'chrome',
-      use: { ...devices['Desktop Chrome'], channel: 'chrome' },
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
     },
 
     {
