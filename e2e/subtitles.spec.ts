@@ -1,6 +1,23 @@
 import { test, expect } from '@playwright/test';
 import { setVideoCurrentTime } from './functions/video';
 
+const container = (page) => page.locator('.fluid_subtitles_container');
+const openMenu = async (page) => {
+    await page.locator('.fluid_control_subtitles').hover();
+    await page.locator('.fluid_control_subtitles').click();
+    await expect(page.locator('.fluid_subtitles_list')).toBeVisible();
+};
+const pickTrack = async (page, label: string) => {
+    await openMenu(page);
+    await page.locator('.fluid_subtitle_list_item', { hasText: new RegExp(`^${label}$`) }).click();
+};
+const seekAndPlay = async (page, time: number) => {
+    const video = page.locator('#fluid-player-e2e-case');
+    await setVideoCurrentTime(video, time);
+    // renderSubtitles runs on timeupdate, which only fires on seek/playback
+    await video.evaluate((v) => (v as HTMLVideoElement).dispatchEvent(new Event('timeupdate')));
+};
+
 test.describe('subtitles', () => {
 
     test.beforeEach(async ({ page }) => {
@@ -9,23 +26,6 @@ test.describe('subtitles', () => {
         // The track list is built once the vtt.js chunk has loaded
         await expect(page.locator('.fluid_subtitle_list_item:not(.fluid_sub_menu_button)')).toHaveCount(3);
     });
-
-    const container = (page) => page.locator('.fluid_subtitles_container');
-    const openMenu = async (page) => {
-        await page.locator('.fluid_control_subtitles').hover();
-        await page.locator('.fluid_control_subtitles').click();
-        await expect(page.locator('.fluid_subtitles_list')).toBeVisible();
-    };
-    const pickTrack = async (page, label: string) => {
-        await openMenu(page);
-        await page.locator('.fluid_subtitle_list_item', { hasText: new RegExp(`^${label}$`) }).click();
-    };
-    const seekAndPlay = async (page, time: number) => {
-        const video = page.locator('#fluid-player-e2e-case');
-        await setVideoCurrentTime(video, time);
-        // renderSubtitles runs on timeupdate, which only fires on seek/playback
-        await video.evaluate((v) => (v as HTMLVideoElement).dispatchEvent(new Event('timeupdate')));
-    };
 
     test('should list the tracks plus OFF and select the default track', async ({ page }) => {
         const items = page.locator('.fluid_subtitle_list_item:not(.fluid_sub_menu_button)');
@@ -68,5 +68,46 @@ test.describe('subtitles', () => {
         await sizeMenu.locator('.fluid_subtitle_size_button', { hasText: '150%' }).click();
         expect(await container(page).evaluate((el) => (el as HTMLElement).style.fontSize)).toBe('1.5em');
         await expect(sizeMenu.locator('.subtitle_size_selected')).toHaveCount(1);
+    });
+});
+
+test.describe('subtitles off by default (subtitlesOnByDefault: false)', () => {
+
+    test.beforeEach(async () => {
+        console.log(`Running ${test.info().title}`);
+    });
+
+    test('should select OFF without requesting any subtitle file', async ({ page }) => {
+        // Only the player's own requests: browsers also load the <track> files by themselves (texttrack/media/other)
+        const subtitleRequests: string[] = [];
+        page.on('request', (request) => {
+            if (['xhr', 'fetch'].includes(request.resourceType())) {
+                subtitleRequests.push(request.url());
+            }
+        });
+
+        await page.goto('/subtitles.html?off=1');
+        const items = page.locator('.fluid_subtitle_list_item:not(.fluid_sub_menu_button)');
+        await expect(items).toHaveText([/OFF/, /English/, /Deutsch/]);
+        await expect(items.nth(0).locator('.subtitle_button_icon')).toHaveClass(/subtitle_selected/);
+
+        await page.waitForLoadState('networkidle');
+        expect(subtitleRequests).toEqual([]);
+    });
+
+    test('picking a track should load it, and OFF should clear it again', async ({ page }) => {
+        await page.goto('/subtitles.html?off=1');
+        await expect(page.locator('.fluid_subtitle_list_item:not(.fluid_sub_menu_button)')).toHaveCount(3);
+
+        await seekAndPlay(page, 16);
+        await expect(container(page)).toHaveText('');
+
+        await pickTrack(page, 'English');
+        await seekAndPlay(page, 16);
+        await expect(container(page)).toContainText('At the left we can see...');
+
+        await pickTrack(page, 'OFF');
+        await seekAndPlay(page, 16);
+        await expect(container(page)).toHaveText('');
     });
 });

@@ -24,9 +24,13 @@
 <%= htmlWebpackPlugin.tags.bodyTags %>
 
 <script>
+    // ?off=1 starts with subtitles off (subtitlesOnByDefault: false)
+    var off = new URLSearchParams(window.location.search).has('off');
+
     var instance = fluidPlayer('fluid-player-e2e-case', {
         layoutControls: {
-            subtitlesEnabled: true
+            subtitlesEnabled: true,
+            subtitlesOnByDefault: !off
         }
     });
 </script>
