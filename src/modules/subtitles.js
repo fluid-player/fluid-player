@@ -108,7 +108,10 @@ export default function (playerInstance, options) {
                 !subtitlesOnByDefault && subtitle.label === subtitlesOff
             ) {
                 subtitleSelected = 'subtitle_selected';
-                playerInstance.subtitleFetchParse(subtitle);
+                // "OFF" has no file to load (its url is a placeholder): subtitlesData stays empty
+                if (subtitle.label !== subtitlesOff) {
+                    playerInstance.subtitleFetchParse(subtitle);
+                }
                 hasSelectedSubtitle = true;
             }
 
