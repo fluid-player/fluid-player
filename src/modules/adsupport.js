@@ -803,7 +803,7 @@ export default function (playerInstance, options) {
 
             //Tracking the NonLinearClickTracking events
             if (typeof ad.clicktracking !== 'undefined') {
-                playerInstance.callUris([ad.clicktracking]);
+                playerInstance.callUris(ad.clicktracking);
             }
         };
 
