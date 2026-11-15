@@ -223,7 +223,7 @@ export default function (playerInstance, options) {
     }
 
     function getSourceSelectedClass(level) {
-        const matchingLevels = playerInstance.videoSources.filter(source => source.title === playerInstance.fluidStorage.fluidQuality);
+        const matchingLevels = playerInstance.videoSources.filter(source => source.title === playerInstance.getRememberedQuality());
 
         // If there are multiple matching levels, use the first one
         if (matchingLevels.length > 1) {
@@ -253,7 +253,7 @@ export default function (playerInstance, options) {
         playerInstance.videoSources.forEach(source => {
             if (source.title === videoChangedTo.innerText.replace(/(\r\n\t|\n|\r\t)/gm, '')) {
                 playerInstance.hlsPlayer.currentLevel = selectedLevel.id;
-                playerInstance.fluidStorage.fluidQuality = selectedLevel.title;
+                playerInstance.saveSetting('fluidQuality', selectedLevel.title);
             }
         });
 
@@ -273,7 +273,7 @@ export default function (playerInstance, options) {
 
     function setInitialLevel(levels) {
         // Check if a persistency level exists and set the current level accordingly
-        const persistedLevel = levels.find(level => level.title === playerInstance.fluidStorage.fluidQuality);
+        const persistedLevel = levels.find(level => level.title === playerInstance.getRememberedQuality());
 
         if (persistedLevel) {
             playerInstance.hlsPlayer.currentLevel = persistedLevel.id;

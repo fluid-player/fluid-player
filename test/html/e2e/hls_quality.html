@@ -23,6 +23,10 @@
 
 <script>
     var instance = fluidPlayer('fluid-player-e2e-case', {
+        layoutControls: {
+            // ?noPersist=1 turns off remembering the quality (persistentSettings.quality: false)
+            persistentSettings: { quality: !new URLSearchParams(window.location.search).has('noPersist') }
+        },
         hls: {
             // Force hls.js so quality levels are available in browsers with native HLS
             overrideNative: true

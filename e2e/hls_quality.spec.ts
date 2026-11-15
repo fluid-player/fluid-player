@@ -85,3 +85,18 @@ test.describe('HLS quality switching', () => {
         await expect(page.locator('.source_selected')).toHaveCount(1);
     });
 });
+
+test.describe('HLS quality with persistentSettings.quality: false', () => {
+
+    test('a remembered quality is not applied', async ({ page }) => {
+        // As if another player of the site had remembered 240p
+        await page.addInitScript(() => localStorage.setItem('fluidQuality', '240p'));
+        await page.goto('/hls_quality.html?noPersist=1');
+        await page.waitForFunction(() => (window as any).instance?.hlsInstance()?.levels?.length === 2);
+
+        await startAndOpenMenu(page);
+        expect((await hlsState(page)).auto).toBe(true);
+        await expect(qualityItem(page, 'auto').locator('.source_button_icon')).toHaveClass(/source_selected/);
+        await expect(page.locator('.source_selected')).toHaveCount(1);
+    });
+});

@@ -1057,11 +1057,10 @@ const fluidPlayerClass = function () {
         const muteButtonTag = self.domRef.player.parentNode.getElementsByClassName('fluid_control_mute');
         const menuOptionMute = self.domRef.wrapper.querySelector('.context_option_mute');
 
+        // Runs on every volume change, including the player's own (mute: true at start), so it doesn't
+        // remember anything: viewer changes are remembered by muteToggle and setVolume
         if (0 !== self.domRef.player.volume) {
             self.latestVolume = self.domRef.player.volume;
-            self.fluidStorage.fluidMute = false;
-        } else {
-            self.fluidStorage.fluidMute = true;
         }
 
         if (self.domRef.player.volume && !self.domRef.player.muted) {
@@ -1096,8 +1095,8 @@ const fluidPlayerClass = function () {
         }
 
         // Persistent settings
-        self.fluidStorage.fluidVolume = self.latestVolume;
-        self.fluidStorage.fluidMute = self.domRef.player.muted;
+        self.saveSetting('fluidVolume', self.latestVolume);
+        self.saveSetting('fluidMute', self.domRef.player.muted);
 
         self.trackMuteChange();
     };
@@ -2419,7 +2418,7 @@ const fluidPlayerClass = function () {
                     if (source.title === videoChangedTo.innerText.replace(/(\r\n\t|\n|\r\t)/gm, '')) {
                         self.setBuffering();
                         self.setVideoSource(source.url);
-                        self.fluidStorage.fluidQuality = source.title;
+                        self.saveSetting('fluidQuality', source.title);
                     }
                 });
 
@@ -3023,7 +3022,7 @@ const fluidPlayerClass = function () {
 
         // Set correct variables
         self.theatreMode = !self.theatreMode;
-        self.fluidStorage.fluidTheatre = self.theatreMode;
+        self.saveSetting('fluidTheatre', self.theatreMode);
 
         // Trigger theatre event
         const theatreEvent = (self.theatreMode) ? 'theatreModeOn' : 'theatreModeOff';
@@ -3132,6 +3131,36 @@ const fluidPlayerClass = function () {
         }
     };
 
+    // Which persistentSettings flag controls each remembered value
+    const persistentSettingFlags = {
+        fluidVolume: 'volume',
+        fluidMute: 'volume',
+        fluidQuality: 'quality',
+        fluidSpeed: 'speed',
+        fluidTheatre: 'theatre'
+    };
+
+    /**
+     * Remembers a setting, unless this player's persistentSettings flag for it is off.
+     * The stored values are shared by every player of the site.
+     */
+    self.saveSetting = (key, value) => {
+        if (!self.displayOptions.layoutControls.persistentSettings[persistentSettingFlags[key]]) {
+            return;
+        }
+
+        self.fluidStorage[key] = value;
+    };
+
+    /**
+     * The remembered quality, or undefined when this player doesn't restore quality
+     */
+    self.getRememberedQuality = () => {
+        return self.displayOptions.layoutControls.persistentSettings.quality
+            ? self.fluidStorage.fluidQuality
+            : undefined;
+    };
+
     self.setPersistentSettings = (ignoreMute = false) => {
         try {
             if (!(typeof (Storage) !== 'undefined' && typeof (localStorage) !== 'undefined')) {
@@ -3151,12 +3180,17 @@ const fluidPlayerClass = function () {
         }
 
         self.fluidStorage = localStorage;
+        // Remembered values are shared by every player of the site: only apply the ones this player allows
         if (typeof (self.fluidStorage.fluidVolume) !== 'undefined'
             && self.displayOptions.layoutControls.persistentSettings.volume
+            && !self.displayOptions.layoutControls.mute
             && !ignoreMute) {
+            // Read before setVolume, which saves the mute state too
+            const rememberedMute = self.fluidStorage.fluidMute === 'true';
+
             self.setVolume(self.fluidStorage.fluidVolume);
 
-            if (typeof (self.fluidStorage.fluidMute) !== 'undefined' && self.fluidStorage.fluidMute === 'true') {
+            if (rememberedMute) {
                 self.muteToggle();
             }
         }
@@ -3172,13 +3206,15 @@ const fluidPlayerClass = function () {
         }
 
         if (typeof (self.fluidStorage.fluidSpeed) !== 'undefined'
-            && self.displayOptions.layoutControls.persistentSettings.speed) {
+            && self.displayOptions.layoutControls.persistentSettings.speed
+            && self.displayOptions.layoutControls.playbackRateEnabled) {
             self.setPlaybackSpeed(self.fluidStorage.fluidSpeed);
         }
 
         if (typeof (self.fluidStorage.fluidTheatre) !== 'undefined'
             && self.fluidStorage.fluidTheatre === 'true'
-            && self.displayOptions.layoutControls.persistentSettings.theatre) {
+            && self.displayOptions.layoutControls.persistentSettings.theatre
+            && self.displayOptions.layoutControls.allowTheatre) {
             self.theatreToggle();
         }
     };
@@ -3209,7 +3245,7 @@ const fluidPlayerClass = function () {
             return;
         }
         self.domRef.player.playbackRate = speed;
-        self.fluidStorage.fluidSpeed = speed;
+        self.saveSetting('fluidSpeed', speed);
     };
 
     self.setVolume = (passedVolume) => {
@@ -3223,7 +3259,8 @@ const fluidPlayerClass = function () {
         const latestVolume = 0 === passedVolume ? 1 : passedVolume;
 
         self.latestVolume = latestVolume;
-        self.fluidStorage.fluidVolume = latestVolume;
+        self.saveSetting('fluidVolume', latestVolume);
+        self.saveSetting('fluidMute', 0 === passedVolume || self.domRef.player.muted);
     };
 
     self.isCurrentlyPlayingVideo = (instance) => {
