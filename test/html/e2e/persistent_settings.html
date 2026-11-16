@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+          name="viewport">
+    <meta content="ie=edge" http-equiv="X-UA-Compatible">
+    <title>E2E persistent settings</title>
+    <%= htmlWebpackPlugin.tags.headTags %>
+    <style lang="css">
+        #fluid-player-e2e-case {
+            width: 60%;
+        }
+    </style>
+</head>
+<body>
+
+<video id="fluid-player-e2e-case">
+    <source src="/static/e2e/content_20s.webm" type="video/webm"/>
+</video>
+
+<%= htmlWebpackPlugin.tags.bodyTags %>
+
+<script>
+    // Query options:
+    //   noTheatre=1           allowTheatre: false
+    //   speedMenu=1           playbackRateEnabled: true
+    //   mute=1                mute: true
+    //   noPersist=a,b         persistentSettings.<a>/<b>: false (volume, quality, speed, theatre)
+    //   sources=1             two sources (360p, 720p), so the quality menu is shown
+    var params = new URLSearchParams(window.location.search);
+
+    if (params.has('sources')) {
+        document.getElementById('fluid-player-e2e-case').innerHTML =
+            '<source src="/static/e2e/content_20s.webm" title="360p" type="video/webm"/>' +
+            '<source src="/static/e2e/miniplayer_30s.webm" title="720p" type="video/webm"/>';
+    }
+    var persistentSettings = { volume: true, quality: true, speed: true, theatre: true };
+
+    (params.get('noPersist') || '').split(',').filter(Boolean).forEach(function (name) {
+        persistentSettings[name] = false;
+    });
+
+    var instance = fluidPlayer('fluid-player-e2e-case', {
+        layoutControls: {
+            allowTheatre: !params.has('noTheatre'),
+            playbackRateEnabled: params.has('speedMenu'),
+            mute: params.has('mute'),
+            persistentSettings: persistentSettings
+        }
+    });
+</script>
+
+</body>
+</html>
