@@ -99,4 +99,14 @@ test.describe('HLS quality with persistentSettings.quality: false', () => {
         await expect(qualityItem(page, 'auto').locator('.source_button_icon')).toHaveClass(/source_selected/);
         await expect(page.locator('.source_selected')).toHaveCount(1);
     });
+
+    test('a chosen quality is not saved', async ({ page }) => {
+        await page.goto('/hls_quality.html?noPersist=1');
+        await page.waitForFunction(() => (window as any).instance?.hlsInstance()?.levels?.length === 2);
+
+        await startAndOpenMenu(page);
+        await qualityItem(page, '240p').click();
+        await expect.poll(() => hlsState(page)).toEqual({ level: 0, auto: false });
+        expect(await page.evaluate(() => localStorage.getItem('fluidQuality'))).toBeNull();
+    });
 });
