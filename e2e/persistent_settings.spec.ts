@@ -114,6 +114,19 @@ test.describe('persistent settings', () => {
             // No speed menu and no theatre button on this player
             await openWithStorage(page, '?noTheatre=1', { fluidSpeed: '2', fluidTheatre: 'true' });
 
+            // Record every speed and theatre change while the suggested video loads: checking only the end
+            // state isn't enough, because loading a new source resets the speed and a second theatre
+            // toggle would switch theatre mode back off
+            await page.evaluate((selector) => {
+                const w = window as any;
+                w.seenRates = [];
+                w.theatreEvents = [];
+                document.querySelector('#fluid-player-e2e-case')!
+                    .addEventListener('ratechange', (e) => w.seenRates.push((e.target as HTMLVideoElement).playbackRate));
+                new MutationObserver(() => w.theatreEvents.push(document.querySelector(selector)!.className.includes('fluid_theatre_mode')))
+                    .observe(document.querySelector(selector)!, { attributes: true, attributeFilter: ['class'] });
+            }, wrapper);
+
             // What clicking a suggested video tile does (the debug API exposes the player internals)
             await page.evaluate(() => (window as any).fluidPlayerDebug[0].internals.resetPlayer([
                 { url: '/static/e2e/miniplayer_30s.webm', mimeType: 'video/webm', resolution: '360p' }
@@ -123,6 +136,12 @@ test.describe('persistent settings', () => {
 
             await expect(page.locator(wrapper)).not.toHaveClass(/fluid_theatre_mode/);
             expect(await playbackRate(page)).toBe(1);
+            // Never switched to the remembered speed or in or out of theatre mode on the way
+            expect(await page.evaluate(() => (window as any).seenRates)).not.toContain(2);
+            expect(await page.evaluate(() => (window as any).theatreEvents)).not.toContain(true);
+            // And the other players' remembered choices are left as they were
+            expect(await stored(page, 'fluidTheatre')).toBe('true');
+            expect(await stored(page, 'fluidSpeed')).toBe('2');
         });
     });
 
