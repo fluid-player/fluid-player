@@ -1,0 +1,178 @@
+/* Auto Play Next Video (FP-323). Reuses the design tokens introduced in FP-362 so the overlay matches the
+   settings sheet and inherits light/dark automatically. */
+
+/* --- Control-bar toggle icon (desktop / landscape) --- */
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_autoplay:before {
+    background: url('../static/autoplay-toggle-on.svg') no-repeat 0 0;
+    background-size: 20px;
+}
+
+.fluid_video_wrapper.fluid_player_layout_default .fluid_controls_container .fluid_button.fluid_button_autoplay.fluid_autoplay_off:before {
+    background: url('../static/autoplay-toggle-off.svg') no-repeat 0 0;
+    background-size: 20px;
+}
+
+/* --- Countdown overlay --- */
+.fluid_video_wrapper .fluid_autoplay_overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+    background: var(--fluid-scrim-color, rgba(0, 0, 0, 0.5));
+    color: var(--fluid-text-color, #ffffff);
+    font-family: var(--fluid-font-family, sans-serif);
+    opacity: 0;
+    transition: opacity var(--fluid-sheet-duration, 220ms) var(--fluid-sheet-easing, ease);
+}
+
+.fluid_video_wrapper .fluid_autoplay_overlay.fluid_autoplay_overlay_open {
+    opacity: 1;
+}
+
+.fluid_video_wrapper .fluid_autoplay_panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 320px;
+}
+
+.fluid_video_wrapper .fluid_autoplay_uptitle {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--fluid-primary-color, #3b82f6);
+}
+
+.fluid_video_wrapper .fluid_autoplay_thumb {
+    position: relative;
+    width: 100%;
+    max-width: 240px;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--fluid-menu-radius, 12px);
+    overflow: hidden;
+    background: var(--fluid-menu-inset-bg, #181818);
+}
+
+.fluid_video_wrapper .fluid_autoplay_thumb_img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.fluid_video_wrapper .fluid_autoplay_title {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.3;
+    max-width: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.fluid_video_wrapper .fluid_autoplay_timer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 3px solid var(--fluid-primary-color, #3b82f6);
+}
+
+.fluid_video_wrapper .fluid_autoplay_seconds {
+    font-size: 18px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.fluid_video_wrapper .fluid_autoplay_actions {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    width: 100%;
+    justify-content: center;
+    margin-top: 4px;
+}
+
+.fluid_video_wrapper .fluid_autoplay_actions button {
+    min-height: var(--fluid-touch-target, 44px);
+    padding: 0 20px;
+    border-radius: calc(var(--fluid-touch-target, 44px) / 2);
+    border: 2px solid transparent;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--fluid-sheet-duration, 220ms) var(--fluid-sheet-easing, ease);
+}
+
+.fluid_video_wrapper .fluid_autoplay_cancel {
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.4);
+    color: var(--fluid-text-color, #ffffff);
+}
+
+.fluid_video_wrapper .fluid_autoplay_cancel:hover,
+.fluid_video_wrapper .fluid_autoplay_cancel:focus-visible {
+    background: var(--fluid-menu-highlight-bg, rgba(255, 255, 255, 0.08));
+}
+
+.fluid_video_wrapper .fluid_autoplay_playnow {
+    background: var(--fluid-primary-color, #3b82f6);
+    color: #ffffff;
+    border-color: var(--fluid-primary-color, #3b82f6);
+}
+
+.fluid_video_wrapper .fluid_autoplay_playnow:hover,
+.fluid_video_wrapper .fluid_autoplay_playnow:focus-visible {
+    filter: brightness(1.1);
+}
+
+.fluid_video_wrapper .fluid_autoplay_actions button:focus-visible {
+    outline: 2px solid var(--fluid-text-color, #ffffff);
+    outline-offset: 2px;
+}
+
+/* Visually hidden live region for screen-reader announcements. */
+.fluid_video_wrapper .fluid_autoplay_live {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+/* --- Mobile portrait: stacked buttons, Play now on top for thumb reach ---
+   DOM order is Cancel then Play now; column-reverse puts Play now on top. */
+@media (orientation: portrait) {
+    .fluid_video_wrapper.fluid_mobile_layout .fluid_autoplay_actions {
+        flex-direction: column-reverse;
+    }
+
+    .fluid_video_wrapper.fluid_mobile_layout .fluid_autoplay_actions button {
+        width: 100%;
+    }
+}
+
+/* --- Reduced motion: keep the timer functional, drop the animation (Scenario 9) --- */
+@media (prefers-reduced-motion: reduce) {
+    .fluid_video_wrapper .fluid_autoplay_overlay,
+    .fluid_video_wrapper .fluid_autoplay_actions button {
+        transition: none;
+    }
+}

@@ -14,6 +14,7 @@ import UtilsModule from './modules/utils';
 import SuggestedVideosModule from './modules/suggestedVideos';
 import MiniPlayerModule from './modules/miniplayer';
 import SettingsMenuModule from './modules/settingsMenu';
+import AutoplayModule from './modules/autoplay';
 
 const FP_MODULES = [
     VPAIDModule,
@@ -26,7 +27,8 @@ const FP_MODULES = [
     UtilsModule,
     SuggestedVideosModule,
     MiniPlayerModule,
-    SettingsMenuModule
+    SettingsMenuModule,
+    AutoplayModule
 ];
 
 // Determine build mode
@@ -236,7 +238,8 @@ const fluidPlayerClass = function () {
                     volume: true,
                     quality: true,
                     speed: true,
-                    theatre: true
+                    theatre: true,
+                    autoPlay: true
                 },
                 controlForwardBackward: {
                     show: false,
@@ -254,6 +257,11 @@ const fluidPlayerClass = function () {
                     placeholderText: 'Playing in Miniplayer',
                     position: 'bottom right',
                     autoToggle: false,
+                },
+                autoPlayNextVideo: {
+                    enabled: false,      // master switch — publisher opt-in (requires suggestedVideos.configUrl)
+                    defaultState: true,  // initial toggle state for a new viewer
+                    countdown: 5         // seconds; minimum 3, no maximum, default 5
                 },
                 roundedCorners: 0
             },
@@ -299,6 +307,8 @@ const fluidPlayerClass = function () {
                 fullscreen: 'Fullscreen',
                 subtitles: 'Subtitles',
                 exitFullscreen: 'Exit Fullscreen',
+                autoPlayOn: 'Autoplay is on',
+                autoPlayOff: 'Autoplay is off',
             },
             debug: FP_RUNTIME_DEBUG,
             modules: {
@@ -655,7 +665,13 @@ const fluidPlayerClass = function () {
         // Event listener doesn't wait on flags to be flipped from post roll ads, needs small time out to compensate
         setTimeout(() => {
             if (!self.isCurrentlyPlayingAd && self.displayOptions.suggestedVideos.configUrl) {
-                self.displaySuggestedVideos();
+                // Autoplay next video (FP-323): when the toggle is on and a next video exists, run the countdown
+                // overlay instead of showing the grid; otherwise keep the existing FP-271 end-of-video behaviour.
+                if (self.shouldAutoPlayNextVideo && self.shouldAutoPlayNextVideo()) {
+                    self.startAutoPlayCountdown();
+                } else {
+                    self.displaySuggestedVideos();
+                }
             }
         }, 100);
     };
@@ -832,6 +848,14 @@ const fluidPlayerClass = function () {
         controls.theatre.className = 'fluid_button fluid_control_theatre fluid_button_theatre';
         controls.theatre.title = 'Theatre Mode';
         controls.rightContainer.appendChild(controls.theatre);
+
+        // Right container -> Autoplay next video (FP-323). Hidden by default; the autoplay module shows and wires
+        // it in initAutoPlay() only when the feature is enabled and a suggestedVideos.configUrl is present.
+        controls.autoplay = document.createElement('div');
+        controls.autoplay.className = 'fluid_button fluid_control_autoplay fluid_button_autoplay';
+        controls.autoplay.title = 'Autoplay';
+        controls.autoplay.style.display = 'none';
+        controls.rightContainer.appendChild(controls.autoplay);
 
         // Right container -> Cardboard
         controls.cardboard = document.createElement('div');
@@ -1908,6 +1932,9 @@ const fluidPlayerClass = function () {
         if (self.displayOptions.layoutControls.miniPlayer.enabled && !self.isInIframe) {
             self.trackEvent(self.domRef.player.parentNode, 'click', '.fluid_control_mini_player', () => self.toggleMiniPlayer(undefined, true));
         }
+
+        // Autoplay next video (FP-323) — shows/hides and wires the toggle based on config + configUrl
+        self.initAutoPlay();
 
         self.domRef.player.addEventListener('ratechange', () => {
             if (self.isCurrentlyPlayingAd) {
@@ -3210,6 +3237,11 @@ const fluidPlayerClass = function () {
             && self.displayOptions.layoutControls.persistentSettings.theatre) {
             self.theatreToggle();
         }
+
+        // Autoplay next video (FP-323) — returning viewer's persisted preference overrides defaultState.
+        if (typeof self.applyPersistedAutoPlay === 'function') {
+            self.applyPersistedAutoPlay();
+        }
     };
 
     // "API" Functions
@@ -3341,7 +3373,12 @@ const fluidPlayerClass = function () {
             timeupdate: () => self.domRef.player.addEventListener('timeupdate', (event) => {
                 functionCall(event, { currentTime: self.domRef.player.currentTime });
             }),
-            miniPlayerToggle: () => self.domRef.player.addEventListener('miniPlayerToggle', functionCall)
+            miniPlayerToggle: () => self.domRef.player.addEventListener('miniPlayerToggle', functionCall),
+            autoPlayToggled: () => self.domRef.player.addEventListener('autoPlayToggled', functionCall),
+            autoPlayCountdownStarted: () => self.domRef.player.addEventListener('autoPlayCountdownStarted', functionCall),
+            autoPlayCancelled: () => self.domRef.player.addEventListener('autoPlayCancelled', functionCall),
+            autoPlayPlayNow: () => self.domRef.player.addEventListener('autoPlayPlayNow', functionCall),
+            autoPlayCompleted: () => self.domRef.player.addEventListener('autoPlayCompleted', functionCall)
         };
 
         if (!eventHandlers[eventCall]) {

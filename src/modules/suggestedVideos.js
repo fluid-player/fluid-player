@@ -1,5 +1,8 @@
 export default function (playerInstance, options) {
     playerInstance.suggestedVideosGrid = null;
+    // The parsed suggested-videos list from the latest config fetch. Retained (not just the rendered grid) so the
+    // autoplay countdown can read the next video's metadata — thumbnail, title, sources (FP-323, Scenario 2.8).
+    playerInstance.suggestedVideosList = null;
 
     playerInstance.generateSuggestedVideoList = () => {
         const configUrl = playerInstance.displayOptions.suggestedVideos.configUrl;
@@ -13,8 +16,11 @@ export default function (playerInstance, options) {
             const suggestedVideosGrid = playerInstance.generateSuggestedVideoGrid(config);
 
             playerInstance.suggestedVideosGrid = suggestedVideosGrid;
+            playerInstance.suggestedVideosList = Array.isArray(config) ? config : null;
 
         }).catch(err => {
+            // A failed/invalid fetch leaves no next video, so autoplay treats it as end of queue (FP-323, Scenario 11.5).
+            playerInstance.suggestedVideosList = null;
             console.error('[FP_ERROR] given suggested videos config url is invalid or not found.', err);
         })
     };
